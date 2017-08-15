@@ -21,7 +21,7 @@ namespace LFE.Application.Services.ExternalProviders
 {
     public class AmazonEmailWrapper : ServiceBase, IAmazonEmailWrapper
     {
-        private static readonly string FROM      = Utils.GetKeyValue("AWSEmailFrom");//"hi@beame.io"; //
+        private static readonly string FROM      = Utils.GetKeyValue("AWSEmailFrom");
         private static readonly string AccessKey = Utils.GetKeyValue("AWSAccessKey");
         private static readonly string AppSecret = Utils.GetKeyValue("AWSSecretKey");
         
