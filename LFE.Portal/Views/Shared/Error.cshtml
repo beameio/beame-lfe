@@ -1,0 +1,25 @@
+﻿@using LFE.Core.Utils
+@model HandleErrorInfo
+
+@{
+    ViewBag.Title = "Technical Error";
+}
+
+
+<h1 style="font-size:22px;font-weight:bold;margin-top:20px;">Technical problems</h1>
+<div style="padding-left:3px;margin-top:20px;">
+    
+    <p>
+        We are having some minor technical problems, which prevented us from completing the task you were doing.
+        <br />
+        Our technical team was notified of the problem, please try again what you were doing in a few minutes.
+        <br /><br />
+        We are sorry for the inconvenience.  
+        
+      @*  @Utils.FormatError(Model.Exception)*@
+    </p>
+
+    <div class="thank-wrapper">
+        <div class="thank-image"></div>
+    </div>
+</div>

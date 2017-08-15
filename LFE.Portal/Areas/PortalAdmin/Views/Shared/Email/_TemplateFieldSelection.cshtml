@@ -1,0 +1,40 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@{
+    var fields = Utils.EnumWithDescToList<EmailEnums.eTemplateFields>();
+}
+<script>
+    $(document).ready(function () {
+        var clip = new ZeroClipboard($(".copy-btn"), {
+            moviePath: '@Utils.BuildHttpAddress()' + "Areas/PortalAdmin/Scripts/zero/ZeroClipboard.swf"
+        });
+
+        clip.on('complete', function (client, args) {
+            if (window.console) console.log("Copied text to clipboard: " + args.text);
+        });
+    });
+    function onFiledSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+
+        $('#filed-template').val("{{" + dataItem.Name + "}}");
+    }
+</script>
+<div style="height: 35px;display: none;margin: 0 0 10px 0" id="d-filed-combo-container">
+    <div class="inline">
+        @(Html.Kendo().DropDownList()
+              .BindTo(fields)   
+              .Name("comboFieldSelection")
+              .DataValueField("Name")
+              .DataTextField("Title")
+              .OptionLabel("... select field")
+              .Events(e=>e.Select("onFiledSelected"))
+              )
+    </div>
+    <div class="inline" style="margin: 5px 0 0 15px">
+        <input type="text" style="height:20px;color: #000" readonly="readonly" id="filed-template"/>
+    </div>
+    <div class="inline" style="margin: 5px 0 0 15px">
+        <span class="copy-btn k-button" data-clipboard-target="filed-template">Copy to clipboard</span>
+    </div>
+</div>

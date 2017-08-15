@@ -1,0 +1,221 @@
+﻿@using LFE.Portal.Helpers
+
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditCoursePageToken
+
+@{
+	ViewBag.Title = Model.user.fullName + " | " + Model.course.name + " Manage";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	
+	<link href="~/Content/kendo/@Url.ToKendoVersionUrl()/kendo.bootstrap.min.css" rel="stylesheet" />
+	<link href="~/Content/styles/sweet-alert.css" rel="stylesheet" />
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/course.css" )" rel="stylesheet" type="text/css"  />
+	<link href="@Url.Content("~/Areas/AuthorAdmin/Content/styles/chapters.css")" rel="stylesheet" type="text/css"/>
+	@Styles.Render("~/admin/course/less")
+	
+	<style>
+		.field-validation-error, .validation-summary-errors {margin: 0 0 0 4px;}
+		#d-contents-container { height: 620px;}
+		#d-chapters-container {max-height: 580px;}   
+	</style>      
+}
+
+@section scripts
+{
+	<script src="~/Scripts/plugins/sweet-alert.min.js"></script>
+	<script src="@Url.Content("~/Areas/AuthorAdmin/Scripts/lfe/chapters.js")"></script>
+	
+	<script type="text/javascript">
+		var videoSelectionUrl = '@Url.Action("VideoSelection","Course")';
+
+        var quizEditWndUrl = '@Url.Action("_QuizManageForm", "Quiz", new { area = "AuthorAdmin" })';        
+        var WND_QUIZ_MANAGE_SELECTOR = '#wndQuizManage';
+
+    	var apiUrl = '@Url.ToApiUrl("Course","updatelog")';
+		var isFormInEditMode = false;
+		
+		var WND_CERT_MANAGE_SELECTOR = '#wndCertManage';
+
+		$(document).ready(function () {
+
+			setTabsState('@Model.mode');
+
+			$('#ul-course-tabs').find('a').unbind('click').bind('click', function () {
+
+
+				if (isFormInEditMode) {
+					if (!window.confirm(CHANGE_TAB_CONFIRM)) {
+						return;
+					}
+				}
+
+				var ind = $(this).attr('data-index');
+				var id = $('#CurrentCourseId').val();
+				if (id < 0 && ind > 0) {
+					alert('Save course first');
+					setTimeout(function () {
+						window.location.hash = 'details';
+					}, 50);
+					return;
+				}
+				var link = $(this);
+				$('#ul-course-tabs').find('a').removeClass('active');
+				link.addClass('active');
+				isFormInEditMode = false;
+				link.parent().submit();
+				
+			});
+
+			var h = window.location.hash;
+
+			if (!hasValue(h)) {
+				h = '#details';
+			}            
+			$('#ul-course-tabs > li > form > a[href=' + h + ']').click();         
+			
+			//save on course created event
+			window.getNotifManagerInstance().unsubscribe(notifEvents.course.courseCreated, handleCourseSaveEvent, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.course.courseCreated, handleCourseSaveEvent, null);
+			
+			window.getNotifManagerInstance().unsubscribe(notifEvents.course.courseStateChanged, sendApiUpdate, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.course.courseStateChanged, sendApiUpdate, null);
+		});
+
+		function sendApiUpdate() {
+			$.ajax({
+				url: apiUrl + $('#CurrentCourseId').val()
+				,dataType: "json"
+				,type: "Post"
+				,cache: false			   
+			});
+		}
+
+		function reloadQuizWindow(token) {
+			var wnd = $(window.WND_QUIZ_MANAGE_SELECTOR).data("kendoWindow");
+			var url = window.quizEditWndUrl + '?id=' + token.id + '&cid=@Model.course.id';
+
+			var t = "Edit " + token.title;
+
+			wnd.title(t);
+
+			wnd.refresh(url);
+		}
+	</script>
+}
+
+<ul class="ul-crumb">
+	<li>
+		@Html.ActionLink("My courses & bundles","Courses","Author")
+	</li>
+	<li id="li-page-name">
+		@Model.title
+	</li>
+</ul>
+
+<div class="c-tabs upper-gray-box">
+	@Html.Hidden("CurrentCourseId",Model.course.id)
+	<ul id="ul-course-tabs">
+		<li>
+			@using (Ajax.BeginForm("CourseDetails", "Course", new {area="AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmDetails" }))
+			{
+				@Html.Hidden("Uid",Model.course.Uid)
+				<a href="#details" data-index="0">Course details</a>   
+			}
+		</li>
+		<li>
+			@using (Ajax.BeginForm("CourseContent", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmContent" }))
+			{
+				<a href="#content" data-index="1">Contents</a>
+			}
+		</li>
+		<li>
+			@using (Ajax.BeginForm("CoursePricing", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmPrice" }))
+			{
+				<a href="#price" data-index="2">Pricing & Coupons</a>
+			}
+		</li>
+	    <li>
+	        @using (Ajax.BeginForm("CourseQuizzes", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmQuizzes" }))
+	        {
+	            <a href="#quizzes" data-index="3">Quizzes</a>
+	        }
+	    </li>
+        <li>
+            @using (Ajax.BeginForm("_CertificateManageForm", "Certificate", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmQuizzes" }))
+            {
+                <a href="#cert" data-index="4">Certificate</a>
+            }
+        </li>	
+		<li>
+			@using (Ajax.BeginForm("CourseReviews", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmReviews" }))
+			{
+				<a href="#reviews"  data-index="5">reviews</a>
+			}            
+		</li>		
+		<li>
+			@using (Ajax.BeginForm("CourseSales", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmSales" }))
+			{
+				<a href="#sales"  data-index="6">Sales</a>
+			}
+		</li> 
+		<li>
+			@using (Ajax.BeginForm("CourseStores", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmStores" }))
+			{
+				<a href="#stores" data-index="7">Stores</a>
+			}
+		</li>
+		<li style="display: none">
+			@using (Ajax.BeginForm("CourseMarketing", "Course", new { area = "AuthorAdmin", Model.course.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmMarket" }))
+			{
+				<a href="#market" data-index="8">Marketing</a>
+			}
+		</li>           
+	</ul>
+</div>
+
+
+<div class="c-tabs-content" id="c-tabs-content" style="min-height: 500px">
+ 
+</div>
+
+@(Html.Kendo().Window()
+		.Name("wndVideo")
+		.Title("Select Video")
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(580)
+		.Width(880)
+		.Modal(true)  
+		.Animation(false)     
+		.Events(e=>e.Close("cleanWndContent"))
+		.Content("loading video library.....")	  
+)
+@(Html.Kendo().Window()
+	.Name("wndQuizManage")
+	.Title(" ")
+	.Draggable(false)
+	.HtmlAttributes(new { @style = "overflow:hidden;" })
+	.Actions(actions => actions.Close())
+	.Resizable(builder => builder.Enabled(false))
+	.Visible(false)
+	.Height(700)
+	.Width(1160)
+	.Iframe(true)
+	.Modal(true)
+	.Animation(false)    
+	.Content("loading .....")
+)
+<script type="text/x-kendo-template" id="kendo-video-thumb-template">
+	<div class="preview" id="thumb-${identifier}" style="background: url('${fixSR(stillUrl)}') no-repeat;">&nbsp;</div> 
+			
+	<div class="hint" style="display:none;" id="hint-${identifier}">
+		<span class="play" id="play-${identifier}">Play</span>
+	</div>
+    <div style="display:none;" class="list-player jwp" id="player-#=newGuid()#"></div>
+</script>

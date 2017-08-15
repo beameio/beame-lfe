@@ -1,0 +1,75 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.RefundOrderLinePaymentDTO
+<style type="text/css">
+    .fs-ref label {display: inline-block}
+</style>
+           
+<script>
+    $(document).ready(function() {
+        $('#btn-submit-refund').unbind('click').bind('click', function(e) {
+           // e.preventDefault();
+         //   showFormLoader('#wndRefund');
+            console.log($('#frmRefund_' + '@Model.LineId'));
+            $('#frmRefund_'+'@Model.LineId').submit();
+        });
+    });
+
+    function onRefundSuccess(response) {
+        hideFormLoader();
+        if (response.success) {
+            alert('refund saved');
+            window.getNotifManagerInstance().notify(notifEvents.object.rebindReport);
+        } else {
+            alert(response.error);
+        }
+    }
+
+</script>
+
+@{
+    if (Model.IsValid)
+    {
+        using (Ajax.BeginForm("DoRefund", "Billing", new { area = "PortalAdmin" }, new AjaxOptions {OnSuccess = "onRefundSuccess" }, new { @id = "frmRefund_" + Model.LineId, @style = "" }))
+        {
+            @Html.HiddenFor(x => x.LineId)
+            @Html.HiddenFor(x => x.PaymentId)
+            @Html.HiddenFor(x => x.TransactionId)
+            @Html.HiddenFor(x => x.ExternalTransactionId)
+            <fieldset class="fs-ref">
+                <legend></legend>
+                <ul class="ul-edit-form cd">
+                    <li>
+                        @Html.LabelFor(m => m.Amount)
+                        <div class="inline">
+                            @(Html.Kendo().NumericTextBoxFor(m => m.Amount)
+                                  .Decimals(2)
+                                  .Step((decimal) 0.1)
+                                  .Min((decimal?) 0.1)
+                                  .Spinners(true)
+                                  .Max(Model.Amount)
+                                  .HtmlAttributes(new { }))                 
+                        </div>                
+                    </li>
+
+                    <li>
+                        @Html.LabelFor(m => m.DeniedAccess)
+                        <div class="inline">
+                            @Html.CheckBoxFor(m => m.DeniedAccess)
+                        </div>                
+                    </li>
+                </ul>
+
+                <div class="inline" style="padding-top: 5px">
+                    <a href="#" id="btn-submit-refund" class="btn-submit">Refund Transaction</a>
+                </div>
+            </fieldset>
+
+        }        
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}
+
+

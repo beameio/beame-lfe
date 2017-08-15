@@ -1,0 +1,28 @@
+﻿@model LFE.DataTokens.TrainingUserNotificationSettingsDTO
+           
+
+<ul>
+    <li>
+        <span>
+            @Html.CheckBoxFor(m=>m.AddEmailNotify)
+        </span>
+        <span>
+            <label class="info">E-Mail notification</label>
+        </span>
+        <span>
+            @Html.TextBoxFor(m=>m.NotificationEmail, new{ type="email" })
+        </span>
+    </li>
+
+    <li>
+        <span>
+            @Html.CheckBoxFor(m => m.AddSmsNotify)
+        </span>
+        <span>
+            <label class="info">SMS/Text notification</label>
+        </span>
+        <span>
+            @Html.TextBoxFor(m => m.NotificationPhone, new { type = "tel" })
+        </span>
+    </li>
+</ul>

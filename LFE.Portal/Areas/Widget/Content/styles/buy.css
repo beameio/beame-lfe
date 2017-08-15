@@ -1,0 +1,157 @@
+﻿hgroup
+{
+      
+    line-height:2px;
+    text-align: left;
+}
+
+h1{font-size: 25px;color: #000; text-transform: uppercase;}
+
+h2{font-size: 15px;color: #000; font-weight:normal  }
+
+h3{font-size: 13px; font-weight:normal}
+
+.hidden { display:none; } 
+.displayed { display:block; } 
+
+
+.express-checkout
+{    
+    overflow:hidden;
+    display:inline-block    
+}
+
+a {cursor:pointer}
+
+input {height: 28px;width: 210px;}
+
+select {height:28px; width:71px; color:grey; float:right}
+
+
+#couponEntry input[type=text]
+{
+    width:350px;
+}
+
+
+#couponEntry input[type=button]
+{
+  background-color:#0066cb;color: #FFF;width: 125px;border: none;height: 25px;text-align: center;font-weight: bold;cursor: pointer;
+}
+
+
+#details input[type=submit]
+{  
+    background-color: #329900;color: #FFF;width: 125px;border: none;height: 25px;text-align: center;font-weight: bold;cursor: pointer;
+}
+
+.field-validation-error {
+    color: #e80c4d;
+    font-weight: bold;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #e80c4d;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+label.error
+{
+    background-color:#c83513;
+    color:#fff;
+}
+
+.buyWaiting
+{
+    display:none;
+    font-weight:bold;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+.buyWaiting img
+{
+    margin-left:10px;
+}
+
+body {
+    background: #e3e3e3;  
+    margin-right:20px;
+    margin-left:20px;
+
+}
+
+
+        .sub_tool_bar4 {width: 100%;background: #e3e3e3; max-width: 1024px; padding-bottom:50px ; margin: 0 auto; padding-top:30px;    }
+
+
+        #viewCourse {text-decoration:underline; font-size:22px; font-weight:bold}
+
+        .validation-summary-errors ul :nth-child(n+1) {  display:none;}
+        .validation-summary-errors ul :first-child {  display:block;}
+        .validation-summary-errors {font-size: 12px; color: #b60f00; font-weight: bold; }
+        .error-div {text-align:center}
+      
+        .paypal-block {text-align:center; padding-top:35px; padding-bottom:30px; border-bottom:  1px solid #A6ABAE    }
+       
+        .coupon-block {border-bottom:  1px solid #A6ABAE ;padding-top:25px; padding-bottom:25px;   }
+        .coupon-block .content{width:100%; text-align:justify}
+        .coupon-block .content .text-wrap {display:inline-block}
+        .coupon-block .message {font-weight:bold; color:#B60F00;text-align:center; width:100%}
+        .coupon-block .content:before {content: '';display: block;width: 100%;}
+        .coupon-block .content:after {  content: '';display: inline-block;width: 100%;}
+
+        .title-block {width:100%; text-align:justify;border-bottom:1px solid #a6abae;   padding-bottom:26px;   }
+        .title-block:before {content: '';display: block;width: 100%;}
+        .title-block:after {  content: '';display: inline-block;width: 100%;}
+        .title-block div {display:inline-block}
+        .title-block hgroup {   display:inline-block       }  
+
+        .form-wrapper {width:100%; text-align:justify; font-size:12px}
+        .form-wrapper div {display:inline-block}
+        .form-wrapper:before {content: '';display: block;width: 100%;}
+        .form-wrapper:after {  content: '';display: inline-block;width: 100%;}
+         input:focus {outline: none;border-color: #B60F00; box-shadow: 0 0 10px  #B60F00; }
+        .form-wrapper tr {width:210px }
+        .form-wrapper .third-col .select {width:140px; float:right }
+        .form-wrapper .third-col .small-input {width:140px}
+
+
+   @media screen and (max-width: 860px) {
+        #couponEntry input[type=text] { width:235px; }
+        input {width: 185px;}
+        select {width:60px; }
+        .form-wrapper .third-col .select {width:124px}
+}
+
+  @media screen and (max-width: 780px) {
+        #couponEntry input[type=text] { width:300px;  }
+        input {width: 300px;}
+        select {width:71px; float:right }
+        #details input[type=submit] {width:200px; margin-top:15px }
+        .form-wrapper .third-col .select {width:140px; float:right}
+        .billing-info {padding-top:10px}
+        .coupon-block {border-bottom:  1px solid #A6ABAE ;padding-top:25px; padding-bottom:25px;   }
+        .coupon-block .content{width:100%; text-align:center}
+        .coupon-block .content .text-wrap {display:block; padding-bottom:10px;}
+        .coupon-block .content .input {display:block; padding-top:10px;}
+
+        .form-wrapper {width:100%; text-align:center; }
+        .form-wrapper div {display:block; text-align:center; width:100%;}
+        
+        .credit-card-form {text-align:center}
+
+        table {margin-left:auto;margin-right:auto;text-align:left}
+        .validation-summary {padding-top:10px}
+}

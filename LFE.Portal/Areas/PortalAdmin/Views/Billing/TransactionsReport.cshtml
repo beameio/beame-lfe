@@ -1,0 +1,72 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model TransactionFiltersLOV
+@{
+    ViewBag.Title = "Transaction report";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="font-size: 24px">Transactions Report</h2>
+
+@Html.Partial("Billing/_TrxReportFilters",Model)
+
+
+<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindTrxReport, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindTrxReport, null);
+    });
+
+    function rebindTrxReport() {
+        var wnd = $("#wndRefund").data("kendoWindow");
+        if (wnd != undefined) wnd.close();
+        $('#TrxReport').data("kendoGrid").dataSource.read();
+    }
+  
+    function onTrxReportBound(e) {
+        window.boundGridUserDetails(e);
+        var grid = e.sender;
+        var data = grid.dataSource.data();
+        $.each(data, function (i, row) {
+            if (!(row.IsRefundAllowed))
+                $('tr[data-uid="' + row.uid + '"] ').find(".k-grid-Refund").hide();
+        });
+    }
+    var amp = '#';
+</script>
+<style>
+    a.prof, a.pay {color: blue;text-decoration: underline;}
+</style>
+@(Html.Kendo().Grid<TransactionSummaryToken>()
+      .Name("TrxReport")
+      .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.TrxId).Width(60);
+          columns.Bound(p => p.ItemName).Width(100).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(ItemName)#' style='width:100px'>${ItemName}</div>");
+          columns.Bound(p => p.Seller.FullName).Width(100).ClientTemplate("<span data-val='${Seller.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Seller.FullName)#' style='width:100px'>#=Seller.FullName#</a>");//.ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Seller.FullName)#' style='width:100px'>${Seller.FullName}</div>");
+          columns.Bound(p => p.Buyer.FullName).Width(100).ClientTemplate("<span data-val='${Buyer.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#' style='width:100px'>#=Buyer.FullName#</a>"); //ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#' style='width:100px'>${Buyer.FullName}</div>");
+          columns.Bound(p => p.Fee).Width(80).Format("{0:c}");
+          columns.Bound(p => p.Amount).Width(80).Format("{0:c}");          
+          columns.Bound(p => p.OrderNumber).Width(60).Title("Order Num");
+          columns.Bound(p => p.PaymentNumber).Width(60).Title("Pay. N");
+          columns.Bound(p => p.TrxType).Width(100).Title("Type");
+          columns.Bound(p => p.TrxDate).Width(80).Format("{0:MM/dd/yy}").Title("Date");          
+      })
+      .Events(e => e.DataBound("onTrxReportBound"))
+      .Sortable()
+      .AutoBind(false)
+      .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.TrxId))
+                            .Read(read => read.Action("SearchTransactions", "Billing").Data("getTrxFilters").Type(HttpVerbs.Get)).ServerOperation(true)
+                            .PageSize(20))
+      )
+
+@(Html.Kendo().Tooltip()
+        .For("#TrxReport")
+    .Filter(".col-tooltip")
+    .Position(TooltipPosition.Top)
+    .Width(300)
+)

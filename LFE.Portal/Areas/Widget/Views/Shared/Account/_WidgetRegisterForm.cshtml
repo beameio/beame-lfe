@@ -1,0 +1,76 @@
+﻿@model LFE.DataTokens.RegisterDTO
+    
+<script type="text/javascript">
+    $(document).ready(function () {
+        SetParentUrl();
+    });
+
+    function SetParentUrl() {
+        var parentUrl = '@Model.ParentWindowURL';
+        if (typeof Wix !== 'undefined') {
+            Wix.getSiteInfo(function (siteInfo) {
+                parentUrl = siteInfo.url;
+                if (isEmpty(parentUrl)) {
+                    parentUrl = siteInfo.baseUrl;
+                }
+            });
+        }
+        else {
+            var scriptParentUrl = getParameterByName('parentUrl');
+            if (!isEmpty(scriptParentUrl)) {
+                parentUrl = scriptParentUrl;
+            }
+        }
+        $('#hidParentUrl').attr('value', parentUrl);
+    }
+
+    function isEmpty(str) {
+        return (!str || 0 === str.length);
+    }
+
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+</script>
+
+    @Html.HiddenFor(m => m.ParentWindowURL)
+    @Html.HiddenFor(m => m.IsWidget)
+    @Html.HiddenFor(m=>m.RequiredConfirmation)
+
+    <div class="block-wrapper" id="registerBlockWrapper">
+        <div class="facebook-wrapper">
+            <a id="facebookLoginBig">
+                <img src="http://@(Request.Url.Authority)/Content/images/webstore/Connect-with-FB-btn.png" alt="Connect with Facebook" />
+            </a>
+        </div>
+        <div class="blue-spacer"></div>
+        <div class="inputs-wrapper">
+            <div class="input-col">
+                <span>Or, sign up using this form:</span>
+                <div class="editor-field">@Html.TextBoxFor(m => m.Email, new { placeholder = "E-Mail", tabindex = "1" })</div>
+                <div class="editor-label">@Html.TextBoxFor(m => m.FirstName, new { placeholder = "First Name", tabindex = "3" })</div>
+                <div class="editor-field">@Html.PasswordFor(model => model.Password, new { value = Model.Password, placeholder = "Password", tabindex = "5" })</div>
+            </div>
+            <div class="input-col">
+                <div class="editor-field">@Html.TextBoxFor(m => m.Nickname, new { placeholder = "Nickname", tabindex = "2" })</div>
+                <div class="editor-field">@Html.TextBoxFor(m => m.LastName, new { placeholder = "Last Name", tabindex = "4" })</div>
+                <div class="editor-field">@Html.PasswordFor(model => model.ReenterPassword, new { value = Model.ReenterPassword, placeholder = "Re-enter Password", tabindex = "6" })</div>
+                @Html.HiddenFor(m => m.ParentWindowURL, new { value = Model.ParentWindowURL, id="hidParentUrl" } )
+            </div>
+        </div>
+        <div class="submit-wrapper">
+            <input type="submit" value="Register" id="register-submit" />
+            <img class="register-loader" src="~/Content/images/webstore/login-ajax-loader.gif" alt="" />
+
+        </div>
+        <div class="input-col">
+            <a class="close_register">Close</a>
+        </div>
+    </div>
+    <div class="block-error">
+        @Html.ValidationSummary()
+    </div>
+       

@@ -1,0 +1,61 @@
+﻿@using LFE.DataTokens
+@model UserViewDto
+
+<script>
+    var listId = 'AuthorVideos';
+    $(document).ready(function() {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoSaved, rebindVideoGrid, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.videoSaved, rebindVideoGrid, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+    });
+
+    function filterVideosGrid(filter) {
+
+        var filterExists = filter.filters.length > 0;
+
+        if (filterExists) {
+            checkFilter(filter, listId, "kendoGrid");
+            filterReport(filter, listId, "kendoGrid");
+        } else {
+            filterReport(null, listId, "kendoGrid");
+        }
+    }
+
+    function rebindVideoGrid() {
+        $('#AuthorVideos').data("kendoGrid").dataSource.read();
+    }
+
+
+
+    function onVideoDeleting(e) {
+        if (e.model.uses > 0) {
+            alert(userMessages.UPLOAD.VIDEO_PREVENT_DELETE);
+            e.sender.cancelChanges();
+            e.preventDefault();
+        }
+    }
+</script>
+@(Html.Kendo().Grid<UserVideoDto>()
+      .Name("AuthorVideos")
+      .TableHtmlAttributes(new { @style = "background-color: #fff !important;background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.title).Title("Title");
+          columns.Bound(p => p.addon).Title("Date Added").Format("{0:d}").Width(120);
+          columns.Bound(p => p.uses).Title("Number of Uses");
+          columns.Bound(p => p.minutes).Title("Duration").Width(120);
+          columns.Bound(m => m.identifier).ClientTemplate("<a href='javascript:editVideo(\"#=bcid#\",#=fileId#,\"#=Encoder.htmlEncode(title)#\")' style='margin:3px 0 0' class='list-cmd' >Edit</a>").Title(" ").Filterable(false).Width(50);
+          columns.Command(c => c.Destroy().HtmlAttributes(new { @class = "list-cmd" })).Title(" ").Width(50);
+      })
+      .Sortable()
+      .Pageable(pager => pager.Enabled(true))
+      .Filterable(f => f.Enabled(false))
+      .Events(e => e.DataBound("onVideosGridBound").Remove("onVideoDeleting"))
+      .DataSource(dataSource => dataSource.Ajax()
+                            .PageSize(10)
+                            .Model(model => model.Id(p => p.identifier))
+                            .Read(read => read.Action("GetAuthorVideosReport", "Author").Type(HttpVerbs.Get)).ServerOperation(false)
+                            .Destroy(d => d.Action("DestroyVideo", "Author")))
+)

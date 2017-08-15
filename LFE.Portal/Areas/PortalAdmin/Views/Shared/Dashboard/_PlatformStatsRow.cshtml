@@ -1,0 +1,24 @@
+﻿
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.PlatformStatsToken
+           
+
+<div class="row">
+    <div class="pl-title">
+        <h3 class="float-left">@Utils.GetEnumDescription(Model.Platform)</h3>
+        
+        <div class="float-right" style="margin-right: 6px;">
+            <span class="float-left">@Model.TotalPlatformNew</span> <i title="@Model.Tendency.Tooltip" class="float-left tend @Html.TendencyDirection2CssClass(Model.Tendency.Direction,"arrow-")"></i>
+        </div>
+    </div>        
+</div>
+
+<div class="row" style="margin-top: 7px;">
+    @{
+        foreach (var token in Model.Stats.OrderBy(x => x.Index).ToArray())
+        {
+            @Html.Partial("Dashboard/_PlatformStatsBox", token)
+        }
+    }
+</div>

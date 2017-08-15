@@ -1,0 +1,137 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@model LFE.Portal.Areas.WixEndPoint.Models.IndexViewToken
+
+@{
+    ViewBag.Title = "LFE Wix App Settings";
+    Layout = "~/Areas/WixEndPoint/Views/Shared/_SettingsLayout.cshtml";
+}
+
+@section HeaderScripts
+{
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+
+    <script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.core.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.data.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.aspnetmvc.min.js")"></script>
+    <script src="~/Areas/Widget/Scripts/Html5PlaceHolder.js"></script>
+    <script>
+        kendo.culture("en-US");
+    </script>
+    @Scripts.Render("~/bundles/lfe/common")
+    <script type="text/javascript">
+        var notificationManager;
+
+        $(document).ready(function () {
+            $("#loginHeader").click(function () {
+                $("#registrationWrapper").hide();
+                $("#loginAjaxWrapper").toggle();
+                setTimeout(window.wixAdjustH, 500);
+            });
+            $("#registerHeader").click(function () {
+                $('#loginAjaxWrapper').hide();
+                $("#registrationWrapper").toggle();
+                $('#forgetPasswordWrapper').hide();
+                setTimeout(window.wixAdjustH, 500);
+
+            });
+
+            setTimeout(window.wixAdjustH, 500);
+        });
+
+        function getNotifManagerInstance() {
+            if (notificationManager == undefined || notificationManager == null) {
+                notificationManager = new NotificationManager();
+            }
+            return notificationManager;
+        }
+    </script>
+}
+
+@{
+    if (Model.Instance != null)
+    {
+        if (Model.userId == null && Model.Instance.uid != null)
+        {
+            if (!string.IsNullOrEmpty(TempData["WixLoginError"] as string))
+            {
+                <div class="box" id="d-error-box">
+                    <h3 class="input-col-w">Error:</h3>
+                    <div class="feature">
+                        <div style="background-color:#cc0001; color:white; font-weight:bold; text-align:center; margin:2px">@TempData["WixLoginError"]</div>
+                    </div>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        $('#d-error-box').remove();
+                    }, 10000);
+                </script>
+            }
+
+            <div id="d-reg-form" class="box">
+                <h3 class="input-col-w" id="loginHeader">Registered LFE user? Please login:</h3>
+                <div class="feature" id="loginAjaxWrapper">
+                    @Html.Partial("_Login", new WixLoginDTO
+                        {
+                            uid            = Model.Instance.uid
+                            ,instanceId    = Model.Instance.instanceId
+                            ,instanceToken = Model.Instance.instanceToken
+                            ,compId        = Model.compId
+                            ,origCompID    = Model.origCompId
+                            ,TrackingID    = Model.Instance.instanceId.ToString()
+                        })
+                </div>
+                <div class="feature" id="forgetPasswordWrapper" style="display:none">
+                    @Html.Partial("~/Areas/WixEndPoint/Views/Shared/_ForgotPassword.cshtml")
+                </div>
+            </div>
+
+            <div id="d-reg-form2" class="box">
+                <h3 class="input-col-w" id="registerHeader">New to LFE? Register below:</h3>
+                <div class="feature" id="registrationWrapper" style="display:none">
+                    @Html.Partial("_RegisterWixUser", new WixUserRegisterDTO(Model.Instance.uid, Model.Instance.instanceId, Model.Instance.instanceToken, Model.compId, Model.origCompId))
+                </div>
+            </div>
+
+            @*<div class="d-reg-store-form box"></div>*@
+        }
+        else if (Model.userId == null && Model.Instance.uid == null)
+        {
+            <div class="box">
+                <h3 class="input-col-w">Error:</h3>
+                <div class="feature">
+                    <div style="background-color:#cc0001; color:white; font-weight:bold; text-align:center; margin:2px">Wix Member Uid missing</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="box">
+                <h3 class="input-col-w">Error:</h3>
+                <div class="feature">
+                    <div style="background-color:#cc0001; color:white; font-weight:bold; text-align:center; margin:2px">Required parameters missing</div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="box">
+            <h3 class="input-col-w">Error:</h3>
+            <div class="feature">
+                <div style="background-color:#cc0001; color:white; font-weight:bold; text-align:center; margin:2px">Instance not supplied</div>
+            </div>
+        </div>
+    }
+    <div id="d-auth-form" class="d-auth-form"></div>
+}
+
+@section FooterScripts
+{
+    <script type="text/x-kendo-template" id="form-loader-template">
+        <span class="k-loading-text">Loading...</span>
+        <div class="k-loading-image"></div>
+        <div class="k-loading-color"></div>
+    </script>
+}

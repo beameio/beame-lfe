@@ -1,0 +1,187 @@
+﻿@using LFE.Portal.Helpers
+@using LFE.Core.Utils
+@model LFE.DataTokens.CoursePurchaseDTO
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+@{
+    string tabName = !string.IsNullOrEmpty(ViewBag.TabName) ? ViewBag.TabName : "content";
+    tabName = tabName.ToLower().Trim();
+
+    string wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+    string target = !string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self";
+    
+    string currentRelativeUrl = Request.Url.PathAndQuery;
+    if (!currentRelativeUrl.Contains("?"))
+    {
+        currentRelativeUrl += "?_escaped_fragment_=";
+    } 
+    else
+    {
+        currentRelativeUrl += "&_escaped_fragment_=";
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {//
+
+        $('#ul-course-tabs').find('a').click(function () {
+            $('#ul-course-tabs').find('a').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $(".tab-ajax").click(function () {
+            var url = $(this).attr('data-url');
+            var hashtagName = $(this).attr('href');
+            $("#image_loading").show();
+
+            $.ajax({
+                url: url,
+                cache: false
+            })
+            .done(function (html) {
+                loadView(html, hashtagName);
+            });
+            return false;
+        });
+    });
+
+
+
+    function loadView(view, hashId) {
+        $("#image_loading").hide();
+        if (isFxSupported()) {
+            $("#d-tab-content").hide();
+            $('#d-tab-content').kendoAnimate({
+                effects: "slideOut:right fadeOut",
+                hide: true,
+                duration: 500,
+                complete: function () {
+                    $('#d-tab-content').html(view).kendoAnimate({
+                        effects: "slideIn:left fadeIn",
+                        show: true,
+                        duration: 500
+                    });
+                    @{
+                        if ( viewModel != null )
+                        {
+                                <text>                                
+                                if (typeof Wix !== 'undefined') {
+                                    Wix.pushState('@(viewModel.IsSingleCourseStore ? "SingleCourse/" : "")' + hashId);
+                                    document.location.hash = hashId;                               
+                                }
+                                else {
+                                    document.location.hash = hashId;
+                                }
+                                </text>
+                        }
+                    }
+                }
+            });
+        } else {
+            $('#d-tab-content').slideUp("slow", function () {
+                $('#d-tab-content').html(view).slideDown("slow");
+            });
+        }
+    }
+
+
+    function setTabBegin() {
+        $("#image_loading").show();
+    }
+
+
+
+
+
+</script>
+
+
+<div class="tabs">
+    <ul class="float-left" id="ul-course-tabs">
+        @if ( !string.IsNullOrEmpty(wixSectionUrl))
+        { 
+            <li>
+                <a target="@target" href="@(wixSectionUrl + (viewModel != null && viewModel.IsSingleCourseStore ? "/SingleCourse/" : "/currentRelativeUrl") )content" class="tab-ajax@(tabName == "content" ? " active" : "")" data-url="@Url.Action("GetCourseContentsPartial", "Course", new {   Area = "Widget", courseID = Model.CourseId })">CONTENT</a>
+            </li>
+            <li>
+                <a target="@target" href="@(wixSectionUrl + (viewModel != null &&  viewModel.IsSingleCourseStore ? "/SingleCourse/" : "/currentRelativeUrl"))author" class="tab-ajax@(tabName == "author" ? " active" : "")" data-url="@Url.Action("GetAuthorContentPartial", "Course", new { Area = "Widget", authorID = Model.User.userId, currentCourseID = Model.CourseId })">AUTHOR</a>
+            </li>
+            <li>
+                <a target="@target" href="@(wixSectionUrl + (viewModel != null && viewModel.IsSingleCourseStore ? "/SingleCourse/" : "/currentRelativeUrl"))reviews" class="tab-ajax@(tabName == "reviews" ? " active" : "")" data-url="@Url.Action("GetCourseReviewsPartial", "Course", new {   Area = "Widget", courseID = Model.CourseId })">REVIEWS</a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a class="tab-ajax@(tabName == "content" ? " active" : "")" href="#!content" data-url="@Url.Action("GetCourseContentsPartial", "Course", new {   Area = "Widget", courseID = Model.CourseId })">CONTENT</a>
+            </li>
+            <li>
+                <a class="tab-ajax@(tabName == "author" ? " active" : "")" href="#!author" data-url="@Url.Action("GetAuthorContentPartial", "Course", new { Area = "Widget", authorID = Model.User.userId, currentCourseID = Model.CourseId })">AUTHOR</a>
+            </li>
+            <li>
+                <a class="tab-ajax@(tabName == "reviews" ? " active" : "")" href="#!reviews" data-url="@Url.Action("GetCourseReviewsPartial", "Course", new {   Area = "Widget", courseID = Model.CourseId })">REVIEWS</a>
+            </li>
+        }
+    </ul>
+
+
+
+    <img id="image_loading" alt="" src="@Url.Content("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/Uniform/loading-image.gif")" class="progress" />
+</div>
+
+<div class="Small-Buy-Button">
+    @if (Model.IsFreeCourse)
+    {
+        <div class="button-wrapper">
+            <a id="buyFreeCourse2" href='@Url.Action("FreeCourseRedirect", "Payment", new { trackingID = Model.TrackingID ?? "", authorName = Model.User.fullName, courseUrlName = Model.CourseUrlName ?? "", courseId = Model.CourseId ?? -1, })' target="_blank">
+                <div class="buy-button">GET FOR FREE</div>
+            </a>
+        </div>
+    }
+    else
+    {
+        if (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed)
+        {
+            <div class="button-wrapper">
+                <a href='@Url.GenerateCoursePageUrl(Model.User.fullName,Model.CourseUrlName, null,(viewModel!=null && viewModel.WebStore!=null ? viewModel.WebStore.TrackingID : string.Empty))' target="_blank">
+                    <div class="buy-button">
+                        OPEN COURSE
+                    </div>
+                </a>
+            </div>
+        }
+        else
+        {
+             if (Model.Price != null && Model.Price > 0)
+                {
+            <div class="button-wrapper">
+                @if (Model.MonthlySubscriptionPrice != null)
+                {
+                    <div class="unlimited">UNLIMITED ACCESS</div>
+                }
+               
+                <a id="buyCourse2">
+                    <div class="buy-button">
+                        $@Model.Price.FormatPrice() BUY NOW
+                    </div>
+                </a>
+                
+            </div>
+             }
+
+            if (Model.MonthlySubscriptionPrice != null && Model.MonthlySubscriptionPrice > 0)
+            {
+
+                <div class="button-wrapper">
+                    <div class="unlimited">A MONTH</div>
+                    <a id="buyCourseSubscr2">
+                        <div class="buy-button blue">
+                            $@(Model.MonthlySubscriptionPrice.FormatPrice()) BUY NOW
+                        </div>
+                    </a>
+                </div>
+            }
+
+        }
+    }
+</div>
+

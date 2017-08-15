@@ -1,0 +1,14 @@
+﻿@helper RenderTemplates(string folderPath, string targetPath, params string[] excludedUrls)
+{
+var folder = Server.MapPath(folderPath);
+var rootFolder = Server.MapPath("~/");
+var dir = new DirectoryInfo(folder);
+var urls = dir.GetFiles("*.cshtml", SearchOption.AllDirectories).Where(x => !excludedUrls.Contains(x.FullName));
+foreach (var url in urls)
+{
+    var target = targetPath + "/" + url.Name;
+        <script type="text/ng-template" id="@target" class="ng-cloak">
+            @WebPageContext.Current.Page.RenderPage($"~/{url.FullName.Remove(0, rootFolder.Length).Replace('\\', '/')}")
+        </script>
+}
+}

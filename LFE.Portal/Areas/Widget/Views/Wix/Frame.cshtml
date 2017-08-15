@@ -1,0 +1,131 @@
+﻿@using LFE.Portal.Helpers
+@model string
+@{   
+    Layout = null;    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>LFE App</title>
+    @Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+    <script src="~/Areas/Widget/Scripts/jquery.1.9.1.min.js"></script>
+    <script>
+        function getQuerystring(key, defaultValue) {
+            if (defaultValue == null) defaultValue = "";
+            key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            var regex = new RegExp("[\\?&]" + key + "=([^&#]*)");
+            var qs = regex.exec(window.location.href);
+            if (qs == null)
+                return defaultValue;
+            else
+                return qs[1];
+        }
+
+        $(document).ready(function () {
+
+            var lfe_parentFrameHeight = $(document).height();
+            var lfe_parentFrameWidth = $(document).width();//Wix.Utils.getWidth();            
+
+
+
+            $('iframe').css('height', lfe_parentFrameHeight);
+            $('iframe').css('width', lfe_parentFrameWidth);
+
+            var viewMode = Wix.Utils.getViewMode();
+            if (viewMode == 'editor') {
+                CheckRefresh();
+            }
+
+            //var wixParentURL = "";
+            //Wix.getSiteInfo(function (siteInfo) {
+            //    wixParentURL = encodeURIComponent(siteInfo.url);
+            //    wixParentURL = encodeURIComponent('http://test.com/index2.html');
+            //});
+            
+            var lfeURL = decodeURIComponent(getQuerystring("lfe_app_url", "http://@HttpContext.Current.Request.Url.Host/Wix" + "?instance=@Model&width=" + lfe_parentFrameWidth + "&height=" + lfe_parentFrameHeight + "&viewmode=" + viewMode));// + "&wixURL="  +wixParentURL));
+            document.getElementById('lfe_widget_iframe').src = lfeURL;
+
+            //console.log(Wix.Utils.getViewMode());
+        });
+
+
+        function CheckRefresh() {
+            setTimeout(CheckRefresh, 1000);
+            var instanceId = Wix.Utils.getInstanceId();
+            getStoreLastChange(instanceId);
+        }
+
+        var lastSaveStoreDate = null;
+        var lfe_apiUrl = '@Url.ToApiUrl("WebStore","get")';
+
+        function getStoreLastChange(storeId) {
+            var url = lfe_apiUrl + storeId;
+            // console.log(url);
+            $.ajax({
+                url: url
+               , dataType: "json"
+               , cache: false
+               , success: function (response) {
+                   if (response.result != null) {
+                       if (lastSaveStoreDate == null) {
+                           lastSaveStoreDate = parseResulttoDate(response.result);
+                           document.getElementById('lfe_widget_iframe').contentWindow.location.reload();
+                       }
+                       else {
+                           var newDate = parseResulttoDate(response.result);
+                           if (newDate.getTime() > lastSaveStoreDate.getTime()) {
+                               lastSaveStoreDate = newDate;
+                               //console.log("page reload");
+                               document.getElementById('lfe_widget_iframe').contentWindow.location.reload();
+                           }
+                       }
+                   }
+               }
+            });
+        }
+
+
+        function parseResulttoDate(result) {
+            //input example 2013-10-06T12:46:12.39
+            var stringArray = result.split('T');
+            var dateArray = stringArray[0].split('-');
+            var timeArray = stringArray[1].split(':');
+            var secondsArray = timeArray[2].split('.');
+            return new Date(dateArray[0], dateArray[1], dateArray[2], timeArray[0], timeArray[1], secondsArray[0], secondsArray[1]);
+        }
+
+        var lfeIframUrl = '';
+
+        window.addEventListener('message', receiveMessage, false);
+        function receiveMessage(evt) {
+            //Example
+            //Given the browser is showing the site URL http://site.domain.com/#!page-title/page-id/app-state-1
+
+            //When you call the method pushState("app-state-2")
+
+            //The browser URL will change to http://site.domain.com/#!page-title/page-id/app-state-2 but your app iframe will not reload
+
+            //Example
+            //When a user clicks on a link with a URL such as http://site.domain.com/#!page-title/page-id/app-state
+
+            //we will reload the app iframe using the URL http://integration.staging.lfe.com/WixFrame/app-state?rest-of-the-parameters
+
+
+            
+
+            if (evt.origin === 'http://@HttpContext.Current.Request.Url.Host') {
+                lfeIframUrl = 'lfe_app_url=' + encodeURIComponent(evt.data);
+                //console.log(evt.data);
+                Wix.pushState(lfeIframUrl);
+                
+            }
+        }
+    </script>
+</head>
+<body style="margin: 0px">
+    <iframe frameborder="0" style="background-color: transparent; border: 0px none transparent; padding: 0px; overflow-x: hidden;" name="lfe_widget_iframe" id="lfe_widget_iframe" src=""></iframe>
+</body>
+</html>

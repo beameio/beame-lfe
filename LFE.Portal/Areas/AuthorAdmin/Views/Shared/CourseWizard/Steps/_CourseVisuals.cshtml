@@ -1,0 +1,141 @@
+﻿@model LFE.DataTokens.WizardCourseVisualsDTO
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmCourseVisuals';
+	var VIDEO_FIELD_NAME = '#PromoVideoIdentifier';
+	var BC_TH_PLAEYR_W = 330;
+	var BC_TH_PLAEYR_H = 190;
+	
+	$(document).ready(function () {
+	    window.isFormInEditMode = false;
+	    
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, submitStep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, submitStep, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.course.videoSelected, onWizardVideoSelected, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.course.videoSelected, onWizardVideoSelected, null);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.file.fileUploaded, setEditMode, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.file.fileUploaded, setEditMode, null);
+
+		window.uploadConsole = $('#async-upload-console');
+
+		$("#a-fake-thumb-upload").click(openFileSelector);
+		$("#d-crs-thumb").click(openFileSelector);
+		$('#d-video-thumb').click(openVideoWnd);
+	});
+
+	function openFileSelector() {
+		$('#file').data("kendoUpload").wrapper.find("input[type='file']").click();
+	}
+
+	function submitStep() {
+		$(EDIT_FORM_SELECTOR).submit();
+	}
+
+	function onCourseVisualSaved(response) {
+		hideFormLoader();
+
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Course Visuals saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+			window.isFormInEditMode = false;
+			setTimeout(function() {
+				window.getNotifManagerInstance().notify(notifEvents.wizard.stepSaved, null);
+			},500);
+			
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+</script>
+
+
+@using (Ajax.BeginForm("SaveCourseVisuals", "Course", null, new AjaxOptions { OnBegin = "javaScript:showFormLoader('#frmCourseVisuals')", OnSuccess = "onCourseVisualSaved", LoadingElementId = "site-loader" }, new { @id = "frmCourseVisuals", @class = "ajax-form"}))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.Uid)
+	
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form crs visual">
+			<li style="position: relative">
+				<div class="input-container" style="width: 350px;">
+					@Html.Label("Course Thumbnail image (200*120 px)")  
+					<div class="thumb-box" id="d-crs-thumb">					   
+						@{
+							if (String.IsNullOrEmpty(Model.ThumbUrl))
+							{
+								<span class="prompt">
+									Image Size
+									<br/>
+									200 x 120px
+								</span>
+							}
+							else
+							{
+								<img src="@Model.ThumbUrl" alt="" class="img-preview"/>
+							}
+						}
+					</div>
+				</div>
+				
+				<a class="browse browse-image" href="#" id="a-fake-thumb-upload">Select file</a>  
+				<div class="validator-container" id="valid-thumb">
+					@Html.ValidationMessageFor(model => model.ThumbName,null,new{@class="inline forthumb" + (String.IsNullOrEmpty(Model.ThumbName) ? " " :" pass"),@style="top:30px"})
+				</div>
+
+				<div id="async-upload-console" class="upl-consol"></div>
+				
+					<span style="display: none">
+						@(Html.Kendo().Upload()
+							  .Name("file")
+							  .Events(e => e.Upload("onThumbUploadAction").Success("onThumbUploadSuccess").Progress("onUploadProgress"))
+							  .Async(a => a.Save("SaveCourseFile", "Upload",new {area="AuthorAdmin"}).AutoUpload(true))
+						)
+					</span>
+
+				@Html.HiddenFor(m=>m.ThumbName)
+			</li>
+
+			<li style="position: relative;margin-top: 50px;height: 230px">
+				<div style="display: table-cell;">
+					@Html.LabelFor(m=>m.PromoVideoIdentifier)    
+					@Html.HiddenFor(m=>m.PromoVideoIdentifier)					
+				</div>
+
+				<div class="input-container" style="width:300px;height: 120px">
+					<div class="thumb-box video-th" id="d-video-thumb" >
+						@{
+							if (Model.PromoVideo != null)
+							{
+								<script>
+									var token = {
+									    stillUrl: fixSR('@Model.PromoVideo.stillUrl')
+										, title: '@Model.PromoVideo.title'
+										, minutes: '@Model.PromoVideo.minutes'
+										, identifier: '@Model.PromoVideoIdentifier'
+                                        , videoUrl: fixSR('@Model.PromoVideo.videoUrl')
+									};
+									buildThumbMediaPlayer(token, '#d-video-thumb');
+								</script>
+							}
+						}
+					</div>
+				</div>  
+				
+				<a class="browse browse-video" href="javaScript:openVideoWnd()">Browse video manager</a>
+				<div class="validator-container valid-video" style="width:90px;height: 200px" id="valid-video">
+					@Html.ValidationMessageFor(model => model.PromoVideoIdentifier,null,new{@class="inline forthumb" + (Model.PromoVideoIdentifier==null ? " " :" pass")})
+				</div>				
+			</li>
+			
+		</ul>
+	</fieldset>
+}

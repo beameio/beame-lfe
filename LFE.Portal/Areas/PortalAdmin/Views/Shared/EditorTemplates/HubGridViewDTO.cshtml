@@ -1,0 +1,46 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.HubGridViewDTO
+<style scoped>
+    .editor-label{text-align: left;font-size: 15px;font-weight: 600}
+    .field-validation-error, .validation-summary-errors{display: block;position: relative;text-align: left}
+</style>
+<div>
+    <fieldset>
+        <legend style="display: block !important;padding: 7px;font-size: 18px;font-weight: bold">Add Hub</legend>
+
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Currency)
+        </div>
+        <div class="editor-field">
+            @(Html.Kendo().DropDownListFor(m => m.Currency.CurrencyId)
+                  .BindTo(this.ActiveCurrencies())
+                  .DataValueField("CurrencyId")
+                  .DataTextField("CurrencyName")
+                  )
+            @Html.ValidationMessageFor(model => model.Currency)
+        </div>
+        
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Status)
+        </div>
+        <div class="editor-field">
+            @(Html.Kendo().DropDownListFor(m => m.Status)
+                    .BindTo(this.ObjectStateStatuses())
+                    .DataValueField("Value")
+                    .DataTextField("Title")
+            )
+            @Html.ValidationMessageFor(model => model.Status)
+        </div>
+
+    </fieldset>   
+</div>

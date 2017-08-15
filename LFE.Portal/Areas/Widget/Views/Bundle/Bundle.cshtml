@@ -1,0 +1,45 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.BundleViewerPageToken
+
+@{
+    //ViewBag.Title = Model.CourseName + " by " + Model.User.fullName;
+    Layout = "~/Areas/widget/Views/Shared/_WidgetLayout.cshtml";
+
+}
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+
+@{
+
+if (!Model.IsValid)
+{
+    <h1>@Model.Message</h1>
+}
+else
+{
+    if (!Model.ItemState.IsOwnedByUser && !Model.ItemState.IsPublished)
+    {
+        <h1 class="h-viewer-msg">Unfortunatly this bundle has not been published yet. Please try later.</h1>
+    }
+    else
+    {
+
+        @section css
+        {
+            <link href="@Url.Action("CourseIntroCss", "Style", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", lastUpdate = viewModel != null && viewModel.WebStore != null ? (int)(viewModel.WebStore.LastUpdate - new DateTime(1970, 1, 1)).TotalSeconds : 0 })" rel="stylesheet" />
+        }
+
+        @section JS
+        {
+            <script type="text/javascript" src="http://admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+            <script type="text/javascript" src="http://admin.brightcove.com/js/APIModules_all.js"></script>
+            <script src="~/Areas/Widget/Scripts/lfe/lfe.global.js"></script>
+            <script src="~/Areas/Widget/Scripts/lfe/notif.manager.js"></script>
+            <script src="~/Areas/Widget/Scripts/lfe/lfe.bcl.player.js"></script>
+            <script>
+                saveEventApi(USER_EVENTS.COURSE_PREVIEW_ENTER, '@Model.TrackingID', null, '@Model.Bundle.BundleId', null,null);
+            </script>
+        }
+
+        @Html.Action("_BundleProductPage", "Course", new { Area = "Widget", id = Model.Bundle.BundleId })
+    }
+}
+}

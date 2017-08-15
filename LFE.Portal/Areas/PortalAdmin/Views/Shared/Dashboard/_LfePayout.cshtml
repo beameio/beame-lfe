@@ -1,0 +1,51 @@
+﻿@using LFE.Portal.Helpers
+@model List<LFE.DataTokens.AdminPayoutToken>
+
+@{
+      var today = DateTime.Now.ToString("Y");
+}
+
+<div class="head">@today</div>
+<div class="currency-list">
+    @{
+        foreach (var row in Model)
+        {
+            var iso = row.Currency.Symbol;
+
+            <div class="currency-row">
+                <div class="col col-xs-4">@iso@row.TotalSales</div>
+                <div class="col col-xs-4">
+                    <div class="inline" style="width: 44%;"><span class="float-left">{</span> @iso@row.LfeCommission</div>
+                    <div class="inline" style="width: 4%;"> + </div>
+                    <div class="inline" style="width: 44%;"> @iso@row.LicenseFee <span class="float-right">}</span></div>
+                </div>
+                <div class="col col-xs-4 total">
+                    <div class="inner">
+                        <div class="first">=</div>
+                        <div class="total"><span class="inline">@row.TotalRevenue</span> <span class="iso inline">@row.Currency.ISO</span></div>
+                        <div class="prcnt"><span class="tend">@row.Tendency.Percent% <i class="@Html.TendencyDirection2CssClass(row.Tendency.Direction)"></i> </span></div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="foot">
+            <div class="col col-xs-4">
+                <span class="title">Total Sales</span>
+            </div>
+            <div class="col col-xs-4">
+                <div class="inline" style="width: 44%;">
+                    <span class="title">LFE Commissions</span>
+                </div>
+                <div class="inline" style="width: 4%;">  </div>
+                <div class="inline" style="width: 44%;">
+                    <span class="title">LFE LicenseFee</span>
+                </div>
+            </div>
+            <div class="col col-xs-4">
+                <span class="title"></span>
+            </div>
+        </div>
+    }
+</div>
+

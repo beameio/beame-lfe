@@ -1,0 +1,23 @@
+﻿@model LFE.DataTokens.BundlePurchaseDTO
+
+@{
+    Layout = "~/Areas/widget/Views/Shared/_WixLayout.cshtml";    
+}
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+
+@section css
+{
+    <link href="@Url.Action("CourseIntroCss", "Style", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "",
+                                                             lastUpdate = viewModel != null && viewModel.WebStore != null ? (int)(viewModel.WebStore.LastUpdate - new DateTime(1970, 1, 1)).TotalSeconds : 0 })" rel="stylesheet" />
+}
+
+@section JS
+{
+        <script src="~/Areas/Widget/Scripts/lfe/lfe.global.js"></script>
+        <script src="~/Areas/Widget/Scripts/lfe/notif.manager.js"></script>
+        <script src="~/Areas/Widget/Scripts/lfe/lfe.bcl.player.js"></script>
+   
+}
+
+
+@Html.Action("_BundleProductPage", "Course", new { Area = "Widget", id = Model.BundleId })

@@ -1,0 +1,118 @@
+﻿@using LFE.Portal.Helpers
+@{
+    var trackingID = "Place_Holder_Temp";
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    //var parentUrl = viewModel != null && viewModel.ParentURL != null ? viewModel.ParentURL : "";
+    var pageName = "STORE NAME";
+    if (viewModel != null && viewModel.WebStore != null)
+    {
+        if (!string.IsNullOrEmpty(viewModel.WebStore.TrackingID))
+        {
+            trackingID = viewModel.WebStore.TrackingID;
+        }
+
+        if (!string.IsNullOrEmpty(viewModel.WebStore.WebStoreName))
+        {
+            pageName = viewModel.WebStore.WebStoreName;
+        }
+    }
+        
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml")    
+    <meta name="viewport" content="width=device-width" />
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>@pageName</title>
+  
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutHeadCustomCssSettings.cshtml")
+
+    @Styles.Render("~/bundles/widget")
+
+    @RenderSection("CSS", false)
+
+    @Html.Partial("~/Views/Shared/Layout/_HeaderScripts.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+    @Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+</head>
+<body>
+
+    @if (viewModel != null && viewModel.Status == LFE.Core.Enums.WebStoreEnums.StoreStatus.Draft && viewModel.WixViewMode == "editor")
+    {
+        <div class="placeholder-header">
+            <div class="inner">
+                <div class="title">Your online course hasn't been configured yet </div>
+                <div class="subtitle">Double-Click here to set up your new course @(viewModel.WebStore != null && viewModel.WebStore.WebStoreID > 0 ? "(" + viewModel.WebStore.WebStoreName + ")" : "")</div>
+            </div>
+        </div>
+    }
+
+   @Html.Partial("~/Views/Shared/Layout/_SiteHeader.cshtml")
+
+    @RenderSection("SecondNav", false)
+
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">
+        @RenderBody()
+    </div>
+    
+  
+
+    <script>
+        var effect;
+        var reverse = false;
+        var flipSupported;
+
+        var initMode = 'Login';
+
+        var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+    </script>
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Scripts.Render("~/bundles/kendo/widget")
+
+    @Scripts.Render("~/bundles/widget/common")
+
+    @Scripts.Render("~/bundles/plugins")
+
+    @RenderSection("JS", required: false)
+
+    <script>
+
+        //_NavViewOptions
+        $(document).ready(function () {
+            $('.nav-inner-toggle').unbind('click').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).siblings($(this).attr('data-target')).toggle(300);
+            });
+        });
+    </script>
+    
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutWixScripts.cshtml")
+    @{
+        if (!User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutLoginScripts.cshtml")
+        }
+    }    
+    <script>
+
+        $(document).ready(function () {
+            saveEventApi(USER_EVENTS.STORE_VIEW, '@trackingID', null, null, null, null);
+        });
+    </script>
+    @Html.Partial("~/Views/Shared/Common/_FooterScripts.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    <script type="text/x-kendo-template" id="kendo-sort-template">
+        <li>
+            <a data-val="${field}" data-dir="${dir}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+        </li>
+    </script>
+    @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+</body>
+</html>

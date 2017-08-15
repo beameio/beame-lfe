@@ -1,0 +1,46 @@
+﻿@model LFE.DataTokens.VideoInfoToken
+
+@{
+    var wrapperId = "q-player-" + Model.BcIdentifier;
+}
+
+
+<div id="quiz_player" class="player-co" >    <div class="video-wrapper" id="@wrapperId">
+        Loading the player...
+    </div>        @*<object id="myExperience-@Model" class="BrightcoveExperience">      <param name="bgcolor" value="#fff" />      <param name="width" value="600" />      <param name="height" value="400" />      <param name="playerID" value="1775581216001" />      <param name="playerKey" value="AQ~~,AAABm0drRPk~,DiQRmh9VgVWZubcHWonC2cZbcR-19kzC" />      <param name="isVid" value="true" />      <param name="isUI" value="true" />      <param name="includeAPI" value="true" />      <param name="templateLoadHandler" value="myTemplateLoaded" />            <param name="htmlFallback" value="true" />      <param name="dynamicStreaming" value="true" />      <param name="wmode" value="opaque" />      @{      @:<param name="@@videoPlayer" value="@Model" />      }      </object><script type="text/javascript">brightcove.createExperiences();</script>*@</div>
+
+
+<script>
+    var playerInstance = jwplayer("@wrapperId");
+
+    var sources = [];
+    var rend = @Html.Raw(Json.Encode(Model.Renditions));
+
+
+    for (var i = 0; i < rend.length; i++) {
+
+        var json = {
+            file:rend[i].CloudFrontPath,
+            label:rend[i].FrameWidth +'x'  +rend[i].FrameHeight,
+            image:'@Model.StillUrl'
+        }
+
+        sources.push(json);
+    }
+    //console.log(sources);
+    playerInstance.setup({
+        image:'@Model.StillUrl',
+        sources:sources,
+        autostart:true,
+        width: "100%",
+        aspectratio: "16:9" ,
+        skin: '/Scripts/jwplayer/jwplayer-skins-premium/vapor.xml',
+        events:{
+            onComplete: function() {
+                console.log('swith video');
+                window.getBcPlayerInstance().onMediaComplete();
+            }
+        }
+    });
+
+</script>

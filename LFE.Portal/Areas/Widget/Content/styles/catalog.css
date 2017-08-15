@@ -1,0 +1,12 @@
+﻿
+
+/*item list pager*/
+.pager-container{ height:28px;margin: 7px 0 0;}
+.pager-container > .float-left > h3{font-size: 21px;font-weight: 600;margin: 0;padding: 0}
+.pager-container > .paging { height: 28px;display: table}
+.pager-container a { color: #000;text-decoration: none;display: table-cell;vertical-align: top;width: 20px;height: 20px;padding-top: 2px;}
+.pager-container > .paging > a.prev{padding: 0 6px 0 0}
+.pager-container > .paging > a.next{padding: 0 0 0 6px}
+.pager-container > .paging > span{ display: table-cell;padding: 3px 0 0 0 }
+.pager-container a.current{font-weight: bold}
+

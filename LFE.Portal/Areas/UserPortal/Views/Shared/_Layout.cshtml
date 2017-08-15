@@ -1,0 +1,92 @@
+﻿@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# learnfromexpirence: http://ogp.me/ns/fb/learnfromexpirence#">
+    <title>@ViewBag.Title</title>
+    <!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge" /><![endif]-->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    @RenderSection("fb_meta", false)
+
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    
+
+    @Styles.Render("~/Areas/UserPortal/Content/styles/css")
+
+    @Styles.Render("~/Content/styles/common")
+    <link href="~/Content/styles/site.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Styles.Render("~/Content/plugin/scroll")
+
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+    @Scripts.Render("~/bundles/kendo")
+
+    @Scripts.Render("~/bundles/lfe/common")
+
+    @Scripts.Render("~/Areas/UserPortal/bundles/lfe")
+    
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    <script type="text/javascript">
+        kendo.culture("en-US");
+
+        var saveEventUrl = '@Url.Action("SaveEvent","EventApi",new{area=""})';        
+    </script>
+
+    @RenderSection("css", false)
+    @RenderSection("scripts", false)
+    @{
+        if (!User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+        }
+    }
+</head>
+<body>
+
+    @Html.Partial("~/Areas/UserPortal/Views/Shared/_Header.cshtml")
+    <div class="wrap" id="main">
+        @RenderBody()
+    </div>
+    @Html.Partial("~/Views/Shared/Common/_FooterScripts.cshtml")
+
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+  
+
+    <script type="text/x-kendo-template" id="feed-list-template">
+        <li>
+            <div class="inline img-container">
+                <img alt="" src="${CreatorPhotoUrl}" />
+            </div>
+            <div class="inline row">
+                <div class="auth">
+                    <a href="#='@Url.Action("UserProfile","User",new{area="UserPortal"})' + '?id=' + CreatorId#" class="a-profile-link">
+                        <span class="cr-name">${CreatorName}</span>
+                    </a>
+
+                    <span class="post-on">${PostedOn}</span>
+                </div>
+                <div class="room">${RoomName}/${CourseName}</div>
+                <div class="txt">
+                    #=Encoder.htmlDecode(HTMLMessage)#
+                </div>
+            </div>
+        </li>
+    </script>
+   
+    <script type="text/x-kendo-template" id="kendo-sort-template">
+        <li>
+            <a data-val="${field}" data-dir="${dir}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+        </li>
+    </script>
+   
+    
+</body>
+</html>

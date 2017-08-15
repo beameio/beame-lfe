@@ -1,0 +1,271 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.QuizDTO
+           
+@{
+    var scoreRulesList = Utils.EnumWithDescToList<QuizEnums.eScoreRules>();
+    var attempts = 10.ToNumberList();
+}
+
+<script>
+    var currentStatus = parseInt('@((byte)Model.Status)');
+    var tq = parseInt('@Model.TotalQuestions');
+    var isQuizValid = '@Model.IsQuizValid'.toLowerCase() == 'true';
+    var QUIZ_EDIT_FORM_SELECTOR = $('#frm-edit-quiz');
+
+    function onQuizSaved(response) {
+        window.hideLoader();
+
+        if (response.success) {
+            swal(
+            {
+                title: "Success",
+                text: "Quiz saved",
+                type: "success",
+                timer:1000
+            });
+            
+            if (response.result.isNew) {
+                showLoader();
+                window.parent.reloadQuizWindow({ id: '@Model.QuizId', title: QUIZ_EDIT_FORM_SELECTOR.find('#Title').val() });
+            }
+            else {
+                $('#frm-quiz-pub').submit();
+            }
+
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+
+    $(document).ready(function () {
+        initUnobstructiveFormValidation(QUIZ_EDIT_FORM_SELECTOR);
+
+        QUIZ_EDIT_FORM_SELECTOR.find("#AttachCertificate").die("change").live('change', function () {
+            var chk = $(this);
+            var available = '@Model.CertificateAvailable.ToString().ToLower()' == 'true';
+            var checked = Boolean(chk.is(':checked'));
+
+            console.log(available);
+            console.log(checked);
+
+            if (!available && checked) {
+                swal({
+                    title: "No certificate was created for this course",
+                    type: "warning"
+                });
+                chk.prop("checked", false);
+                return;
+            }
+
+            if (checked == false) return;
+            var data = {
+                quizId: "@Model.QuizId",
+                courseId: "@Model.CourseId"
+            };
+            ajaxAction('@Url.Action("CheckCertificate","Quiz",new {area="AuthorAdmin"})', data, onCertChecked, QUIZ_EDIT_FORM_SELECTOR);
+        });
+    });
+
+    function onCertChecked(response)
+    {
+        window.hideLoader();
+
+        if (response.success) {
+            //no other certificates attached
+            if (!response.result) return;
+
+            swal({
+                title: "You already have a certification quiz attached to this course.",
+                text: "Are you sure you want to attach another (the certificate will be sent to the student upon completing any of the attached quizzes) ?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Cancel it",
+                cancelButtonText: "Complete Action",
+                closeOnConfirm: true
+            }, function() {
+                QUIZ_EDIT_FORM_SELECTOR.find("#AttachCertificate").prop("checked", false);
+            });
+
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+
+    function validateQuiz() {
+        var mandatory = QUIZ_EDIT_FORM_SELECTOR.find('#IsMandatory').is(":checked");
+        var pass = QUIZ_EDIT_FORM_SELECTOR.find('#PassPercent').data('kendoNumericTextBox').value();
+
+        if (mandatory && !hasValue(pass)) {
+            sweetAlert("Oops...", "For mandatory Quiz Pass Percent required", "warning");
+            return false;
+        }
+        showLoader();
+
+        return true;
+    }
+</script>
+
+@using (Ajax.BeginForm("LoadQuizPublishForm", "Quiz", new { area = "AuthorAdmin", id = Model.QuizId }, new AjaxOptions { UpdateTargetId = "quiz-pub-container", OnBegin = "showContainerLoader('#quiz-pub-container')" }, new { @id = "frm-quiz-pub", @class = "" })) { }
+
+@using (Ajax.BeginForm("SaveQuiz", "Quiz", new { area = "AuthorAdmin", Model.QuizId, Model.Sid, Model.Status,Model.CourseId }, new AjaxOptions { HttpMethod = "Post", OnBegin = "return validateQuiz()", OnSuccess = "onQuizSaved" }, new { @id = "frm-edit-quiz", @class = "" }))
+{
+    @Html.AntiForgeryToken()
+
+    <fieldset class="" id="fs-from-quiz-meta">
+        <legend></legend>
+        <ul class="ul-frm">
+            <li>
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.Title)
+                    <div class="k-edit-field">
+                        @Html.TextBoxFor(model => model.Title, new { @class = "l-edit-field" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Title)
+                </div>
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.ScoreRule, "Question Scoring")
+                    <div class="k-edit-field">
+                        @(Html.Kendo().DropDownListFor(m => m.ScoreRule)
+                            .HtmlAttributes(new { @style = "width:250px;" })
+                            .BindTo(scoreRulesList)
+                            .DataValueField("Value")
+                            .DataTextField("Title")
+                            .Value(((byte)Model.ScoreRule).ToString())
+                        )
+                    </div>
+                </div>
+            </li>
+
+            <li style="height: 220px;clear: both " class="ca">
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.Instructions)
+                    <div class="k-edit-field">
+                        @(Html.Kendo().EditorFor(m => m.Instructions)
+                                              .HtmlAttributes(new { @style = "width:250px;height:200px !important;" })
+                                              .Encode(false)
+                                              .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().CreateLink().Unlink())
+                        )
+                    </div>
+                </div>
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.Description)
+                    <div class="k-edit-field">
+                        @(Html.Kendo().EditorFor(m => m.Description)
+                            .HtmlAttributes(new { @style = "width:250px;height:200px !important;" })
+                            .Encode(false)
+                            .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().CreateLink().Unlink())
+                        )
+                    </div>
+                </div>
+            </li>
+
+            <li class="ca">
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.PassPercent, "Quiz Pass %")
+                    <div class="k-edit-field">
+                        @(Html.Kendo().NumericTextBoxFor(m => m.PassPercent)
+                              .HtmlAttributes(new { @style = "width:250px;" })
+                              .Decimals(0)
+                              .Format("{0:F}")
+                              .Min(1)
+                              .Max(100)
+                              .Step(1)
+                              .Spinners(false)
+                        )
+                    </div>
+                </div>
+                <div class="inner-box">
+                    @Html.CheckBoxFor(model => model.IsMandatory)
+                    @Html.LabelFor(model => model.IsMandatory, "Mandatory Quiz")
+
+                   @Html.CheckBoxFor(model => model.AttachCertificate)
+                    @Html.LabelFor(model => model.AttachCertificate, "Attach Certificate", new { @style = "width:150px;" })
+
+                </div>
+
+            </li>
+            <li>
+                <div class="inner-box">
+                    <label for="AvailableAfter">Quiz placement</label>
+                    <div class="k-edit-field">
+                        @(Html.Kendo().DropDownListFor(m => m.AvailableAfter)
+                          .HtmlAttributes(new { @style = "width:190px" })
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .DataSource(ds => ds.Read("GetQuizAvailabilityLOV", "Course", new { id = Model.CourseId }))
+                        )
+                    </div>
+                </div>
+                <div class="inner-box">
+                    <label for="Attempts">Attempts</label>
+                    <div class="k-edit-field">
+                        @(Html.Kendo().DropDownListFor(m => m.Attempts)
+                          .HtmlAttributes(new { @style = "width:190px" })
+                          .DataTextField("Text")
+                          .DataValueField("Value")
+                          .OptionLabel("Unlimited")
+                          .BindTo(attempts)
+                        )
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="inner-box">
+                    @Html.LabelFor(model => model.TimeLimit, "Time Limit")
+                    <div class="k-edit-field" style="width: 250px;">
+                        @(Html.Kendo().NumericTextBoxFor(m => m.TimeLimit)
+                              .HtmlAttributes(new { @style = "width:190px;" })
+                              .Decimals(0)
+                              .Format("{0:F}")
+                              .Min(1)
+                              .Spinners(false)
+                              .Placeholder("Unlimited")
+                        )
+                        <i>Minutes</i>
+                    </div>
+                </div>
+                <div class="inner-box">
+                    @Html.CheckBoxFor(model => model.RandomOrder)
+                    @Html.LabelFor(model => model.RandomOrder, "Random Order")
+
+
+                    @Html.CheckBoxFor(model => model.IsBackAllowed)
+                    @Html.LabelFor(model => model.IsBackAllowed, "Is Back Allowed for Answers", new { @style = "width:150px;" })
+
+                </div>
+            </li>
+        </ul>
+        @*@{
+            if (Model.Sid >= 0)
+            {
+                        <pre class="quiz-info-pre">
+                        To attach a quiz to this course click on the "Contents" option in the course menu, then on "Attach Quiz to Course". 
+                        Select the quiz you wish to attach from the pull down menu. 
+                        Don't forget to click on "Save" to make it public.
+                        </pre>
+
+            }
+        }*@
+      
+        <div class="btn-action">
+            <input type="submit" value="Save" />    
+        </div>
+        
+    </fieldset>
+}
+
+
+@{
+    if (Model.Sid >= 0)
+    {
+        <div class="" id="quiz-pub-container">
+            @Html.Partial("Quiz/_QuizPublishForm", Model.ValidationToken)
+        </div>
+    }
+}
+
+
+

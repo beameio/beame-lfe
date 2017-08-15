@@ -1,0 +1,291 @@
+﻿@using System.Collections
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+@using LFE.Portal.Helpers
+
+
+
+@model LFE.DataTokens.CourseEditDTO
+
+
+<script type="text/javascript">
+	var BC_TH_PLAEYR_W = 295;
+	var BC_TH_PLAEYR_H = 198;
+	var FORM_HEIGHT = 750;
+	var EDIT_FORM_SELECTOR = '#frmCourseDetails';
+	var VIDEO_FIELD_NAME = '#PromoVideoIdentifier';
+	
+	var uploadConsole, formValidator,formUserNotifManager;
+
+	$(document).ready(function () {
+		
+		$(window).resize(function () {
+			adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+		$(document).scroll(function () {
+			adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+
+		formUserNotifManager = new UserNotificationManager('#cd-info', '.alert',false);
+
+		window.uploadConsole = $('#async-upload-console');
+
+		$("#a-fake-thumb-upload").click(function () {
+			$('#file').data("kendoUpload").wrapper.find("input[type='file']").click();
+		});
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.course.videoSelected, onVideoSelected, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.course.videoSelected, onVideoSelected, null);
+	});
+	
+	function onCourseDetailsSaving() {
+		var id = $('#CourseId').val();
+
+		if (id < 0) {
+			showContainerLoader('#main', null);
+			return true;
+		}
+
+		var isPurchased    = $('#IsCoursePurchased').val().toLowerCase() == 'true';
+		var hasChapters    = $('#HasChapters').val().toLowerCase() == 'true';
+		var isPriceDefined = $('#IsPriceDefined').val().toLowerCase() == 'true';
+		var status         = $('#Status').data('kendoDropDownList').value();
+
+		if (status == 2) //published
+		{
+			if (!hasChapters) {                
+				window.formUserNotifManager.show({ message: 'Please create course chapters', kind: NotificationKinds.Info });
+				return false;
+			}
+
+			if (!isPriceDefined) {
+				window.formUserNotifManager.show({ message: 'Please define course price', kind: NotificationKinds.Info });
+				return false;
+			}
+		}
+
+		if (isPurchased) {
+			var published = $('#OrigStatus').val().toLowerCase() == 'published';
+			   
+
+			if (status == 1 && published) //status changed to draft from published
+			{
+				if (!window.confirm('Course already published.Are You sure change status to draft?')) return false;
+			}
+			
+		}
+
+		showContainerLoader('#main', null);
+		return true;
+	}
+
+</script>
+
+
+
+@using (Ajax.BeginForm("SaveCourseDetails", "Course", new { id = Model.CourseId }, new AjaxOptions { OnBegin = "javaScript:return onCourseDetailsSaving()", OnSuccess = "onCourseSaved"}, new { @id = "frmCourseDetails", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.Uid)
+	@Html.HiddenFor(m=>m.IsCoursePurchased)
+	@Html.HiddenFor(m=>m.HasChapters)
+	@Html.HiddenFor(m=>m.IsPriceDefined)
+	@Html.Hidden("OrigStatus",Model.Status)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cd">
+			<li>
+				@Html.LabelFor(m=>m.CourseName)
+				<div class="input-container">
+					@Html.TextBoxFor(m => m.CourseName, new { @class = "txt-inp", @onchange = "onTxtBoxInEdit(this)" })
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.CourseName,null,new{@class=String.IsNullOrEmpty(Model.CourseName) ? "" :"pass"})
+				</div>
+			</li>
+			@{
+				if (Model.CourseId > 0)
+				{
+					<li style="border-bottom: 1px solid #a0a0a0;padding-bottom: 30px;">
+						@Html.LabelFor(m=>m.Status)
+						<div class="input-container" style="width: 250px;padding-left: 320px">
+							@Html.EditorFor(m=>m.Status)
+						</div>
+					</li>
+					<li style="border-bottom: 1px solid #a0a0a0;padding-bottom: 10px;margin-top: 10px;">
+						@Html.Label("When published, your course will be live at:",new{@style="width: auto;padding-top: 2px"})
+						<div class="input-container" style="width:auto;padding-left: 10px">
+							<a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.CourseName)" target="_blank" style="color: blue;font-size: 13px">@Url.GenerateCourseFullPageUrl(this.CurrentUserFullName(), Model.CourseName,null)</a>
+						</div>
+					</li>       
+				}
+			}		    
+			<li>
+				@Html.LabelFor(m => m.CourseDescription)
+				<div class="input-container">
+					@*@Html.TextAreaFor(m=>m.Description,new{@rows=4,@columns=3,@class="txt-inp",@style="height:80px",@onchange="onTxtBoxChanged(this)"})*@
+					@(Html.Kendo().EditorFor(m => m.CourseDescription)
+							.HtmlAttributes(new { @style = "width:570px;height:200px;" })
+							.Encode(false)
+							.Events(e => e.Change("setEditMode"))
+							.Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+					)
+				</div>
+				<div class="validator-container">                   
+					@Html.ValidationMessageFor(model => model.CourseDescription, null, new { @class = String.IsNullOrEmpty(Model.Description) ? "" : "pass" })
+				</div>
+			</li>
+		    <li style="padding-bottom: 15px;">
+		        <div style="display: table-cell;">
+		            @Html.LabelFor(m => m.PromoVideoIdentifier)
+		            @Html.HiddenFor(m => m.PromoVideoIdentifier)
+		            <a class="browse-video" href="javaScript:openVideoWnd()" style="top: 160px;">Browse video manager</a>
+		        </div>
+
+		        <div class="input-container" style="width: 300px; height: 120px">
+		            <div class="thumb-box video-th" id="d-video-thumb">
+		                @{
+		                    if (Model.PromoVideo != null)
+		                    {
+		                        <script>
+                        		    var token = {
+                        		        stillUrl: fixSR('@Model.PromoVideo.stillUrl'),
+		                                title: '@Model.PromoVideo.title',
+		                                minutes: '@Model.PromoVideo.minutes',
+                        		        identifier: '@Model.PromoVideoIdentifier',
+                        		        videoUrl: fixSR('@Model.PromoVideo.videoUrl')
+                        		    };
+                                    buildThumbMediaPlayer(token, '#d-video-thumb');
+
+                        		</script>
+		                    }
+		                }
+		            </div>
+		        </div>
+
+		        <div class="validator-container" style="width: 90px; height: 200px" id="valid-video">
+		            @Html.ValidationMessageFor(model => model.PromoVideoIdentifier, null, new {@class = "inline forthumb" + (Model.PromoVideoIdentifier == null ? " " : " pass")})
+		        </div>
+
+
+		        <div class="input-container" style="width: 185px;">
+		            @Html.LabelFor(m => m.ThumbName, new {@style = "width:auto;padding:0 0 15px 3px;"})
+		            <div class="thumb-box" id="d-crs-thumb">
+		                @{
+		                    if (String.IsNullOrEmpty(Model.ThumbUrl))
+		                    {
+		                        <span class="prompt">
+									Image Size
+									<br/>
+									200 x 120px
+								</span>
+		                    }
+		                    else
+		                    {
+		                        <img src="@Model.ThumbUrl" alt=""/>
+		                    }
+		                }
+		            </div>
+
+		            <a class="browse-video" href="#" id="a-fake-thumb-upload" style="width: auto; top: 20px">Upload</a>
+		            <span style="display: none">
+						@(Html.Kendo().Upload()
+						      .Name("file")
+						      .Events(e => e.Upload("onThumbUploadAction").Success("onThumbUploadSuccess").Progress("onUploadProgress"))
+						      .Async(a => a.Save("SaveCourseFile", "Upload").AutoUpload(true))
+						      )
+					</span>
+
+		            @Html.HiddenFor(m => m.ThumbName)
+		        </div>
+		        <div class="validator-container" id="valid-thumb">
+		            @Html.ValidationMessageFor(model => model.ThumbName, null, new {@class = "inline forthumb" + (String.IsNullOrEmpty(Model.ThumbName) ? " " : " pass"), @style = "top:30px"})
+		        </div>
+
+		        <div id="async-upload-console" class="upl-consol"></div>
+		    </li>
+            <li>
+                <div class="input-container" style="width: 60px;">
+                    @Html.CheckBoxFor(m => m.DisplayOtherLearnersTab, new {@style = "width:25px;height: 25px;"})
+                </div>
+                @Html.LabelFor(m => m.DisplayOtherLearnersTab,new{@style="padding:7px 0 0"})
+            </li>
+			<li>
+				@Html.LabelFor(m=>m.MetaTags)
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.MetaTags,new{@rows=2,@columns=3,@class="txt-inp",@onkeydown="onTxtBoxInEdit(this)"})
+					<span style="display: block;margin: 4px 0 0;font-size: 11px; color:#666">separate by comma</span>
+				</div>               
+			</li>
+			
+			<li>
+				@Html.LabelFor(m=>m.Categories)
+				<div class="input-container">
+					@(Html.Kendo().MultiSelectFor(model => model.Categories)
+						  .DataTextField("name")
+						  .DataValueField("id")
+							 .Events(e => e.Change("setEditMode"))
+						  .Placeholder("-- select categories --")
+						  //  .TagTemplateId("cat-tag-template")
+						  //  .ItemTemplateId("cat-item-template")						 
+						  .BindTo((IEnumerable)ViewData[WebConstants.VD_CATEGORY_LOV])
+						  .HtmlAttributes(new {@class="l-combo" ,@style = "width:572px;height:auto !important" })
+						  )
+				</div>
+			</li>
+			<li style="display: none;">
+				@Html.LabelFor(m=>m.ClassRoomId)
+				<div class="input-container">
+					@(Html.Kendo().DropDownListFor(model => model.ClassRoomId)
+						  .DataTextField("name")
+						  .DataValueField("id")
+						  .OptionLabel("-- select classroom --")
+							 .Events(e => e.Change("setEditMode"))
+						  .BindTo((IEnumerable)ViewData[WebConstants.AUTHOR_ROOMS_LOV])
+						  .HtmlAttributes(new {@class="l-combo" ,@style = "width:572px;height:auto !important" })
+					)
+				</div>
+			</li>
+		</ul>
+		<div style="height: 1px;visibility: hidden;position: relative;bottom: 0" id="d-fd-bottom">&nbsp;</div>
+		<div class="form-cmd-row wrap" id="d-cr">
+			<div class="inner">
+				<div class="info-box" id="cd-info">
+					<p class="alert"></p>
+				</div>
+				<div class="btn-container">
+					@{
+						if (Model.CourseId >= 0)
+						{
+							<a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.CourseName,Constants.QS_COURSE_PREVIEW_PREFIX)" target="_blank" class="btn-prev-prod">preview product page</a>
+							<a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.CourseName)" target="_blank" class="btn-prev-course">Preview course</a>   
+						}
+					}
+					<a href="javaScript:submitForm('frmCourseDetails')" class="btn-submit">save changes</a>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+}
+
+
+<script type="text/x-kendo-template" id="cat-tag-template">
+	<img class="tag-image"  src="#:data.url#" alt="#:data.name#" /> ${name}
+</script>
+
+<script type="text/x-kendo-template" id="cat-item-template">
+	<span class="item-image">	<img width="45" height="45" src="#:data.url#" alt="#:data.name#" /> </span> <h4 class="cat-h4"> ${name}</h4>
+</script>
+
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		adjustCmdPosition(EDIT_FORM_SELECTOR);		
+	});		
+</script>		

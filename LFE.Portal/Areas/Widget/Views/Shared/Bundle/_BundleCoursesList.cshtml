@@ -1,0 +1,64 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<BundleCourseListDTO>
+
+<style>
+    .ul-bundle-tree { border: none; color: #000;width: 600px}
+    .ul-bundle-tree li { height: auto; min-height: 18px; margin: 5px 0 10px;width:100% ;cursor: pointer}
+    .ul-bundle-tree li img{margin: 0 10px 0 0}
+    .ul-bundle-tree li .crs-name{font-size: 14px;font-weight: bold}
+    .ul-bundle-tree li .crs-desc{font-size: 13px;max-height: 50px}
+</style>
+
+<script>
+    function onBundleCoursesListBound(e) {
+        var url = '@Url.Action("GetCourseContentsPartial", "Course", new { Area = "Widget" })';
+       
+        var data = e.sender.dataSource.data();
+        $.each(data, function (i, row) {
+           
+            $('li[data-uid="' + row.uid + '"] ').unbind('click').bind('click', function () {
+                var wnd = $("#wndCoursePreview").data("kendoWindow");                
+                var u = url + '?courseID=' + row.id;
+                wnd.title(row.name + ' preview');
+                wnd.refresh(u);
+                wnd.center();                
+                wnd.open();
+            });        
+        });
+    }
+</script>
+
+@(Html.Kendo().ListView<BundleCourseListDTO>()
+    .Name("BundleCourses")
+    .TagName("ul")
+    .HtmlAttributes(new { @class = "ul-bundle-tree" })
+    .ClientTemplateId("kendo-bc-list-template")
+    .BindTo(Model)
+    .Events(e => e.DataBound("onBundleCoursesListBound"))        
+)
+
+<script type="text/x-kendo-template" id="kendo-bc-list-template">
+    <li data-val="${id}" title="click to preview">
+        <img width="120" height="67" src="#:data.url#" alt="#:data.name#" class="inline" />
+        <div class="inline" style="width:465px">
+            <h4 class="crs-name">${name}</h4>
+            <div class="crs-desc ellipsis multiline">${desc}</div>
+        </div>        
+    </li>
+</script>
+
+@(Html.Kendo().Window()
+        .Name("wndCoursePreview")        
+        .Draggable(false)
+        .HtmlAttributes(new { @style = "padding:10px;" })
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Height(600)
+        .Width(620)
+        .Modal(true)
+        .Animation(false)         
+        .Events(e => e.Close("onWndClose"))
+        .Content("loading course preview.....")
+)

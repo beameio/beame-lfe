@@ -1,0 +1,233 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Models
+@model LFE.DataTokens.UserPayoutSettingsDTO
+      
+<style scoped>
+    
+     .h1-payout {
+         margin: 0 0 15px 0;
+         font-size: 18px
+     }
+    .ul-edit-form li div.validator-container {
+        color: #FF0000;
+        display: table-cell;
+        vertical-align: top;
+        width: 20px;
+    }
+    .ul-edit-form.cd li div.input-container {
+        width: 170px;
+    }
+
+    .ul-edit-form li div.input-container {
+        color: #000000;
+        display: table-cell;
+        vertical-align: top;
+    }
+    .ul-edit-form.cd li label {
+        width: 170px;
+    }
+
+    .ul-edit-form li label {
+        color: #000000;
+        display: table-cell;
+        font-size: 15px;
+        vertical-align: top;
+    }
+
+    .ul-edit-form.cd li div.input-container input {
+        border: 1px solid #A4A4A4;
+        height: 24px;
+    }
+
+    .ul-edit-form.cd li div.input-container textarea, .ul-edit-form.cd li div.input-container input {
+        -ms-border-radius: 0;
+        border-radius: 0;
+        width: 150px !important;
+    }
+
+
+    /*bootstrap imported*/
+    .form-horizontal .form-group {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-horizontal .control-label {
+    text-align: right;width: 160px
+}
+label {
+    display: inline-block;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+.form-horizontal .control-label, .form-horizontal .radio, .form-horizontal .checkbox, .form-horizontal .radio-inline, .form-horizontal .checkbox-inline {
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 7px;
+}
+.form-control {
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    color: #555;
+    display: block;
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    width: 250px;height: 20px;margin-left: 15px
+}
+.k-dropdown.form-control{border:none !important}
+</style>
+
+<script>
+    var formUserNotifManager;
+    var PAYOUT_TYPES = {
+        PAYPAL: 'PAYPAL'
+       , CHEQUE: 'CHEQUE'
+    };
+
+    var addressContainer = $('#d-po-address');
+    var loadAddressForm = $('#frmLoadAddress');
+
+    var payoutModel;
+    $(document).ready(function () {
+        formUserNotifManager = new UserNotificationManager('#as-info', '.alert', false);
+
+    });
+
+    function onPayoutSettingsSaved(response) {
+        hideFormLoader();
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? accountMessages.ACCOUNT.PAYOUT_SETTINGS_UPDATED : response.error;
+
+        formUserNotifManager.show({ message: msg, kind: kind });
+
+        if (response.success) {
+            window.getNotifManagerInstance().notify(notifEvents.account.payoutSaved,null);
+            if (response.result != null && response.result.addressId != null) addressContainer.find('#AddressId').val(response.result.addressId);
+        }
+    }
+</script>
+@{
+    if (Model.IsValid)
+    {
+        
+        <h1 class="h1-payout no-pad" style="    ">LFE pays its authors once a month. The options currently available is PayPal</h1>
+        
+        using (Ajax.BeginForm("SavePayoutSettings", "Account", new { area = "" }, new AjaxOptions { OnBegin = "", OnSuccess = "onPayoutSettingsSaved", LoadingElementId = "site-loader" }, new { @id = "frmPayoutSettings", @style = "" }))
+        {
+            <div id="d-payout-container" style="width: 800px">
+                <div style="visibility: hidden">
+                    <div class="inline" style="">
+                        <label class="">
+                            <input type="radio" id="PayoutType_PAYPAL" name="PayoutType" value="@BillingEnums.ePayoutTypes.PAYPAL.ToString()" data-bind="events: { click: onPayoutTypeChanged }" @(Model.PayoutType == BillingEnums.ePayoutTypes.PAYPAL ? "checked" : "")>
+                            Paypal
+                        </label>
+                    </div>
+                    @*<div class="inline" style="">
+                        <label class="paypal">
+                            <input type="radio" id="PayoutType_CHEQUE" name="PayoutType" value="@BillingEnums.ePayoutTypes.CHEQUE.ToString()" data-bind="events: { click: onPayoutTypeChanged }" @(Model.PayoutType == BillingEnums.ePayoutTypes.CHEQUE ? "checked" : "")>
+                            Cheque
+                        </label>
+                    </div>*@
+                </div>
+                
+                <div id="d-po-sett" style="margin-left: 10px">
+                    <div id="d-po-email" >
+                        <ul class="ul-edit-form cd">
+                            <li>
+                                @Html.LabelFor(m => m.Email, "E-mail address your PayPal account is linked to:",new{@style="width: 360px"})
+                                <div class="validator-container">
+                                    @Html.ValidationMessageFor(model => model.Email)
+                                </div>
+                                <div class="input-container">
+                                    @Html.TextBoxFor(m=>m.Email,new{type="email",@style="width: 200px !important"})
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    @*<div id="d-po-address" data-bind="style:{display:isAddressVisible}" style="width: 450px">
+                        @{
+                            if (Model.PayoutType == BillingEnums.ePayoutTypes.CHEQUE)
+                            {
+                                <script>
+                                    $(document).ready(function() {
+                                        loadAddressForm.submit();
+                                    });
+                                </script>
+                            }
+                        }
+                    </div>*@
+                </div>
+            </div>               
+        }
+
+        @Html.Partial("Account/_EditSettingsCommandRow", new AccountSettingsCommandRowToken
+        {
+            Role = CommonEnums.UserRoles.Author,
+            FormName = "frmPayoutSettings"
+        })
+
+        using (Ajax.BeginForm("GetBillingAddressEditForm", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-po-address", InsertionMode = InsertionMode.Replace }, new { @id = "frmLoadAddress" }))
+        {
+            @Html.Hidden("addressId",Model.BillingAddress.AddressId)
+        }
+        
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}
+
+
+<script>
+   
+    $(document).ready(function() {
+      //  $('#frmPayoutSettings').validate().settings.ignore = [];
+        initUnobstructiveFormValidation($('#frmPayoutSettings'));
+
+        payoutModel = kendo.observable({
+            type:'@Model.PayoutType',
+         
+            isPaypalChecked: function () {
+                //if (window.console) console.log('@Model.PayoutType');
+                var checked = '@Model.PayoutType'.toLowerCase() == 'paypal';
+                //if (window.console) console.log(checked);
+                return checked;
+            },
+
+            onPayoutTypeChanged: function () {
+                payoutModel.set('type', $("input:radio[name=PayoutType]:checked").val());
+
+                var type = this.get("type");
+
+                switch (type) {
+                case PAYOUT_TYPES.PAYPAL:
+                    addressContainer.empty();
+                    break;
+                case PAYOUT_TYPES.CHEQUE:
+                    loadAddressForm.submit();
+                    break;
+                }
+            },
+
+            isEmailVisible: function () {                
+                return this.get("type") == PAYOUT_TYPES.PAYPAL ? "block" : "none";
+            },
+            isAddressVisible:function() {
+                return this.get("type") == PAYOUT_TYPES.CHEQUE ? "block" : "none";
+            }
+        });
+
+        kendo.bind($("#d-payout-container"), payoutModel);
+    });
+
+
+</script>

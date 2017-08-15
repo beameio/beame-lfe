@@ -1,0 +1,142 @@
+﻿
+@media screen and (max-width: 780px) {
+    #buyFrameWrapper {  height:1400px;}
+}
+
+    body{margin:0;padding:0;font-family:'Open Sans',Arial;background:#fff}
+
+    a{color:#000;cursor:pointer}
+
+    a:hover{color:#fb2d00}
+
+    a:visited{color:#000}
+
+    .page_head{background:#f5f8f9;height:100px}
+
+    .page_head .indent{margin-left:20px;margin-top:10px;padding-top:30px}
+
+    .page_head .indent .title{font-size:23px;font-weight:bolder;text-transform:uppercase;text-decoration:none}
+
+    .page_head .subtitle{margin-left:20px;padding-top:5px;font-size:14px;float:left;width:98%}
+
+    .page_head .subtitle .opened{display:inline-block;padding:3px 8px 0 8px;margin:0 5px;color:#fff;background:#e3e3e3;color:#000;padding-bottom:20px;text-decoration:none        }
+
+    .page_head .subtitle .arrow{display:inline-block;color:#000;text-decoration:none;background:url(../../../../Content/images/webstore/arrow_black.png) no-repeat right 9px;padding-right:15px;margin-right:3px        }
+
+    nav{height:30px}
+
+    nav ul{height:26px;display:block;width:auto;float:left}
+
+    nav ul li{padding:0 10px 0 0;border-right:2px solid #323335;margin:0 0 0 10px;text-transform:uppercase;float:left;display:block            }
+
+    nav ul li.cb{padding-right:14px;background:url(../../../../Content/images/webstore/arrow_black.png) no-repeat;background-position:100% 7px                }
+
+    nav ul li:first-child{margin-left:0}
+
+    nav ul li:last-child{border-right:none}
+
+    nav ul li a{color:#323335;text-decoration:none;font-size:14px}
+
+    nav ul .bold{font-weight:bold}
+
+    nav ul li span.a{color:#323335;font-size:14px;cursor:pointer}
+
+    nav ul li .bold{color:#323335;font-size:14px;cursor:pointer;font-weight:bold}
+
+    nav ul li a:hover{color:#fb2d00}
+    /*nav ul li a.current,nav ul li span.a.current{color: #006699}*/
+
+    nav ul li.li-sub:hover .sub{display:block}
+
+    nav ul li div.sub{position:absolute;top:-10px;left:-6px;width:270px;background:#1d1d1d;display:none;text-align:left;padding-bottom:10px;z-index:100001}
+
+    nav ul li div.sub .inner{padding:0 5px}
+
+    nav ul li div.sub .menu-name{padding-right:-20px;color:#fff;font-size:14px;text-transform:uppercase;margin:5px auto 0;padding-bottom:15px;background:url(../../../../Content/images/webstore/arrow.png) no-repeat right 7px;background-position:64% 7px}
+                    
+    nav ul li div.sub .sub-menu-link{height:12px;padding-bottom:10px;margin-top:10px;text-align:left}
+
+    nav ul li div.sub .sub-menu-link a{color:#fff;font-size:12px;text-decoration:none;text-transform:capitalize;font-weight:normal}
+
+    nav ul li div.sub .sub-menu-link a:hover{color:#fb2d00}
+
+    .subtitle .share{background:url("../../../../Content/images/webstore/arrow_black.png") no-repeat scroll right 10px transparent;float:right;font-size:12px;margin-right:43px;margin-top:-29px;width:110px}
+    
+    .subtitle .share a{display:inline-block;padding:3px 8px 0 8px;color:#323335;text-decoration:none}
+    
+    ul,ol{list-style:none;padding:0;margin:0}
+    
+    .page_content .indent{margin:20px}
+    
+    .tool_bar{position:absolute;top:0;left:0;color:#fff;background:url(../../../../Content/images/webstore/header_bg01.png) repeat-x top;height:34px;width:100%;z-index:100}
+    
+    .tool_bar_placeholder{position:absolute;left:0;color:#fff;background:url(../../../../Content/images/webstore/header_bg01.png) repeat-x top;height:34px;width:100%;z-index:100}
+    
+    .tool_bar .logo{float:left;margin-left:10px;font:normal 12px arial;line-height:29px;margin-top:7px;margin-right:3px}
+    
+    .tool_bar .power{float:left;margin-left:5px;font:normal 12px arial;line-height:29px}
+    
+    .tool_bar .power a{color:#fff}
+    
+    .tool_bar .power a:hover{color:#fb2d00}
+    
+    .tool_bar .links{float:right;font:normal 12px arial;margin-top:5px}
+    
+    .tool_bar .links a{display:inline-block;color:#fff;text-decoration:none}
+    
+    .tool_bar .links .link{padding:3px 8px 0 8px;display:inline-block}
+    
+    .tool_bar .links a:hover{color:#fb2d00}
+    
+    .tool_bar .links .opened{display:inline-block;padding:3px 8px 0 8px;margin:0 5px;color:#fff;background:#e3e3e3;color:#000;padding-bottom:20px;text-decoration:none}
+    
+    .tool_bar .links .arrow{background:url(../../../../Content/images/webstore/arrow.png) no-repeat right 9px;padding-right:15px;margin-right:3px}
+        
+
+       .dark{display:none;position:absolute;width:100%;height:100%;top:0;background:#000;filter:alpha(opacity=75);opacity:.75;z-index:20}
+
+    /*list sorting*/
+    .d-sort-row{height:30px;margin:0 0 10px 0;font-size:13px;color:#000}
+
+    .d-sort-row label{display:inline-block;vertical-align:top;margin:0 5px 0 0}
+
+    .d-sort-row ul{display:inline-block;vertical-align:top;border:none}
+
+    .d-sort-row ul li{float:left;margin:0 10px 0 0}
+
+    .d-sort-row ul li a{color:#000;cursor:pointer;text-decoration:none}
+
+    .d-sort-row ul li a.active{font-weight:bold;text-decoration:underline}
+
+
+    .CourseTitle{margin-left:2px;margin-right:2px}
+
+    .CourseTitle h3{color:#000;font-size:13px;margin-top:0;font-weight:normal}
+
+    .CourseTitle h4{color:#000;text-decoration:none;margin-top:-12px;font-size:15px;min-height:80px}
+
+    #d-tab-content .promo .promo-item-wrapper .thumb-container .CourseTitle .header4{color:#000;text-decoration:none;margin-top:0;font-size:15px;min-height:80px}
+
+        
+    .navigationdiv{padding-bottom:5px}
+
+    .navigationdiv .sort{font-size:13px;float:left;display:inline-block    }
+
+    .navigationdiv .sort a{text-decoration:none;color:#000}
+
+    .navigationdiv .sort a:hover{color:#fb2d00}
+
+    .navigationdiv .sort .current{font-weight:bold;text-decoration:underline}
+
+    .navigationdiv .paging{float:right;display:inline-block}
+
+    .navigationdiv .paging a{font-size:14px;color:#000;text-decoration:none}
+
+
+    .navigationdiv .paging .nextButton{vertical-align:middle;margin-top:-5px}
+
+    .navigationdiv .paging a:hover{color:#fb2d00}
+
+    .navigationdiv .paging .current{color:#fb2d00;font-weight:bold}
+
+    #li-not { display:inline-block;padding: 3px 8px 0 8px;}

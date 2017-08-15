@@ -1,0 +1,100 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+@model LFE.Portal.Areas.UserPortal.Models.CourseViewerPageToken 
+
+@section fb_meta
+{
+	
+	@{
+		if (Model.IsValid)
+		{
+			<meta property="fb:app_id" content="@Utils.GetKeyValue("fbAppId")" /> 
+			<meta property="og:type"   content="learnfromexpirence:lfe_course" /> 
+			<meta property="og:title"  content="@Model.CourseName" />   
+			<meta property="og:url"    content="@(this.GenerateCourseFullPageUrl(Model.CourseViewerDTO.AuthorUserBaseDto.fullName, Model.CourseName))" /> 	      
+			<meta property="og:image"  content="@Model.CourseViewerDTO.ThumbUrl" /> 
+		}
+	} 
+}
+
+
+@{
+	Layout = "~/Areas/UserPortal/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	if (!Model.IsValid)
+	{
+		<h1 class="h-viewer-msg">@Model.Message</h1>
+	}
+	else
+	{
+		ViewBag.Title = Model.CourseName + " by " + Model.CourseViewerDTO.AuthorUserBaseDto.fullName;
+
+		if (!Model.ItemState.IsOwnedByUser && !Model.ItemState.IsPublished)
+		{
+			<h1 class="h-viewer-msg">Unfortunately this course not published yet for public view. Please try later</h1>
+		}
+		else
+		{
+			if (!Model.ItemState.IsPreview && (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed))
+			{
+				@section css
+			    {
+				    @Styles.Render("~/Areas/UserPortal/Content/styles/courseviewer")
+	
+				    <!--[if lt IE 9]>
+				    <style type="text/css">
+					    .inflip{display: block}
+					    .highlighter{background: #a3bcea}
+					    #d-tag-container{margin: 0}
+				    </style>   
+				    <![endif]-->
+	
+				    <style>        
+					    .ul-cba-list > li.box{ width: 190px;}
+				    </style>
+			    }
+
+			    @section scripts
+			    {    
+				    <script type="text/javascript" src="http://admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+				    <script type="text/javascript" src="http://admin.brightcove.com/js/APIModules_all.js"></script>
+	
+				    @Scripts.Render("~/bundles/jquery/jqueryval")
+				    @Scripts.Render("~/Areas/UserPortal/bundles/courseviewer")
+	                
+			        <script>
+                        saveEventApi(USER_EVENTS.COURSE_VIEWER_ENTER, '@Model.TrackingID', '@Model.CourseId', null,null, null);
+        			</script>
+				
+			    }
+			
+			    @Html.Partial("CourseViewer/_CourseViewer",Model)
+			}
+			else
+			{
+				@section css{
+					<link href="~/Areas/Widget/Content/styles/CourseIntro.css" rel="stylesheet" />
+				}
+				@section scripts 
+				{
+					@Scripts.Render("~/bundles/jquery/jqueryval")
+                    <script>
+                        saveEventApi(USER_EVENTS.COURSE_PREVIEW_ENTER, '@Model.TrackingID', '@Model.CourseId', null, null,null);
+                    </script>
+				}
+
+                @Html.Partial("~/Areas/Widget/Views/Shared/Course/_BuyPlaceHolder.cshtml", false)
+    
+				@Html.Action("_CourseProductPage", "Course", new { Area = "Widget", id = Model.CourseId, trackingId = Model.TrackingID,isPreview = Model.ItemState.IsPreview })
+			}
+		}		
+	}
+}
+
+
+
+
+

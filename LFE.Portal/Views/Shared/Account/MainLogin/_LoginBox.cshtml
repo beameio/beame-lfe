@@ -1,0 +1,74 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Models
+@model LoginWindowToken
+@{
+    var linkText   = string.Empty;
+    var actionName = string.Empty;
+}
+
+<div class="main-login-container rel login-wnd-container">
+    <div class="login-head">
+        <h4 class="common-title">Login</h4>
+    </div>
+    <div class="wnd-login">
+
+        <div class="login-main rel">
+            @{
+                switch (Model.Mode)
+                {
+                    case eLoginWindowMode.Login:
+                        linkText = "create new account";
+                        actionName = "Register";
+                        <div class="flip" id="log-form">
+                            @Html.Partial("Account/MainLogin/_LoginPartial", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = CommonEnums.eRegistrationSources.LFE })
+                        </div>
+                        <div id="req-pwd-form-container" class="flip" style="display: none">
+                            @Html.Partial("Account/Login/_WindowRequestForgottenPassword")
+                        </div>
+                        <script>$('.login-main').addClass('login-main-360');</script>
+                        break;
+                    case eLoginWindowMode.Register:
+                        linkText = "login to lfe";
+                        actionName = "Login";
+                        <div style="height:57px;margin: 35px auto 0" class="login-inner-w">
+                            @Html.Partial("Account/MainLogin/_ExternalLogin", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = CommonEnums.eRegistrationSources.LFE })
+                        </div>
+                        <label style="display: block;height: 16px;font-size: 16pt;font-weight: bold;margin: 20px 0" class="">or</label>
+                        <div id="reg-form">
+                            @Html.Partial("Account/MainLogin/_LfeRegisterForm", new RegisterDTO { RequiredConfirmation = Model.RequiredConfirmation })
+                        </div>
+                        break;
+                    default:
+                    <h3>Unknown mode</h3>
+                        break;
+                }
+            }
+        </div>
+
+        <div class="foot main-login-footer">
+            @{
+                if (!string.IsNullOrEmpty(actionName))
+                {
+                    <div id="login-footer-link">
+                        @Html.ActionLink(linkText, actionName, "Account", new { area = "" }, new { @class = "link-button" })
+                    </div>
+                }
+            }
+            <div id="lw-action-button">
+                @{
+                    switch (Model.Mode)
+                    {
+                        case eLoginWindowMode.Login:
+                            <span>Login</span>
+                            break;
+                        case eLoginWindowMode.Register:
+                        <span>Register</span>
+                            break;
+                    }
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

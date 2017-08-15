@@ -1,0 +1,20 @@
+﻿
+@model LFE.DataTokens.CourseEditDTO
+
+<script type="text/javascript">
+    function onCourseSaved() {
+        
+    }
+</script>
+
+@using (Ajax.BeginForm("CourseDetails", "Course", new {id=Model.CourseId}, new AjaxOptions {OnSuccess= "onCourseSaved", LoadingElementId = "site-loader"}, new {@id = "frmDetails"}))
+{
+    <fieldset>
+        <legend></legend>
+        <ul class="ul-edit-form cd">
+            <li style="padding-top:25px">
+              
+            </li>            
+        </ul>
+    </fieldset>
+}

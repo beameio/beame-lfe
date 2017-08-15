@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "Udemy Import";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="~/Areas/AuthorAdmin/Content/styles/udemy.css" rel="stylesheet" />
+}
+
+<div class="mc-header" style="margin-bottom: 30px;">
+    <h1>UDEMY IMPORT</h1>
+</div>
+
+<div class="mc-content">
+    <div class="udemy-succes">
+        <h2>
+            YOU'RE ON YOUR WAY!
+        </h2>
+        <h3>
+            We are importing your Udemy courses.<br />
+            This might take a few minutes, depending on the number and content of your courses.
+        </h3>
+    </div>
+    
+    <a href="@Url.Action("Index", "Udemy")" class="blueBtn">Import more courses</a>
+    <a href="@Url.Action("JobsReport", "Udemy")" class="blueBtn">Status Report</a>
+    <div style="clear: both;"></div>
+</div>

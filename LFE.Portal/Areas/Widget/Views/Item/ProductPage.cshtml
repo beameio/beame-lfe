@@ -1,0 +1,38 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Helpers
+@model  LFE.DataTokens.ItemProductPageToken
+
+@{
+    ViewBag.Title = Model.ItemName + " by " + Model.Author.FullName;
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapLayout.cshtml";  
+}
+
+@section CSS
+{
+    @Styles.Render("~/Areas/Widget/Content/styles/catalog")
+    @Styles.Render("~/widget/catalog/less")
+  @*<link href="~/Content/styles/sweet-alert.css" rel="stylesheet" />*@
+}
+@section JS
+{
+    @Scripts.Render("~/bundles/catalog")
+    @*<script src="~/Scripts/plugins/sweet-alert.min.js"></script>
+    <script src="~/Areas/Widget/Scripts/plugins/countdown.min.js"></script>*@
+    @Html.Partial("~/Areas/Widget/Views/Shared/Item/_ProductPageScripts.cshtml", Model)
+
+
+    @Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+
+    <script>
+        saveEventApi(USER_EVENTS.COURSE_PREVIEW_ENTER, '@Model.TrackingID', '@(Model.ItemProductToken2ItemId(BillingEnums.ePurchaseItemTypes.COURSE))', '@(Model.ItemProductToken2ItemId(BillingEnums.ePurchaseItemTypes.BUNDLE))', null, null);
+    </script>
+        
+}
+
+@section SecondNav
+{
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_ProductNavigation.cshtml")
+}
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Item/_ProductPagePartial.cshtml", Model)
+

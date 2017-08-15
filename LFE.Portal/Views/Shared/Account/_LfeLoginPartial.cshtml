@@ -1,0 +1,61 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.LoginDTO
+
+<script>
+	$(document).ready(function () {
+
+		$('#a-fp').unbind('click').bind('click',function(e) {
+			e.preventDefault();
+			var wnd = $("#wndForgotPwd").data("kendoWindow");
+
+			wnd.center();
+			wnd.open();
+		});
+	});
+	
+	function clearwndForgotPwd() {
+		$('#frm-forgot-pwd #email').val(null);
+	}
+</script>
+
+@using (Html.BeginForm("LfeLogin", "Account", new { ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-lfe-login" }))
+{
+	@Html.AntiForgeryToken()
+		
+	<fieldset id="fs-login">
+		<legend></legend>
+		<ul class="ul-login simple-list">
+			<li>
+				@Html.TextBoxFor(model => model.Email, new { placeholder = "Email",title="Email" })  
+				@Html.ValidationMessageFor(m => m.Email)  
+			</li>
+			<li>
+				@Html.PasswordFor(model => model.Password, new { placeholder = "Password",title="Password" })  
+				@Html.ValidationMessageFor(m => m.Password)           
+			</li>
+		</ul>
+		   
+		<div class="d-forgot-pwd">
+			<a href="#" id="a-fp">Forgot Password</a>
+		</div> 
+				
+	</fieldset>  
+		
+	<input type="submit" value="Login" class="btn-reg-form"/>    
+}
+
+@(Html.Kendo().Window()
+		.Name("wndForgotPwd")
+		.Title("Request forgotten password")
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(150)
+		.Width(400)
+		.Modal(true)
+		.Content(@<text>
+					@Html.Partial("Account/_RequestForgottenPassword")
+				</text>)
+		.Events(e=>e.Close("clearwndForgotPwd"))
+)	

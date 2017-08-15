@@ -1,0 +1,20 @@
+﻿@model LFE.DataTokens.MessageViewDTO
+
+@{
+	ViewBag.Title = "Message";
+	Layout = "~/Areas/UserPortal/Views/Shared/_Layout.cshtml";
+}
+
+<div style="width: 600px;margin: 25px auto 0">
+@{
+	if (Model == null)
+	{
+		<h3>Message not found</h3>
+	}
+	else
+	{
+	   @Html.Partial("Discussion/_MessageView",Model)
+	}
+}
+
+</div>

@@ -1,0 +1,106 @@
+﻿@using LFE.DataTokens
+@model QuizDTO
+
+
+<script>
+    var saveQuestOrderUrl      = '@Url.Action("SaveQuestionOrder","Quiz",new{area="AuthorAdmin"})';
+    var questEditUrl           = '@Url.Action("_EditQuestion", "Quiz", new { area = "AuthorAdmin"})';
+    var answerManageUrl        = '@Url.Action("_AnswerManageForm", "Quiz", new { area = "AuthorAdmin" })';
+    var saveAnswerOrderUrl     = '@Url.Action("SaveAnswerOrder", "Quiz", new {area = "AuthorAdmin"})';
+    var updateAnswerCorrectUrl = '@Url.Action("UpdateAnswerCorrectOption", "Quiz", new {area = "AuthorAdmin"})';
+    var deleteAnswerUrl        = '@Url.Action("DeleteAnswer", "Quiz", new {area = "AuthorAdmin"})';
+
+    var CONTENT_CONTAINER_SELECTOR = '.q-list-container';
+    var currentQuizId              = '@Model.QuizId';
+    var currentQuizSId             = '@Model.Sid';
+    var quizStatus                 = parseInt('@((byte)Model.Status)');
+    var isQuizAttached             = '@Model.IsAttached.ToString().ToLower()' === 'true';
+    $(document).ready(function () {
+        //window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.questionAddNew, addNewQuest, null);
+        //window.getNotifManagerInstance().subscribe(notifEvents.quiz.questionAddNew, addNewQuest, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.questionStateChanged, readQuestions, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.quiz.questionStateChanged, readQuestions, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.quizStatusChanged, updateQuizStatus, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.quiz.quizStatusChanged, updateQuizStatus, null);
+        
+    });
+
+    function updateQuizStatus(status) {
+        quizStatus = parseInt(status);
+    }
+
+    function addNewQuest() {
+        initNewQuest('@Model.QuizId', '@Model.Sid');
+    }
+    function onQuestionRequestEnd(e) {
+        if (e.type === "read") {
+            window.getNotifManagerInstance().notify(notifEvents.quiz.questionReadEnd, e.sender._data.length);
+        }
+    }
+    
+</script>
+
+
+<div class="q-list-container nano">
+    <div class="content">
+        @(Html.Kendo().ListView<QuizQuestionDTO>()
+                .Name("QuizQuestions")
+                .TagName("ul")
+                .HtmlAttributes(new { @class = "ul-quiz-q-list" })
+                .ClientTemplateId("kendo-quiz-quest-list-template")
+                .Editable(e => e.Enabled(true))
+                        .Events(e => e.DataBound("onQuestionListBound").Remove("onQuestionRemoved"))//.Cancel("onChapterEditExit").Save("onChapterEditExit").Remove("onChapterRemoved")
+                .DataSource(ds => ds.Read(read => read.Action("GetQuizQuestionsList", "Quiz", new { id = Model.QuizId }).Type(HttpVerbs.Get)).Events(e=>e.RequestStart("onQuestionRequestEnd"))
+                .Destroy(d => d.Action("DeleteQuestion", "Quiz", new { area = "AuthorAdmin" }))
+                        .Model(model => model.Id("QuestionId")))
+        )
+
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="kendo-quiz-quest-list-template">
+    <li data-val="${QuestionId}" class="">
+        <div class="inner l-one">
+            <div class="drag-box" title="drag to reorder">
+                <i class="drag"></i>
+            </div>
+            <div class="btn-expand-collapse btn-collapse-first" data-val="${QuestionId}">
+                <i class="collapsed"></i>
+            </div>
+            <div class="q-container">
+                <span title="#=Encoder.htmlEncode(QuestionText)#" class="q-txt">#=Encoder.htmlDecode(QuestionText)#</span>
+            </div>
+            <div class="btn-container">
+                <a href="#=emptyHref#" class="btn-edit" data-val="${QuestionId}">Edit Details</a>
+                <a href="#=emptyHref#" class="btn-add-answer" data-val="${QuestionId}">Add/Edit Answers</a>
+                <a href="#=emptyHref#" class="k-delete-button" title="Delete answer">Delete</a>
+            </div>
+        </div>
+        <div class="first-contents" data-load="false" data-val="${QuestionId}" id="q-detail-${QuestionId}"></div>
+    </li>
+</script>
+
+<script type="text/x-kendo-tmpl" id="answer-template">
+    <li data-val="${OptionId}" class="">
+        <div class="inner">
+            <div class="drag-box" title="drag to reorder">
+                <i class="drag"></i>
+            </div>
+            <div class="a-container">
+                <div class="ot">#=Encoder.htmlDecode(OptionText)#</div>
+
+                <div class="chk-field">
+                    <input type='checkbox' data-val="${OptionId}" #=IsCorrect ? "checked" : "" # />
+                    <label for="IsCorrect">Correct</label>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <span class="k-edit-button" data-val="${OptionId}">Edit Answer</span>
+                <span class="l-delete-button" data-val="${OptionId}" title="Delete question">Delete</span>
+            </div>
+        </div>
+    </li>
+</script>

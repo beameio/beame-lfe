@@ -1,0 +1,120 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+    var isUserLoggedIn = WebSecurity.IsAuthenticated;
+}
+@*@Scripts.Render("~/bundles/signalR")
+<script src="@Url.Content("~/signalr/hubs")"></script>*@
+<script>
+    var USER_NOT_REFRESH_INTERVAL;
+    var isUserLogged = '@isUserLoggedIn'.toLowerCase() == 'true';
+    var discussionNotificationHub;
+    var hub = null;
+    var hubStart = null;
+    $(document).ready(function () {
+        clearInterval(USER_NOT_REFRESH_INTERVAL);
+        USER_NOT_REFRESH_INTERVAL = setInterval(rebindUserNot, NOTIFICATION_REFRESH_TIMEOUT);      
+    });
+    function rebindUserNot() {
+        try {
+            var list = $('#UserNotifcation').data("kendoListView");
+            if (list == undefined) return;
+            list.dataSource.read();
+        } catch (e) {
+            if (window.console) console.log(e);
+        }
+    }
+    function onNotificationRequestEnd(e) {
+        if (!isUserLogged) return;
+        if (e.response == undefined) return;
+        var array = $.map(e.response.Data, function (obj) {
+            return $.extend({}, obj);
+        });
+        var newMsg = 0;
+        $.map(array, function (item) {
+            newMsg += item.isRead ? 0 : 1;
+        });
+        window.getHeadNotifManagerInstance().notify(window.headNotifEvents.notif.notifyNewMsg, newMsg);
+    }
+
+    function setNotifState() {
+        if ($('#notif-container').is(':hidden')) {
+            $('#notif-container').css({ 'z-index': -1000 });
+            $('#notif-container').show();
+            setReportScroll(".d-user-not-container");
+            $('#notif-container').css({ 'z-index': 1000 });
+            $('#notif-container').hide();
+        }
+    }
+
+    function onUserNotifBound(e) {
+        setNotifState();
+
+        var lv = e.sender;
+
+        $.each(lv.wrapper.find('li > .btn > .row > .txt'), function () {
+            var h = $(this);
+            var n = h.html().replace(new RegExp("onMessageClickEvent", 'g'), "onMessageClicked");
+            h.html(n);
+        });
+    }
+    function onMessageClicked(uid) {
+
+        var url = '@Url.Action("IFrameMessage","Discussion",new{area="UserPortal"})' + '?id=' + uid;
+
+        var wnd = $("#wndFeed").data("kendoWindow");
+        $('#wndFeed').parent().find('.k-window-titlebar').addClass('l-header');
+
+        wnd.setOptions({
+            height: $(window).height() - 200
+        });
+
+        wnd.refresh(url);
+        wnd.title("Discussion Message");
+        wnd.center();
+
+        wnd.open();
+    }
+</script>
+
+<div class="d-user-not-container nano">
+    <div class="content">
+        @(Html.Kendo().ListView<UserNotificationDTO>()
+            .Name("UserNotifcation")
+            .TagName("ul")
+            .HtmlAttributes(new { @class = "ul-not-list" })
+            .ClientTemplateId("user-not-list-template")
+            .Events(e => e.DataBound("onUserNotifBound"))
+            //.DataSource(ds => ds.SignalR()
+            //                    .AutoSync(true)
+            //                    .Transport(tr => tr.Hub("hub")
+            //                                    .Promise("hubStart")
+            //                                            .Client(c => c.Read("getUserNotifications").Create("create"))
+            //                                            .Server(s => s.Read("getUserNotifications").Create("create"))) //.Create("create")
+            //        )
+            .DataSource(ds => ds.Read( read => read.Action("GetUserNotifications", "User",new{area="UserPortal"}).Type(HttpVerbs.Post)).Events(e=>e.RequestEnd("onNotificationRequestEnd")).ServerOperation(false))
+        )
+    </div>
+</div>
+<div class="view-all">
+    <a href="@Url.Action("UserFeed","Discussion",new{area="UserPortal"})" id="a-view-all-not">View all</a>
+</div>
+
+<script type="text/x-kendo-template" id="user-not-list-template">
+    <li>
+        <div class="btn" onclick="onMessageClicked('${Uid}')">
+            <div class="inline img-container">
+                <img alt="" src="${CreatorPhotoUrl}" />
+            </div>
+            <div class="inline row">
+                <div class="auth">
+                    <span class="cr-name">${CreatorName}</span> <span class="post-on">${PostedOn}</span>
+                </div>
+                <div class="room ellipsis">${RoomName}/${CourseName}</div>
+                <div class="txt ellipsis multiline">
+                    #=Encoder.htmlDecode(HTMLMessage)#
+                </div>
+            </div>
+        </div>
+    </li>
+</script>

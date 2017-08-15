@@ -1,0 +1,38 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@model BaseEntityDTO
+
+
+<script type="text/javascript">
+	function getRequestParams() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)ReportEnums.ePeriodSelectionKinds.thisMonth).ToString())'
+			, id:'@Model.id'
+		};
+	}	
+</script>
+
+@Html.Partial("SalesReports/_SalesReportsScripts")
+
+<div id="d-rep-manage">
+    <div class="page-title">
+        <div class="float-left"></div>
+        <div id="total-title" class="float-right">Total: <span data-bind="text:salesTotal"></span> $</div>
+    </div>
+
+    @Html.Partial("SalesReports/_SalesReportMVVMFilters")
+ 
+</div>
+
+<div style="margin: 20px 0 0">
+    <div id="d-onetime-c">
+        @Html.Partial("SalesReports/Course/_SalesGrid")
+    </div>
+    <div id="d-subscription-c" style="display: none">
+        @Html.Partial("SalesReports/Course/_SubscriptionSalesGrid")
+    </div>
+</div>
+
+@Html.Partial("SalesReports/_SalesReportMVVM")
+
+@Html.Partial("Billing/_SalesReportsTemplates")

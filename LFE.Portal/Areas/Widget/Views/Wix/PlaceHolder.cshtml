@@ -1,0 +1,17 @@
+﻿@model  LFE.DataTokens.ItemProductPageToken
+@{
+    ViewBag.Title = Model.ItemName + " by " + Model.Author.FullName;
+    Layout = "~/Areas/Widget/Views/Shared/_WixBootstrapLayout.cshtml";
+}
+
+@section CSS
+{
+    @Styles.Render("~/Areas/Widget/Content/styles/catalog")
+}
+@section JS
+{
+    @Scripts.Render("~/bundles/widget/catalog")    
+    @Html.Partial("~/Areas/Widget/Views/Shared/Item/_ProductPageScripts.cshtml")
+}
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Item/_ProductPagePartial.cshtml", Model)

@@ -1,0 +1,99 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.CustomTrxDTO
+   
+<script>
+    function onCustomTrxSaved(response) {
+        hideFormLoader();
+        if (response.success) {
+            alert('trx created');
+            window.getNotifManagerInstance().notify(notifEvents.object.rebindReport);
+            setTimeout(function () {
+                $("#wndCustomTrx").data("kendoWindow").close();
+            }, 300);
+        } else {
+            alert(response.error);
+        }
+    }
+</script>
+<style scoped>
+     .row{min-height: 40px;height: auto;margin: 7px 0}
+.editor-label{width: 150px;}
+.editor-label,.editor-field{display: inline-block;vertical-align: top}
+.l-button{background: #26a65b;color: #fff;padding: 7px !important;border-radius: 7px;width: auto;display: block;}
+</style>       
+@using (Ajax.BeginForm("CreateCustomTrx", "Billing", new { Model.LineId, Model.PaymentId,Model.Type }, new AjaxOptions { OnBegin = "javaScript:window.showFormLoader('#fs-custom-trx');", OnSuccess = "onCustomTrxSaved" }, new { @id = "frmCustomTrx", @style = "" }))
+{
+    <fieldset style="padding: 10px" id="fs-custom-trx">
+      
+
+      <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Amount)
+            </div>
+            <div class="editor-field">
+                @(Html.Kendo().CurrencyTextBoxFor(m=>m.Amount).Spinners(false).Decimals(2))
+                @Html.ValidationMessageFor(model => model.Amount)
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Currency)
+            </div>
+            <div class="editor-field">
+                @Model.Currency.ISO
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Fee)
+            </div>
+            <div class="editor-field">
+                @(Html.Kendo().CurrencyTextBoxFor(m => m.Fee).Spinners(false).Decimals(2))
+                @Html.ValidationMessageFor(model => model.Fee)
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.ExternalTrxID)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(model => model.ExternalTrxID)
+                @Html.ValidationMessageFor(model => model.ExternalTrxID)
+            </div>
+        </div>
+        
+        @{
+            if (Model.ScheduledDate != null)
+            {
+                var date = ((DateTime) Model.ScheduledDate).ToShortDateString();
+                
+                <div class="row">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.ScheduledDate)
+                    </div>
+                    <div class="editor-field">
+                          @date
+                    </div>
+                </div>
+
+            }
+        }
+
+        
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Type)
+            </div>
+            <div class="editor-field">
+                @Model.Type.ToString()
+            </div>
+        </div>
+
+        <p>
+            <input class="l-button" type="submit" value="Create Transaction" />
+        </p>
+    </fieldset>
+}

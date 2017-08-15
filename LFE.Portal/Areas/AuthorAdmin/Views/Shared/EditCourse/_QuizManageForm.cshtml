@@ -1,0 +1,133 @@
+﻿
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.CourseQuizDTO
+
+@{
+
+    if (Model.IsValid)
+    {
+        var isEditMode = Model.CourseQuizSid >= 0;
+        
+        if (Model.Quizzes.Any() ||  isEditMode)
+        {
+            var attempts = 10.ToNumberList();
+
+            <script>
+                function onCourseQuizSaving() {
+                    // console.log(e);
+                    showContainerLoader('#wndQuizManage');
+                    return true;
+                }
+                function onCourseQuizSaved(response) {
+                    hideLoader();
+                    if (response.success) {
+                        alert('Quiz Saved');
+                        window.getNotifManagerInstance().notify(notifEvents.quiz.courseQuizSaved, null);
+                        window.closeQuizWnd();
+                    } else {
+                        alert(response.error);
+                    }
+
+                }
+            </script>
+            
+            using (Ajax.BeginForm("SaveCourseQuiz2", "Quiz", new {area = "AuthorAdmin"}, new AjaxOptions {HttpMethod = "Post", OnBegin = "onCourseQuizSaving", OnSuccess = "onCourseQuizSaved"}, new {@id = "frmEditQuiz", @style = ""}))
+             {
+                <fieldset>
+                    <legend></legend>
+
+                    @Html.HiddenFor(m => m.CourseId)
+                    @Html.HiddenFor(m => m.CourseQuizSid)
+                    @Html.HiddenFor(m => m.CourseQuizId)
+
+                    <ul class="ul-frm">
+                        <li>
+                            <label for="QuizId">Select@(isEditMode ? "ed" :"") Quiz</label>
+                            
+                                @{
+                                    if (isEditMode)
+                                    {
+                                        @Html.HiddenFor(m=>m.QuizId)
+                                        <label>@Model.Title</label>
+                                    }
+                                    else
+                                    {
+                                        <div class="k-edit-field">
+                                            @(Html.Kendo().DropDownListFor(m => m.QuizId)
+                                                  .BindTo(Model.Quizzes)
+                                                  .HtmlAttributes(new {@style = "width:400px", @class = "ul-qz"})
+                                                  .DataTextField("Text")
+                                                  .DataValueField("Value")
+                                            )
+                                        </div>
+                                    }
+                                }
+                        </li>
+                        <li>
+                            <label for="AvailableAfter">Availability</label>
+                            <div class="k-edit-field">
+                                @(Html.Kendo().DropDownListFor(m => m.AvailableAfter)
+                                      .HtmlAttributes(new { @style = "width:190px" })
+                                      .DataTextField("Text")
+                                      .DataValueField("Value")
+                                      .DataSource(ds => ds.Read("GetQuizAvailabilityLOV", "Course", new { id = Model.CourseId }))                                      
+                                )
+                            </div>
+
+
+                            <div class="k-edit-field chk-b">
+                                @Html.CheckBoxFor(m => m.IsMandatory)
+                            </div>
+                            <label for="IsMandatory" style="width: 80px;">Mandatory</label>
+                        </li>
+                        <li>
+                            <label for="Attempts">Attempts</label>
+                            <div class="k-edit-field">
+                                @(Html.Kendo().DropDownListFor(m => m.Attempts)
+                                      .HtmlAttributes(new { @style = "width:190px" })
+                                      .DataTextField("Text")
+                                      .DataValueField("Value")
+                                      .OptionLabel("Unlimited")
+                                      .BindTo(attempts)
+                                )
+                            </div>
+                        </li>
+                        <li>
+                            <div class="">
+                                @Html.LabelFor(model => model.TimeLimit, new { })
+                                <div class="k-edit-field" style="width: 250px;">
+                                    @(Html.Kendo().NumericTextBoxFor(m => m.TimeLimit)
+                                          .HtmlAttributes(new { @style = "width:190px;" })
+                                          .Decimals(0)
+                                          .Format("{0:F}")
+                                          .Min(1)
+                                          .Spinners(false)
+                                          .Placeholder("Unlimited")
+                                    )
+                                    <i>Minutes</i>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>                   
+
+                    <div class="btn-action cancel-edit">
+                        <a href="#" onclick="closeQuizWnd()">Cancel</a>
+                    </div>
+                    <div class="btn-action">
+                        <input type="submit" value="Save" />
+                    </div>
+
+                </fieldset>
+             }
+        }
+        else
+        {
+            <h2>You have no more available quizzes for this course</h2>
+        }
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}
+

@@ -1,0 +1,54 @@
+﻿@{
+	ViewBag.Title = "Class Rooms";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<style scoped="scoped">
+	.list-manage-row-up{border-top: none;}
+</style>
+
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.discussion.roomsLoaded, onRoomsLoaded, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.discussion.roomsLoaded, onRoomsLoaded, null);
+	});
+
+	function onRoomsLoaded(total) {
+		$('#d-cr-total').html(total);
+	}
+
+	function editRoom(id,title) {
+
+		var wnd = $("#wndEditClassRoom").data("kendoWindow");
+		var url = '@Url.Action("ClassRoomEditPartial","Discussion")' + '/' + id;
+		wnd.title(id < 0 ? 'Create New ClassRoom' : 'Edit ' + title);
+		$('#wndEditClassRoom').parent().find('.k-window-titlebar').addClass('l-header');
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+</script>
+
+<div class="list-manage-row-up">
+	<div class="count-title" id="d-cr-total">0</div>
+	<a class="add-btn" href="javascript:editRoom(-1)">Add ClassRoom</a>
+</div>
+
+@Html.Partial("Discussion/_AuthorClassRoomsGrid")
+
+	  
+@(Html.Kendo().Window()
+		.Name("wndEditClassRoom")
+		//.Title(false)
+		.Draggable(false)
+		.HtmlAttributes(new{@style="padding:40px 10px 0 10px;overflow:hidden"})
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(400)
+		.Width(625)
+		.Modal(true)  
+		.Animation(false)     
+		.Events(e=>e.Close("cleanWndContent"))
+		.Content("loading .....")	  
+)

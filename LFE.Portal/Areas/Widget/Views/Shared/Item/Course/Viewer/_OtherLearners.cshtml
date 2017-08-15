@@ -1,0 +1,91 @@
+﻿@model LFE.Portal.Areas.Widget.Models.OtherLearnersPageToken
+
+<script>
+	var OL_LIST_CONTAINER_SELECTOR = '#d-ol-full-list';
+	var OL_PERSONAL_CONTAINER_SELECTOR = '#d-ol-personal';
+	var OL_CONTAINER_SELECTOR = '#d-ol-container';
+	
+	var effect;
+	var reverse = false;
+	var flipSupported;
+	
+	$(document).ready(function () {
+	   
+
+		flipSupported = isFxSupported();
+		
+		if (flipSupported) {
+			effect = kendo.fx("#d-ol-container").flipHorizontal($(OL_LIST_CONTAINER_SELECTOR), $(OL_PERSONAL_CONTAINER_SELECTOR)).duration(1000);
+		}
+		
+	   
+	});
+
+	
+	function showLearner(id) {
+		ajaxAction('@Url.Action("GetOtherLearnerPersonalPartial","Item",new{area="Widget"})',{id:id},showLearnerPersonal,null);
+	}
+
+	function showLearnerPersonal(view) {
+		
+		if (flipSupported) {
+			$(OL_PERSONAL_CONTAINER_SELECTOR).html(view);
+		  //  $(OL_CONTAINER_SELECTOR).height(800);
+			effect.stop();
+			reverse ? effect.reverse() : effect.play();
+			reverse = !reverse;
+		} else {
+			$(OL_LIST_CONTAINER_SELECTOR).toggle("slide", function () {
+			//    $(OL_CONTAINER_SELECTOR).height(800);
+				$(OL_PERSONAL_CONTAINER_SELECTOR).html(view).toggle("slide");
+			});
+		}
+		
+	}
+	
+	function showFullList() {
+		if (flipSupported) {
+		   // $(OL_CONTAINER_SELECTOR).height(675);
+			effect.stop();
+			reverse ? effect.reverse() : effect.play();
+		   // $(OL_PERSONAL_CONTAINER_SELECTOR).html(null);
+			reverse = !reverse;
+		} else {
+			$(OL_PERSONAL_CONTAINER_SELECTOR).toggle("slide", function () {
+			 //   $(OL_CONTAINER_SELECTOR).height(675);
+				$(OL_PERSONAL_CONTAINER_SELECTOR).html(null);
+				$(OL_LIST_CONTAINER_SELECTOR).toggle("slide");
+			});
+		}        
+	}
+	
+	
+</script>
+
+<div id="d-ol-container" class="row">    
+	<div id="d-ol-full-list" class="col-xs-12">
+	@{
+		if (Model.AuthorProfile.ProfileCart.Profile != null && Model.ItemId > 0)
+		{
+			@Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/Viewer/_OtherLearnerList.cshtml", Model.ItemId)        
+		}
+	}        
+	</div>
+	
+	<div id="d-ol-personal" class="col-xs-12" style="display: none"></div>
+</div>
+
+
+
+<script type="text/x-kendo-template" id="kendo-ol-list-template">
+	<li data-val="${id}" class="col-xs-12 col-sm-6 col-md-6">
+		<div class="d-lo-cart">   
+			<div class="cell">
+				<img src="${photoUrl}" alt="${name}" />
+			</div>
+			<div class="cell">
+				<label class="name">${name}</label>
+			</div>
+		</div>
+	</li>
+</script>

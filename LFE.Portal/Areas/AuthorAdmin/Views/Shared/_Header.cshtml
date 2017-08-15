@@ -1,0 +1,100 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Helpers
+
+
+
+<header>
+    @{
+        var user = this.CurrentUser();
+
+        if (user != null)
+        {
+            var isPayoutDefined = this.IsPayoutTypeDefined();
+            if (!isPayoutDefined)
+            {
+                @(Html.Kendo().Notification()
+                    .Name("notification")
+                    .Position(p => p.Pinned(true).Top(30))
+                    .AutoHideAfter(0)
+                    .Events(e=>e.Show("onNotifShow"))
+                    .Templates(t =>
+                    {
+                        t.Add().Type("error").ClientTemplateID("errorTemplate");
+                        t.Add().Type("success").ClientTemplateID("successTemplate");
+                        t.Add().Type("notification").ClientTemplateID("notificationTemplate");
+                    })
+                )
+
+                if (User.IsInRole(CommonEnums.UserRoles.Author.ToString()) || User.IsInRole(CommonEnums.UserRoles.Affiliate.ToString()))
+                {
+                    <script>
+                        var notification;
+                        $(document).ready(function () {
+
+                            notification = $("#notification").data("kendoNotification");
+                            notification.show({
+                                title: "Your Payout options have not been defined yet",
+                                message: '@Html.ActionLink("Click here so we'll be able to pay you", "Settings", "Author", null, null, "payout", new { area = "AuthorAdmin" }, null)'
+                            }, "notification");
+
+                            window.getNotifManagerInstance().unsubscribe(notifEvents.account.payoutSaved, hidePayoutAlert, null);
+                            window.getNotifManagerInstance().subscribe(notifEvents.account.payoutSaved, hidePayoutAlert, null);
+                        });
+
+                        function hidePayoutAlert() {
+                            notification.hide();
+                        }
+                    </script>
+                }
+            }
+
+            <div class="top" id="d-head-top">
+                <ul>
+                    <li> Hi, @user.FullName </li>
+                    <li> Last login: @(user.LastLogin == null ? string.Empty : ((DateTime)user.LastLogin).ToShortDateString()) </li>
+                    <li>@Html.ActionLink("Log Out", "SignOff", "Account", new { area = "", returnUrl = @Url.Action("Index", "Home", new { area = "AuthorAdmin" }) }, new { style = "", onclick = "lfe.SignOff();" })</li>
+                </ul>
+            </div>
+            <div class="logo-row">
+                <h1 style="width: 140px;" class=""><a class="logo" title="LFE - Learning from Experience" href="/"> </a></h1>
+                <div class="nav-container">
+                    @Html.Partial("_Navigation")
+                </div>
+            </div>
+        }
+        else
+        {
+            <script>
+                $(document).ready(function () {
+                    window.location.href = '/';
+                });
+            </script>
+        }
+    }
+
+
+</header>
+<script id="notificationTemplate" type="text/x-kendo-template">
+    <div class="note-alert">
+        <i class="note-icon notif"></i>
+        <h3>#= title #</h3>
+        <p>#= message #</p>
+    </div>
+</script>
+
+<script id="errorTemplate" type="text/x-kendo-template">
+    <div class="wrong-pass">
+        <img src="../../../content/web/notification/error-icon.png" />
+        <h3>#= title #</h3>
+        <p>#= message #</p>
+    </div>
+</script>
+
+<script id="successTemplate" type="text/x-kendo-template">
+    <div class="upload-success">
+        <img src="../../../content/web/notification/success-icon.png" />
+        <h3>#= message #</h3>
+    </div>
+</script>
+
+@*@Html.Action("_FeedWindow","Home" , new{area="UserPortal"})*@

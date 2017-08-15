@@ -1,0 +1,12 @@
+﻿@model LFE.Portal.Areas.Widget.Models.ItemIntroToken
+           
+<div class="row promo-video-container">
+    <div class="col col-xs-12">
+        <div class="video-container-wrapper">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/_Player.cshtml", Model)
+        </div>
+    </div>
+</div>
+<div class="desc-container" itemprop="description">    
+    @Html.Raw(Model.IntroHtml)
+</div>

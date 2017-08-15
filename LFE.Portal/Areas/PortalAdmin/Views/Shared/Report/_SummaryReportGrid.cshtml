@@ -1,0 +1,150 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@model SummaryReportDTO
+
+
+<style>
+    .rep th{min-width: 100px;padding: 7px;}
+</style>
+@{
+    if (Model.IsValid && String.IsNullOrEmpty(Model.Message) && Model.Rows.Any())
+    {
+        <div class="k-grid">
+        <table style="background-color: #f2f2f2 !important;background-image: none !important;" role="grid">
+            <colgroup><col><col><col><col><col></colgroup>
+            <thead class="k-grid-header">
+                <tr>
+                    <th class="k-header" scope="col"></th>
+                    @foreach (var period in Model.Periods)
+                    {
+                        <th class="k-header" scope="col">
+                            <span class="k-link">@period</span>
+                        </th>
+                    }
+                    <th class="k-header" scope="col">
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var rowTypes = Utils.EnumWithDescToList<ReportEnums.eSummaryRows>();
+                    var periods = Model.Periods;
+                    var data = Model.Rows;
+
+                    foreach (var row in rowTypes)
+                    {
+                        var t = Utils.ParseEnum<ReportEnums.eSummaryRows>
+                            (row.Value.ToString());
+                        switch (t)
+                        {
+                            case ReportEnums.eSummaryRows.User:
+                                <tr role="row">
+                                    <td role="gridcell">@Utils.GetEnumDescription(t)</td>
+                                    @{
+                                        for (var i = 0; i < periods.Count; i++)
+                                        {
+                                            var i1 = i;
+                                            <td role="gridcell">
+                                                @data.Where(x => x.Period == periods[i1]).Select(x => x.Users).FirstOrDefault().ToString()
+                                            </td> 
+                                        }
+                                    }
+                                    <td role="gridcell">
+                                        @data.Sum(x=>x.Users)
+                                    </td>
+                                </tr>
+                                break;
+                            case ReportEnums.eSummaryRows.Authors:
+                                <tr role="row">
+                                    <td role="gridcell">@Utils.GetEnumDescription(t)</td>
+                                    @{
+                                        for (var i = 0; i < periods.Count; i++)
+                                        {
+                                            var i1 = i;
+                                            <td role="gridcell">
+                                                @data.Where(x => x.Period == periods[i1]).Select(x => x.Authors).FirstOrDefault().ToString()
+                                            </td> 
+                                        }
+                                    }
+                                    <td role="gridcell">
+                                        @data.Sum(x => x.Authors)
+                                    </td>
+                                </tr>
+                                break;
+                            case ReportEnums.eSummaryRows.Courses:
+                                <tr role="row">
+                                    <td role="gridcell">@Utils.GetEnumDescription(t)</td>
+                                    @{
+                                        for (var i = 0; i < periods.Count; i++)
+                                        {
+                                            var i1 = i;
+                                            <td role="gridcell">
+                                                @data.Where(x => x.Period == periods[i1]).Select(x => x.Courses).FirstOrDefault().ToString()
+                                            </td> 
+                                        }
+                                    }
+                                    <td role="gridcell">
+                                        @data.Sum(x => x.Courses)
+                                    </td>
+                                </tr>
+                                break;
+                            case ReportEnums.eSummaryRows.Sales:
+                                <tr role="row">
+                                    <td role="gridcell">@Utils.GetEnumDescription(t)</td>
+                                    @{
+                                        for (var i = 0; i < periods.Count; i++)
+                                        {
+                                            var i1 = i;
+                                            <td role="gridcell">
+                                                @data.Where(x => x.Period == periods[i1]).Select(x => x.Sales).FirstOrDefault().ToString()
+                                            </td> 
+                                        }
+                                    }
+                                    <td role="gridcell">
+                                        @data.Sum(x => x.Sales)
+                                    </td>
+                                </tr>
+                                break;
+                        }                     
+                    }
+                }
+            </tbody>
+          
+        </table>
+        </div>
+        <hr />
+    
+   @(Html.Kendo().Grid<SummaryReportRowDTO>()
+	    .Name("SummaryReportGrid")
+	    .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	    .Columns(columns =>
+	    {
+            columns.Bound(p => p.Period);
+            columns.Bound(p => p.Users).FooterTemplate(@<text>Total: @item.Sum</text>);
+		    columns.Bound(p => p.Authors).FooterTemplate(@<text>Total: @item.Sum</text>);
+            columns.Bound(p => p.Courses).FooterTemplate(@<text>Total: @item.Sum</text>);
+            columns.Bound(p => p.Sales).FooterTemplate(@<text>Total: @item.Sum</text>);	
+	    })	  
+        .BindTo(Model.Rows)
+	    .Sortable(s=>s.Enabled(false))
+	    .Pageable(pager => pager.Enabled(false))
+	    .Filterable(f => f.Enabled(false))	   
+        .DataSource(dataSource => dataSource.Server().Aggregates(aggregates =>
+        {
+            aggregates.Add(p => p.Users).Sum();
+            aggregates.Add(p => p.Courses).Sum();
+            aggregates.Add(p => p.Authors).Sum();
+            aggregates.Add(p => p.Sales).Sum();
+        }))
+      )      
+
+    
+    }
+    else
+    {
+        <h3>@Model.Message</h3>
+    }
+}

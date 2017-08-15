@@ -1,0 +1,76 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Extensions
+@using LFE.Core.Utils
+@model LFE.Portal.Areas.Widget.Models.CheckoutBaseToken
+
+@{
+    ViewBag.Title = "Purchase " + Model.ItemInfo.ItemName + " completed successfully!";
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapCheckoutLayout.cshtml";
+
+    var token = Model.PurchaseCompleteToken;
+
+    var smallItemTypeName = Model.ItemInfo.ItemType == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+}
+
+
+
+
+<div class="sc-main-area rel">
+    <div class="sc-wide-cart sc-success-main">
+        <div class="sub-info bb">
+            <label class="success">Purchase completed successfully!</label>
+            A purchase confirmation was sent to: @Model.PurchaseCompleteToken.BuyerInfo.Email        
+        </div>
+        
+        <div class="it-title semi-bold">
+            <span class="cap">@Model.ItemInfo.Author.FullName</span> - @Model.ItemInfo.ItemName
+        </div>
+        
+        <div class="bb it-title" style="padding-top: 0">
+            @{
+                if (token != null && token.FinalPrice > 0)
+                {
+                    <span class="price">
+                        @token.PriceToken.Currency.Symbol  @token.FinalPrice.FormatPrice(2)
+                    </span>
+                    <span class="txt">
+                        @{
+                            switch (token.PriceToken.PriceType)
+                            {
+                                case BillingEnums.ePricingTypes.ONE_TIME:
+                                    <span>one-time payment</span>
+                                    break;
+                                case BillingEnums.ePricingTypes.SUBSCRIPTION:
+                                    <span>monthly subscription</span>
+                                    break;
+                                case BillingEnums.ePricingTypes.RENTAL:
+                                    <span>rent for @token.PriceToken.NumOfPeriodUnits @token.PriceToken.PeriodType</span>
+                                    break;
+                            }
+                        }
+                    </span>
+                }
+                else
+                {
+                    <span class="price">
+                        FREE @smallItemTypeName
+                    </span>
+                }
+            }
+        </div>
+        
+        <div style="padding-top: 50px;width: 100%;display: table">
+            <a id="sc-link-open-item" class="sc-form-btn sc-btn-gray" href="@this.GenerateItemFullPageUrl(Model.ItemInfo.Author.FullName,Model.ItemInfo.ItemName,Model.ItemInfo.ItemType,Model.TrackingId)">Click to view your new @smallItemTypeName</a>
+        </div>        
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if (window.top == window.self) return;
+
+        var a = $('#sc-link-open-item');
+        a.attr({ 'target': '_blank' });
+        a.html(a.html() + ' in new window');
+    });
+</script>

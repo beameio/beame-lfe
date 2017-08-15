@@ -1,0 +1,36 @@
+﻿@model LFE.Portal.Models.UserIndicatorViewModel
+@using LFE.Portal.Helpers
+
+
+
+@{
+    var isAdmin = this.IsCurrentUserAdmin();       
+}
+
+@if (Model.IsLoggedIn)
+{
+     <div class="links">
+     <span class="link">@Model.DisplayName</span>
+
+   | @Html.Action("_NotificationMenu", "Home", new { area = "UserPortal" }) 
+   | @Html.ActionLink("Account Settings", "UserSettings", "Account", new { area = "" }, new { target = "_blank", @class = "link" })
+   | @Html.ActionLink("Author Login", "Index", "Home", new { Area = "AuthorAdmin" }, new { target = "_blank", @class = "link" })
+   @{
+       if (isAdmin)
+       {
+           @Html.ActionLink("| Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { target = "_blank", @class = "link" })
+       }
+   }
+   | @Html.ActionLink("Log Out ", "SignOff", "Account", new {area="",returnUrl= Request.Url.PathAndQuery}, new { @class = "link" })
+         @* @Html.ActionLink("Sign Out", "Logoff", "Account", new { area = "Widget" }, new { @class = "link"})  *@
+    </div>
+}
+else
+{
+     <div class="links">
+            <a href="https://itunes.apple.com/us/app/lfe.com/id576166691?mt=8" target="_blank" class="link" >iPad Viewer App</a> | 
+            <a id="btnRegister" href="#" class="toolbar-arrow">Register</a> | 
+            <a id="btnLogin" href="#" class="toolbar-arrow">Login</a>
+        </div>
+}
+

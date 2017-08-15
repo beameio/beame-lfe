@@ -1,0 +1,47 @@
+﻿@model LFE.DataTokens.ItemViewerPageToken
+    
+<div class="vp-head">
+
+    <div class="item-thumb col">
+        <img src="@Model.ThumbUrl" alt="@Model.ItemName" class="img-responsive" />
+    </div>
+
+    <div class="item-header col">
+        <div class="inner">
+            <h4>@Model.Author.FullName</h4>
+
+            <h3 class="ellipsis multiline" title="@(HttpUtility.HtmlDecode(Model.ItemName))">@Model.ItemName</h3>
+        </div>
+    </div>
+    
+    <div class="head-buttons-container">
+        <div class="inner rel">
+            <div class="fb-share-button-container" style="visibility: hidden">
+                <div class="inner">
+                    <i class="f-ico inline"></i>
+                    <div class="f-bnt inline">
+                        <a id="aFacebookSwitch2" href="javascript:SetFacebookCoockie();" style="text-decoration:underline; cursor:pointer">Turn Off</a> facebook story notification
+                    </div>
+                </div>
+            </div>
+            <div class="review-button-container">
+                <div class="inner">
+                    <div class="inline">
+                        <div class="rating" id="head-item-rating"></div>
+                    </div>
+                    <div class="inline">
+                        <span class="inline btn-review" id="btn-write-review" title="write course review">Review this course</span>
+                    </div>
+                </div>
+            </div>            
+        </div>      
+    </div>
+
+    
+</div>
+
+<script id="item-rating-template" type="text/x-kendo-template">    
+    # for (var i = 0; i < data; i++) { #
+        <span>☆</span>
+    # } #    
+</script>

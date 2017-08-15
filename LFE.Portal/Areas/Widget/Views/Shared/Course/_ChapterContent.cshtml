@@ -1,0 +1,26 @@
+﻿<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+
+		var video = window.CURRENT_VIDEO_TOKEN;
+
+		if (video == null) return;
+        	
+		handleChangeVideo(video);
+	});
+	
+	function handleChangeVideo(video) {
+       
+		setVideoContent(video);	
+	}
+
+</script>
+<div class="d-chapter-content-container">
+	<div class="ch-cnt-header">
+		<label id="lbl-video-title" class="float-left"></label>	
+	</div>
+	<div  id="bc-player-container" style="display: block"></div>
+	 
+</div>
+

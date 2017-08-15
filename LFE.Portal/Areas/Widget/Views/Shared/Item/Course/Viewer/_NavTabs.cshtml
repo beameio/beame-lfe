@@ -1,0 +1,36 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.DataTokens.ItemInfoToken
+@{
+    var contentUrl    = Url.ActionString("GetChapterContentsPartial", "Item", "Widget");
+    var disucssionUrl = String.Format("{0}?id={1}&courseId={2}", Url.ActionString("GetCourseDiscussionPartial", "Item", "Widget"), Model.ClassRoomId, Model.ItemId);    
+}
+<div class="iv-nav col col-xs-12 col-sm-12 col-md-9 col-lg-9">
+    <ul class="nav-tabs" id="iv-nav-tabs">
+        <li>
+            <a href="#tabContent" class="tb-content" data-toggle="tab" data-url="@contentUrl">View course</a>
+        </li>
+        <li>
+            <a href="#tabDiscuss" class="tb-discuss" data-toggle="tab" data-url="@disucssionUrl">discuss</a>
+        </li>
+        @{
+            if (Model.DisplayOtherLearnersTab)
+            {
+                var otherUrl = String.Format("{0}?id={1}", Url.ActionString("GetOtherLearnersPartial", "Item", "Widget"), Model.ItemId);
+                
+                <li>
+                    <a href="#tabLearner" class="tb-learner" data-toggle="tab" data-url="@otherUrl">other Learners</a>
+                </li>
+            }
+        }        
+    </ul>
+</div>
+
+<div class="iv-nav-autoplay col col-xs-12 col-sm-12 col-md-3 col-lg-3">
+    <div class="autoplay-container">
+        <div class="inner">
+            <label class="inline lbl">autoplay is</label>
+            <a id="btn-autoplay" class="btn on" href="javascript:setAutoplay()">on</a>    
+        </div>
+        
+    </div>
+</div>

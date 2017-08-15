@@ -1,0 +1,96 @@
+﻿@model LFE.DataTokens.LearnerCourseViewerDTO
+
+<script type="text/javascript">
+    var FEED_REFRESH_INTERVAL;
+		$(document).ready(function () {
+
+		    $('#ul-course-tabs').find('.btn').unbind('click').bind('click', function () {
+		        clearInterval(FEED_REFRESH_INTERVAL);
+				var link = $(this);
+				
+				if (link.attr('data-val') == tabsHashPrefix.CONTENT) {
+					$('.autoplay-container').show();
+				}
+				else{
+					$('.autoplay-container').hide();
+				}
+
+				$('#ul-course-tabs').find('.btn').removeClass('active');
+				link.addClass('active');
+
+				var hash = parseHash();
+				window.location.hash = link.attr('data-val') + '-' + hash[1] + '-' + hash[2];
+
+				//reset player
+				window.getBcPlayerInstance().resetPlayer();
+
+				link.parent().submit();
+				
+			});
+
+			var h = parseHash();
+					   
+			$('#ul-course-tabs > li > form > .btn[data-val=' + h[0] + ']').click();         
+						
+		});
+
+		function loadView(view) {
+
+			if (isFxSupported()) {
+				$('#d-tab-content').kendoAnimate({
+					effects: "slideOut:right fadeOut",
+				  //  hide: true,
+					duration: 500,
+					complete: function() {
+						$('#d-tab-content').html(view).kendoAnimate({
+							effects: "slideIn:left fadeIn",
+							show: true,
+							duration: 500
+						});
+					    
+                        if (window.notifyVideoSelection) {
+                            window.notifyVideoSelection = false;
+                            window.getNotifManagerInstance().notify(notifEvents.video.videoSelected, window.SELECTED_VIDEO_ID);
+                            window.SELECTED_VIDEO_ID = null;
+                        }
+					}
+				});
+			} else {
+				$('#d-tab-content').slideUp("slow", function () {
+					$('#d-tab-content').html(view).slideDown("slow");
+				});    
+			}
+
+			
+		}
+
+	</script>
+
+
+<div class="tabs">  
+	<ul class="float-left" id="ul-course-tabs">
+		<li>
+			@using (Ajax.BeginForm("GetChapterContentsPartial", "Course", null, new AjaxOptions { OnSuccess = "loadView", LoadingElementId = "site-loader" }, new { @id = "frmContents" }))
+			{
+				<span data-val="content" title="view course content" class="btn active" id="btn-content-tab">View Course</span>
+			}
+		</li>
+	    <li >
+	        @using (Ajax.BeginForm("GetCourseDiscussionPartial", "Discussion", new { id = Model.ClassRoomId, courseId = Model.CourseId }, new AjaxOptions { OnSuccess = "loadView", LoadingElementId = "site-loader" }, new { @id = "frmDiscus" }))
+			{
+				<span data-val="discuss" title="view course discussion" class="btn" >discussion</span>
+            }	        
+	    </li>
+		<li >
+			@using (Ajax.BeginForm("GetOtherLearnersPartial", "Course", new { id = Model.CourseId}, new AjaxOptions { OnSuccess = "loadView", LoadingElementId = "site-loader" }, new { @id = "frmOthers" }))
+			{
+				<span data-val="learner" title="other course learners" class="btn">other learners</span>
+			}            
+		</li>
+	</ul>
+			
+	<div class="float-right autoplay-container">
+		<label class="inline lbl">autoplay is</label>
+		<a id="btn-autoplay" class="btn on" href="javascript:setAutoplay()">on</a>
+	</div>    
+</div>

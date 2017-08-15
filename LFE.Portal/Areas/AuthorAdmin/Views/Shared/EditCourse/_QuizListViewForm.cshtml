@@ -1,0 +1,40 @@
+﻿@model LFE.DataTokens.QuizDTO
+           
+<ul class="ul-frm">
+    <li>
+        <label for="AvailableAfter">Availability</label>
+
+        <label>
+            @(Model.AvailableAfter != null ? String.Format("After chapter {0}", Model.AvailableAfter) : "End of course")
+        </label>
+
+
+        <div class="k-edit-field chk-b">
+            @Html.CheckBoxFor(m => m.IsMandatory, new { @disabled = "disabled" })
+        </div>
+        <label for="IsMandatory" style="width: 80px;">Mandatory</label>
+    </li>
+    <li>
+        <label for="Attempts">Attempts</label>
+        <label>
+            @(Model.Attempts != null ? Model.Attempts.ToString() : "Unlimited")
+        </label>
+
+        <div class="k-edit-field chk-b">
+            @Html.CheckBoxFor(m => m.IsBackAllowed, new { @disabled = "disabled" })
+        </div>
+        <label for="IsBackAllowed" style="width: auto;">Back navigation allowed</label>
+    </li>
+    <li>
+        <div class="">
+            @Html.LabelFor(model => model.TimeLimit, new { })
+            <label style="width: auto;">
+                @{
+                    var tl = Model.TimeLimit != null ? String.Format("{0} minutes", Model.TimeLimit) : "Unlimited";
+                }
+                @tl
+            </label>
+        </div>
+    </li>
+
+</ul>

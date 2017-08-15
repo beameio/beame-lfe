@@ -1,0 +1,13 @@
+﻿@using LFE.Core.Utils
+@{
+    var useSSL = bool.Parse(Utils.GetKeyValue("useSSL"));
+    if (useSSL && !Request.IsLocal)
+    {
+        <script>
+            if (window.location.protocol === "http:") {
+                var restOfUrl = window.location.href.substr(5);
+                window.location = "https:" + restOfUrl;
+            }
+        </script>
+    }
+}

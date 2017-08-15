@@ -1,0 +1,27 @@
+﻿@{
+	ViewBag.Title = "PayPal Billing Agreement";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_BillingLayout.cshtml";
+}
+
+
+<div data-ng-controller="CourseSelectCntrl" id="dSlctCourse">
+	
+	
+	<input id="course-name" style="width: 400px"  data-kendo-auto-complete="" data-k-options="options"  data-k-on-select="courseSelected(kendoEvent)"/>
+	
+	<hr/>
+	<form name="frmDirectPay"  action="@Url.Action("CreatePaymentAgreement","Billing")" method="POST">
+		
+		<input type = "text" data-ng-show = "false" name="courseId" value="{{CourseId}}" />
+		<input type = "text" data-ng-show = "false" name="price"  value="{{Price}}"/>
+	  
+		<h2>Course name: {{Name}}</h2>
+		
+		<h3>Price: {{Price}}</h3>
+				
+
+		<input type="submit" style="padding: 7px;margin: 15px 0 0" class="k-button" title="Pay" value="Do Payment" /> 
+	</form>     
+</div>
+
+@Html.Partial("Billing/_CourseSelectionController")

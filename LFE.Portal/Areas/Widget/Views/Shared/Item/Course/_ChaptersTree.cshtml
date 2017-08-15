@@ -1,0 +1,45 @@
+﻿@model List<LFE.DataTokens.ContentTreeViewItemDTO>
+
+<ul class="ul-chapters-tree">
+    @{
+        var iChapter = 1;
+        foreach (var chapter in Model)
+        {
+            <li class="li-chap">
+                <h3 style="padding-bottom:10px; margin:0 0 0 0; font-size: 16px; font-weight: bold; text-transform: uppercase;@(iChapter == 0 ? "" : "margin-top:20px")">@iChapter.ToString("00"). @chapter.name (@chapter.duration)</h3>
+                <div class="htmlSlot">@Html.Raw(chapter.desc)</div>
+                @{iChapter++;}
+                <ul class="ul-item-content-list ul-videos-tree" id="ul-v-@chapter.id">
+                    @{
+                        if (chapter.videos != null)
+                        {
+                            foreach (var video in chapter.videos)
+                            {
+                                <li class="li-video" style="cursor: @(video.IsOpen ? "pointer" : "default")" id="li-@video.id" data-id="@(video.IsOpen ? video.bcId : "-1")">
+                                    <div class="content-item">
+                                        <div class="image-wrap rel @(video.IsOpen ? "" : "disable-opacity")">
+                                            @if (!string.IsNullOrEmpty(video.thumb))
+                                            {
+                                                <img src="@(video.thumb.ToLower().Contains("http://") || video.thumb.ToLower().Contains("https://") ? video.thumb : "http://" + Request.Url.Authority + video.thumb)" alt="@video.name" />
+                                            }
+                                            <div class="length">@video.duration</div>
+                                        </div>
+
+                                        <div class="details">
+                                            <div>
+                                                <h4>@video.name</h4>
+                                                <span class="htmlSlot  ellipsis multiline">@Html.Raw(video.desc)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+
+            </li>
+        }
+    }
+</ul>
+

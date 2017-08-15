@@ -1,0 +1,125 @@
+﻿@model LFE.DataTokens.CourseCouponDTO
+
+<script type="text/javascript">
+	var formCouponUserNotifManager;
+	var EDIT_FORM_SELECTOR = '#frmCourseCoupon';
+	var FORM_HEIGHT = COUPON_FORM_HEIGHT;
+	$(document).ready(function () {
+	 
+	    $(window).resize(function () {
+	        
+			adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+	    $(document).scroll(function () {
+	        adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+
+		formCouponUserNotifManager = new UserNotificationManager('#cpn-info', '.alert', false);
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		setTimeout(adjustValidatorsH,50);
+		
+		
+				
+	});
+	
+	function onCouponSaved(response) {
+	    hideFormLoader();
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Coupon saved successfully" : response.error;
+
+		formCouponUserNotifManager.show({ message: msg, kind: kind });
+
+		if (!response.success) return;
+		window.isFormInEditMode = false;
+		window.getNotifManagerInstance().notify(notifEvents.coupon.couponSaved, null);
+		window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		window.getNotifManagerInstance().notify(notifEvents.coupon.switch2List, null);
+	}
+
+
+    function onCouponSaving() {
+        var typeCombo = $('#frmCourseCoupon #Type').data("kendoDropDownList");
+
+        if (typeCombo == undefined) {
+            formCouponUserNotifManager.show({ message: "Type not defined", kind: NotificationKinds.Error });
+            return false;
+        }
+
+        var id = typeCombo.value();
+
+        if (!hasValue(id)) {
+            formCouponUserNotifManager.show({ message: "Type required", kind: NotificationKinds.Error });
+            return false;
+        }
+
+        var typeId = parseInt(id);
+
+        if (typeId == window.CouponTypes.SUBSCRIPTION) {
+            var monthsCombo = $('#frmCourseCoupon #SubscriptionMonths').data("kendoDropDownList");
+
+            if (monthsCombo == undefined) {
+                formCouponUserNotifManager.show({ message: "Discount period combo not defined", kind: NotificationKinds.Error });
+                return false;
+            }
+
+            var m = monthsCombo.value();
+
+            if (!hasValue(m)) {
+                formCouponUserNotifManager.show({ message: "Please select the discount period", kind: NotificationKinds.Error });
+                return false;
+            }
+
+            var months = parseInt(m);
+
+            var amount = $('#frmCourseCoupon #Amount').data("kendoNumericTextBox").value();
+
+            if (!hasValue(amount)) {
+                formCouponUserNotifManager.show({ message: "Coupon Amount value required", kind: NotificationKinds.Error });
+                return false;
+            }
+
+            //For recurring payments with Express Checkout, the payment amount can be increased by no more than 20% every 180 days 
+            if (months <= 6 && amount > 20) {
+                formCouponUserNotifManager.show({ message: "For discount less or equal to 6 months, amount should be less as 20%", kind: NotificationKinds.Error });
+                return false;
+            }
+        }
+        
+        showContainerLoader('#f-cpn', null);
+        return true;
+    }
+</script>
+<style>
+	#cp-info{ height: 20px;margin-left: 130px}
+	#frmCoursePrice{ padding-bottom: 22px; border-bottom: 2px solid #9f9f9f}
+</style>
+@using (Ajax.BeginForm("SaveCourseCoupon", "Course", new { id = Model.CourseId }, 
+                        new AjaxOptions { OnBegin = "javaScript:return onCouponSaving()", OnSuccess = "onCouponSaved", LoadingElementId = "site-loader" }, 
+                        new { @id = "frmCourseCoupon", @style = "height:340px;position: relative" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)	
+	@Html.Partial("Coupons/_EditCouponForm",Model)
+	
+    <div class="form-cmd-row wrap" id="d-cpn" style="display: none">
+			<div class="inner">
+				<div id="cpn-info"  class="info-box" >
+					<p class="alert"></p>
+				</div>
+				<div class="btn-container">
+					<a href="javaScript:cancelEditCoupon()" class="btn-cancel inline" title="cancel coupon editing">cancel</a>
+					<a href="javaScript:submitForm('frmCourseCoupon')" class="btn-submit inline" title="save coupon">save changes</a>
+				</div>
+			</div>
+		</div>	
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        adjustCmdPosition(EDIT_FORM_SELECTOR);
+    });
+</script>	

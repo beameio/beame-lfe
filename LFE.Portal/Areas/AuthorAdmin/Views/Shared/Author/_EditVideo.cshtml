@@ -1,0 +1,384 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Helpers
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditVideoToken
+
+@{
+    var isInProgress = Model.videoDTO.fileId != null;
+}
+
+<script>
+    var SUCCESS_UPLOAD_MSG = "We are processing your video. This can take some time. You can keep working in other screens in the meantime";
+    var EDIT_FORM_SELECTOR = '#frmEditBcVideo';
+    var BC_TH_PLAEYR_W = 290;
+    var BC_TH_PLAEYR_H = 198;
+    var uploadConsole, formUserNotifManager;
+    var videosSaved = 0;
+    var uploaderOrigin = "@this.UploaderOrigin()";
+
+    function generateBcId(uid) {
+        var videoId = Math.round(Date.now() * Math.random());
+        if (uid != null) {
+            var cominedId = videoId.toString() + uid.toString();
+
+            return cominedId;
+        }
+        return videoId;
+    }
+
+    $(document).ready(function () {
+
+        formUserNotifManager = new UserNotificationManager('#vd-info', '.alert', false);
+
+        var form = $(EDIT_FORM_SELECTOR);
+
+        window.initUnobstructiveFormValidation(form);
+
+        window.adjustValidatorsH();
+
+        window.setReportScroll("#li-upload-container");
+    });
+
+    function validateVideoForm() {
+        var mode = '@Model.mode.ToString().ToLower()';
+
+        var title = $('#videoDTO_title').val();
+        if (!hasValue(title)) {
+            window.formUserNotifManager.show({ message: "Title required", kind: window.NotificationKinds.Error });
+            return false;
+        }
+
+        if (mode == window.FormModes.insert) {
+            var fileId = $('#videoDTO_fileId').val();
+            if (!hasValue(fileId)) {
+                window.formUserNotifManager.show({ message: "Upload video file", kind: window.NotificationKinds.Error });
+                return false;
+            }
+        }
+
+        window.showContainerLoader('#frmEditBcVideo', null);
+        return true;
+    }
+
+    function onThumbSaved(e) {
+        var operation = e.operation;
+        var response = e.response;
+
+        if (!response) return;
+
+        if (!response.success) {
+            window.formUserNotifManager.show({ message: response.error, kind: window.NotificationKinds.Error });
+            return;
+        }
+
+        switch (operation) {
+            case "upload":
+                window.formUserNotifManager.show({ message: window.userMessages.UPLOAD.VIDEO_THUMB_UPDATED, kind: window.NotificationKinds.Success });
+                break;
+        }
+    }
+
+    function onThumbUploadAction(e) {
+        // Array with information about the uploaded files
+        var files = e.files;
+
+        // Check the extension of each file and abort the upload if it is not .jpg
+        $.each(files, function () {
+            if ($.inArray(this.extension.toLocaleLowerCase(), window.IMAGE_EXTENSIONS) < 0) {
+                window.formUserNotifManager.show({ message: window.userMessages.UPLOAD.ONLY_IMAGE, kind: window.NotificationKinds.Error });
+                e.preventDefault();
+                return;
+            } else {
+                //showContainerLoader('#d-crs-thumb', null);
+            }
+        });
+
+        e.data = {};
+        e.data["id"] = JSON.stringify('@Model.videoDTO.identifier');
+
+        //   console.log(e);
+    }
+    function closeVideoEditWnd() {
+        $("#wndEditVideo").data("kendoWindow").close();
+    }
+
+    function onVideoSaved(response) {
+        window.hideLoader();
+        var kind = response.success ? window.NotificationKinds.Success : window.NotificationKinds.Error;
+        var msg = response.success ? window.userMessages.UPLOAD.VIDEO_UPDATED : response.error;
+
+        window.formUserNotifManager.show({ message: msg, kind: kind });
+
+        if (response.success) {
+            setTimeout(function () {
+                window.getNotifManagerInstance().notify(window.notifEvents.video.videoSaved, response.result);
+                videosSaved++;
+                closeVideoEditWnd();
+            }, 25000);
+
+        }
+    }
+
+
+
+
+    function handleWndClosed(e) {
+
+        window.getNotifManagerInstance().notify(window.notifEvents.video.videoSaved, null);
+        window.cleanWndContent(e);
+    }
+
+    function onVideoRemove() {
+        window.setReportScroll("#li-upload-container");
+    }
+
+    function mimeType(extension) {
+        var types = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".gif": "image/gif"
+            // ...
+        };
+
+        return types[extension.toLowerCase()];
+    }
+
+    function onSelect(e) {
+        // Filter selected files by extension
+        for (var i = 0; i < e.files.length; i++) {
+            var file = e.files[i];
+        }
+    }
+
+    var startSent = [];
+    var completeSent = [];
+
+    function uploaderListener(event) {
+
+        console.log('uploaderListener event', event.origin, uploaderOrigin, event.origin == uploaderOrigin);
+        if (event.origin != uploaderOrigin) {
+            //console.log('Unauthorized request blocked');
+            return;
+        }
+        var token = JSON.parse(event.data);
+        //console.log('uploaderListener token' + token);
+        if (!token.action) {
+            console.log('uploaderListener:: action not defined');
+            return;
+        }
+
+        switch (token.action) {
+            case 'start':
+                if ($.inArray(token.vid, startSent)>=0) return;
+
+                //console.log('onstart cb');
+                //console.log(token.file);
+
+                startSent.push(token.vid);
+
+                if (!token.file) {
+                    console.log('uploaderListener::on uploader start::file is empty');
+                    return;
+                }
+
+                var data = {
+                     bcId: token.vid
+                    , fileName: token.file.name
+                    , contentType: token.file.type
+                    , size: token.file.size
+                    , tags: $('#frmEditBcVideo #Tags').val()
+                };
+
+                $.ajax({
+                    url: '@Url.Action("OnUploadBegin","Upload",new{area="AuthorAdmin"})',
+                    cache: false,
+                  //  async: true,
+                    type: "Post",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8"
+                    , success: function (response) {
+                        console.log('begin upload saved for ' + token.vid);
+                    }
+                });
+                break;
+            case 'complete':
+
+                if ($.inArray(token.vid, completeSent) >= 0) return;
+
+                completeSent.push(token.vid);
+
+                $.ajax({
+                    url: '@Url.Action("OnUploadEnd","Upload",new{area="AuthorAdmin"})',
+                    cache: false,
+                   // async: true,
+                    type: "Post",
+                    data: JSON.stringify({ vid: token.vid }),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8"
+                   , success: function (response) {
+                       console.log('end upload saved for ' + token.vid);
+                       if (response.success) {
+                           window.transcodeVideo(token.vid, token.file.name);
+                       }
+                   }
+                });
+                break;
+            case "error":
+                window.formUserNotifManager.show({ message: token.message, kind: window.NotificationKinds.Error });
+                break;
+            default:
+                console.log('uploaderListener::unknown action is ' + token.action);
+                return;
+        }
+        }
+
+        window.addEventListener("message", uploaderListener, false);
+        //addEventListener(window, 'message', iFrameListener);
+</script>
+
+
+
+@using (Ajax.BeginForm("SaveVideo", "Author", null, new AjaxOptions { OnBegin = "validateVideoForm", OnSuccess = "onVideoSaved", LoadingElementId = "site-loader" }, new { @id = "frmEditBcVideo", @style = "height: 100%;" }))
+{
+    @Html.HiddenFor(x => x.videoDTO.identifier)
+    @Html.HiddenFor(x => x.videoDTO.fileId)
+    <fieldset style="height:485px;position: relative;padding:0">
+        <legend style="display: none;" class="l-header">
+            <span class="inner">
+                Upload new videos
+            </span>
+        </legend>
+        @{
+            if (Model.mode == CommonEnums.ePageMode.insert)
+            {
+
+                if (isInProgress)
+                {
+                    <label style="display: block;width: 100%;text-align: center;color: #333;font-size: 18px">
+                        File waiting for upload
+                    </label>}
+                else
+                {
+                    <ul class="ul-edit-form vd">
+                        <li>
+                            <label style="font-size: 18px;width: 100px;">
+                                <span style="display: block;padding: 15px 0 0">Tags</span>
+                            </label>
+                            <div class="input-container">
+                                @Html.TextAreaFor(m => m.Tags, new { @rows = 2, @cols = 30, @style = "height:80px" })
+                                <span style="display: block;margin: 4px 0 0;font-size: 11px; color:#666">separate by comma</span>
+                            </div>
+                        </li>
+                        <li class="nano" style="height: 170px;width: 530px;" id="li-upload-container">
+                            <div class="content">
+                                <label style="font-size: 18px;width: 100px;">
+                                    <span style="display: block;padding: 15px 0 0">Upload files</span>
+                                </label>
+                                <div class="input-container" style="width: 500px">
+                                    <div id="async-upload" style="position: relative">
+                                        @*@(Html.Kendo().Upload()
+                                                   .Name("file")
+                                                   .Multiple(true)
+                                                   .ShowFileList(true)
+                                                    .Events(e => e.Upload("onVideoUploadAction").Select("onVideoSelected").Success("onVideoUploadSuccess")) //.Remove("onVideoRemove").Cancel("onVideoRemove")
+                                                    .Async(a => a.AutoUpload(true)
+                                                    .SaveUrl(ViewBag.S3Config.BucketUrl)
+                                            ))*@
+                                        <iframe src="@this.UploaderOrigin()?uid=@this.CurrentUser().UserId" id="ifrm-mule-upload" style="width: 92%;margin: 0 4%"></iframe>
+                                    </div>
+
+                                    <span style="display: block;margin: 4px 0 0;font-size: 11px; color:#666">
+                                        Allowed extensions: .mov,.mpg, .mpeg4, .mp4,.mv4,.wmv,.avi,.ogv,.3gp,.3g2
+                                    </span>
+
+                                    <div id="async-upload-console" class=""></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>}
+            }
+            else
+            {
+                <ul class="ul-edit-form vd">
+                    <li>
+                        @Html.LabelFor(m => m.videoDTO.title)
+                        <div class="input-container">
+                            @Html.TextBoxFor(m => m.videoDTO.title, new { @class = "txt-inp", @onchange = "onTxtBoxChanged(this)" })
+                        </div>
+                        <div class="validator-container">
+                            @Html.ValidationMessageFor(model => model.videoDTO.title, null, new { @class = String.IsNullOrEmpty(Model.videoDTO.title) ? "" : "pass" })
+                        </div>
+                    </li>
+                    <li style="max-height:140px;height: auto" id="li-thumb-upload-container">
+                        <label>Upload thumbnail</label>
+                        <div class="input-container" style="width: 400px">
+                            <div id="async-upload" style="position: relative">
+                                @(Html.Kendo().Upload()
+                                                    .Name("VideoThumb")
+                                                    .Messages(m => m.Select("Select thumb"))
+                                                    .Multiple(false)
+                                                    .ShowFileList(true).Messages(m => m.StatusUploaded("Thumb uploaded"))
+                                                    .Events(e => e.Upload("onThumbUploadAction").Success("onThumbSaved"))
+                                                    .Async(a => a.AutoUpload(true)
+                                                    .Save("SaveVideoThumb", "Upload")
+                                            ))
+                            </div>
+
+                            <div style="margin:0px;font-size:0.8em; color:#666">
+                                Allowed extensions: .jpg, .jpeg, .gif , .png
+                                <div style="font-size:0.75em;margin-top:3px;">A video thumbnail is the image displayed on the video player before starting to play the video. This enables you to ensure the first view a learner has on your course is picture perfect!</div>
+                            </div>
+
+                            <div id="async-upload-console" class=""></div>
+                        </div>
+                    </li>
+                    <li>
+                        @Html.Label("Video")
+                        <div class="input-container thumb-box video-th" id="d-video-edit-thumb">
+                            @{
+
+                                <script>
+                                        var token = {
+                                            stillUrl: fixSR('@Model.videoDTO.stillUrl')
+                                            , title: '@Model.videoDTO.title'
+                                            , minutes: '@Model.videoDTO.minutes'
+                                            , identifier: '@Model.videoDTO.identifier'
+                                            , videoUrl: fixSR('@Model.videoDTO.videoUrl')
+                                        };
+                                        buildThumbMediaPlayer(token, '#d-video-edit-thumb');                                        
+                                </script>
+                            }
+                        </div>
+                </ul>
+                                }
+        }
+
+
+        <div class="form-cmd-row " id="d-vd" style="padding: 0 10px;width: 585px;">
+            <div class="inner">
+                <div class="info-box" id="vd-info">
+                    <p class="alert"></p>
+                </div>
+                <div class="btn-container">
+                    <a href="javaScript:closeVideoEditWnd()" class="btn-cancel" id="btn-video-close">close</a>
+                    @{
+                        if (Model.mode == CommonEnums.ePageMode.edit)
+                        {
+                            <a href="javaScript:submitForm('frmEditBcVideo')" class="btn-submit">save changes</a> }
+                    }
+                </div>
+            </div>
+        </div>
+    </fieldset>
+                        }
+
+<script type="text/x-kendo-template" id="kendo-video-thumb-template">
+    <div class="preview" id="thumb-${identifier}" style="background: url('${fixSR(stillUrl)}') no-repeat;">&nbsp;</div>
+
+    <div class="hint" style="display:none;" id="hint-${identifier}">
+        <span class="play" id="play-${identifier}">Play</span>
+    </div>
+
+    <div style="display:none;" class="list-player jwp" id="player-#=newGuid()#"></div>
+</script>

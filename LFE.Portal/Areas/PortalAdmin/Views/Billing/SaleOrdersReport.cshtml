@@ -1,0 +1,339 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.DataTokens
+
+@model TransactionFiltersLOV
+@{
+	ViewBag.Title = "Sales orders report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="font-size: 24px;margin-bottom: 20px">Sales order Report</h2>
+
+@*@Html.Partial("Billing/_TrxReportFilters",Model)*@
+
+
+<script>
+	var currentGridId = null;
+	var amp = '#';
+	var fltrSellerId, fltrBuyerId, fltrCourseId, fltrBundleId, fltrStoreId, fltrOnlySubscriptions, fltrStatus;
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindTrxReport, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindTrxReport, null);
+	});
+
+	function rebindTrxReport() {
+		var wnd = $("#wndRefund").data("kendoWindow");
+		if (wnd != undefined) wnd.close();
+
+		if (!hasValue(currentGridId)) {
+			$('#OrderReport').data("kendoGrid").dataSource.read();
+			return;
+		}
+
+		$('#' + currentGridId).data("kendoGrid").dataSource.read();
+	}
+
+
+
+	function doRefund(e) {
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		//console.log(dataItem);
+
+		if (!dataItem.IsRefundable) {
+			alert('refund not allowed');
+			return;
+		}
+
+		currentGridId = 'lines_' + dataItem.OrderId;
+
+		var id = dataItem.PaymentId;
+		//var sid = dataItem.SubscriptionSid;
+		//var subId = dataItem.SubscriptionId;
+		var amount = Math.min(dataItem.TotalPrice, Math.round(parseFloat(dataItem.TotalPrice - dataItem.TotalRefunded), 2));
+
+		var wnd = $("#wndRefund").data("kendoWindow");
+
+		var url = '@Url.Action("_RefundOrderLinePayment", "Billing")' + '/?paymentId=' + id + '&amount=' + amount;
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+	function cancelSubscription(e) {
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		//SALE = 1
+		//SUBSCRIPTION = 2
+
+		if (dataItem.LineType != 2) {
+			alert('cancel not allowed');
+			return;
+		}
+
+		if (!window.confirm('Are You sure?')) return;
+
+		var data = {
+			id: dataItem.LineId
+			, paymentMethod: dataItem.PaymentMethod
+		};
+		window.showLoader();
+		$.ajax({
+			url: '@Url.Action("CancelSubscription","Billing")',
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+				window.hideLoader();
+				if (response.success) {
+					alert("Subscription canceled");
+					$('#OrderReport').data("kendoGrid").dataSource.read();
+				} else {
+					alert(response.error);
+				}
+			}
+		});
+	}
+
+	function onLinesBound(e) {
+		var grid = e.sender;
+		var data = grid.dataSource.data();
+		$.each(data, function (i, row) {
+			//console.log(row);
+			if (row.LineType != 2 || row.Status != 'Active') // subscription
+				$('tr[data-uid="' + row.uid + '"] ').find(".k-grid-Cancel").hide();
+		});
+	}
+
+	function onPaymentsBound(e) {
+		var grid = e.sender;
+		var data = grid.dataSource.data();
+
+		$.each(data, function (i, row) {
+			if (!(row.IsRefundable))
+				$('tr[data-uid="' + row.uid + '"] ').find(".k-grid-Refund").hide();
+
+			if(!(row.IsCustomTrxAllowed))
+				$('tr[data-uid="' + row.uid + '"] ').find(".k-grid-CreateTrx").hide();
+		});
+	}
+
+	function onRequestSend() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)ReportEnums.ePeriodSelectionKinds.lastMonth).ToString())'
+			, sellerId: fltrSellerId
+			, buyerId: fltrBuyerId
+			, courseId: fltrCourseId
+			, bundleId: fltrBundleId
+			, storeId: fltrStoreId
+			, isSubscription: fltrOnlySubscriptions
+			, status: $('#ddlStatus').data("kendoDropDownList") != undefined ? $('#ddlStatus').data("kendoDropDownList").value() : null
+		};
+	}
+
+	function createPaymentTrx(e) {
+
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		//console.log(dataItem);
+
+		if (!dataItem.IsCustomTrxAllowed) {
+			alert('custom trx not allowed');
+			return;
+		}
+
+		currentGridId = 'lines_' + dataItem.OrderId;
+
+		var id = dataItem.PaymentId;
+	  
+
+		var wnd = $("#wndCustomTrx").data("kendoWindow");
+
+		var url = '@Url.Action("_CustomTrxWindow", "Billing")' + '/' + id;
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+</script>
+<style>
+	a.prof, a.pay {
+		color: blue;
+		text-decoration: underline;
+	}
+</style>
+
+
+@Html.Partial("Billing/_ReportFilters")
+
+@(Html.Kendo().Grid<OrderDTO>()
+	  .Name("OrderReport")
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.OrderNumber).Title("Order N");
+		  columns.Bound(p => p.Seller.FullName).Title("Seller").ClientTemplate("<span data-val='${Seller.UserId}' title='click to view user details' class='list-cmd usr-btn'>#=Seller.FullName#</a>");
+		  columns.Bound(p => p.Buyer.FullName).Title("Buyer").ClientTemplate("<span data-val='${Buyer.UserId}' title='click to view user details' class='list-cmd usr-btn'>#=Buyer.FullName#</a>");
+		  columns.Bound(p => p.OrderDate).Title("Date").Format("{0:d}");
+		  columns.Bound(p => p.TotalAmount).Title("Amount").ClientTemplate("#=kendo.toString(TotalAmount, 'n2')##=TotalAmount > 0 ? Currency.Symbol : ''#").Width(100);
+		  columns.Bound(p => p.PaymentMethodName).Title("Method");
+		  columns.Bound(p => p.PaymentInstrumentName).Title("Instr.");
+		  columns.Bound(p => p.WebStore.Name).Title("Web store");
+		  columns.Bound(p => p.StatusName).Title("Status");
+	  })
+		.Events(e => e.DataBound("boundGridUserDetails"))
+		.ClientDetailTemplateId("template-order-lines")
+		.Sortable()
+		.Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+		.Filterable(f => f.Enabled(false))
+		.DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.OrderId))
+							.Read(read => read.Action("GetOrders", "Billing").Data("onRequestSend").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+)
+
+
+
+<script id="template-order-lines" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<OrderLineDTO>()
+		   .Name("lines_#=OrderId#")
+		   .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+		   .Columns(columns =>
+			{
+				columns.Bound(p => p.ItemName).Width(300);
+				columns.Bound(p => p.PaymentTermName).Title("Term").Width(150);
+				columns.Bound(p => p.LineType).Title("Type").Width(100);
+				columns.Bound(p => p.Price).Title("Price").ClientTemplate("\\#=kendo.toString(Price, \"n2\")\\#\\#=Currency.Symbol\\#").Width(100);
+				columns.Bound(p => p.Discount).Title("Discount").ClientTemplate("\\#=kendo.toString(Discount, \"n2\")\\#\\#=Currency.Symbol\\#").Width(100);
+				columns.Bound(p => p.TotalPrice).Title("Amount").ClientTemplate("\\#=kendo.toString(TotalPrice, \"n2\")\\#\\#=Currency.Symbol\\#").Width(100);
+				columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(100);
+				columns.Bound(p => p.CouponValue).Title("Coupon").Width(100);
+				columns.Bound(p => p.PaypalProfileID).Title("ProfileID").Width(100);
+				columns.Command(c => c.Custom("Cancel").Click("cancelSubscription")).Width(80).Title(" ");
+
+			})
+			.Events(e => e.DataBound("onLinesBound"))
+			.Sortable(s => s.Enabled(false))
+			.Pageable(pager => pager.Enabled(false))
+			.Filterable(f => f.Enabled(false))
+			.ClientDetailTemplateId("template-order-line-trx")
+			.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.LineId)).Read(read => read.Action("GetOrderLines", "Billing", new { OrderId = "#=OrderId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+<script id="template-order-line-trx" type="text/kendo-tmpl">
+	@(Html.Kendo().TabStrip()
+			.Name("tabStrip_#=LineId#")
+			.SelectedIndex(0)
+			.Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+			.Items(items =>
+			{
+				items.Add().Text("Payments").Content(
+					@<text>
+						@(Html.Kendo().Grid<LinePaymentDTO>()
+									.Name("payments_#=LineId#")
+									.TableHtmlAttributes(new { @style = "background-image: none !important;" })
+									.Columns(columns =>
+									{
+										columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+										columns.Bound(p => p.TypeName).Width(60).Title("Type");
+										columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+										columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#");
+										columns.Bound(p => p.Status).Width(100).Title("Status");
+										columns.Bound(p => p.ScheduledDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+										columns.Bound(p => p.CompletedDate).Width(80).Format("{0:MM/dd/yy}").Title("Completed");
+										columns.Command(c => c.Custom("Refund").Click("doRefund")).Width(80).Title(" ");
+										columns.Command(c => c.Custom("Create Trx").Click("createPaymentTrx")).Width(80).Title(" ");
+									})
+									.ClientDetailTemplateId("template-payment-refunds")
+									.Sortable(s => s.Enabled(false))
+									.Pageable(pager => pager.Refresh(true).Enabled(false))
+									.Filterable(f => f.Enabled(false))
+									.Events(e => e.DataBound("onPaymentsBound"))
+									.DataSource(dataSource => dataSource.Ajax()
+									.Model(model => model.Id(p => p.PaymentId))
+									.Read(read => read.Action("GetOrderLinePayments", "Billing", new { LineId = "#=LineId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+					</text>
+				);
+				items.Add().Text("Transactions").Content(
+					@<text>
+						@(Html.Kendo().Grid<TransactionSummaryToken>()
+									.Name("trx_#=LineId#")
+									.TableHtmlAttributes(new { @style = "background-image: none !important;" })
+									.Columns(columns =>
+									{
+										columns.Bound(p => p.TrxId).Width(60);
+										columns.Bound(p => p.PaymentNumber).Width(60).Title("Pay. N");
+										columns.Bound(x => x.ExternalTrxId).Width(80).Title("External ID");
+										columns.Bound(p => p.Fee).Width(80).ClientTemplate("\\#=kendo.toString(Fee, \"n2\")\\#\\#=Currency.Symbol\\#");
+										columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+										columns.Bound(p => p.TrxTypeName).Width(100).Title("Type");
+										columns.Bound(p => p.TrxDate).Width(80).Format("{0:MM/dd/yy}").Title("Date");
+									})
+									.Sortable(s => s.Enabled(false))
+									.Pageable(pager => pager.Enabled(false))
+									.Filterable(f => f.Enabled(false))
+									.DataSource(dataSource => dataSource.Ajax()
+										.Model(model => model.Id(p => p.TrxId))
+										.Read(read => read.Action("GetOrderLineTransactions", "Billing", new { LineId = "#=LineId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+					</text>
+				);
+
+			}).ToClientTemplate())
+</script>
+
+
+
+
+<script id="template-payment-refunds" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<PaymentRefundDTO>()
+		   .Name("refund_#=PaymentId#")
+		   .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+		   .Columns(columns =>
+		   {
+			   columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+			   columns.Bound(p => p.TypeName).Width(60).Title("Type");
+			   columns.Bound(p => p.RefundDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+		   })
+			.Sortable(s => s.Enabled(false))
+			.Pageable(pager => pager.Enabled(false))
+			.Filterable(f => f.Enabled(false))
+			.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.RefundId)).Read(read => read.Action("GetPaymentRefunds", "Billing", new { PaymentId = "#=PaymentId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+
+
+
+@(Html.Kendo().Tooltip()
+	.For("#OrderReport")
+	.Filter(".col-tooltip")
+	.Position(TooltipPosition.Top)
+	.Width(300)
+)
+@(Html.Kendo().Window()
+		.Name("wndRefund")
+		.Title("Refund transaction")
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(300)
+		.Width(450)
+		.Modal(true)
+		.Events(e => e.Close("clearWndContent"))
+	  )	
+@(Html.Kendo().Window()
+		.Name("wndCustomTrx")
+		.Title("Create transaction")
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(400)
+		.Width(450)
+		.Modal(true)
+		.Events(e => e.Close("clearWndContent"))
+)

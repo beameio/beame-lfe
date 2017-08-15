@@ -1,0 +1,34 @@
+﻿@import "../../../../../Content/styles/less/mixins";
+@import "../../../../../Content/styles/less/variables";
+@import "variables";
+@import "mixins";
+
+
+.pp-price-row .g2t-container {
+    position: absolute;bottom: 0;height:84px;width: 380px;
+    .ul-g2t-boxes { background: #fff;width: 100%;height: 100%;
+        > li{ width:20%;height: 100%;.float-left;
+              &:last-child > .inner{ width: 100%;}
+              > .inner{ width: calc(100% - 2px);color:#fff;height: 100%;
+                   &.static{background-color:@g2t_box_static_bg_color;
+                        &.live{.g2t-box-bg("live");background-position:center center;}
+                        &.camera{.g2t-box-bg("camera");background-position:center center;}
+                   } 
+                   &.dynamic{background-color:@g2t_box_dynamic_bg_color;
+                        &.places{text-transform:uppercase;text-align:center;
+                            span{display:block;text-align:center;margin:0 auto;
+                                &.cnt{.semi-bold;font-size:28pt;}
+                                &.msg{font-size:11px;width:80%;}
+                            }                            
+                        }
+                        &.count{.g2t-box-bg("clock");background-position:center 15px;
+                                .timer-container{width:90%;text-align:center;margin:0 auto;padding-top:60px;
+                                    > .timer{font-size:11px;color:#fff;}
+                                }
+                            }
+                        }
+                        &.more{.g2t-box-bg("more");background-position:center center;}
+                   } 
+              }
+        }
+}

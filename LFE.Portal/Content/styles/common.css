@@ -1,0 +1,156 @@
+﻿/* reset5 © 2011 opensource.736cs.com MIT */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,audio,canvas,details,figcaption,figure,footer,header,hgroup,mark,menu,meter,nav,output,progress,section,summary,time,video{border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;margin:0;padding:0;}
+article,aside,figure,footer,header,hgroup,nav,section,blockquote{display:block;}
+nav ul{list-style:none;}
+ol{list-style:decimal;}
+ul{list-style:none;}
+ul ul{list-style:none;}
+fieldset{border: none}
+ins{text-decoration:underline;}
+del{text-decoration:line-through;}
+mark{background:none;}
+abbr[title],dfn[title]{border-bottom:1px dotted #000;cursor:help;}
+table{border-collapse:collapse;border-spacing:0;}
+hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0;}
+input[type=submit],input[type=button]{margin:0 ;padding:0;}
+a{outline:medium none;text-decoration:none}
+
+/*register form*/
+header.login{background:url('../../Content/images/login-logo.png') no-repeat center center #252b30;height: 194px;width: 100%}
+
+#d-reg-form{ width: 380px;margin: 0 auto 0 115px;text-align: left}
+.form-lfe-login {position: relative}
+.ul-login li input,.ul-reg li input{ width: 270px;height:16px !important;border: 1px solid #a4a4a4;margin: 0 0 4px 0;background-color: #ccced0;color: #333;padding: 8px 0 8px 8px}
+.ul-reg li input.inp-name-w{width: 128px}
+.forgotPassword {display:block; text-decoration: underline;font-size: 12px;color: #000;}
+.reg-form{display: block;position: relative;text-align: left}
+.ajax-form{position: relative}
+.hidden{display: none}
+.disabled{-ms-opacity:.5;opacity:.5}
+.form-lfe-login .btn-reg-form{ right: 20px;bottom:24px}
+.reg-form .btn-reg-form{ right: 20px;bottom:4px}
+
+.btn-reg-form{color: #fff;font-size: 13px;background: #329900;font-family: Arial;width: 70px;margin: 0 0 0 130px !important;padding: 5px !important;cursor: pointer;border: 0;position: absolute;}
+.btn-fb-login{margin: 0 0 30px 30px !important;display: block;width: 205px;height: 40px;border: 0;cursor: pointer;background: url('../../Content/images/icons/btn-bf-login.png') no-repeat}
+
+a:link,a:visited,a:active,a:hover{color:#666}
+
+.d-forgot-pwd{font-size: 12px;width: 270px;text-align: right;margin: 5px 0 0}
+.d-forgot-pwd a{ color: #fff;text-decoration: underline;font-size: 12px;}
+
+.field-validation-error,.validation-summary-errors{ color: red;font-size: 14px;display: inline-block;vertical-align: top;margin: 15px 0 0 4px}
+
+/*misc*/
+.inline{ display: inline-block !important;vertical-align: top}
+.inline-na{ display: inline-block !important}
+.no-bord{border:none !important}
+.float-left{float: left !important}
+.float-right{float: right !important}
+.btn{cursor: pointer}
+.rel{position: relative}
+.loading-panel{width:100%;height:100%;top:0;left:0;display:none;-ms-opacity:.5;opacity:.5;background-color:#cfcfcf}
+
+.ul-inline li{ display: inline-block;vertical-align: top}
+
+.no-pad{padding: 0 !important}
+.no-marg{margin: 0 !important}
+.currency-item{ font-weight: bold;font-size: 11px;color: #000000;display: block;margin: 4px 0;}
+/*ellipsis*/
+.ellipsis{white-space:nowrap;overflow:hidden;-moz-text-overflow: ellipsis;-ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis;}
+.ellipsis.multiline{white-space:normal}
+
+/*kendo*/
+.l-header{ height: 50px;width: 100%;background-color: #000;color: #fff;font-size: 24px;background-image: none;z-index: 100}
+.l-header .k-window-title{padding: 10px 0 0 35px}
+.l-header  .k-window-actions{display: none}
+
+
+/*user notifications*/
+#notif-container{position: absolute;top:25px;height: 425px;width: 264px;background:transparent;text-align: center;z-index: 1000}
+#notif-container .tri{width: 0;height: 0;border-style: solid;border-width: 0 10px 10px 10px;border-color: transparent transparent #dedede transparent;margin: 0 auto}
+#notif-container .ul-not-list{width: 235px;background: #dedede;padding: 7px}
+#notif-container .view-all{ height: 30px;display: block;background: #000;border-top: dotted 1px #fff; }
+#notif-container .view-all a{ display: block;font-size: 13px;color: #fff;text-decoration: underline;margin: 4px 0 0}
+
+.ul-not-list { border: none;text-align: left}
+.ul-not-list li{ height: auto;margin: 0;min-height: 30px;width: 100%;border-bottom: solid 1px #fff}
+.ul-not-list li .img-container{ width: 25px;height: 25px;margin: 5px 0 0}
+.ul-not-list li .img-container img{ width: 100%;height: 100%}
+.ul-not-list li .row{ width: 200px;margin: 0 0 0 5px}
+.ul-not-list li .txt{ font-size: 12px;color: #333;margin: 0 0 5px 0;max-height: 35px;}
+.ul-not-list li .auth{ height:14px;margin: 3px 0 5px;width: 100%;color: #000;font-size:12px}
+.ul-not-list li .room{ height:14px;margin: 3px 0 5px;width: 100%;font-size: 12px;color:#006699}
+.ul-not-list li .auth .cr-name{ float: left;color: #000;font-size: 12px;text-transform: capitalize;font-weight: bolder;text-decoration: underline}
+.ul-not-list li .auth .cr-name.topic{font-size: inherit}
+.ul-not-list li .auth .cr-name:hover{color:#006699}
+.ul-not-list li .auth .post-on{ float: right;font-size: 11px;color: #666}
+.ul-not-list li .auth .replay{ float: right;font-size: 11px;color: #000;text-transform: capitalize;cursor: pointer;text-decoration: underline;margin-left: 15px}
+.ul-not-list li span.btn{ color: #006699;text-decoration: underline;cursor: pointer}
+.d-user-not-container{ height:370px !important;overflow-y: hidden;background: none repeat scroll 0 0 #dedede}
+
+
+/*user courses header combo*/
+.combo-uc{font-size:12px;height:25px;top:-3px;background:#000;border:none!important;-ms-border-radius:0!important;border-radius: 0 !important;}
+.combo-uc > .k-dropdown-wrap{border:none!important;-ms-border-radius:0!important;border-radius: 0 !important;}
+.combo-uc > .k-dropdown-wrap > .k-input { color: #fff;background: #000;}
+.combo-uc > .k-dropdown-wrap >.k-select {background: #000 !important}
+/*.combo-uc > .k-dropdown-wrap >.k-select > .k-icon{background-image: url("MetroBlack/sprite.png") !important;border-color: #000000;}*/
+.combo-uc > .k-state-default > .k-select {border-color: #333333;}
+.combo-uc>.k-dropdown-wrap .k-select{-ms-border-radius:0 0 0 0;border-radius:0 0 0 0}
+#ddlMyCourses-list,#ddlMyCourses-list > ul{width: 300px !important}
+#ddlMyCourses-list>ul>li{background:#000;border-bottom:1px solid #fff;-webkit-box-shadow:none!important;-ms-box-shadow:none!important;box-shadow:none!important}
+#ddlMyCourses-list>ul>li.k-state-focused{-webkit-box-shadow:none!important;-ms-box-shadow:none!important;box-shadow:none!important;background-color:#069}
+
+.crs-link{ color: #fff;font-size: 12px}
+.crs-link > .crs-thumb{ width: 30px;height: 30px;margin: 5px;}
+.crs-link > span {width: 200px}
+.crs-link > span > label{ display: block;}
+.crs-link > span > label.au{font-size: 11px}
+
+/*tree collapse*/
+.tree-collapse-container{height:28px;padding-top: 12px;text-transform: uppercase}
+.tree-collapse-container .ec-btn{color: #000;font-weight: bold;font-size: 13px;width: auto;line-height: 14px;height: 14px;cursor: pointer}
+.tree-collapse-container .ec-btn.expand{padding:0 12px 2px 5px;border-right: solid 2px #000;margin-right: 12px;}
+.tree-collapse-container .ec-btn.collapse{ padding:0 0 2px 5px;}
+.tree-collapse-container .ico-expand{ background: url('../../Content/images/icons/icon-sprite.png'); background-position: -835px 0; width: 17px; height: 17px;}
+.tree-collapse-container .ico-collapse{ background:url('../../Content/images/icons/icon-sprite.png'); background-position: -636px 0; width: 17px; height: 17px;}
+.expandable{background: transparent}
+
+/*notifications*/
+/*.note-icon {background: url('../../Content/images/icons/notification-sprite.png') no-repeat top left;}*/
+/*.note-icon.alert{ background-position: 0 0; width: 45px; height: 45px; } 
+.note-icon.notif{ background-position: -95px 0; width: 45px; height: 45px;} 
+.note-icon.success{ background-position: -190px 0; width: 45px; height: 45px; }*/
+
+.note-icon {background-repeat: no-repeat;} 
+.note-icon.notif{ background-image:url(../../Content/images/icons/notification-icon.png); width: 45px; height: 45px;} 
+
+.k-notification-notification.k-group{background:rgba(0,0,0,.7);color:#fff}
+.note-alert{width:440px;height: 100px;}
+.note-alert a{ color: #fff;font-size: 13px;text-decoration: underline}
+.note-alert h3{font-size:1em;padding:32px 10px 5px}
+.note-alert i{float:left;margin:30px 15px 30px 30px}
+
+/*grid*/
+.k-grid{border:none !important}
+thead.k-grid-header,th.k-header{ background-color: #fff !important;background-image: none !important;border-bottom: 1px solid #cccccc !important}
+th.k-header { border-right: none!important;border-left: none !important;padding: 12px 0 12px 4px !important}
+th.k-header .k-link{ font-size: 13px !important;text-decoration: underline !important;color: #000 !important}
+
+.k-grid tbody td{ border: none !important;font-size: 14px !important;height: 24px !important;padding-left: 4px !important;text-align: left}
+.k-grid-pager{ font-size: 12px !important;background-image: none !important; border: none !important;background-color: #fff !important;}
+.k-grid .k-button,.k-grid .k-state-highlight,.k-grid .k-button:hover,.k-grid .k-button:focus,.k-grid-delete,.k-grid-delete a{text-decoration: underline;background: none !important;border: none !important;margin: 0 !important;padding: 0}
+.k-grid-delete .k-icon{display: none}
+
+.k-listview{border: none}
+
+.k-ff {
+    overflow: inherit !important;
+}
+/*loader*/
+#site-loader{width:100%;height:100%;top:0;left:0;display:none;-ms-opacity:.5;opacity:.5;background-color:#cfcfcf}
+/*loader*/
+.loader-mask{ position: absolute;background: #fff;opacity: 0.8;display: none}
+.loader-mask > .inner{ width: 100%;height: 100%;text-align: center;}
+.loader-mask > .inner > .info{ position: relative;top: 150px;width: auto;margin: 0 auto;font-size: 18px;color: #000;}
+.loader-mask > .inner > .loader{ background: url('../../Content/images/main-loader.gif') no-repeat;width: 128px;height: 128px;position: relative;top: 200px;margin: 0 auto}

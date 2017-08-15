@@ -1,0 +1,51 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditWebStorePageToken
+
+@{
+	ViewBag.Title = Model.user.fullName + " | " + Model.store.name + " Manage";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+    
+    
+}
+<script src="~/Areas/AuthorAdmin/Scripts/plugins/jquery-ui-1.10.4.custom.min.js"></script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.form.helper.js"></script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.ws.js"></script>
+
+@section css
+{
+	
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/ws.css" )" rel="stylesheet" type="text/css"  /> 
+	
+	<style>
+		.cn-col .actn-container {height: 120px;}
+        #d-category-container {max-height: 580px;}
+	</style>       
+}
+
+@section scripts
+{
+    <script>
+        var apiUrl = '@Url.ToApiUrl("WebStore", "update")';
+
+        $(document).ready(function () {
+            window.getNotifManagerInstance().unsubscribe(notifEvents.webstore.storeStateChanged, window.sendApiUpdate, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.webstore.storeStateChanged, window.sendApiUpdate, null);
+        });
+        function sendApiUpdate() {
+            $.ajax({
+                url: apiUrl + $('#CurrentStoreId').val()
+                , dataType: "json"
+                , type: "Post"
+                , cache: false
+                , success: function (response) {
+                    if (window.console) console.log(response);
+                }
+            });
+        }
+    </script>
+}
+
+
+@Html.Partial("WebStore/_WebStoreEditManager",Model)
+
+@Html.Partial("Billing/_SalesReportsTemplates")

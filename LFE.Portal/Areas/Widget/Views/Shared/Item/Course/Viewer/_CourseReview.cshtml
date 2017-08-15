@@ -1,0 +1,70 @@
+﻿@model LFE.DataTokens.CourseUserReviewDTO
+
+<script>
+	var REVIEW_FORM_SELECTOR = '#frmCourseReview';
+	var formUserNotifManager;
+	
+	$(document).ready(function () {
+		var form = $(REVIEW_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+		
+		formUserNotifManager = new UserNotificationManager('#cr-info', '.alert', false);
+
+		$('#crs-rating').rateit({ max: 5, step: 1, resetable: false ,value:'@Model.Rating'});
+		$('#crs-rating').bind('rated', function(event, value) {
+			$('#Rating').val(parseInt(value));
+		});
+
+	    $('.btn-review-submit').unbind('click').bind('click', function(e) {
+	        e.preventDefault();
+	        $(REVIEW_FORM_SELECTOR).submit();
+	    });
+	});   
+</script>
+@using (Ajax.BeginForm("SaveReview", "Item", new { area = "Widget", id = Model.CourseId }, new AjaxOptions { OnSuccess = "onReviewSaved" }, new { @id = "frmCourseReview", @role = "form", @class = "form-horizontal" }))
+{
+	@Html.HiddenFor(m=>m.ReviewId)
+	@Html.HiddenFor(m=>m.CourseId)
+	@Html.HiddenFor(m=>m.Rating)
+
+    <div class="form-group">
+        <label class="col-sm-4 control-label" style="padding-top: 0">Rate this course (1-5 stars)</label>
+        <div class="col-sm-8">
+            <div id="crs-rating"></div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 control-label">
+            <span class="lbl-span">Review title</span>
+            <span class="lbl-span add-info">Say it in 10 words or less</span>
+        </label>        
+        <div class="col-sm-8">
+           @Html.TextAreaFor(m => m.Title, new { @rows = 2, @cols = 30, @class = "area" })
+           @Html.ValidationMessageFor(model => model.Title)
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 control-label">
+            <span class="lbl-span">Review Text</span>
+            <span class="lbl-span add-info">Say it in 200 words or less</span>
+        </label>
+        <div class="col-sm-8">
+           @Html.TextAreaFor(m => m.Text, new { @rows = 8, @cols = 30, @class = "area", @style = "height:auto" })
+           @Html.ValidationMessageFor(model => model.Text)
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-8">
+            <a href="#" class="btn-review-submit">Submit review</a>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-8">
+            <div class="info-box" id="cr-info">
+                <p class="alert"></p>
+            </div>
+        </div>
+    </div>    
+}

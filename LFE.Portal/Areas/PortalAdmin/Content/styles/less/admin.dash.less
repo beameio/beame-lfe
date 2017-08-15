@@ -1,0 +1,250 @@
+﻿@import "../../../../../Content/styles/less/mixins";
+@import "../../../../../Content/styles/less/variables";
+@import "../../../../../Content/styles/less/navbar";
+@import "admin.nav.less";
+@import "../../../../../Content/styles/less/triangle.less";
+@import "variables";
+@import "mixins";
+
+body{background:#efefef;min-width:1200px;}
+
+
+/*payout*/
+.po-container{height:auto;
+    
+    color:#fff;
+     > .head{background-color:@dash_po_header_color;background-image: url("@{portal_images_root}/ico-chart.png");.no-repeat;background-position:5px 5px;height:32px;font-size:16px;.semi-bold;letter-spacing:0.1em;text-transform:uppercase;padding:4px 0 0 40px;}
+     > .currency-list {margin:10px auto;background-color:@dash_po_color;
+         & .col{padding:0 15px;text-align:center}
+         & .total {text-align:center;
+                   > .inner{margin: 0 auto;
+                           > div{display:inline-block;padding:0 5px;
+                                 &.first{width:50px;}
+                                 &.total{width:100px;
+                                    & .iso { font-size: 16px;padding:5px 0 0 5px; }
+                                 }
+                                 &.prcnt{width:75px;}
+                           }
+                        }
+         }
+         &  .tend{font-size:15px;}         
+         > .currency-row{height:40px;padding:7px 0;
+                         & .col{font-size:24px;}
+         }
+         > .foot{color:#000;font-size:12px;.semi-bold;text-align:center;height:26px;margin-top:15px;
+                    & .title{border-top:1px solid #000;padding-top:5px;}                    
+                }
+    }
+
+    > .top-seller-container{margin:15px 0;color:#fff;background:@dash_po_top_bg_color;
+        .ul-ts{display:table;width:100%;
+             > li{display:table-cell;vertical-align:middle;height:75px;width:20%;border:solid 2px #fff;border-top:none;border-bottom:none;
+                  &:first-child{border-left:none;}
+                  &:last-child{border-right:none;}
+                  & h3{.dh-common-title;text-align:center;}
+                  .box{float:left;width:50%;
+                       > .inner{padding:7px;text-transform:uppercase;text-align:center;
+                            > .seller{height:40px;font-size:12px;}
+                            > .sale{.semi-bold;font-size:15px;}
+                       }
+                  }
+             }
+          }
+    }
+     
+}
+
+/*filter*/
+.filter-row{height:30px;margin-top:10px;}
+
+.dh-common-title{font-size:@title_row_font_size;text-transform:uppercase;.semi-bold;}
+
+.base-arrow(@width,@height,@up_color,@down_color){margin:6px 0 0 0;display:block !important;
+                        &.arrow-up{#tri >.top(@width,@height, @up_color);}
+                        &.arrow-down{#tri >.bottom(@width,@height, @down_color);}
+                        &.arrow-eq{.eq;margin-top:-2px !important;
+                                    &:before{padding-left:3px;}
+                        }
+            }
+
+
+/*platforms stats*/
+.pl-title{height:@title_row_height;padding:14px 0 4px 0;color:@platform_title_color;font-size:@title_row_font_size;.semi-bold;width:20%;
+          > h3{padding:0;margin:0;.dh-common-title;}
+          & .tend{width:10px;padding:0 0 0 5px;}
+          & .arrow-up{.up;color:@platform_title_arrow_up;}
+          & .arrow-down{.down;color:@platform_title_arrow_down;}
+          & .arrow-eq{.eq;
+                      &:before{padding-left:3px;}
+          }
+
+}
+
+.stats-container{border-bottom:2px solid @platform_stats_border_color;padding-bottom:30px;margin-bottom:30px;
+    & .stats-box{height:70px;padding:0;width:20%;float:left;
+        > .inner{width:~"calc(100% - 6px)";height: 100%;padding: 4px 6px;background:#fff;    
+            & .num{color:@platform_box_num_color;.semi-bold;
+                &.total{font-size:@platform_box_total_font_size;}
+                &.new{font-size:@platform_box_lable_font_size;}
+            }          
+            > .upper{height: 24px; padding:4px 0;
+                    & span{padding: 0 4px}
+                    & .lbl{color:@platform_box_lable_color;font-size:@platform_box_lable_font_size;text-transform:uppercase;}
+                    & .arrow{.base-arrow(@arrow_pl_width,@arrow_pl_height,@platform_box_tri_up_color,@platform_box_tri_down_color);}
+                
+            }
+            > .bottom{height:~"calc(100% - 32px)";
+                > div{float:left;}
+                & .num{width:25%;}
+                & .chart{width:75%;}
+            } 
+        }    
+    }
+}
+@media (max-width: 1159px) {
+    .stats-box > .inner > .bottom > .num{width:35% !important;}
+    .stats-box > .inner > .bottom > .chart{width:65% !important;}
+}
+/*totals*/
+
+.total-box-arrow{
+    .base-arrow(@arrow_tl_width,@arrow_tl_height,@white,@platform_box_tri_down_color);top:15px;margin:0 !important;display:inline-block !important;position:absolute;
+}
+
+.total-box-base{width:@total_box_size;height:100%;float:left;
+            > .box-inner{width:~"calc(100% - 2px)";height: 100%;padding: 4px 2px;color:#fff;
+                > .title{.dh-common-title;padding:7px 0 7px 7px;}
+                > .total{font-size:@box_total_font_size;text-align:center;margin:0 14px;padding:0 0 4px 0;border-bottom:solid 1px #fff;position:relative;
+                           > span{margin-right:5px;} 
+                           & .arrow{.total-box-arrow;top:10px;}
+                }
+                > .new{.dh-common-title;font-size:@box_total_font_size;text-align:center;padding-top:5px;font-weight:normal;position:relative;
+                        > .new-inner{margin:0 auto;
+                            > span{padding-right:4px;}
+                        }
+                        & .arrow{.total-box-arrow;}
+                }
+                
+            }
+}
+
+.totals-title-bg(@image_name){padding-left:35px;
+     background-image:url("@{portal_images_root}/ico-@{image_name}.png");background-repeat:no-repeat;background-position:5px 2px;
+}
+
+.totals-container,.sales-totals-container{
+    
+    .totals-title{height:@title_row_height;color:@totals_title_color;font-size:@title_row_font_size;.semi-bold;
+        > h3{padding:0;margin:0;font-size:@title_row_font_size;text-transform:uppercase;.semi-bold;}
+    }
+
+    .totals-boxes-container{
+        > div{height:@total_box_size;}
+        .total-box{.total-box-base;
+            & .title{
+                &.stores{.totals-title-bg("stores");}
+                &.courses{.totals-title-bg("courses");background-position:5px -2px;padding-left:40px;}
+                &.bundles{.totals-title-bg("bundles");}
+                &.learners{.totals-title-bg("learners");}
+                &.authors{.totals-title-bg("authors");}
+            }
+        }
+        .common-totals{width:100%;
+            > .total-box{width:20%;}
+            & .box-inner{background-color:@totals_box_bg_color;}
+        }
+
+       
+    }
+    
+}
+
+.sales-totals-container{
+    .totals-title{
+        > h3{color:@totals_box_sales_bg_color;}
+    }
+
+     .sales-totals{width:100%;
+            > .total-box{width:20%;}
+            & .box-inner{background-color:@totals_box_sales_bg_color;}
+        }
+
+     .arrow-up{border-bottom-color:#fff !important;}
+}
+
+/*video and integrations*/
+.video-integration-container{height:@vi-row-size;margin:15px 0;
+    > .row > div{height:@vi-row-size;
+          &.video-stats-container{border:solid 1px @video_stats_base_color;background:url("@{portal_images_root}/ico-video.png") no-repeat 5px 8px @video_bg_color;width:57%;}
+          &.integration-container{border:solid 1px @integration_base_color;background:url("@{portal_images_root}/ico-integrate.png") no-repeat 5px 8px @integration_bg_color;width:40%;}
+          .ul-vi{margin:3px 0;padding-left:66px;
+             > li{text-align:center;padding:0 0 0 7px;float:left;margin-right:7px;min-width:75px;
+                  > .title{.dh-common-title;color:@vi-title-color;display:block;}
+                  > .value{font-size:24px;color:@vi-value-color;display:block;}
+             }
+          }
+    }
+}
+
+/*author and learner stats*/
+.event-title{font-size:@author_total_font_size;text-align:center;font-weight:normal;}
+.event-arrow{&.arrow-up{.up;color:#fff;}
+                      &.arrow-down{.down;color:#ff0000;}
+                      &.arrow-eq{.eq;
+                                  &:before{padding-left:3px;}
+                      }
+}
+.cb-font{
+    font-size:@event-cb-font-size;font-weight:normal;text-transform:uppercase;
+    & .num{font-size:@box_total_font_size;
+          
+    }
+}
+
+.event-box-inner(@bg-color){padding:5px;
+                background-color:@bg-color;
+               & .total{border:none;} 
+               & .title{.event-title;height:50px;}
+               & .cb{.cb-font;text-align:center;}
+               & .tend{.event-arrow;}
+}
+
+.event-row(@bg_name,@sub_title){position:relative;
+    background-image:url("@{portal_images_root}/@{bg_name}");background-repeat:no-repeat;background-position:5px 10px;
+    > .row-inner{padding-left:70px;}
+    &:before{content:"@{sub_title}";text-transform:uppercase;font-size:12px;color:#000;position:absolute;top:80px;}
+}
+
+.author-stats-container{width:100%;margin:@event-row-margin;
+    > .row {.event-row('ico-authors-row.png','authors');}    
+    & .author-total-stats-container{width:~"calc(100% * 0.43 )";height:@total_box_size;
+        & .total-box{.total-box-base;width:~"calc(100% / 3)";
+            & .box-inner{.event-box-inner(@author_total_bg_color);}
+        }
+        
+    }
+
+    & .author-period-stats-container{width:~"calc(100% * 0.57 )";height:@total_box_size;
+       & .total-box{.total-box-base;width:~"calc(100% / 4)";
+            & .box-inner{.event-box-inner(@author_period_bg_color);}
+        }
+    }
+}
+
+
+
+.learner-stats-container{width:100%;
+    > .row{.event-row('ico-learners-row.png','learners');}
+    & .learner-period-stats-container{width:~"calc(100% * 0.8571 )";height:@total_box_size;
+        & .total-box{.total-box-base;width:~"calc(100% / 6)";
+            & .box-inner{.event-box-inner(@learner_period_bg_color);}
+        }
+        
+    }
+
+    & .learner-period-coupon-stats-container{width:~"calc(100% * 0.1428 )";height:@total_box_size;
+       & .total-box{.total-box-base;width:100%;
+            & .box-inner{.event-box-inner(@learner_period_coupon_bg_color);}
+        }
+    }
+}

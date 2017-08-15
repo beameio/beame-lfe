@@ -1,0 +1,86 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Models
+
+@model LoginWindowToken
+
+
+@{
+    ViewBag.Title = "Login to LFE";
+    Layout = null;
+
+    var loginFormDisplayStyle = Model.Mode == eLoginWindowMode.Login ? "block" : "none";
+    var registerFormDisplayStyle = Model.Mode == eLoginWindowMode.Login ? "none" : "block";
+}
+<script>
+    var LOGIN_FORM_MODE = 'WINDOW';
+</script>
+@Html.Partial("~/Views/Shared/Common/_ReferrerScripts.cshtml")
+<link href="~/Content/styles/login.css" rel="stylesheet" />
+
+<style>
+    ::-webkit-input-placeholder {
+        color: #64769a;
+        background-color: #ccd7ed;
+    }
+    /* WebKit browsers */
+    :-moz-placeholder {
+        color: #64769a;
+        background-color: #ccd7ed;
+    }
+    /* Mozilla Firefox 4 to 18 */
+    ::-moz-placeholder {
+        color: #64769a;
+        background-color: #ccd7ed;
+    }
+    /* Mozilla Firefox 19+ */
+    :-ms-input-placeholder {
+        color: #64769a;
+        background-color: #ccd7ed;
+    }
+    /* Internet Explorer 10+ */
+</style>
+
+<div class="wnd-login" id="wnd-login-main">
+    <div class="login-main rel">
+        
+        <div class="flip" id="login-flip" style="display: @loginFormDisplayStyle">
+            <div class="rel">
+                <div class="flip" id="log-form">
+                    @Html.Partial("Account/Login/_WindowLoginPartial", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = Model.RegistrationSource,TrackingID = Model.TrackingId})
+                </div>
+                <div id="req-pwd-form-container" class="flip" style="display: none">
+                    @Html.Partial("Account/Login/_WindowRequestForgottenPassword")
+                </div>
+                <script>
+                    $('.login-main').addClass('login-main-360');
+                </script>
+            </div>
+        </div>
+        
+        <div class="flip" id="reg-flip" style="display: @registerFormDisplayStyle">
+            <div class="rel">
+                <div style="height:57px;margin: 35px auto 0" class="login-inner-w">
+                    @Html.Partial("Account/MainLogin/_ExternalLogin", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = Model.RegistrationSource, TrackingID = Model.TrackingId })
+                </div>
+                <label style="display: block;height: 16px;font-size: 16pt;font-weight: bold;margin: 20px 0" class="">or</label>
+                <div id="reg-form">
+                    @Html.Partial("Account/Login/_WindowRegisterForm", new RegisterDTO { RequiredConfirmation = Model.RequiredConfirmation, IsPluginRegistration = Model.IsPlugin, Uid = Model.Uid, RegistrationSource = Model.RegistrationSource, TrackingID = Model.TrackingId })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="foot wnd-login-footer">
+        <div id="login-footer-link">
+            <a class="link-button" id="btn-form-switch" href="#"></a>            
+        </div>
+        <div id="lw-action-button">
+            <span></span>           
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        initLoginBehavior('@Model.Mode.ToString()');
+    </script>

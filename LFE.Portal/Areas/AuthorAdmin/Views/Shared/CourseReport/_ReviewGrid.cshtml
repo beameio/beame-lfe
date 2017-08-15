@@ -1,0 +1,41 @@
+﻿@using LFE.DataTokens
+
+@(Html.Kendo().Grid <ReviewDTO>()    
+	  .Name("gridReviewReport")
+	  .HtmlAttributes(new{@style=""})
+	  .TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important"})
+	  .Columns(columns => {
+			columns.Bound(p => p.CourseName).ClientTemplate("<div class='ellipsis col-tooltip' title='${CourseName} 'style='width:auto'>${CourseName}</div>").Title("Course");
+			columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Text)#'style='width:auto'>${Title}</div>").Title("Title");
+			columns.Bound(p => p.Date).Title("Date").Format("{0:d}").Width(70);
+			columns.Bound(p => p.LearnerFullName).Title("Learner").Width(120);
+			columns.Bound(p => p.Rating).Title("Rating").Width(120);
+	  })
+	  .Events(e=>e.DataBound("onReviewBound"))
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true))
+	  .Filterable(f=>f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.ReviewId))
+							.Read(read => read.Action("GetAuthorReviews", "Course").Type(HttpVerbs.Get))
+							.PageSize(15))
+	  )
+	  
+<script>
+	function onReviewBound(e) {
+		$(".col-tooltip").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+			width: 250
+		}).data("kendoTooltip");
+
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.report.reviewBound, total);
+	}
+</script>
+
+<script id="tp-template" type="text/x-kendo-template">
+	<p class="ptp">
+		#=target.data('title')#
+	</p>    
+</script>

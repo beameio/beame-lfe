@@ -1,0 +1,131 @@
+﻿@using System.Globalization
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Helpers
+@model LFE.DataTokens.MonthlyStatementDTO
+      
+@{
+    var nextMonth = new DateTime(Model.Year, Model.Month, 1).AddMonths(1);
+    var payoutDefined = Model.PayoutTypeId != null;
+    var currencySymbol = Model.Currency != null ? Model.Currency.Symbol : "$";
+}
+     
+<table>
+    <tr>
+        <td style="padding-bottom: 5px;border-bottom: solid 2px #999 !important">
+            <table style="width: 100%">
+                <tr>
+                    <td style="width: 50%;text-align: left">
+                        <img src="@(String.Format("{0}Content/images/em-logo.png", Utils.GetKeyValue("baseUrl")))" alt="" />
+                    </td>
+                    <td style="width: 50%;text-align: right;vertical-align: bottom">
+                        <a href="@(Utils.GetKeyValue("homeUrl"))" style="color: blue !important">@(Utils.GetKeyValue("homeUrl"))</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="height: 20px;padding: 30px 0 20px;text-align: left;color:#000;font-size: 20px;font-weight: bold;border-bottom: solid 1px #f2f2f2 !important">
+            Thanks for using LFE! Here’s your monthly statement:
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 13px;color: #000;text-align: left;padding: 15px 0 35px">
+            Hi, @Model.User.FullName
+            <p style="line-height: 20px;padding: 5px 0 0">
+                We appreciate your business and thank you for choosing LFE. Here is the summary of your
+                <br />
+                monthly statement for the month of <b>@(String.Format("{0} {1}", CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.Month), Model.Year))</b>.
+                <br />
+                Click on "View detailed Statement" to see the full details on the @(Constants.APP_OFFICIAL_NAME) website.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 25px 0; border: 2px solid #ddd !important; font-size: 13px; color: #000; text-align: left;line-height: 22px;">
+            <div style="display: inline-block; width: 370px;padding-left: 25px; border-right: 2px solid #f2f2f2;">
+                <div style="">Income from one-time sales</div>
+                <div style="">Income from monthly subscriptions	</div>
+                <div style="">Income from rental </div>
+
+                <div style="padding-top: 15px;">Affiliate Sales</div>
+
+                <div style="padding-top: 15px;">Money back guarantee released</div>
+                <div style="">Money back guarantee hold back</div>
+
+                <div style="padding-top: 10px">Total Sales</div>
+
+                <div style="padding-top: 30px;">PayPal fees</div>
+                <div style="">Affiliate Commission</div>
+                <div style="">Total Refunds</div>
+                <div style="">Total Refund Fees</div>
+
+                <div style="padding-top: 25px;">Total Balance</div>
+
+                <div style="padding-top: 30px;">@(Constants.APP_OFFICIAL_NAME) fees</div>
+
+                <div style="padding-top: 30px;font-weight: bold">Total for this statement:</div>
+            </div>
+            <div style="display: inline-block; width: 160px;text-align: center">
+                <div style="">@currencySymbol@Model.Stats.TotalOneTimeSales</div>
+                <div style="">@currencySymbol@Model.Stats.TotalSubscriptionPayments</div>
+                <div style="">@currencySymbol@Model.Stats.TotalRentalSales</div>
+
+                <div style="padding-top: 15px;">@currencySymbol@Model.Stats.AffiliateSales</div>
+
+                <div style="padding-top: 15px;">@currencySymbol@Model.Stats.RefundProgrammToRelease</div>
+                <div style="">-@currencySymbol@Model.Stats.RefundProgrammToHold</div>
+
+                <div style="padding-top: 10px;font-weight: bold;">@currencySymbol@(Model.Stats.TotalSales + Model.Stats.RefundProgrammToRelease - Model.Stats.RefundProgrammToHold)</div>
+
+                <div style="padding-top: 30px;">-@currencySymbol@Model.Stats.Fees</div>
+                <div style="">-@currencySymbol@Model.Stats.AffiliateFees</div>
+                <div style="">-@currencySymbol@Model.Stats.TotalRefunds</div>
+                <div style="">+@currencySymbol@Model.Stats.TotalRefundFees</div>
+
+                <div style="padding-top: 25px;font-weight: bold;">@currencySymbol@Model.Stats.Balance</div>
+
+                <div style="padding-top: 30px;">-@currencySymbol@Model.Stats.TotalLfeCommission</div>
+
+                <div style="padding-top: 30px;font-weight: bold">@currencySymbol@Model.Stats.TotalPayout</div>
+            </div>
+
+            <div style="padding: 30px 0 0 25px;">
+                <a href="@Url.ToAuthorMonthlyStatementUrl(Model.Year,Model.Month)" style="display:block;width:231px;height: 43px;"><img src="@(String.Format("{0}Content/images/btn-view-statement.png", Utils.GetKeyValue("baseUrl")))" alt="" /></a>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 13px;color: #000;text-align: left;padding: 30px 0 5px">
+            This amount will be paid according to the payment method you defined in your Payout preferences:
+        </td>
+    </tr>
+    <tr>
+        <td style="border: solid 2px #ddd !important; border-top-color: @(payoutDefined ? "#5ba71b" : "red") !important;border-top-width: 5px !important;padding: 18px 0 18px 20px;text-align: left;font-size: 13px;color: #000">           
+            <table>
+                <tr>
+                    <td style="width: 42px; height: 42px; padding-right: 15px;">
+                        <img src="@(String.Format("{0}Content/images/icons/ico-{1}-42.png", Utils.GetKeyValue("baseUrl"), payoutDefined ? "ok" : "error"))" alt="" />
+                    </td>
+                    <td style="line-height: 20px;">
+                        @{
+                            if (payoutDefined)
+                            {
+                                <div>
+                                    Automatic payment method: <b>@Model.PaymentMethodName</b>
+                                </div>
+                                <div>
+                                    Date: <b>@(String.Format("{0} 1, {1}", CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(nextMonth.Month), nextMonth.Year))</b>
+                                </div>    
+                            }
+                            else
+                            {
+                                <h3 style="text-transform: uppercase;font-size: 22px">Author payment method not defined</h3>
+                            }
+                        }
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,158 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model LFE.Portal.Areas.PortalAdmin.Models.HostAbandonFilterToken
+@{
+	ViewBag.Title = "Host event Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css{
+
+}
+@{
+	var from = Model.from;
+	var last = Model.last;
+}
+
+<h2>Abandon Hosts Report</h2>
+
+<div style="margin: 10px 0">
+	<div class="inline">
+		<label for="fromDate">From</label>
+		@(Html.Kendo().DatePickerFor(m=>m.from)              
+			  .Value(from)
+			  .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })				
+			  )
+	</div>
+
+	<div class="inline">
+		<label for="lastDate">Last event date</label>
+		@(Html.Kendo().DatePickerFor(m=>m.last)
+			  .Value(last)
+			  .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+			  )
+	</div>
+
+
+	<div class="inline" style="margin-left: 25px;" id="frmSubmitRep">
+		<span class="" style="text-decoration: underline;cursor: pointer;color: #000;font-size: 16px;" id="btn-submit-rep">Generate Report</span>
+	</div>
+
+	<div class="inline" style="margin:0 0 0 30px">
+		<a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+		$('#btn-submit-rep').unbind('click').click(submitReport);
+		setTimeout(submitReport, 300);
+	});
+	function submitReport() {
+		$('#HostEventsReport').data('kendoGrid').dataSource.read();
+	}
+
+	function getRepFilters() {
+		
+		return {
+			from: $('#from').data('kendoDatePicker').value()
+			, last: $('#last').data('kendoDatePicker').value()
+		};
+	}
+
+	function clearFilters() {
+		$('#from').data('kendoDatePicker').value('@(from)');
+		$('#last').data('kendoDatePicker').value('@(last)');		
+		
+		submitReport();
+	}
+</script>
+
+<div id="d-rep-container">
+
+	@(Html.Kendo().Grid<AbandonHostDTO>()
+		  .Name("HostEventsReport")
+		  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+		  .Columns(columns =>
+		  {
+			  columns.Bound(p => p.HostName).ClientTemplate("<a href='#=HostName#' style='' title='click to view page' class='list-cmd'  target='_blank'>#=HostName#</a>").Width(200);				
+			  columns.Bound(f => f.User.FullName).Width(150).Title("User");
+			  columns.Bound(f => f.User.Email).Width(100).Title("Email");
+			  columns.Bound(p => p.TotalEvents).Title("Total").Width(100).Filterable(false);
+			  columns.Bound(p => p.PreviewCount).Title("Preview").Width(100).Filterable(false);
+			  columns.Bound(p => p.TotalCourses).Title("Courses").Width(100).Filterable(false);
+			  columns.Bound(p => p.LastEventDate).Title("Last").Format("{0:d}").Width(100).Filterable(false);
+			  columns.Bound(p => p.FirstEventDate).Title("First").Format("{0:d}").Width(100).Filterable(false);
+		  })
+		  .AutoBind(false)
+		  .ToolBar(tools => tools.Excel())
+		  .Excel(excel => excel
+			  .FileName(DateTime.Now.ToShortDateString() + " Host Events Report.xlsx")
+			  .Filterable(false).AllPages(true)
+			  .ProxyURL(Url.Action("Export_Save", "Home", new { area = "" }))
+		  )
+		  .Sortable(s=>s.SortMode(GridSortMode.MultipleColumn))
+		  .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+		  .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Row))
+		  .DataSource(ds => ds.Ajax().Sort(x => x.Add(c => c.LastEventDate).Descending()).Read(read => read.Action("GetHostAbandon", "Report", new { area = "PortalAdmin" }).Data("getRepFilters").Type(HttpVerbs.Get)).ServerOperation(true)))
+</div>
+
+
+@*<div id="d-pivot-container">
+				  @(Html.Kendo().PivotConfigurator()
+		.Name("configurator")
+		.Height(570)
+				)
+
+				@(Html.Kendo().PivotGrid<HostEventDTO>()
+					.Name("pivotgrid")
+					.Configurator("#configurator")
+					.ColumnWidth(120)
+					.Height(570)
+					.DataSource(dataSource => dataSource
+						.Ajax()
+							.Transport(t => t.Read("GetHostPivotEvents", "Report",new{area="PortalAdmin"}))
+							.Schema(schema => schema
+							.Cube(cube => cube
+								.Dimensions(dimensions =>
+								{
+									dimensions.Add(model => model.STORE_VIEW).Caption("STORE_VIEW");
+									dimensions.Add(model => model.COURSE_PREVIEW_ENTER).Caption("COURSE_PREVIEW_ENTER");
+									dimensions.Add(model => model.REGISTRATION_SUCCESS).Caption("REGISTRATION_SUCCESS");
+									dimensions.Add(model => model.BUY_PAGE_ENTERED).Caption("BUY_PAGE_ENTERED");
+								})
+								.Measures(measures => measures.Add("StoreView Count").Field(model => model.HostName).AggregateName("sum"))
+							))
+						.Columns(columns =>
+						{
+							columns.Add("STORE_VIEW").Expand(true);
+							columns.Add("COURSE_PREVIEW_ENTER").Expand(true);
+							columns.Add("COURSE_VIEWER_ENTER").Expand(true);
+							columns.Add("COURSE_VIEWER_ENTER").Expand(true);
+						})
+						.Rows(rows => rows.Add("Period").Expand(true))
+						//.Measures(measures =>
+						//{
+						//    measures.Values("STORE_VIEW Sum");
+						//    measures.Values("COURSE_PREVIEW_ENTER Sum");
+						//    measures.Values("REGISTRATION_SUCCESS Sum");
+						//    measures.Values("BUY_PAGE_ENTERED Sum");
+						//})
+					)
+				)
+
+				<style>
+					#pivotgrid {
+						display: inline-block;
+						vertical-align: top;
+						width: 70%;
+					}
+
+					#configurator {
+						display: inline-block;
+						vertical-align: top;
+					}
+				</style>
+	</div>*@
+

@@ -1,0 +1,85 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Models
+@using LFE.Core.Enums
+@{
+    ViewBag.Title = "Stores Report";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+    var userAC = new CTRL_UserAutoComplete { SelectedCallback = "onUserSelected" };
+    var registrationSources = Utils.EnumWithDescToList<CommonEnums.eRegistrationSources>();
+    var platformDDL = new CTRL_EnumDropDown { NameValueList = registrationSources, SelectedCallback = "onPlatformSelected", OptionLabel = "..select platform" };
+}
+<h2 class="page-title">Stores report</h2>
+
+
+@Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_UserAutoComplete.cshtml", userAC)
+
+@Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_EnumDropDown.cshtml", platformDDL)
+
+&nbsp;&nbsp;<label for="chkIsAffiliate">Is Affiliate</label><input id="chkIsAffiliate" type="checkbox" />
+
+<div style="margin: 10px 0">
+    <a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+</div>
+@(Html.Kendo().Grid<StoreReportDTO>()
+      .Name("StoresReport")
+      .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.StoreId).Width(60);
+          columns.Bound(p => p.Name).Title("Name").Width(120);
+          columns.Bound(p => p.RegistrationSource).Title("Platform").Width(120);
+          columns.Bound(p => p.Owner.FullName).ClientTemplate("<span data-val='${Owner.UserId}' title='click to view #=Owner.FullName# details' class='list-cmd usr-btn ellipsis col-tooltip' style='width:120px' >#=hasValue(Owner.FullName) ? Owner.FullName : ''#</a>").Width(120).Title("Owner");
+          columns.Bound(p => p.SiteUrl).ClientTemplate("<a target='_blank' href='#=hasValue(SiteUrl) ? SiteUrl : emptyHref#'>#=hasValue(SiteUrl) ? SiteUrl : ''#</a>").Width(100);
+          columns.Bound(p => p.TotalOwnedItems).Title("Owned No").Width(100);
+          columns.Bound(p => p.TotalAffiliateItems).Title("Affiliate No").Width(100);
+          columns.Bound(p => p.TotalItems).Title("Total No").Width(100);
+          columns.Bound(m => m.TrackingID);
+          columns.Bound(m => m.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+      })
+      .AutoBind(false)
+      .Events(e => e.DataBound("onDataBound"))
+      .Sortable()      
+      .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()
+                                .Read(read => read.Action("GetStoresReport", "Report").Data("getRepFilters").Type(HttpVerbs.Get)).ServerOperation(true))
+)
+<script>
+    $(document).ready(function () {
+        clearFilters();
+        rebindGrid();
+        $('#chkIsAffiliate').bind('change', function (e) {
+            filter.isAffiliate = e.target.checked ? true : null;
+            rebindGrid();
+        });
+    });
+
+    function rebindGrid() {
+        $('#StoresReport').data("kendoGrid").dataSource.read();
+    }
+
+    function onDataBound(e) {
+        window.boundGridUserDetails(e);
+    }
+    function onUserSelected(value) {
+        filter.userId = value;
+        rebindGrid();
+    }
+    function onPlatformSelected(value) {
+        filter.sourceId = value;
+        rebindGrid();
+    }
+    var filter = {};
+    function getRepFilters() {
+        return filter;
+    }
+    function clearFilters() {
+        @userAC.Clear()
+        @platformDDL.Clear()
+        filter = {};
+        rebindGrid();
+    }
+</script>

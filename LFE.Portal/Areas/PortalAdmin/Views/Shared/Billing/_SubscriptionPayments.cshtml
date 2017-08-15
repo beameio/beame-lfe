@@ -1,0 +1,25 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<SubscriptionPaymentSummaryToken>
+           
+<div style="padding: 20px;">
+    @(Html.Kendo().Grid<SubscriptionPaymentSummaryToken>()
+      .Name("SubscriptionPaymentsReport")
+      .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.Number).Width(60);
+          columns.Bound(p => p.StatusCode).Width(80).Title("Status");
+          columns.Bound(p => p.Amount).Width(80).Format("{0:c}");
+          columns.Bound(p => p.Fee).Width(80).Format("{0:c}");
+          columns.Bound(p => p.ExternalTransactionID).Width(100);
+          columns.Bound(p => p.ScheduledDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+          columns.Bound(p => p.CompletedOn).Width(80).Format("{0:MM/dd/yy}").Title("Completed");
+          columns.Bound(p => p.TrxType).Width(120).Title("Trx Type");          
+      })        
+      .Sortable(s=>s.Enabled(false))      
+      .Pageable(pager => pager.Enabled(false))
+      .Filterable(f => f.Enabled(false))
+      .BindTo(Model)
+)
+</div>

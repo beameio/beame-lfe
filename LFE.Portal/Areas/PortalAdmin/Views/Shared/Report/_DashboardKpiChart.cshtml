@@ -1,0 +1,163 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Portal.Areas.PortalAdmin.Helpers
+
+@{
+    var defaultPeriod = ((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString();
+}
+
+<div class="d-chart-row">
+    <div class="inline chart-wrapper">
+        @(Html.Kendo().Chart<KpiViewsChartDTO>()
+            .Name("kpiChart")
+            .Title("KPI")
+            .HtmlAttributes(new{@style="height:400px"})
+            .Legend(legend => legend
+                .Position(ChartLegendPosition.Top)
+            )
+            .DataSource(ds => ds.Read(read => read.Action("GetKpiData", "Report").Data("onRequestSend")))
+            .Series(series =>
+            {
+                series.Line(model => model.authors).Name("Authors").Color("red");
+                series.Line(model => model.stores).Name("Stores").Color("blue");
+                series.Line(model => model.videos).Name("Videos uploads").Color("green").Tooltip(t => t.Template("Total #=value# videos uploads"));
+            })
+            .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+            .CategoryAxis(axis => axis
+                .Date()
+                .BaseUnit(ChartAxisBaseUnit.Days)
+                .Categories(model => model.date)
+                .Labels(labels => labels.Rotation(-90))
+            )
+            .ValueAxis(axis => axis.Numeric()
+                .Labels(labels => labels.Format("{0:N0}"))              
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:N0}")
+                .Template("Total #=value# events")
+            ))
+    </div>
+    <div class="config-section inline">
+        <span class="configHead">Base date unit</span>
+        <ul id="kpi-options" class="options">
+            <li>
+                <input id="baseUnitAuto" name="baseUnit" type="radio" value="" autocomplete="off" />
+                <label for="baseUnitAuto">
+                    Automatic (default)
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitYears" name="baseUnit" type="radio" value="years" autocomplete="off" />
+                <label for="baseUnitYears">
+                    Years
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitMonths" name="baseUnit" type="radio" value="months" autocomplete="off" />
+                <label for="baseUnitMonths">
+                    Months
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitWeeks" name="baseUnit" type="radio" value="weeks" autocomplete="off" />
+                <label for="baseUnitWeeks">
+                    Weeks
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitDays" name="baseUnit" type="radio" value="days" autocomplete="off" checked="checked" />
+                <label for="baseUnitDays">
+                    Days
+                </label>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+@(Html.Kendo().PanelBar()
+        .Name("KpiDataPanel")        
+        .Items(panel =>
+        {
+            panel.Add().Text("KPI Data").Content(@<text>
+              @(Html.Kendo().Grid<KpiDetailRowDTO>()
+                .Name("gridKpiRows")
+                .Columns(c =>
+                {
+                    c.Bound(p => p.Author.FullName).Title("Author").Width(200);
+                    c.Bound(p => p.Store.Name).Title("Store").Width(200);
+                    c.Bound(p => p.Item.name).Title("Item").Width(400);
+                    c.Bound(p => p.Views).Title("Views");
+                })
+                .Sortable(s => s.Enabled(true))
+                .Selectable(s => s.Enabled(true).Mode(GridSelectionMode.Single))
+                .Pageable(p => p.Enabled(true).Numeric(true))
+                .Events(e => e.Change("onDataRowSelected"))
+                .DataSource(dataSource => dataSource.Ajax()
+                    .Read(read => read.Action("GetKpiDataRows", "Report").Data("onRequestSend").Type(HttpVerbs.Get)).ServerOperation(false)
+                    .PageSize(20)))
+            </text>).Expanded(false);          
+        })
+)
+
+
+
+<script>
+    function onDataRowSelected() {
+        var selectedRows = this.select();
+        var dataItem = this.dataItem(selectedRows[0]);
+        //console.log(dataItem);
+
+        var wnd = $(window.FUNNEL_WND_SELECTOR).data("kendoWindow");
+
+        // period, int? authorId, int? storeId, int? itemId, CommonEnums.eEventItemTypes? itemType
+        var qs = 'period=' + (hasValue(period) ? period : '@defaultPeriod');
+
+        var aid = dataItem.Author != null && hasValue(dataItem.Author.UserId) ? dataItem.Author.UserId : null;
+        qs += '&authorId=' + aid;
+
+        var sid = dataItem.Store != null && hasValue(dataItem.Store.StoreId) ? dataItem.Store.StoreId : null;
+        qs += '&storeId=' + sid;
+
+        var iid = dataItem.Item != null && hasValue(dataItem.Item.id) ? dataItem.Item.id : null;
+        qs += '&itemId=' + iid;
+
+        if (hasValue(iid)) qs += '&itemType=' + dataItem.Item.ItemType;
+
+        var url = '@Url.Action("_FunnelChart", "Report")' + '?' + qs;
+        wnd.title("Funnel performance: " + dataItem.Author.FullName + " - " + (dataItem.Store != null && hasValue(dataItem.Store.Name) ? (dataItem.Store.Name + "-") : "") + " " + dataItem.Item.name);
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+
+    $(document).ready(function () {
+        $("#kpi-options").bind("change", refreshKpi);
+    });
+
+    function refreshKpi() {
+        var chart = $(window.KPI_CHART_SELECTOR).data("kendoChart"),
+            //series = chart.options.series,
+            categoryAxis = chart.options.categoryAxis,
+            baseUnitInputs = $("input:radio[name=baseUnit]");
+
+
+        categoryAxis.baseUnit = baseUnitInputs.filter(":checked").val();
+
+        chart.refresh();
+    }
+</script>
+
+@(Html.Kendo().Window()
+            .Name("wndFunnelData")
+            .Draggable(false)
+            .Actions(actions => actions.Close())
+            .Resizable(builder => builder.Enabled(false))
+            .Visible(false)
+            .Height(800)
+            .Width(1100)
+            .Modal(true)
+            .Events(e => e.Close("clearWndContent"))
+)

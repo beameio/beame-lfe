@@ -1,0 +1,83 @@
+﻿@using LFE.DataTokens
+@model AccountSettingsDTO
+
+@{
+    var isLearner = User.IsInRole("Learner");
+    var isAuthor = User.IsInRole("Author");
+}
+
+
+<link href="@Url.Content( "~/Content/styles/acc.css" )" rel="stylesheet" type="text/css"  />    
+
+<script>
+	var navSelector = ".ul-acc-nav";
+
+	$(document).ready(function () {
+		
+		$(navSelector).find('a').unbind('click').bind('click', function () {
+			var link = $(this);
+			$(navSelector).find('a').removeClass('active');
+			link.addClass('active');
+			link.parent().submit();
+				
+		});
+
+		var h = window.location.hash;
+
+		if (!hasValue(h)) {
+			h = '#settings';
+		}            
+		$(navSelector + ' > li > form > a[href=' + h + ']').click();         
+				   
+	});
+</script>
+
+<div id="d-acc-sett-nav">
+	<ul class="ul-acc-nav">
+	    <li>
+	        @using (Ajax.BeginForm("_EditAccountSettings", "Account", new { area = "", Model.Role }, new AjaxOptions { UpdateTargetId = "d-settings-container", LoadingElementId = "site-loader" }, new { @id = "frmDetails" }))
+	        {
+	            <a href="#settings">Account settings</a>
+	        }
+	    </li>
+        
+        @{
+            if (isLearner)
+            {
+                <li>
+                    @using (Ajax.BeginForm("_EditPaymentMethods", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-settings-container", LoadingElementId = "site-loader" }, new { @id = "frmPaymentMethods" }))
+                    {
+                        <a href="#methods">Payment methods</a>
+                    }
+                </li>
+                <li>
+                    @using (Ajax.BeginForm("_UserPurchases", "User", new { area = "UserPortal" }, new AjaxOptions { UpdateTargetId = "d-settings-container", LoadingElementId = "site-loader" }, new { @id = "frmPurchases" }))
+                    {
+                        <a href="#purchase">Purchases</a>
+                    }
+                </li>
+            }
+
+            if (isAuthor)
+            {
+                <li>
+                    @using (Ajax.BeginForm("_PayoutSettings", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-settings-container", LoadingElementId = "site-loader" }, new { @id = "frmPayout" }))
+                    {
+                        <a href="#payout">Payout Options</a>
+                    }
+                </li>
+                <li>
+                    @using (Ajax.BeginForm("_RefundProgram", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-settings-container", LoadingElementId = "site-loader" }, new { @id = "frmRefundProgram" }))
+                    {
+                        <a href="#refund">Guaranteed Refund Program</a>
+                    }
+                </li>
+            }
+        }
+		
+	</ul>
+</div>
+
+<div id="d-settings-container" style="position: relative"></div>
+
+@Html.Partial("Billing/_SalesReportsTemplates")

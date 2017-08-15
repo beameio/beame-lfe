@@ -1,0 +1,41 @@
+﻿@using LFE.Portal.Models
+@model LoginWindowToken
+
+@{
+  
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+
+    var error = Model.IsValid ? (ViewBag.LoginError == null || String.IsNullOrEmpty(ViewBag.LoginError.ToString()) ? null : ViewBag.LoginError) : Model.Message;
+
+    ViewBag.Title = Model.Mode == eLoginWindowMode.Login ? "Login to LFE" : "Register to LFE";
+
+    var rq = String.IsNullOrEmpty(Request.QueryString["ReturnUrl"]) ? Url.Action("UserEndPoint", "Account", new {area = ""}) : Request.QueryString["ReturnUrl"];
+
+    ViewBag.ReturnUrl = rq;
+}
+
+<script>
+    var LOGIN_FORM_MODE = 'MAIN';
+</script>
+    
+@section scripts{
+     
+    <script>
+        $(document).ready(function () {
+            initLoginBehavior('@Model.Mode.ToString()');            
+        });
+    </script>
+    @{
+        if (error != null)
+        {
+            <script>
+                $(document).ready(function () {
+                    showLoginError('@error');
+                });
+            </script>
+        }
+    }
+}
+
+@Html.Partial("Account/MainLogin/_LoginBox",Model)
+

@@ -1,0 +1,190 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "Courses Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+@{
+	var statuses = Utils.EnumWithDescToList<CourseEnums.CourseStatus>();
+}
+
+@section css{
+	<style>
+		.user-thumb {
+			width: 25px;
+			height: 25px;
+		}
+
+		.k-grid-Edit {
+			text-align: left;
+		}
+
+		.old-login-row {
+			background: #c0c0c0 !important;
+		}
+
+        #auItemName-list{width: 400px !important;}
+	</style>
+}
+
+<h2>Courses Report</h2>
+
+<div style="margin: 10px 0">
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("auUserName")
+              .DataTextField("FullName")
+              .Placeholder(" find by author name")
+              .Filter("contains")
+              .MinLength(2)
+              .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                        "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+              .HtmlAttributes(new { style = "width:250px;font-size:13px;" })
+              .Events(e => e.Select("onUserSelected").Change("onUserChanged"))
+              .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onUserNameAu")).ServerFiltering(true))
+              )
+    </div>
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+                        .Name("auItemName")
+                        .DataTextField("Name")
+                        .Placeholder(" find by item name")
+                        .Filter("contains")
+                        .MinLength(2)
+                        .HtmlAttributes(new { style = "width:250px;font-size:13px;" })
+                        .DataSource(source => source.Read(read => read.Action("GetItemNamesLOV", "Report").Data("onUserNameAu")).ServerFiltering(false))
+                        .Events(e => e.Select("onItemSelected").Change("onItemChanged"))
+                     
+        )
+    </div>
+	<div class="inline" style="margin-left: 15px">
+		@(Html.Kendo().DropDownList()
+			.Name("ddlStatus")
+			.OptionLabel("All statuses")
+			.DataTextField("Title")
+			.DataValueField("Value")
+			.BindTo(statuses)
+			.Events(e => e.Select("onStstusSelected"))
+			.HtmlAttributes(new { style = "width:150px;font-size:13px" })
+		)
+	</div>
+    <div class="inline" style="margin-left: 25px;">
+        <a href="#" onclick="clearFilters(true)" class="a-clear">clear filters</a>
+    </div>
+	<script>
+		var gridId = '#ItemReport';
+		var hidUserId = '#SelectedUserId';
+		var hidItemId = '#SelectedItemId';
+		var hidStatusId = '#SelectedStatusId';
+		$(document).ready(function () {			
+			setFocusAuEvnt('auUserName');
+			setFocusAuEvnt('auItemName');
+		    clearFilters(false);
+		});
+
+		function clearFilters(read) {
+		    $('#auItemName').data('kendoAutoComplete').value(null);
+		    $('#auUserName').data('kendoAutoComplete').value(null);
+		    $('#ddlStatus').data('kendoDropDownList').value(null);
+
+		    $(hidUserId).val(null);
+		    $(hidItemId).val(null);
+		    $(hidStatusId).val(null);
+
+            if (read) {
+                $(gridId).data('kendoGrid').dataSource.read();
+            }
+		}
+
+		function onUserNameAu() {
+			return {
+				name: $("#auUserName").val()
+				, email: null
+			};
+		}
+		function onUserChanged() {
+			try {
+				var value = this.value();
+				if (!hasValue(value)) {
+					$(hidUserId).val(null);
+					$(gridId).data('kendoGrid').dataSource.read();
+				}
+			} catch (ex) {
+			    if (window.console) console.log(ex);
+			}
+		}
+		function onUserSelected(e) {
+			var dataItem = this.dataItem(e.item.index());
+			var id = dataItem.UserId;
+			$(hidUserId).val(id);
+			$(gridId).data('kendoGrid').dataSource.read();
+		}
+
+		function onItemChanged() {
+		    try {
+		        var value = this.value();
+		        if (!hasValue(value)) {
+		            $(hidItemId).val(null);
+		            $(gridId).data('kendoGrid').dataSource.read();
+		        }
+		    } catch (ex) {
+		        if (window.console) console.log(ex);
+		    }
+		}
+		function onItemSelected(e) {
+		    var dataItem = this.dataItem(e.item.index());
+		    var id = dataItem.Value;
+		    $(hidItemId).val(id);
+		    $(gridId).data('kendoGrid').dataSource.read();
+		}
+
+		function onStstusSelected(e) {
+			var dataItem = this.dataItem(e.item.index());
+			var id = dataItem.Value;
+			$(hidStatusId).val(id);
+			$(gridId).data('kendoGrid').dataSource.read();
+		}
+
+		function onRequestSend() {
+
+			return {
+			    id: $(hidUserId).val(),
+			    itemId: $(hidItemId).val(),
+				status: $(hidStatusId).val()
+			};
+		}
+	
+	</script>
+</div>
+
+<div>
+	@Html.Hidden("SelectedUserId", null)
+    @Html.Hidden("SelectedItemId", null)
+	@Html.Hidden("SelectedStatusId", null)
+	@(Html.Kendo().Grid<ItemListDTO>()
+			.Name("ItemReport")
+			.TableHtmlAttributes(new { @style = "background-color: #fff !important;background-image: none !important;" })
+			.Columns(columns =>
+            {
+                columns.Bound(p => p.AuthorName).Title("Author").ClientTemplate("<span data-val='${AuthorId}' title='click to view user details' class='list-cmd usr-btn'>#=AuthorName#</a>");
+                columns.Bound(m => m.ItemName).ClientTemplate("<a href='#=ItemPageUrl#?mode=admin' style='' title='click to view course page' class='list-cmd'  target='_blank'>#=ItemName#</a>").Title("Name");
+                columns.Bound(p => p.ItemType).Title("Type").Width(80);
+				columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+				columns.Bound(p => p.Status).Width(80);
+                columns.Bound(p => p.IsFree).Width(80);
+				columns.Bound(p => p.Price).Title("Price").Format("{0:c}").Width(120);
+				columns.Bound(p => p.MonthlySubscriptionPrice).Title("Subscription").Format("{0:c}").Width(120);                
+				columns.Bound(p => p.SubscribersCount).Title("Number of Subscribers ").Width(150);
+				columns.Bound(p => p.ReviewCount).Title("Reviews").Width(120);
+			})
+			.Sortable()
+			.Pageable(pager => pager.Numeric(true).Refresh(true).PageSizes(true))
+			.Filterable(f => f.Enabled(true))
+			.Events(e => e.DataBound("boundGridUserDetails"))
+			.DataSource(dataSource => dataSource.Ajax()
+			  .Model(model => model.Id(p => p.ItemId))
+			  .Read(read => read.Action("GetAuthorItemsReport", "Report", new { area = "PortalAdmin" }).Data("onRequestSend").Type(HttpVerbs.Get)).PageSize(20).ServerOperation(true)
+		  ))
+</div>

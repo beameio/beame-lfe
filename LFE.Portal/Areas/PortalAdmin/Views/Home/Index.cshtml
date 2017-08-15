@@ -1,0 +1,19 @@
+﻿@using LFE.Core.Extensions
+@model LFE.DataTokens.AdminDashboardToken
+
+@{
+	ViewBag.Title = "Portal Admin Dashboard";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<script>
+	$(document).ready(function () {
+	  
+	});
+</script>
+
+
+@Html.Partial("Dashboard/_AdminDashboard", Model)
+
+
+

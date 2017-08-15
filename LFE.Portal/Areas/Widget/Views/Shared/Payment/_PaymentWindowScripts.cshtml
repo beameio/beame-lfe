@@ -1,0 +1,84 @@
+﻿@model LFE.Portal.Areas.Widget.Models.PaymentWindowScriptsToken
+
+<script>
+    var buySubscription = false;
+    $(document).ready(function () {
+        $('#buyCourse').click(function () {
+            buySubscription = false;
+            @if (User.Identity.IsAuthenticated )
+            {
+                @:ToggleBuyFrame();
+                        }
+            else
+            {
+                @:ToggleLogin();
+                            @:$('.block-message').show();
+                        }
+        });
+
+        $('#buyCourse2').click(function () {
+            buySubscription = false;
+            @if (User.Identity.IsAuthenticated )
+            {
+                @:ToggleBuyFrame();
+                        }
+            else
+            {
+                @:ToggleLogin();
+                            @:$('.block-message').show();
+                        }
+        });
+
+        $('#buyCourseSubscr').click(function () {
+            buySubscription = true;
+            @if (User.Identity.IsAuthenticated )
+            {
+                @:ToggleBuyFrame();
+                        }
+            else
+            {
+                @:ToggleLogin();
+                            @:$('.block-message').show();
+                        }
+        });
+
+        $('#buyCourseSubscr2').click(function () {
+            buySubscription = true;
+            @if (User.Identity.IsAuthenticated )
+            {
+                @:ToggleBuyFrame();
+                        }
+            else
+            {
+                @:ToggleLogin();
+                            @:$('.block-message').show();
+                        }
+        });
+    });
+
+    function loadIframe(iframeName, url) {
+        var $iframe = $('#' + iframeName);
+        if ($iframe.length) {
+            $iframe.attr('src', url);
+            return false;
+        }
+        return true;
+    }
+
+    function ToggleBuyFrame(lineId) {
+       // console.log('l2=' + lineId + 'url=' + '@Model.PurchaseActionUrl');
+        var div = $('.dark');
+        if ($('#buyFrameWrapper').is(":hidden")) {
+            div.fadeIn();
+            $('#buyFrameWrapper').slideToggle();
+            //console.log(buySubscription);
+            var frameSrc = '@Model.PurchaseActionUrl' + '?id=' + lineId;// + '&buySubscription=' + buySubscription;
+            loadIframe('buyIframe', frameSrc);
+        }
+        else {
+            div.fadeOut();
+            $('#buyFrameWrapper').slideToggle();
+        }
+
+    }
+</script>

@@ -1,0 +1,26 @@
+﻿@model LFE.DataTokens.AuthorPayoutToken
+           
+<div class="box">
+    <div class="inner">
+        <div class="seller">&nbsp;
+            @{
+                if (Model.Seller != null)
+                {
+                    <span>@Model.Seller.FullName</span>
+                }
+            }
+        </div>
+        <div class="sale">
+            @{
+                if (Model.Sales > 0)
+                {
+                    <span>@Model.Currency.Symbol</span> <span>@Model.Sales</span>
+                }
+                else
+                {
+                    <span>N/A @Model.Currency.Symbol</span>
+                }
+            }
+        </div>
+    </div>
+</div>

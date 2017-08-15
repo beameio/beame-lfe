@@ -1,0 +1,181 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Models
+@model FbAdminAuthenticationResult
+
+@{
+    Layout = "../Shared/_FacebookFramesLayout.cshtml";
+
+}
+
+@section FbAppSettings
+{
+    <script>
+        var facebookAppId = '@Utils.GetKeyValue("fbAppId")'
+    </script>
+}
+
+@section JS
+{
+    <script>
+        var INFO_PANEL_SELECTOR = '.fb-admin-info';
+        var ADMIN_CONTAINER_SELECTOR = '#fb-admin-container';
+
+        var LOGIN_ERROR_FORM_SELECTOR = '#lfe-login-info-panel';
+        var LOGIN_ERROR_MESSAGE_SELECTOR = '#lfe-login-info-panel > .inner > .e-row';
+
+        var FB_LOGIN_ERROR_FORM_SELECTOR = '#fb-login-info-panel';
+        var FB_LOGIN_ERROR_MESSAGE_SELECTOR = '#fb-login-info-panel > .inner > .e-row';
+
+        var socialLoginUrl, socialConnectUrl;
+        socialConnectUrl = '@Url.Action("VerifyAndConnect", "Account", new { area = "Widget", Model.trackingId })';
+        socialLoginUrl = '@Url.Action("FbAppAdminCreate", "Account", new { area = "Widget", Model.trackingId })';
+
+        $(document).ready(function () {
+
+            $('#aFacebookLogin,#aFacebookConnect').click(function () {
+
+                var url = socialLoginUrl;
+                if ($(this).prop('id') == 'aFacebookConnect') url = socialConnectUrl;
+
+
+                window.PopSafariSessionWindow();
+                if (typeof FB !== 'undefined' && typeof FB.login === 'function') {
+                    showFormLoader(ADMIN_CONTAINER_SELECTOR);
+                    FB.init({ appId: window.facebookAppId, status: 1, xfbml: 1 });
+                    FB.login(function (response) {
+                        if (response.authResponse && response.status === 'connected') {
+                            onAdminFacebokLogin(response.authResponse, url);
+                        } else {
+                            hideFormLoader();
+                            window.displayLoginError('FB Login failed with status ' + response.status, 'fb');
+                        }
+                    }, { scope: 'email,user_birthday,publish_stream' });
+                }
+            });
+        });
+
+        function onAdminFacebokLogin(fbResponse, url) {
+            $.post(url, { token: fbResponse.accessToken }, function (response) {
+                if (response.success) {
+                    parent.reloadWidget(response.result.returnUrl);
+                } else {
+                    hideFormLoader();
+                    window.displayLoginError(response.error, 'fb');
+                }
+            });
+        }
+
+        function PopSafariSessionWindow() {
+            @if(Request.Browser.Browser.ToLower().Trim() == "safari" )
+            {
+                <text>
+            if (window.top != window.self) {
+                OpenForm('@(Request.Url.Scheme + "://" + Request.Url.Authority + Url.Action("SafariLoginSession", "Account", new { area = "Widget" }))');
+            }
+            </text>
+            }
+        }
+        function showInfoMessage(msg) {
+            if (!hasValue(msg)) return;
+            $(INFO_PANEL_SELECTOR).html(msg);
+        }
+
+        function displayLoginError(error, type) {
+
+            var $LOGIN_ERROR_MESSAGE_SELECTOR = null, $LOGIN_ERROR_FORM_SELECTOR = null;
+
+            if (type == 'lfe') {
+                $LOGIN_ERROR_MESSAGE_SELECTOR = LOGIN_ERROR_MESSAGE_SELECTOR;
+                $LOGIN_ERROR_FORM_SELECTOR = LOGIN_ERROR_FORM_SELECTOR;
+            }
+            if (type == 'fb') {
+                $LOGIN_ERROR_MESSAGE_SELECTOR = FB_LOGIN_ERROR_MESSAGE_SELECTOR;
+                $LOGIN_ERROR_FORM_SELECTOR = FB_LOGIN_ERROR_FORM_SELECTOR;
+            }
+
+            if ($LOGIN_ERROR_MESSAGE_SELECTOR == null || $LOGIN_ERROR_FORM_SELECTOR == null) return;
+
+            $($LOGIN_ERROR_MESSAGE_SELECTOR).html(error);
+
+            if (hasValue(error)) {
+                if ($($LOGIN_ERROR_FORM_SELECTOR).is(":visible")) return;
+
+                $($LOGIN_ERROR_FORM_SELECTOR).slideToggle();
+
+            } else {
+                $($LOGIN_ERROR_FORM_SELECTOR).hide();
+            }
+        }
+    </script>
+
+}
+
+@section CSS{
+    <style>
+        .loader-mask {width: 810px !important;}
+        .loader-mask > .inner > .info {top: 15px;}
+        .loader-mask > .inner > .loader {top: 20px;}
+    </style>    
+}
+
+
+
+
+
+<div id="fb-admin-container" class="fb-admin-container">
+    @{
+
+        if (Model.IsValid)
+        {
+            switch (Model.state)
+            {
+                case FbPageAppAdminMatchResults.Unknown:
+                    <h2>@(Model.Message ?? "Something went wrong. Please contact support team")</h2>
+                    break;
+                case FbPageAppAdminMatchResults.NotFoundNotAuthenticated:
+                    <div class="fb-admin-info">
+                        You’re just a few clicks away from creating and selling your online courses on Facebook.<br/>
+                        What would you like to do?
+                    </div>
+                    <div class="box" id="nfna-box-1">
+                        @Html.Partial("Facebook/_AdminPanelFbConnect")
+                    </div>
+                    <div class="box" id="nfna-box-2">
+                        @Html.Partial("Facebook/_AdminPanelLfeLogin")
+                    </div>
+                    break;
+                case FbPageAppAdminMatchResults.NotFoundAuthenticated:
+                    <script>
+                        if (window.parent) parent.setSettingsIframeH(220);
+                    </script>
+                    <div class="fb-admin-info">
+                        You’re almost done! Sign in with Facebook so we can link your LFE and Facebook accounts. Next time you access your Facebook LFE app no login will be required. 
+                    </div>
+                    <div class="box" id="nfa-box-1">
+                        @Html.Partial("Facebook/_AdminPanelFbConnect")
+                    </div>
+                    <div class="box" id="nfa-box-2">
+                        @Html.Partial("Facebook/_AdminPanelConnectAccounts")
+                    </div>
+                    break;
+
+                case FbPageAppAdminMatchResults.FoundAndMatchedByEmail:
+                    <script>
+                        if (window.parent) parent.setSettingsIframeH(220);
+                    </script>
+                    <div class="fb-admin-info">
+                        You’re almost done! Sign in with Facebook so we can link your LFE and Facebook accounts. Next time you access your Facebook LFE app no login will be required. 
+                    </div>
+                    <div class="box" id="fme-box-1">
+                        @Html.Partial("Facebook/_AdminPanelConnectAccounts")
+                    </div>
+                    break;
+            }
+        }
+        else
+        {
+            <h2>@Model.Message</h2>
+        }
+    }
+</div>
+

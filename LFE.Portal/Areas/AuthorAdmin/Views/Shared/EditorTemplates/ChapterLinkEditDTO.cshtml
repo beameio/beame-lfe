@@ -1,0 +1,48 @@
+﻿@model LFE.DataTokens.ChapterLinkEditDTO
+           
+
+<li data-val="${LinkId}">
+    @using (Ajax.BeginForm("SaveChapterLink", "Course", null, new AjaxOptions { OnSuccess = "onChapterLinkSaved" }, new { @id = "frmChapterLink", @style = "" }))
+        {
+            @Html.HiddenFor(x => x.LinkId)
+            @Html.HiddenFor(x => x.ChapterId)
+            @Html.HiddenFor(x => x.Kind)
+            @Html.HiddenFor(x => x.OrderIndex)
+    
+            <div class="content-head-row">
+                <span class="float-left drag-box">&nbsp;</span>
+                <span class="float-left btn-collapse-second expanded">&nbsp;</span>
+                <span title="#=Encoder.htmlEncode(Title)#" class="float-left cn-name #=Kind==1 ? 'cn-dc' : 'cn-lnk'#" style="padding-top: 6px">
+                    @Html.TextBoxFor(m => m.Title, new { @style = "width: 350px", @maxlength = 150})
+                </span>
+                <span class="float-right" style="width:150px;">
+                    <span class="row-btn right btn-save inline" title="Save #=Kind==1 ? 'document' : 'link'#"><span class="ico"></span></span>
+
+                    <span class="k-cancel-button row-btn btn-cancel inline pt9" title="Cancel" data-val="${LinkId}"><span class="ico"></span></span>
+                </span>
+            </div>
+            <div class="cn-details">
+                #if(Kind==1){#
+                @Html.HiddenFor(m => m.LinkHref)
+                @(Html.Kendo().Upload()
+                      .Name("file")
+                      .Events(e => e.Upload("onListDocUploadAction").Success("onListDocUploadSuccess"))
+                      .Async(a => a.Save("SaveCourseDoc", "Upload").AutoUpload(true))
+                      )
+        
+                <a href="#hasValue(LinkHref) ? LinkHref : emptyHref#" target="_blank" title="open document" id="a-doc-preview">#:LinkHref#</a>
+                #} else{#
+                <div class="inline" style="padding: 14px 12px 0 37px">
+                    @Html.LabelFor(m => m.LinkHref)
+                </div>
+                <div class="inline">
+                    @Html.TextAreaFor(m => m.LinkHref, new { @style = "width:300px", @rows = 2, @maxlength = 500 })
+                </div>
+                #}#
+            </div>
+
+        }
+
+</li>
+
+    

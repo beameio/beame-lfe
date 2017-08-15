@@ -1,0 +1,78 @@
+﻿@using LFE.Core.Utils
+@model LFE.Portal.Areas.UserPortal.Models.AuthorProfilePageToken
+
+
+<div class="author-profile-container">
+    <div class="profile-head">
+        <h2>@Model.ProfileCart.Profile.fullName</h2>
+
+        @{
+            if (!String.IsNullOrEmpty(Model.ProfileCart.Profile.PhotoUrl) && Model.ProfileCart.Profile.PhotoUrl != Constants.DefaultAvatarUrl)
+            {
+                <img class="avatar" src="@Model.ProfileCart.Profile.PhotoUrl" alt="@Model.ProfileCart.Profile.fullName" />
+
+                <script>
+                    var avatar = $(".author-profile-container img.avatar");
+                    var img = new Image();
+                    img.src = avatar.attr('src');
+                    img.onload = function () {
+                        var newSizes = scaleSize(365, 215, this.width, this.height);
+                        //console.log(newSizes);
+                        avatar.width(newSizes[0]);
+                        avatar.height(newSizes[1]);
+                        avatar.fadeIn(300);
+                    }
+
+                    function scaleSize(maxW, maxH, currW, currH) {
+                        var ratio = Math.min(maxW / currW, maxH / currH);
+                        var width = ratio * currW;
+                        var height = ratio * currH;
+                        return [width, height];
+                    }
+                </script>
+            }
+
+            if (!String.IsNullOrEmpty(Model.ProfileCart.Profile.bioHtml) && Model.ProfileCart.Profile.bioHtml.Length > 1)
+            {
+                <p>
+                    @Html.Raw(Model.ProfileCart.Profile.bioHtml)
+                </p>
+            }
+        }
+    </div>
+
+    @{
+        var items = Model.ShowPurchased ? Model.LearnerCourses : Model.AuthorItems;
+
+        if (items.Any())
+        {
+            <div class="row">
+                @{
+                    if (Model.ShowItemsListTitle && !String.IsNullOrEmpty(Model.ItemsListTitle))
+                    {
+                        <h4 class="other-sub">@Model.ItemsListTitle</h4>
+                    }
+                }
+                <div style="width: auto; text-align: center; margin: 0 auto">
+                    <ul class="ul-w-item-list">
+                        @{
+                            foreach (var item in items)
+                            {
+                                <li class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                                    @Html.Partial("Item/_WidgetItemBox", item)
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    $(document).ready(function () {
+        //console.log('notify author profile loaded');
+        window.getNotifManagerInstance().notify(notifEvents.window.contentLoaded, null);
+    });
+</script>

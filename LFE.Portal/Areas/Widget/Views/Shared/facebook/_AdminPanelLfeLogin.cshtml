@@ -1,0 +1,49 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Models.FbAdminAuthenticationResult
+
+<script>
+    if (window.parent) parent.setSettingsIframeH(280);
+
+    $(document).ready(function () {
+
+        $('#btn-lfe-login').unbind('click').click(function () {
+
+            var isValid = $('#frm-lfe-login').validate().form();
+            if (!isValid) return;
+
+            $('#frm-lfe-login').submit();
+            showLoader();
+        });
+    });
+
+    function onLoginEnd(response) {
+        hideFormLoader();
+        if (response.success) {
+            window.socialLoginUrl = '@Url.Action("VerifyAndConnect", "Account", new { area = "Widget" })' + '?userId=' + response.result + '&trackingId=@Model.trackingId';
+
+            $('#nfna-box-2').slideUp(500, function () {
+                $('#nfna-box-2').animate({ "left": "200px" }, "slow");
+            });
+
+            window.showInfoMessage('Thank you for connecting with LFE, You’re almost done! <br/> Sign in with Facebook so we can link your LFE and Facebook accounts. <br/> Next time you access your Facebook LFE app no login will be required.');
+            $('#nfna-box-1-sub').html('Click to complete a process');
+        }
+        else {
+            window.displayLoginError(response.error,'lfe');
+        }
+    }
+</script>
+
+<div class="fb-admin-sub" style="padding-left: 10px">I have an LFE Account.</div>
+<div class="inner">
+    @using (Ajax.BeginForm("AjaxFbApproveLfeLogin", "Account", new { area = "", returnUrl = "" }, new AjaxOptions { HttpMethod = "Post", OnSuccess = "onLoginEnd" }, new { @id = "frm-lfe-login", @class = "form-lfe-login rel" }))
+    {
+        @Html.Partial("Account/MainLogin/_LoginForm", new LoginDTO())
+
+        <div class="conn-btn-container" style="margin: 15px 0 0 192px">
+            <a title="" class="conn-btn" href="#" id="btn-lfe-login" style="width: auto;width: 180px;height:57px">
+                Login
+            </a>
+        </div>
+    }
+</div>

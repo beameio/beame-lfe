@@ -1,0 +1,67 @@
+﻿@using LFE.Portal.Helpers
+@model string
+
+@{
+    
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+    var user = this.CurrentUser();
+    ViewBag.Title = user==null ? "User Dashboard" : "Welcome " + user.FullName;
+}
+@section css
+{   
+    <link href="~/Content/styles/user-endpoint.css" rel="stylesheet" />
+}
+@{
+    if (User.Identity.IsAuthenticated && user != null)
+    {
+        
+        <h1 class="welcome">Welcome @user.FullName</h1>
+
+        <h2 class="what">What would you like to do next?</h2>
+
+        <div class="dash-nav-container">
+            <div class="col">
+                <a href="@Url.Action("MyCourses", "Widget", new { area = "Widget"})">
+                    <i class="dash-ico dash-purchase"></i>
+                    <span class="a-title">Purchased Courses</span>
+                </a>
+            </div>
+            <div class="col">
+                <a href="@Url.Action("Index","Home",new {area="AuthorAdmin"} )">
+                    <i class="dash-ico dash-portal"></i>
+                    <span class="a-title">LFE Author Dashboard</span>
+                </a>
+            </div>
+            @{
+                if (this.IsCurrentUserAdmin())
+                {
+                    
+                    <link href="~/Content/styles/user-admin-endpoint.css" rel="stylesheet" />
+
+                    <div class="col">
+                        <a href="@Url.Action("Index","Home",new{area="PortalAdmin"})">
+                            <i class="dash-ico dash-acc"></i>
+                            <span class="a-title">Admin Portal</span>
+                        </a>
+                    </div>
+                }
+            }
+            
+
+        </div>
+    
+        <div class="bottom-links">
+            <a href="@Url.Action("UserSettings","Account",new{area=""})">Account Settings</a>|
+            <a href="@Url.Action("SignOff", "Account", new { area = "" })">Logout</a>
+        </div>
+
+    }
+    else
+    {
+        <script>
+            window.location.href = '@Url.Action("Login","Account")';
+        </script>
+    }
+}
+
+

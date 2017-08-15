@@ -1,0 +1,92 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.TrainingViewToken
+   @{
+       var backUrl = @Url.Action("Manage", "Training");
+   } 
+<div class="title-container">
+    @{
+        var showTimer = true;
+        var timerDate = DateTime.MinValue;
+        switch (Model.Status)
+        {
+            case TrainingEnums.eTrainingStatus.WAIT:
+                <h3>Live session begin in</h3>
+                timerDate = Model.Start;
+                break;
+            case TrainingEnums.eTrainingStatus.IN_PROGRESS:
+            <h3>Live session in progress</h3>
+                timerDate = Model.End;
+                break;
+            case TrainingEnums.eTrainingStatus.END:
+            <h3 class="expired">Session has expired</h3>
+                showTimer = false;
+                break;
+        }
+
+        if (showTimer && timerDate > DateTime.MinValue)
+        {
+            <span id="countdown" class="timer"></span>
+
+            var minutesRemind = (timerDate - DateTime.Now).TotalMinutes;
+
+            <script>
+
+                                var seconds = 60;
+                                var now = new Date();
+                                var end = addMinutes(now, parseInt('@minutesRemind'));
+                                // console.log('now ' + now);
+                                //  console.log('end ' + end);
+                                var rentalTimer = new Countdown({
+                                    selector: '#countdown',
+                                    msgPattern: "<span>{days}d:</span><span>{hours}h:</span><span>{minutes}m:</span><span>{seconds}s</span>",
+                                    msgAfter: "",
+                                    leadingZeros: "0",
+                                    dateStart: now,
+                                    dateEnd: end,
+                                    onEnd: onTimerEnd
+                                });
+
+
+                                function onTimerEnd() {
+                                    window.location.href = window.location.href;
+                                }
+
+                                function addMinutes(date, minutes) {
+                                    return new Date(date.getTime() + minutes * 60000);
+                                }
+            </script>
+        }
+    }
+</div>
+<div class="link-container">
+    @{
+        if (Model.Status == TrainingEnums.eTrainingStatus.WAIT)
+        {
+            <a class="inline" href="@Model.ManageUrl" target="_blank">open session</a>
+
+            using (Ajax.BeginForm("DeleteTraining", "Training", new { id = Model.TrainingId }, new AjaxOptions { OnSuccess = "onTrainingDeleted" }, new { @id = "frmDeleteTraining", @class = "frm-delete" }))
+            {
+                <a href="@Model.ManageUrl" id="btn-delete-event">delete session</a>
+            }
+            <script>
+                                $(document).ready(function() {
+                                    $('#btn-delete-event').on('click', function (e) {
+                                        e.preventDefault();
+                                        if (!window.confirm('Delete Training?')) return;
+                                        window.showLoader();
+                                        $('#frmDeleteTraining').submit();
+                                    });
+                                });
+                                function onTrainingDeleted(response) {
+                                    window.hideLoader();
+                                    if (response.success) {
+                                        swal("Training deleted", "", "success");
+                                        window.location.href = '@backUrl';
+                                    } else {
+                                        sweetAlert("Oops...", response.error, "error");
+                                    }
+                                }
+            </script>
+        }
+    }
+</div>

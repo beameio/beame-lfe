@@ -1,0 +1,147 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@model KpiDashboardFiltersToken
+
+<style>
+    .d-filter-row {
+        height: 30px;
+        padding: 12px 0;
+        border: solid 1px #a4a4a4;
+        border-left: none;
+        border-right: none;
+    }
+
+        .d-filter-row ul li {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+            .d-filter-row ul li:first-child {
+                font-weight: bold;
+                font-size: 14px;
+                color: #000;
+                text-transform: uppercase;
+                margin-right: 20px;
+            }
+
+    .d-chart-row {
+        margin: 10px 0 0;
+    }
+
+    .config-section {
+        width: 170px;
+        margin: 50px 0 0;
+    }
+
+    .chart-wrapper {
+        width: calc(100% - 180px);
+    }
+
+    .configHead {
+        display: block;
+        font-size: 14px;
+        padding: 0 0 0 5px;
+    }
+    .chart-box{margin: 10px 0 15px;width: 100%}
+
+    .k-chart{width:1060px}
+</style>
+
+<script src="~/Scripts/kendo/@Url.ToKendoVersionUrl()/kendo.all.min.js"></script>
+
+<script>
+    var KPI_GRID_SELECTOR = '#gridKpiRows';
+    var KPI_CHART_SELECTOR = '#kpiChart';
+    var FUNNEL_WND_SELECTOR = '#wndFunnelData';
+    
+
+   
+
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindReport, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindReport, null);
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.periodChanged, onPeriodChanged, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.periodChanged, onPeriodChanged, null);
+        submitDailyCharts();
+    });
+
+    function rebindReport() {
+        $(KPI_CHART_SELECTOR).data("kendoChart").dataSource.read();
+        $(KPI_GRID_SELECTOR).data("kendoGrid").dataSource.read();
+    }
+
+    function onPeriodChanged() {
+        rebindReport();
+        submitDailyCharts();
+    }
+
+    function submitDailyCharts() {
+        var period = window.getSelectedPeriod();
+       
+        $('#tPeriod').val(period);
+        $('#sPeriod').val(period);
+       
+        $('#frmDailyTotals').submit();
+        $('#frmDailyStats').submit();
+    }
+
+
+    function setChartState(chart, type, stack, baseUnit) {
+        var series = chart.options.series,
+            categoryAxis = chart.options.categoryAxis;
+
+        categoryAxis.baseUnit = baseUnit;
+
+        for (var i = 0, length = series.length; i < length; i++) {
+            series[i].stack = stack;
+            series[i].type = type;
+        };
+
+        chart.refresh();
+    }
+</script>
+
+@Html.Partial("Report/_DashboardFilters",Model)
+
+@using (Ajax.BeginForm("_DailyTotals", "Report", null, new AjaxOptions { UpdateTargetId = "d-daily-totals" }, new { @id = "frmDailyTotals" }))
+{
+    @Html.Hidden("tPeriod")
+}
+
+@using (Ajax.BeginForm("_DailyStats", "Report", null, new AjaxOptions { UpdateTargetId = "d-daily-stats" }, new { @id = "frmDailyStats" }))
+{
+    @Html.Hidden("sPeriod")
+}
+
+@(Html.Kendo().PanelBar()
+        .Name("AdminDashPanel")
+        .ExpandMode(PanelBarExpandMode.Multiple)
+        .Items(panel =>
+        {
+            panel.Add().Text("KPI Dashboard").Content(@<text>
+                                                           @Html.Partial("Report/_DashboardKpiChart")
+                                                       </text>).Expanded(true);
+            panel.Add().Text("Daily Totals").Content(@<text>
+                                                          
+                                                          <div id="d-daily-totals"></div>                                                          
+                                                      </text>);
+            panel.Add().Text("Daily Activities").Content(@<text>
+                                                            <div id="d-daily-stats"></div>
+                                                          </text>);
+        })
+       
+    )
+
+
+<script>
+    function onPanleExpaned(e) {
+        
+        $.each($(e.item).find('.k-chart'), function() {
+            var chart = $(this).data('kendoChart');
+            console.log(chart);
+            chart.resize(true);
+        });
+    }
+</script>
+

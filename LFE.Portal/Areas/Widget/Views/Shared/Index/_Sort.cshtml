@@ -1,0 +1,43 @@
+﻿@model LFE.DataTokens.IndexModelViewToken
+
+
+@{ string linkActionName = "Index"; }
+@{ string linkControllerName = "Widget"; }
+@{ Action<RouteValueDictionary> addSort = (rvd => { if (Model.Sort != "date") { rvd.Add("sort", Model.Sort); } }); }
+@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    string wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+
+    }
+
+
+   <div id="sorter" class="sort">
+    Sort by: &nbsp;&nbsp;
+    @if (viewModel != null && viewModel.Category != null)
+    {
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, categoryName = viewModel.CategoryName, page = 1, sort = "ordinal", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "ordinal" || String.IsNullOrEmpty(Model.Sort) ? "current" : "")">Name</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, categoryName = viewModel.CategoryName, page = 1, sort = "popularity", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "popularity" ? "current" : "")">Popularity</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, categoryName = viewModel.CategoryName, page = 1, sort = "date", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "date" ? "current" : "")">Date</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, categoryName = viewModel.CategoryName, page = 1, sort = "cost", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "cost" ? "current" : "")">Cost</a>
+    }
+    else if (viewModel != null)
+    {
+        
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, page = 1, sort = "ordinal", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "ordinal" || String.IsNullOrEmpty(Model.Sort) ? "current" : "")">Name</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, page = 1, sort = "popularity", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "popularity" ? "current" : "")">Popularity</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, page = 1, sort = "date", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "date" ? "current" : "")">Date</a>
+        @:&nbsp;|&nbsp;
+        <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new { trackingID = viewModel.WebStore.TrackingID, page = 1, sort = "cost", width = viewModel.Width, height = viewModel.Height }))" class="@(Model.Sort == "cost" ? "current" : "")">Cost</a>
+    }
+</div>
+
+
+
+
+

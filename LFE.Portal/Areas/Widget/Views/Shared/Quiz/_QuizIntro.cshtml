@@ -1,0 +1,103 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.UserCourseQuizToken
+           
+
+
+@{
+    if (Model.IsValid)
+    {
+        <script>
+            $(VIDEO_TITLE_SELECTOR).fadeOut("slow", function () {
+                $(VIDEO_TITLE_SELECTOR).html("@Model.Title").addClass('qz').fadeIn("slow");
+            });
+        </script>
+
+        <div class="quiz-head">
+            <div class="inner row">
+                <div class="float-left">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_AttemptsCounter.cshtml", new AttemptCounterToken { Attempts = Model.Attempts, UserAttempts = Model.UserAttempts })
+                </div>
+
+                <div class="float-right">
+                    @{
+                        if (Model.TimeLimit != null)
+                        {
+                            var d = TimeSpan.FromMinutes((double)Model.TimeLimit);
+
+                            <div class="quiz-countdown-container">
+                                <div class="title">time remaining</div>
+                                <div id="quiz-countdown" class="timer">@d</div>
+                            </div>
+                        }
+                    }
+                </div>    
+            </div>
+            
+        </div>
+
+        <div class="quiz-content-container">
+            <p class="desc">
+                @Html.Raw(Model.Description)
+            </p>         
+
+            <div class="row props">
+                @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_PropBox.cshtml", new UserQuizPropBoxToken
+                {
+                    Title = "participation mandatory"
+                    , Value = Model.IsMandatory ? "" : "-"
+                    , CssClass = "mand"
+                    , SpanCssClass = Model.IsMandatory ? "ok" : ""
+                })
+
+                @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_PropBox.cshtml", new UserQuizPropBoxToken
+                {
+                    Title = "passing score"
+                    , Value = Model.PassPercent != null ? Model.PassPercent.ToString() : "-"
+                    , CssClass = "score"
+                    , SpanCssClass = ""
+                })
+
+                @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_PropBox.cshtml", new UserQuizPropBoxToken
+                {
+                    Title = "maximum attempts"
+                    , Value = Model.Attempts != null ? Model.Attempts.ToString() : "-"
+                    , CssClass = "attempt"
+                    , SpanCssClass = ""
+                })
+
+                @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_PropBox.cshtml", new UserQuizPropBoxToken
+                {
+                    Title = "Time limit (minutes)"
+                    , Value = Model.TimeLimit != null ? Model.TimeLimit.ToString() : "-"
+                    , CssClass = "limit"
+                    , SpanCssClass = ""
+                })
+            </div>
+
+            <p class="intruct">
+                @Html.Raw(Model.Instructions)
+            </p>
+
+            <div class="bottom-row">
+                <div class="inner row">
+                    <label>start quiz</label>
+                    <div class="btn-nav start inline" id="btn-start-qz">
+                        <i></i>
+                    </div>
+                    <script>
+                        $(document).ready(function () {
+                            $('#btn-start-qz').unbind('click').bind('click', function () {
+                                loadUserQuiz('@eUserQuizActions.StartQuiz', '@Model.QuizId', null);
+                            });
+                        });
+                    </script>
+                </div>                
+
+            </div>
+        </div>    
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}

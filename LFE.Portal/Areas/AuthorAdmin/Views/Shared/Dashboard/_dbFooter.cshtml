@@ -1,0 +1,22 @@
+﻿@using LFE.Core.Utils
+<div class="db-footer">
+    <div>
+        <a href="https://www.facebook.com/games/learnfromexpirence/" target="_blank" class="db-facebook">
+            <span>Add a Facebook store</span>
+        </a>
+    </div>
+    <div>
+        <a href="@Url.Action("Index", "Mailchimp")" class="db-mailchimp">
+            <span>CONNECT YOUR MAILCHIMP ACCOUNT</span>
+        </a>
+    </div>
+    <div>
+        <a href="@Url.Action("EditCourse","Course")/@Guid.NewGuid()" class="db-newcourse">
+            <span>CREATE A NEW COURSE</span>
+        </a> 
+    </div>
+    <div>
+        <a href="@(Utils.GetKeyValue("homeUrl"))" target="_blank" class="db-lfe"></a>
+    </div>
+</div>
+

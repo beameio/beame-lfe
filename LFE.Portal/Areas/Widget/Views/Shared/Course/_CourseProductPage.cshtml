@@ -1,0 +1,136 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.DataTokens.CoursePurchaseDTO
+
+@{    
+    string tabName = !string.IsNullOrEmpty(ViewBag.TabName) ? ViewBag.TabName : "content";
+}
+
+<div class="cv-header">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Course/_CourseHeader.cshtml")
+</div>
+
+<div class="cv-content">
+
+    <div class="col left-col">
+        <div class="inner">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Course/_CourseNavigation.cshtml", Model)
+            <div class="c-tabs-content" id="c-tabs-content">
+                <div id="d-tab-content" style="">
+                    @switch (tabName.ToLower())
+                    {
+                        case "content":
+                            Html.RenderPartial("~/Areas/Widget/Views/Shared/Course/_CourseContent.cshtml");
+                            break;
+                        case "author":
+                            
+                            @Html.Action("GetAuthorContentPartial", "Course", new { area = "Widget", authorID = Model.User.userId })
+                            
+                            break;
+                        case "reviews":
+                            if (Model.CourseId != null)
+                            {
+                                @Html.Action("GetCourseReviewsPartial", "Course", new { area = "Widget", courseID = (int)Model.CourseId })
+                            }                            
+                            break;
+                        default:
+                            Html.RenderPartial("~/Areas/Widget/Views/Shared/Course/_CourseContent.cshtml");
+                            break;
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col right-col">
+        @if (Model.IsFreeCourse)
+        {
+            <div class="price-free"><strong>GET FOR</strong></div>
+            <div class="button-wrapper">       
+                <a id="buyFreeCourse" href='@Url.Action("FreeCourseRedirect", "Payment", new { trackingID = Model.TrackingID ?? "", authorName = Model.User.fullName, courseUrlName = Model.CourseUrlName ?? "", courseId = Model.CourseId ?? -1, })' target="_blank">
+                    <div class="buy-button">FREE</div>
+                </a>
+            @{
+                if (!Model.ItemState.IsAccessAllowed)
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        if (string.IsNullOrEmpty(Model.TrackingID))
+                        {
+                            <script>
+                                $(document).ready(function () {
+                                    var freeBtn = $('#buyFreeCourse');
+                                    freeBtn.click(function (e) {
+                                        e.preventDefault();
+                                        submitFreeCourse();
+                                    });
+
+                                    $('#buyFreeCourse2').click(function (e) {
+                                        e.preventDefault();
+                                        submitFreeCourse();
+                                    });
+                                });
+
+                                function submitFreeCourse() {
+                                    showFormLoader('.cv-content');
+                                    $.ajax({
+                                        url: '@Url.Action("PurchaseFreeCourse", "Payment", new { courseId = Model.CourseId, Model.TrackingID })',
+                                        cache: false,
+                                        type: "Post",
+                                        datatype: "json",
+                                        contentType: "application/json; charset=utf-8"
+                                        , success: function (response) {
+                                            hideFormLoader();
+                                            if (response.success) {
+                                                location.reload();
+                                            } else {
+                                                alert(response.error);
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
+                        }
+                    }
+                    else
+                    {
+                        <script>
+                            $(document).ready(function () {
+                                var freeBtn = $('#buyFreeCourse');
+                                freeBtn.click(function (e) {
+                                    e.preventDefault();
+                                    window.ToggleLogin();
+                                    $('.block-message').show();
+                                });
+
+                                $('#buyFreeCourse2').click(function (e) {
+                                    e.preventDefault();
+                                    window.ToggleLogin();
+                                    $('.block-message').show();
+                                });
+                            });
+                        </script>
+                    }
+                }
+            }
+            </div>
+        }
+        else
+        {
+            if (!Model.ItemState.IsPreview && (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed))
+            {
+                <div class="price"><strong></strong></div>
+                <div class="button-wrapper">
+                    <a href='@Url.GenerateCoursePageUrl(Model.User.fullName, Model.CourseUrlName, null, Model.TrackingID)' target="_blank">
+                        <div class="buy-button">
+                            OPEN COURSE
+                        </div>
+                    </a>
+                </div>
+            }
+            else
+            {
+              //  @Html.Partial("Payment/_ItemPaymentButtons",Model.PriceLines)
+            }
+        }
+    </div>
+</div>

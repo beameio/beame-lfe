@@ -1,0 +1,3 @@
+﻿@model LFE.Portal.Areas.Widget.Models.AttemptCounterToken
+           
+<h4>@(String.Format("Attempt {0}{1}", Model.UserAttempts + (Model.IsCompleteForm ? 0 : 1), Model.Attempts == null ? "" : "/" + Model.Attempts))</h4>

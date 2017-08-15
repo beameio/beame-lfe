@@ -1,0 +1,52 @@
+﻿@model IndexModelViewToken
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+@using System.Collections
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+
+@{
+    Layout = "~/Areas/widget/Views/Shared/_WidgetLayout.cshtml";
+}
+@section CSS {
+    <link href="~/Areas/Widget/Content/styles/Search.css" rel="stylesheet" />
+}
+
+<div class="navigationdiv">
+     @if (Model.ItemsList.Any() )
+     {
+         <div id="sorter" class="sort"><strong>@Model.TotalCourses.ToString() </strong>results for <strong>@ViewBag.Keyword</strong></div>
+     }
+    @Html.Partial("~/Areas/Widget/Views/Shared/Index/_Paging.cshtml")
+</div>
+<div class="promo">
+    @if (!Model.ItemsList.Any())
+    {
+        <div>Your search - <strong>@ViewBag.Keyword</strong> - did not match any courses</div>
+    }
+    else
+    {
+        for (int i = 0; i < Model.ItemsList.Count(); i++)
+        {
+           
+        <div class="promo-item-wrapper">
+
+            @Html.Partial("~/Areas/Widget/Views/Shared/_WidgetItemBox.cshtml",Model.ItemsList[i])
+        </div>        
+         
+        }
+    }
+
+
+</div>
+<div>
+ 
+
+</div>
+
+
+@section JS
+{
+   
+}
+

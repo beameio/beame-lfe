@@ -1,0 +1,92 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Models
+@using LFE.Core.Enums
+@{
+    ViewBag.Title = "Plugin Installations";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+    var userAC = new CTRL_UserAutoComplete { SelectedCallback = "onUserSelected" };
+    var pluginTypes = Utils.EnumWithDescToList<PluginEnums.ePluginType>();
+    var typesDDL = new CTRL_EnumDropDown { NameValueList = pluginTypes, SelectedCallback = "onTypeSelected", OptionLabel = "..select type" };
+}
+<h2 class="page-title">Plugin Installations report</h2>
+
+
+@Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_UserAutoComplete.cshtml", userAC)
+
+@Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_EnumDropDown.cshtml", typesDDL)
+
+&nbsp;&nbsp;<label for="chkActive">Active</label><input id="chkActive" type="checkbox" />
+
+<div style="margin: 10px 0">
+    <a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+</div>
+@(Html.Kendo().Grid<PluginRepDTO>()
+        .Name("PluginsReport")
+        .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.InstallationId).Width(60);
+            columns.Bound(p => p.User.UserId).Width(60).Title("UserId");
+            columns.Bound(p => p.User.FullName).ClientTemplate("<a data-val='${User.UserId}' title='click to view #=User.FullName# details' class='list-cmd usr-btn ellipsis col-tooltip' style='width:120px' >#=hasValue(User.FullName) ? User.FullName : ''#</a>").Width(120).Title("User");
+            columns.Bound(m => m.UserAddOn).Width(80).Title("User Add").Format("{0:d}");//.ClientTemplate("<span>#=hasValue(UserAddOn) ? kendo.toString(UserAddOn, \"d\") : ''#</span>");
+            columns.Bound(p => p.Domain).ClientTemplate("<a target='_blank' href='#=hasValue(Domain) ? Domain : emptyHref#'>#=hasValue(Domain) ? Domain : ''#</a>").Width(100);
+            columns.Bound(p => p.IsActive);
+            columns.Bound(p => p.TypeName).Title("Type");
+            columns.Bound(m => m.UId);
+            columns.Bound(m => m.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+            columns.Bound(m => m.UpdateDate).Format("{0:MM/dd/yyyyyy HH:mm:ss}").Title("Update");
+        })
+        .AutoBind(false)
+        .Events(e => e.DataBound("onDataBound"))
+        .ToolBar(tools => tools.Excel())
+        .Excel(excel => excel
+            .FileName(DateTime.Now.ToShortDateString() + " Plugins Report.xlsx")
+            .Filterable(false).AllPages(true)
+            .ProxyURL(Url.Action("Export_Save", "Home", new { area = "" }))
+        )
+        .Sortable()
+        .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+        .Filterable(f => f.Enabled(false))
+                        .DataSource(dataSource => dataSource.Ajax().Sort(s => s.Add("UpdateDate").Descending())
+                        .Model(model => model.Id(p => p.InstallationId))
+                        .Read(read => read.Action("GetInstallationsReport", "Report").Data("getRepFilters").Type(HttpVerbs.Get)).ServerOperation(true)
+                        .PageSize(ViewData["pagesize"] == null ? 20 : Int16.Parse(ViewData["pagesize"].ToString())))
+)
+<script>
+    $(document).ready(function () {
+        rebindGrid();
+        $('#chkActive').bind('change', function(e) {
+            filter.isactive = e.target.checked ? true : null;
+            rebindGrid();
+        });
+    });
+
+    function rebindGrid() {
+        $('#PluginsReport').data("kendoGrid").dataSource.read();
+    }
+
+    function onDataBound(e) {
+        window.boundGridUserDetails(e);
+    }
+    function onUserSelected(value) {
+        filter.userId = value;
+        rebindGrid();
+    }
+    function onTypeSelected(value) {
+        filter.typeId = value;
+        rebindGrid();
+    }
+    var filter = {};
+    function getRepFilters() {
+        return filter;
+    }
+    function clearFilters() {
+        @userAC.Clear()
+        @typesDDL.Clear()
+        filter = {};
+        rebindGrid();
+    }
+</script>

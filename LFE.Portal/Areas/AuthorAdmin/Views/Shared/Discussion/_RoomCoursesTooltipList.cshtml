@@ -1,0 +1,20 @@
+﻿@model IEnumerable<LFE.DataTokens.BaseListDTO>
+
+@{
+    if (Model.Any())
+    {
+        <ul>
+            @{
+                foreach (var course in Model)
+                {
+                    <li>@course.name</li>
+                }
+            }
+        </ul>        
+    }
+    else
+    {
+        <h5>No courses related</h5>
+    }
+}
+

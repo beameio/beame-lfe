@@ -1,0 +1,49 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge" /><![endif]-->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="@Url.Content("~/Content/styles/google-gonts.css")" rel="stylesheet" type='text/css' />
+
+    <script src="~/Scripts/lfe/lfe.referrer.js"></script>
+    @Scripts.Render("~/bundles/modernizr")    
+    @Styles.Render("~/bundles/widget/sc")
+        
+    @RenderSection("css", false)
+    
+    @Scripts.Render("~/bundles/jqueryval")        
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/lfe/common/sc")
+</head>
+<body>
+    <div class="container sc-container rel" id="sc-container">
+        @RenderBody()
+    </div>
+
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    <script>
+        var DEFAULT_CONTAINER_SELECTOR = '#sc-container';        
+       
+        kendo.culture("en-US");
+        var saveEventUrl = '@Url.Action("SaveEvent","EventApi",new{area=""})';        
+        $(document).ready(function () {
+          //  parent.onScLoad(document);
+        });
+    </script>
+    
+    <script type="text/x-kendo-template" id="cc-error-template">
+        <div class="inner">
+            <div class="e-row common">There was an error in credit card details you provided. Please re-enter. <a href="#=emptyHref#">More</a></div>
+            <div class="e-row pp-error"><span>${paypal_error}</span></div>
+        </div>
+    </script>
+    
+    @RenderSection("scripts", false)
+</body>
+</html>

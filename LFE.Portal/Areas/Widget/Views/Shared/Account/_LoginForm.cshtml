@@ -1,0 +1,41 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+<div class="indent" id="loginAjaxWrapper"  >
+     
+        
+        <div class="block-message">You must login to purchase this course. <a onclick="javascript:ToggleLogin();ToggleRegister();return false;" >Not Registered?</a></div>            
+        <div id="cssBlockWrapper" class="block-wrapper">
+            <div class="facebook-wrapper inline-na" >              
+                 <a id="facebookLogin">
+                     <img src="/Content/images/webstore/Connect-with-FB-btn.png" alt="Connect with Facebook" />
+                </a>
+            </div>
+            <span class="spanOr inline-na">Or</span>
+            
+            @using (Ajax.BeginForm("WidgetLfeLogin", "Account", new { area = "" }, new AjaxOptions { HttpMethod = "Post", UpdateTargetId = "loginWrapper", OnComplete = "loginCompleted", OnBegin = "javascript:return loginBegin()" }, new { id = "login_form", @class = "inline-na rel" }))
+            {
+                @Html.HiddenFor(m=>m.IsWidget)
+                @Html.HiddenFor(m=>m.ParentWindowURL)
+                @Html.TextBoxFor(model => model.Email, new { placeholder = "Email" })
+                <div class="password-wrapper">
+                    @Html.PasswordFor(model => model.Password, new { placeholder = "Password" })            
+                    <a class="forgotPassword">Forgot Password</a>
+                </div>
+                <div class="submit-wrapper">
+                    @Html.HiddenFor(model => model.TrackingID, new { Value = Model.TrackingID })
+                    <input type="submit" value="Login" id="submitLogin" /><img class="login-loader" src="http://@Request.Url.Authority/Content/images/webstore/login-ajax-loader.gif" />               
+                </div>
+            }
+            <a class="close_login">Close</a>
+        </div>
+        
+        <div class="error-wrapper">
+              <span class="loginError">@Model.LoginError</span>
+                @Html.ValidationSummary()
+        </div> 
+   
+</div>
+
+<div class="indent2" id="forgetPasswordWrapper" style="display:none" >
+@Html.Partial("~/Areas/Widget/Views/Shared/Account/_ForgotPassword.cshtml")
+</div>

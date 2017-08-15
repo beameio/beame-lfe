@@ -1,0 +1,81 @@
+﻿@using LFE.Core.Enums
+@model List<LFE.DataTokens.PriceLineDTO>
+           
+
+<div id="buy-btn-container">
+    @{
+        var bindBtnEvents = false;
+
+        foreach (var price in Model.Where(x => x.Price > 0))
+        {
+            var title = string.Empty;
+            var btnTitle = string.Empty;
+            var btnClass = string.Empty;
+            var typeFound = true;
+
+            switch (price.PriceType)
+            {
+                case BillingEnums.ePricingTypes.ONE_TIME:
+                    title = "UNLIMITED ACCESS";
+                    btnTitle = "BUY NOW";
+                    break;
+                case BillingEnums.ePricingTypes.SUBSCRIPTION:
+                    title = "A MONTH";
+                    btnTitle = "BUY NOW";
+                    btnClass = "blue";
+                    break;
+                case BillingEnums.ePricingTypes.RENTAL:
+                    title = price.Name;
+                    btnTitle = "RENT NOW";
+                    btnClass = "blue";
+                    break;
+                default:
+                    typeFound = false;
+                    break;
+            }
+
+            if (!typeFound)
+            {
+                continue;
+            }
+
+            bindBtnEvents = true;
+
+            <div>
+                <div class="price"><strong>@price.Currency.Symbol @price.Price</strong></div>
+                <div class="unlimited">@title</div>
+                <div class="button-wrapper">
+                    <a class="a-buy-btn" href="#" data-src="@price.PriceLineID">
+                        <div class="buy-button @btnClass">
+                            @btnTitle
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        if (bindBtnEvents)
+        {
+            <script>
+                $(document).ready(function () {
+                    $.each($('#buy-btn-container').find('.a-buy-btn'),function() {
+                        var btn = $(this);
+                        var lineId = btn.attr('data-src');
+                        console.log(lineId);
+                        btn.unbind('click').click(function() {
+                                @if (User.Identity.IsAuthenticated )
+                                {
+                                    @:ToggleBuyFrame(lineId);
+                                }
+                                else
+                                {
+                                    @:ToggleLogin();
+                                    @:$('.block-message').show();
+                                }
+                        });
+                    });
+                });
+            </script>
+        }
+    }
+</div>

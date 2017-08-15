@@ -1,0 +1,172 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "Completed Payments";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	ViewData["periodKinds"] = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+							   | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+							   | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+
+
+	ViewData["typesLOV"] = Utils.EnumWithDescToList<BillingEnums.ePaymentTypes>();
+
+}
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindPaymentReport, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindPaymentReport, null);
+	});
+
+	function rebindPaymentReport() {
+
+		$('#CompletedPaymentReport').data("kendoGrid").dataSource.read();
+	}
+
+
+	function onFilterSelected() {
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+	}
+
+	function getPaymentFilters() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)ReportEnums.ePeriodSelectionKinds.lastMonth).ToString())'
+			, type: $('#ddlTypes').data("kendoDropDownList").value()
+			,orderNum:$('#OrderNumber').val()
+			//, authorId: $('#ddlAuthorsLOV').data("kendoComboBox").value()
+			// , courseId: $('#ddlCoursesLOV').data("kendoComboBox").value()
+			// , buyerId: $('#ddlBuyersLOV').data("kendoComboBox").value()
+		};
+	}
+	function clearFilters() {
+		$('#periodSelectionKind').data("kendoDropDownList").value('@((int)ReportEnums.ePeriodSelectionKinds.lastMonth).ToString()');
+		$('#ddlTypes').data("kendoDropDownList").value(null);
+		$('#OrderNumber').val(null);
+		// $('#ddlAuthorsLOV').data("kendoComboBox").value(null);
+		//  $('#ddlCoursesLOV').data("kendoComboBox").value(null);
+		//  $('#ddlBuyersLOV').data("kendoComboBox").value(null);
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+	}
+
+	function onReportBound(e) {
+		window.boundGridUserDetails(e);
+		$(".col-tooltip").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+			width: 250
+		}).data("kendoTooltip");
+	}
+
+	function onFeeUpdateClick() {
+		ajaxAction('@Url.Action("UpdateTransactionFees","Billing",new{area="PortalAdmin"})',{},onFeeUpdated);
+	}
+
+	function onFeeUpdated(response) {
+		if (response.success) {
+			alert(response.message);
+			rebindPaymentReport();
+			return;
+		}
+
+		alert(response.error);
+	}
+</script>
+<h2 style="font-size: 24px">Completed Payments</h2>
+
+<div id="rep-param-row" style="margin:25px 0">
+	<div class="inline">
+		@(Html.Kendo().DropDownList()
+			  .Name("periodSelectionKind")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo((IEnumerable)ViewData["periodKinds"])
+			  .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px;font-size:13px" })
+			  .Events(e => e.Select("onFilterSelected"))
+		)
+	</div>
+
+	<div class="inline" style="margin-left: 15px;">
+		@(Html.Kendo().DropDownList()
+			  .Name("ddlTypes")
+			  .OptionLabel("..select type")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo((IEnumerable)ViewData["typesLOV"])
+			  .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px;font-size:13px" })
+			  .Events(e => e.Select("onFilterSelected")))
+	</div>
+
+	<div class="inline" style="margin-left: 25px;">
+		<a href="#" onclick="clearFilters()" class="a-clear inline" style="margin-left: 50px;font-size: 14px;text-decoration: underline">clear filters</a>
+	</div>
+</div>
+
+<div style="margin: 10px 0 0">
+	<div class="inline">
+
+		<label class="d-lbl lbl-title">Order No.</label>
+
+		@Html.TextBox("OrderNumber",null, new { @onkeypress = "validateNumeric(event)" ,@style="width:100px;font-size:13px"})
+
+		<div class="inline">
+			<span class="inline btn-clear" onclick="rebindPaymentReport()" style="cursor: pointer; padding: 4px 0 0 25px; text-decoration: underline;font-size: 13px">Find</span>
+		</div>
+	</div>
+</div>
+
+<div style="margin: 10px 0">
+	@(Html.Kendo().Button()
+	.Name("btnUpdateFee")
+	.Content("Update fees")
+	.HtmlAttributes( new {type = "button"} )
+	.Events(ev => ev.Click("onFeeUpdateClick")))
+</div>
+
+<script>
+	 $(document).ready(function () {
+		setTimeout(function () {
+			clearFilters(false);
+		}, 500);
+
+	});
+</script>
+
+@(Html.Kendo().Grid<PaymentViewDTO>()
+		.Name("CompletedPaymentReport")
+		.TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+		.Columns(columns =>
+		{
+			columns.Bound(p => p.OrderNumber).Width(80);
+			columns.Bound(p => p.ItemName).Width(300);
+			columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+			columns.Bound(p => p.CompletedDate).Width(80).Format("{0:MM/dd/yy}").Title("Complete Date");
+			columns.Bound(p => p.Seller.FullName).Width(100).ClientTemplate("<div data-val='${Seller.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Seller.FullName)#' style='width:100px'>${Seller.FullName}</div>");
+			columns.Bound(p => p.Buyer.FullName).Width(100).ClientTemplate("<div data-val='${Buyer.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#' style='width:100px'>${Buyer.FullName}</div>");
+			columns.Bound(p => p.Amount).Width(80).Format("{0:c}");
+			columns.Bound(p => p.Fee).Width(80).Format("{0:c}");
+			columns.Bound(p => p.TrxId).Width(100);
+			columns.Bound(p => p.Type).Width(100);
+		})
+		.Sortable()
+		.AutoBind(false)
+		.Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+		.Filterable(f => f.Enabled(false))
+		 .Events(e => e.DataBound("onReportBound"))
+		.DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.PaymentId))
+							.Read(read => read.Action("GetCompletedPayments", "Billing").Data("getPaymentFilters").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+)
+
+@(Html.Kendo().Tooltip()
+	 .For("#CompletedPaymentReport")
+	.Filter(".col-tooltip")
+	.Position(TooltipPosition.Top)
+	.Width(300)
+)

@@ -1,0 +1,143 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Areas.PortalAdmin.Helpers
+@model KpiDashboardFiltersToken
+@{
+    var periodKinds = (ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.thisMonth
+            | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+            | ReportEnums.ePeriodSelectionKinds.week | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    var defaultPeriod = ((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString();
+}
+
+<script>
+    var period, authorId, storeId, itemId, itemType;
+    var comboAuthor, comboStore, comboItem, comboPeriod;
+   
+    function clearFilters(e) {
+        e.preventDefault();
+        period = null; authorId = null; storeId = null; itemId = null; itemType = null;
+        resetComboValues();
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function resetComboValues() {
+        comboPeriod.value('@defaultPeriod');
+        comboAuthor.value(null);
+        comboStore.value(null);
+        comboItem.value(null);
+    }
+
+    function onAuthorSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.authorId = dataItem.id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onStoreSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.storeId = dataItem.id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onItemSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.itemId = dataItem.id;
+        window.itemType = dataItem.ItemType;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onPeriodSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.period = dataItem.Value;
+        window.getNotifManagerInstance().notify(notifEvents.object.periodChanged, null);
+    }
+
+    function onRequestSend() {
+        return {
+            period: hasValue(period) ? period : '@defaultPeriod'
+            , authorId: hasValue(authorId) ? authorId : null
+            , storeId: hasValue(storeId) ? storeId : null
+            , itemId: hasValue(itemId) ? itemId : null
+            , itemType: hasValue(itemType) ? itemType : null
+        };
+    }
+
+    function getReportPeriod() {
+        return {
+            period: hasValue(period) ? period : '@defaultPeriod'            
+        };
+    }
+
+    function getSelectedPeriod() {
+        return hasValue(period) ? period : '@defaultPeriod';
+    }
+</script>
+
+<div class="d-filter-row">
+    <ul>
+        <li>filters:</li>
+        <li>
+            @(Html.Kendo().ComboBox()
+                    .Name("comboAuthors")
+                    .DataTextField("name")
+                    .DataValueField("id")
+                    .Placeholder(" All authors")
+                    .BindTo(Model.Authors)
+                    .Filter(FilterType.Contains)
+                    .MinLength(2)
+                    .HtmlAttributes(new { @style = "font-size:13px;width:200px;" })
+                    .Events(e => e.Select("onAuthorSelected")))
+        </li>
+        <li>
+            @(Html.Kendo().ComboBox()
+                    .Name("comboStores")
+                    .DataTextField("name")
+                    .DataValueField("id")
+                    .Placeholder(" All Webstores")
+                    .BindTo(Model.Stores)
+                    .Filter(FilterType.Contains)
+                    .MinLength(2)
+                    .HtmlAttributes(new { @style = "font-size:13px;width:200px;" })
+                    .Events(e => e.Select("onStoreSelected"))
+            )
+        </li>
+        <li>
+            @(Html.Kendo().ComboBox()
+                    .Name("comboItems")
+                    .DataTextField("name")
+                    .DataValueField("id")
+                    .Placeholder(" All Courses&Bundles")
+                    .BindTo(Model.Items)
+                    .Filter(FilterType.Contains)
+                    .MinLength(2)
+                    .HtmlAttributes(new { @style = "font-size:13px;width:200px;" })
+                    .Events(e => e.Select("onItemSelected"))
+            )
+        </li>
+        <li>
+            @(Html.Kendo().DropDownList()
+                  .Name("periodSelectionKind")
+                  .DataTextField("Title")
+                  .DataValueField("Value")
+                  .BindTo(periodKinds)
+                  .HtmlAttributes(new { @style = "font-size:13px;width:200px;" })
+                  .Events(e => e.Select("onPeriodSelected"))
+            )
+            <script>
+                $(document).ready(function () {
+                    comboAuthor = $('#comboAuthors').data('kendoComboBox');
+                    comboStore = $('#comboStores').data('kendoComboBox');
+                    comboItem = $('#comboItems').data('kendoComboBox');
+                    comboPeriod = $('#periodSelectionKind').data("kendoDropDownList");
+                    resetComboValues();
+                });
+            </script>
+        </li>
+        <li>
+            <a href="#" onclick="clearFilters()" class="a-clear inline" style="margin-left: 50px;font-size: 14px;text-decoration: underline">clear filters</a>
+        </li>
+    </ul>
+</div>

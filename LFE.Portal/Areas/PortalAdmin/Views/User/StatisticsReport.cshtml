@@ -1,0 +1,53 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+    ViewBag.Title = "User Statistics Report";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>User Statistics Report</h2>
+
+
+<div>
+    @(Html.Kendo().Grid<UserStatisticToken>()
+            .Name("UserStatisticsReport")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.FirstName);
+                columns.Bound(p => p.LastName);
+                columns.Bound(p => p.Email);
+                columns.Bound(p => p.courses);
+                columns.Bound(p => p.bundles);
+                columns.Bound(p => p.chapters);
+                columns.Bound(p => p.videos);
+                columns.Bound(p => p.stores);
+                columns.Bound(p => p.purchases);
+                columns.Bound(p => p.logins);
+                columns.Bound(p => p.Score);
+            })
+            .Sortable()
+            .ClientDetailTemplateId("template-user-tabs")
+            .Pageable(pager => pager.Numeric(true).PreviousNext(true).PageSizes(true).Refresh(true))
+            .Filterable(f => f.Enabled(false))                        
+            .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => model.Id(p => p.UserId))
+            .Read(read => read.Action("GetUsersStatistics", "User").Type(HttpVerbs.Get))
+            .PageSize(20))
+    )
+</div>
+
+<script id="template-user-tabs" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+            .Name("tabStrip_#=UserId#")
+            .SelectedIndex(0)
+            .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+            .Items(items =>
+            {
+                items.Add().Text("Courses").LoadContentFrom("GetCourseReportPartial", "User", new { id = "#=UserId#" });
+                items.Add().Text("Bundles").LoadContentFrom("GetBundleReportPartial", "User", new { id = "#=UserId#" });
+                items.Add().Text("Purchases").LoadContentFrom("GetPurchaseReportPartial", "User", new { id = "#=UserId#" });
+                items.Add().Text("Sales").LoadContentFrom("GetSalesReportPartial", "User", new { id = "#=UserId#" });
+                items.Add().Text("Stores").LoadContentFrom("GetStoresReportPartial", "User", new { id = "#=UserId#" });
+                items.Add().Text("Statistics").LoadContentFrom("GetStatisticsPartial", "User", new { id = "#=UserId#" });
+            }).ToClientTemplate())
+</script>

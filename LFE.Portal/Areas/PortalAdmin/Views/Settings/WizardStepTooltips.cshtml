@@ -1,0 +1,121 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "EmailTemplates";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css
+{
+	<style>
+		#steps-template-page { padding: 15px 0 0 }
+		.left-box { width: 200px; }
+		.left-box ul { border: none }
+		.left-box ul li {height: 20px;-ms-border-radius: 7px;border-radius: 7px;font-size: 16px;color: #666;padding: 5px 10px;background: gainsboro;margin-bottom: 10px}
+
+		.left-box ul li.active { background: darkmagenta; }
+		.left-box ul li.active a { color: #fff }
+
+		.right-box {width: 750px;margin-left: 50px;min-height: 700px}
+		.right-box .inner {padding: 0;position: relative}
+  
+		.editor-inner { padding: 0}
+		.copy-btn {cursor: pointer;height: 25px;font-size: 13px}
+
+		.k-window { width: 700px !important; }
+		.k-window-content {position: relative;width: 100% !important}
+		.k-window-content .k-editor-textarea { width: 99% !important }
+	</style>
+}
+
+@section scripts {
+
+	<script>
+		var currentStepId = -1;
+		$(document).ready(function () {
+			currentStepId = -1;
+		});
+		function onStepSelected(e) {
+			var index = e.sender.select().index();
+
+			if (index < 0) return;
+
+			var dataItem = e.sender.dataSource.view()[index];
+
+			$('#lvWizardSteps > li').removeClass('active');
+
+			$(e.sender.select()).addClass('active');
+
+			var editor = $("#frmStepEdit #TooltipHtml").data("kendoEditor");
+			if (hasValue(dataItem.TooltipHtml)) {
+				editor.value(dataItem.TooltipHtml);
+			} else {
+				editor.value(null);
+			}
+			currentStepId = dataItem.StepId;
+			$("#frmStepEdit #StepId").val(dataItem.StepId);
+
+			$('#frmStepEdit').show();
+		}
+
+		function onStepsDataBound(e) {
+			var listView = e.sender;
+			if (currentStepId >= 0) {
+				selectListItemById('#lvWizardSteps', currentStepId, 'StepId');
+			} else {
+				listView.select(listView.element.children().first());
+			}
+			
+		}
+		
+		function onStepSaved(response) {
+			window.hideFormLoader();
+			alert(response.success ? 'Template saved' : response.error);
+			if (!response.success) return;
+
+			$('#lvWizardSteps').data('kendoListView').dataSource.read();
+		}
+	</script>
+}
+
+<h2>Course Wizard Steps</h2>
+
+
+
+<div id="steps-template-page">
+	<div class="inline left-box">
+		@(Html.Kendo().ListView<WizardStepTooltipDTO>()
+			  .Name( "lvWizardSteps" )
+			  .TagName( "ul" )              
+			  .ClientTemplateId( "kendo-template-steps" )
+			  .Selectable(s=>s.Enabled(true).Mode(ListViewSelectionMode.Single))
+			  .Events(e=>e.Change("onStepSelected").DataBound("onStepsDataBound"))
+			  .DataSource(ds=>ds.Read(r=>r.Action("GetSteps","Settings",new{area="PortalAdmin"}).Type(HttpVerbs.Get))))
+	</div>
+	<div class="inline right-box" >
+		<div id="d-editor-container">           
+			@using (Ajax.BeginForm("SaveStepTooltip", "Settings", new{area="PortalAdmin"}, new AjaxOptions { OnBegin = "javaScript:showFormLoader('#frmStepEdit')", OnSuccess = "onStepSaved" }, new { @id = "frmStepEdit", @style = "position: relative;display: none" }))
+			{
+				@Html.Hidden("StepId")
+				
+				@(Html.Kendo().Editor()
+					  .Name("TooltipHtml")
+					  .HtmlAttributes(new {@style = "width:600px;height:400px !important;"})
+					  .Encode(false)
+					  .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+				)
+				
+				<p>
+					<input type="submit" class="k-button" value="Save step tooltip"/>
+				</p>
+			}
+		</div>            
+	</div>
+</div>
+
+<script type="text/x-kendo-template" id="kendo-template-steps">
+	<li>
+		<a data-val="${StepId}" href="\\#" title="">${Name}</a>
+	</li>
+</script>

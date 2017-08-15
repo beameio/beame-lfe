@@ -1,0 +1,6 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Helpers
+@model LFE.Core.Enums.UserEnums.eUserStatuses
+
+
+@Html.Kendo().EnumComboBoxFor(x=>x,Model,null,null,"user status")

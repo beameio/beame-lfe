@@ -1,0 +1,39 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.WidgetTrainingRegistrantDTO
+    
+<div class="user-g2t-register-container">
+    <div class="head cntdwn">
+        @Html.Partial("Training/_Header", new TrainingTimerToken
+            {
+                Start        = Model.EventDate
+                ,LoadTimer   = false
+            })
+    </div>
+    <div class="g2t_countdown-container">
+        <div class="timer-container">
+            <a href="@Model.JoinUrl" target="_blank">
+                <span class="gt2-head-timer">
+                    @Html.Partial("Training/_CountdownTimer", new TrainingTimerToken
+                    {
+                        Start = Model.EventDate
+                        , ContainerId = "g2t-box-timer"
+                        , Template = "<span>{days}:</span><span>{hours}:</span><span>{minutes}:</span><span>{seconds}</span>"
+                    })
+                </span>
+                <label>click to join</label>
+            </a>
+        </div>
+    </div>
+
+    <div class="g2t-foot">
+        <div class="float-left">
+            @Html.Partial("Training/_FooterLinks",new TrainingFooterLinksToken
+            {
+                Item          = Model.Item
+                ,AuthorEmail  = Model.AuthorEmail
+                ,State        = eUserG2TStates.Countdown
+                ,RegistrantId = Model.RegistrantId
+            })
+        </div>
+    </div>
+</div>

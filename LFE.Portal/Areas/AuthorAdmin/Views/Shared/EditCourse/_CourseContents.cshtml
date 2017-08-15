@@ -1,0 +1,116 @@
+﻿@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.CourseContentsManageToken
+
+
+<script type="text/javascript">
+    var chapterContentsUrl = '@Url.Action("_ChapterContents", "Course", new { area = "AuthorAdmin" })';
+    var saveContentOrderUrl = '@Url.Action("SaveContentOrder", "Course", new { area = "AuthorAdmin" })';
+    var saveVideoOrderUrl = '@Url.Action("SaveChapterVideosOrder", "Course", new { area = "AuthorAdmin" })';
+    var saveLinksOrderUrl = '@Url.Action("SaveChapterLinksOrder", "Course", new { area = "AuthorAdmin" })';
+    var quizViewFormUrl = '@Url.Action("_CourseQuizViewForm", "Course", new { area = "AuthorAdmin" })';
+
+    var CURRENT_COURSE_ID          = '@Model.id';
+    var FORM_HEIGHT                = 590;
+    var FORM_SELECTOR              = '#d-contents-container';
+    var CONTENT_CONTAINER_SELECTOR = '#d-chapters-container';
+    var BC_TH_PLAEYR_W             = 183;
+    var BC_TH_PLAEYR_H             = 128;
+    var IS_ANY_VIDEO_IN_EDIT_MODE  = false;
+    var isFormInEditMode           = false;
+    var CURRENT_EDITED_VIDEO_ID;
+
+    var currentChapterId = -1, currentVideoId = -1, currentLinkId = -1, formUserNotifManager;
+
+    $(document).ready(function () {
+        //disable caching
+        $.ajaxSetup({ cache: false });
+
+        //bind command row position events
+        $(window).resize(function () {
+
+        });
+        $(document).scroll(function () {
+
+        });
+
+        //init form notification manager
+        formUserNotifManager = new UserNotificationManager('#chap-info', '.alert', false);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.chapterSaved, showNotification, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.chapter.chapterSaved, showNotification, null);
+    });
+
+
+
+    function addNewChapter() {
+        initNewChapter(CURRENT_COURSE_ID);
+    }
+    function addNewQuiz() {
+        initNewQuiz(CURRENT_COURSE_ID);
+    }
+
+</script>
+
+<div id="d-contents-container" style="position: relative;">
+    <div style="height: 35px;position: relative">
+        <div class="inline">
+            <span class="row-btn btn-add-first btn-add-chap" onclick="addNewChapter()"><span class="ico inline"></span></span>
+        </div>
+        <div class="inline" style="display: none !important">
+            <span class="row-btn btn-add-first btn-add-quiz" onclick="initNewQuiz(CURRENT_COURSE_ID,@Model.TotalQuizzes)"><span class="ico inline"></span></span>
+        </div>
+        <div class="tree-collapse-container inline" style="padding-top:6px">
+            <span class="ico ico-expand inline"></span> <span class="inline ec-btn expand" title="expand all" onclick="expandCollapseChapters(1)">Expand all</span>
+
+            <span class="ico ico-collapse inline"></span> <span class="inline ec-btn collapse" title="collapse all" onclick="expandCollapseChapters(2)">Collapse all</span>
+        </div>
+        <div class="info-box inline" id="chap-info" style="width: 350px;">
+            <p class="alert" style="width:100%"></p>
+        </div>
+        <div class="link-container" style="">
+            <a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.name,Constants.QS_COURSE_PREVIEW_PREFIX)" target="_blank" class="btn-prev-prod" style="border-right: 2px solid #000000;padding-right: 12px;">preview product page</a>
+            <a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.name)" target="_blank" class="btn-prev-course">Preview course</a>
+        </div>
+    </div>
+    <div id="d-chapters-container" class="nano" style="">
+        <div class="content">         
+            @(Html.Kendo().ListView<CourseContentToken>()
+                        .Name("CourseContents")
+                        .TagName("ul")
+                        .HtmlAttributes(new { @class = "ul-first-level" })
+                        .ClientTemplateId("kendo-content-list-template")
+                        .Editable(e => e.Enabled(true))
+                        .Events(e => e.DataBound("onChapterListBound").Edit("onChapterEnterEdit").Cancel("onChapterEditExit").Save("onChapterEditExit").Remove("onChapterRemoved"))
+                        .DataSource(ds => ds.Read(read => read.Action("GetCourseContentsList", "Course", new { Model.id }).Type(HttpVerbs.Get))
+                        .Destroy(d => d.Action("DeleteCourseContent", "Course", new { area = "AuthorAdmin" }))
+                        .Model(model =>
+                        {
+                            model.Id("Uid");
+                            model.Field(f => f.CourseId).DefaultValue(Model.id);
+                            model.Field(f => f.ContentId).DefaultValue(-1);
+                        }))
+            )
+        </div>
+    </div>
+  
+</div>
+
+
+<script type="text/x-kendo-template" id="kendo-content-list-template">
+    <li data-val="${Uid}" data-id="${ContentId}" data-kind="${Kind}" class="li-chap #= Kind==2 ? 'quiz': ''#">
+        <div class="chap-row">
+            <span class="float-left drag-box drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-first">&nbsp;</span>
+            <span title="#=Encoder.htmlEncode(Name)#" class="float-left ch-name pt9 ellipsis">${Name}</span>
+            <span class="float-right btn-area" style="width:150px;">
+                <span class="k-edit-button row-btn right btn-edit inline" title="Edit chapter"><span class="ico"></span></span>
+
+                <span class="k-delete-button row-btn btn-remove inline pt9" title="Delete chapter"><span class="ico"></span></span>
+            </span>
+        </div>
+        <div class="first-contents" data-load="false" id="ch-cn-${Uid}"></div>
+    </li>
+</script>

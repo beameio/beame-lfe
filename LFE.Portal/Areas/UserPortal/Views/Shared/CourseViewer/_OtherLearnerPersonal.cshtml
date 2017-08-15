@@ -1,0 +1,40 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.UserProfilePageToken
+
+<script>
+    var containerSelector = '#d-ol-profile-container';
+    $(document).ready(function () {
+
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setLearnerProfileH, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.course.listBound, initListScroll, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.course.listBound, initListScroll, null);
+    });
+
+    function initListScroll() {
+        var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+        $(containerSelector).height(h - 110); //100 =#d-ol-container h4 => h20+ margin 25*2 =70+40tabs
+        setReportScroll(containerSelector);
+    }
+
+    function setLearnerProfileH(h) {
+        if (h != null) {
+            $(containerSelector).height(h - 110);
+        }
+        setReportScroll(containerSelector);
+    }
+
+</script>
+
+<div class="title-row" style="margin: 25px 0">
+	<h4 class="float-left" style="margin: 0">Who else is taking this course?</h4>
+		
+	<div class="float-right">
+		<span class="back btn" onclick="showFullList()">back to full list</span>
+	</div>
+</div>
+
+<div id="d-ol-profile-container" class="nano">
+    <div class="content">
+       @Html.Partial("User/_UserProfile",Model)    
+    </div>
+</div>

@@ -1,0 +1,149 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@model QuizQuestionDTO
+
+<script>
+    function onQuizQuestionSaved(response) {
+        window.hideLoader();
+        if (response.success) {
+            swal(
+            {
+                title: "Success",
+                text: "Question saved",
+                type: "success",
+                timer:1000
+            });
+            notifyQuestionChange();
+            if (response.result.isNew) {
+                window.newQuestId = response.result.id;
+                console.log(window.newQuestId);
+            }
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+    
+    $(document).ready(function () {
+        $('.cancel-edit > a').die('click').live('click', function() {
+            notifyQuestionChange();
+        });
+
+        $('#d-save-q > a').die('click').live('click', function () {
+            $('#frm-edit-quiz-quest').submit();
+        });
+
+        //initUnobstructiveFormValidation($('#frm-edit-quiz-quest'));
+    });
+
+    function validateQuestForm() {
+
+        var text = $('#QuestionText').val();
+        
+        if (text.length === 0) {
+           swal(
+           {
+               title: "Question text required",
+               type: "warning",
+               timer: 2000
+           }, function () {
+               $('#frm-edit-quiz-quest').find('#QuestionText').data("kendoEditor").focus();
+           });
+            $('#frm-edit-quiz-quest').find('#QuestionText').data("kendoEditor").focus();
+            return false;
+        }
+
+        var scoreRequired = '@Model.ScoreRequired.ToString().ToLower()' === 'true';
+
+        if (scoreRequired) {
+            var score = $('#frm-edit-quiz-quest').find('#Score').val();
+            console.log(score);
+            if (score == null || score.length == 0) {
+                swal(
+                  {
+                      title: "Score required",
+                      type: "warning",
+                      timer: 2000
+                  }, function () {
+                    setTimeout(function() { $('#frm-edit-quiz-quest').find('#Score').siblings("input:visible").focus(); }, 500);
+                });
+                setTimeout(function () { $('#frm-edit-quiz-quest').find('#Score').siblings("input:visible").focus(); }, 2500);
+                
+                return false;
+            }
+        }
+
+        showContainerLoader('#wndEditQuest');
+        return true;
+    }
+</script>
+@using (Ajax.BeginForm("SaveQuestion", "Quiz", new { Model.QuizId, Type = QuizEnums.eQuizQuestionTypes.American }, new AjaxOptions { HttpMethod = "Post", OnBegin = "return validateQuestForm()", OnSuccess = "onQuizQuestionSaved" }, new { @id = "frm-edit-quiz-quest", @class = "" }))
+{
+    @Html.HiddenFor(m=>m.QuestionId)
+    <fieldset class="fs-list-edit-form" id="fs-from-quest-meta">
+        <legend></legend>
+        <ul class="ul-frm">
+            <li style="height: 290px;clear: both">
+                <div class="inner-box">
+                    <ul class="ul-frm second-level">
+                        <li>
+                            <div class="box-short">
+                                @Html.CheckBoxFor(model => model.IsActive, new { })
+                                @Html.LabelFor(model => model.IsActive, "Active Question", new {@style = "width: 130px;"})
+                            </div>
+                            @{
+                                if (Model.ScoreRequired)
+                                {
+                                    <div class="box-short">
+                                        @Html.LabelFor(model => model.Score, "Score", new { })
+                                        <div class="k-edit-field">
+                                            @(Html.Kendo().NumericTextBoxFor(m => m.Score)
+                                                  .HtmlAttributes(new {@style = "width:80px;",@required="required"})
+                                                  .Decimals(0)
+                                                  .Format("{0:N0}")
+                                                  .Min(1)
+                                                  .Max(100)
+                                                  .Spinners(false)
+                                            )
+                                        </div>
+                                        @Html.ValidationMessageFor(model => model.Score, "* score required", new {@style="padding-left: 45px;color:red;" })
+                                    </div>
+                                }
+                            }
+                        </li>
+                        <li>
+                            @Html.LabelFor(model => model.QuestionText,"Question Text",new{@style="display: block;"})
+                            <div class="" style="display: block;">
+                                @(Html.Kendo().EditorFor(m => m.QuestionText)
+                                  .HtmlAttributes(new { @style = "width:425px;height:200px !important;" })
+                                  .Encode(false)
+                                  .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+                                )
+                            </div>
+                            @Html.ValidationMessageFor(model => model.QuestionText, null, new { @style = "padding-left: 120px;" })
+                        </li>
+                    </ul>
+                </div>
+                <div class="inner-box">
+                    <ul class="ul-frm second-level">
+                        <li>
+                            <div class="float-left" style="margin-right: 50px;">
+                                @Html.Partial("Quiz/_VideoBrowser", Model)
+                            </div>
+                            <div class="float-left">
+                                @Html.Partial("Quiz/_ImageUploader", Model)
+                            </div>    
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+
+        <div class="btn-action cancel-edit">
+            <a href="#">Cancel</a>
+        </div>
+        <div class="btn-action" id="d-save-q">
+            <a href="#">Save</a>
+        </div>
+       
+    </fieldset>
+}

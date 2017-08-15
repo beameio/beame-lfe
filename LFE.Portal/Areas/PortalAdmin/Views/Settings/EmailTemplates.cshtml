@@ -1,0 +1,117 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@{
+	ViewBag.Title = "EmailTemplates";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+@{
+	var kinds = Utils.EnumWithDescToList<EmailEnums.eTemplateKinds>().OrderBy(x => x.Title).ThenBy(x => x.Name).ToArray();
+}
+
+@section css
+{
+	<style>
+		#email-template-page { padding: 15px 0 0 }
+		.left-box { width: 200px; }
+		.left-box ul { border: none }
+		.left-box ul li {height: 20px;-ms-border-radius: 7px;border-radius: 7px;font-size: 16px;color: #666;padding: 5px 10px;background: gainsboro;margin-bottom: 10px}
+
+		.left-box ul li.active { background: darkmagenta; }
+		.left-box ul li.active a { color: #fff }
+
+		.right-box {width: 750px;margin-left: 50px;min-height: 700px}
+		.right-box .inner {padding: 0;position: relative}
+		#d-editor-container { margin: 15px 0 0 }
+		.editor-inner { padding: 0}
+		.copy-btn {cursor: pointer;height: 25px;font-size: 13px}
+
+		.k-window { width: 700px !important; }
+		.k-window-content {position: relative;width: 100% !important}
+		.k-window-content .k-editor-textarea { width: 99% !important }
+	</style>
+}
+
+@section scripts {
+
+	<script src="@Url.Content("~/Areas/PortalAdmin/Scripts/zero/ZeroClipboard.min.js")" type="text/javascript"></script>    
+
+	<script>
+		$(document).ready(function () {
+			setTimeout(function() {
+				var listView = $("#lvTemplateKinds").data("kendoListView");
+				// selects first list view item
+				listView.select(listView.element.children().first());
+			},500);
+			
+		});
+		function onKindSelected(e) {
+		   // console.log(e);
+
+		    var index = e.sender.select().index();
+		   
+			if (index < 0) return;
+
+			var kindId = e.sender.dataSource.view()[index].Value;
+
+			$('#lvTemplateKinds > li').removeClass('active');
+
+			$(e.sender.select()).addClass('active');
+
+			actionResultSlide('@Url.Action("_EmailTemplateEditForm","Settings")', { kindId: kindId }, "d-editor-container");
+		}
+		
+		function actionResultSlide(url, data, targetContainerId) {
+			window.showLoader();
+
+			$.ajax({
+				url: url,
+				cache: false,
+				type: "Post",
+				data: JSON.stringify(data),
+				datatype: "json",
+				contentType: "application/json; charset=utf-8"
+				, success: function (view) {
+					$('#d-filed-combo-container').show();
+					$('#' + targetContainerId).empty().html(view);
+					setTimeout(window.hideLoader, 50);
+					//$('#editor-inner').show();
+					//$(".right-box > #editor-inner").fadeOut(500, function () {
+					//    $('#' + targetContainerId).empty().html(view);
+					//    setTimeout(window.hideLoader, 50);
+					//    $(".right-box > #editor-inner").fadeIn(500);
+					//});
+				}
+			});
+		}
+	</script>
+}
+
+<h2>Email Templates</h2>
+
+
+
+<div id="email-template-page">
+	<div class="inline left-box">
+		@(Html.Kendo().ListView<DataSourceSortToken>()
+			  .Name( "lvTemplateKinds" )
+			  .TagName( "ul" )              
+			  .ClientTemplateId( "kendo-template-kinds" )
+			  .BindTo( kinds )
+			  .Selectable(s=>s.Enabled(true).Mode(ListViewSelectionMode.Single))
+			  .Events(e=>e.Change("onKindSelected"))
+		)
+	</div>
+	<div class="inline right-box" >
+		 @Html.Partial("Email/_TemplateFieldSelection")                      
+		<div id="d-editor-container"></div>            
+	</div>
+</div>
+
+<script type="text/x-kendo-template" id="kendo-template-kinds">
+	<li>
+		<span data-val="${Value}" style="cursor:pointer" title="">${Title}</span>
+	</li>
+</script>

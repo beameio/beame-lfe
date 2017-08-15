@@ -1,0 +1,28 @@
+﻿@using LFE.DataTokens;
+@model DashboardStatsToken
+
+
+<div class="productcounts">
+    <div class="pc-box"><div class="pc-cont subscribers" id="btn-act-sub" style="cursor: pointer" title="click to view" data-cnt="@Model.ActiveSubscribers"><span>@Model.ActiveSubscribers</span><h4>Active Subscribers</h4></div></div>
+    <div class="pc-box"><a href="@Url.Action("Report", "WebStore", new {area="AuthorAdmin"})" title="click to view" class="pc-cont stores"><span>@Model.Stores</span><h4>STORES</h4></a></div>
+    <div class="pc-box"><a href="@Url.Action("Courses", "Author", new {area="AuthorAdmin"})" title="click to view" class="pc-cont courses"><span>@Model.Courses</span><h4>COURSES</h4></a></div>
+    <div class="pc-box"><a href="@Url.Action("Courses", "Author", new {area="AuthorAdmin"})" title="click to view" class="pc-cont bundles"><span>@Model.Bundles</span><h4>BUNDLES</h4></a></div>
+    <div class="pc-box"><a href="@Url.Action("Courses", "Author", new {area="AuthorAdmin"})" title="click to view" class="pc-cont unpublished"><span>@Model.UnpublishedCourses</span><h4>UNPUBLISHED COURSES</h4></a></div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+            var btn = $('#btn-act-sub');
+            var cnt = Number(btn.attr('data-cnt'));
+            btn.unbind('click').click(function () {
+                if (cnt < 1) {
+                    swal({ title: "No data available", text: '', type: 'warning', confirmButtonColor: '#2c82c9', timer: 10000 });
+                    return;
+                }
+                window.openActiveSubscribersWindow();
+            });
+            window.animateBoxes('.productcounts .pc-box');
+            
+    });
+</script>

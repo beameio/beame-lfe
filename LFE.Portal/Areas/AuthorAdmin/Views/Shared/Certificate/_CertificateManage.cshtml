@@ -1,0 +1,337 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@model CertificateDTO
+
+
+@Styles.Render("~/admin/cert/less")
+
+<script>
+    var CERT_FORM_SELECTOR = '#frm-edit-cert';
+    $(document).ready(function () {
+        initUnobstructiveFormValidation($(CERT_FORM_SELECTOR));
+        $(".help").click(function () {            
+            $('html, body').animate({
+                scrollTop: $("#pre-inst").offset().top
+            }, 2000);
+        });
+
+        $("#btn-save-cert").die('click').live('click', function (e) {
+            e.preventDefault();
+            $(CERT_FORM_SELECTOR).submit();
+        });
+
+        $("#btn-delete-cert").die('click').live('click', function (e) {            
+            e.preventDefault();            
+        });
+
+        $(CERT_FORM_SELECTOR).find("#IsActive").die("change").live('change', function () {
+            var attached = '@Model.AttachedToQuiz.ToString().ToLower()' == 'true';
+            
+            if (!attached) return;
+            var checked = Boolean($(this).is(':checked'));
+            if (checked == true) return;
+
+            swal({
+                title: "This certificate already attached to quiz",
+                text: "Are you sure you want to disable this certificate (the certificate will be removed from quiz) ?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Cancel it",
+                cancelButtonText: "Complete Action",
+                closeOnConfirm: true
+            }, function () {
+                $(CERT_FORM_SELECTOR).find("#IsActive").prop("checked", true);
+            });
+        });
+    });
+
+    function onSignUploadAction(e) {
+        console.log(e);
+        // Array with information about the uploaded files
+        var files = e.files;
+
+        if (files.length > 1) {
+            sweetAlert("Upload single image", "", "warning");
+            e.preventDefault();
+            return;
+        }
+
+        // Check the extension of each file and abort the upload if it is not .jpg
+        $.each(files, function () {
+            if ($.inArray(this.extension.toLowerCase(), ['.png']) < 0) {
+                sweetAlert("PNG image required", "For better quality of certificate , please upload .png file", "warning");
+                e.preventDefault();
+                return;
+            } else {
+                showContainerLoader('#cert-edit-container', null);
+            }
+        });
+    }
+    function onSignUploadSuccess(e) {
+        var operation = e.operation;
+        var response = e.response;
+
+        hideLoader();
+
+        if (!response) return;
+
+        if (!response.success) {
+            sweetAlert("Oooooops....", response.error, "error");
+            return;
+        }
+        //  clearUploadConsole();
+
+
+
+        switch (operation) {
+        case "upload":
+            try {
+                //  console.log(response.result);
+                viewModel.set("signUrl", response.result.url);
+                viewModel.set("imageName", response.result.path);
+                window.getNotifManagerInstance().notify(notifEvents.file.fileUploaded, null);
+                $('.k-upload').find('.k-upload-files').remove();
+                $('.k-upload-status').remove();
+            } catch (e) {
+                if (window.console) console.log(e);
+            }
+            break;
+        }
+
+    }
+</script>
+
+
+<div id="cert-edit-container" class="cert-edit-container">
+    <h2 class="cert-title" data-bind="text:pageTitle"></h2> <span title="show instructions" class="help"></span>
+
+    <div class="cert-main">
+        <div class="inner">
+            <div class="cert-form-container">            
+                @using (Ajax.BeginForm("SaveCertificate", "Certificate", new { area = "AuthorAdmin", Model.CourseId }, new AjaxOptions { HttpMethod = "Post", OnBegin = "return validateCert()", OnSuccess = "onCertSaved" }, new { @id = "frm-edit-cert", @class = "cert-form" }))
+                {
+                    @Html.HiddenFor(m=>m.SignatureImageUrl,new{@data_bind="value:imageName"})
+
+                    <fieldset>
+                        <legend></legend>
+                        <ul class="ul-cert-frm">
+                            <li>
+                                @Html.LabelFor(model => model.TemplateId)
+                                <div class="k-edit-field">
+                                    @(Html.Kendo().DropDownListFor(m => m.TemplateId)
+                                          .DataValueField("Value")
+                                          .DataTextField("Text")
+                                          .Value((Model.TemplateId).ToString())
+                                          .DataSource(ds => ds.Read("GetTemplates", "Certificate", new { area = "AuthorAdmin" }))
+                                          .HtmlAttributes(new { @style = "width:255px;", @data_bind = "events: {select: onTemplateSelected,dataBound:onTemplatesBound}" })
+                                    )
+                                </div>
+                            </li>
+                            <li style="">
+                                @Html.LabelFor(m => m.CourseName)
+                                <div class="k-edit-field">
+                                    @Html.TextBoxFor(m => m.CourseName, new { @data_bind = "value:courseName", @data_value_update = "keyup", @style = "width: 250px;" })
+                                </div>
+                            </li>
+                            <li style="height: 40px;">
+                                @Html.LabelFor(m => m.Title)
+                                <div class="k-edit-field">
+                                    @Html.TextBoxFor(m => m.Title, new { @data_bind = "value:title", @data_value_update = "keyup", @style = "width: 250px;" })
+                                </div>
+                            </li>
+                            <li style="height: 60px;">
+                                @Html.LabelFor(m => m.Description)
+                                <div class="k-edit-field">
+                                    @*@(Html.Kendo().EditorFor(m => m.Description)
+                        .HtmlAttributes(new { @data_bind = "value:desc", @data_value_update = "keyup", @style = "width: 250px;height:60px;" })
+                        .Encode(false)
+                        .Tools(t => t.Clear())
+                    )*@
+                                    @Html.TextAreaFor(m => m.Description, new { @data_bind = "value:desc", @data_value_update = "keyup", @style = "width: 250px;", @maxlength = 150 })
+                                    <span><i data-bind="text:charsRemining"></i> chars remaining</span>
+                                </div>
+                            </li>
+                            <li style="">
+                                @Html.LabelFor(m => m.PresentedBy)
+                                <div class="k-edit-field">
+                                    @Html.TextBoxFor(m => m.PresentedBy, new { @data_bind = "value:presented", @data_value_update = "keyup", @style = "width: 250px;" })
+                                </div>
+                            </li>
+                            <li style="">
+                                @Html.LabelFor(m => m.IsActive)
+                                <div class="k-edit-field">
+                                    @Html.EditorFor(m => m.IsActive)
+                                </div>
+                            </li>
+                            <li>
+                                <label>
+                                    Upload signature file
+                                    <br/>
+                                    <i style="font-size:11px ">440px*150px</i>
+                                </label>
+
+                                <div class="k-edit-field">
+                                    @(Html.Kendo().Upload()
+                                          .Name("SignFile")
+                                          .Events(e => e.Upload("onSignUploadAction").Success("onSignUploadSuccess"))
+                                          .Async(a => a.Save("SaveCertificateSignature", "Upload", new { area = "AuthorAdmin", id = Model.CourseId })
+                                              .AutoUpload(true))
+                        //  .HtmlAttributes("data-bind=events: { upload: onThumbUploadAction,success:onThumbUploadSuccess }")
+                                    )
+                                </div>
+                            </li>
+                        </ul>
+
+                    </fieldset>
+
+                    <div class="btn-action btn-delete @(Model.CertificateId < 0 || Model.SendToStudents ? "disabled" :"")">
+                        <a id="btn-delete-cert" href="#">Delete</a>
+                    </div>
+                    <div class="btn-action">
+                        <a id="btn-save-cert" href="#">Save</a>
+                    </div>
+                }
+            </div>
+
+            <div data-bind="style: {backgroundImage:certBg},attr:{class:certCssClass}" class="cert-preview">
+                <span data-bind="text:courseName" class="cert-c-name"></span>
+                <span data-bind="text:title" class="cert-title"></span>
+                <span class="cert-stud-name">Student Name</span>
+                <span class="cert-desc"><label data-bind="html:desc"></label></span>
+                <span class="cert-date">
+                    <label>Presented on</label>
+                    <label class="d">@(DateTime.Now.ToString("d"))</label>
+                </span>
+                <span class="cert-sign">
+                    <img data-bind="attr: { src: signUrl}" class="img-sign" alt="" style="overflow: hidden" />
+                    <label class=""><span>Presented by</span> <span data-bind="text:presented" class="n"></span></label>
+                </span>
+            </div>   
+        </div>
+        
+    </div>
+
+    <pre id="pre-inst">
+Important: 
+1.If the course you are attaching this certificate to includes a mandatory quiz after the last chapter, the system will automatically 
+    send this certificate to the student once they achieve a passing score. 
+
+2.If the course you are attaching this certificate to includes a non-mandatory quiz after the last chapter, the system will automatically 
+    send this certificate to the student once they complete the quiz, regardless of the score.  
+
+3.If the course you are attaching this certificate to does not include a quiz,  the system will automatically 
+    send this certificate to the student once they viewed the last course chapter.
+    </pre>
+
+
+</div>
+
+<script>
+    var viewModel = kendo.observable({
+        certId: parseInt("@Model.CertificateId"),
+        title: '@(Model.Title ?? "Certificate")',
+        desc: '@(Model.Description ?? "")',
+        courseName: '@Model.CourseName',
+        presented: '@(String.IsNullOrEmpty(Model.PresentedBy) ? this.CurrentUser().FullName : Model.PresentedBy)',
+        signUrl: '@Model.SignatureImageUrl',
+        imageName: "",
+        certBg: null,
+        certCssClass: "cert-preview",
+        pageTitle: function() {
+            return this.get("certId") < 0 ? "Add new certificate" : "Edit " + this.get("title");
+        },
+        onTemplateSelected: function(e) {
+            var dataItem = e.sender.dataItem(e.item.index());
+            this.setCertPreview(dataItem);
+        },
+        onTemplatesBound: function(e) {
+            var dataItem = e.sender.dataSource._data[e.sender.selectedIndex];
+            this.setCertPreview(dataItem);
+        },
+        setCertPreview: function(template) {
+            //console.log(this);
+            this.set("certBg", "url(" + template.ImageUrl + ")");
+            this.set("certCssClass", "cert-preview t" + template.Value);
+
+            // $('.cert-preview').show();
+        },
+        charsRemining:function() {
+            return 150 - this.get("desc").length;
+        }
+
+
+    });
+
+    kendo.bind($("#cert-edit-container"), viewModel);
+
+
+    function validateCert() {
+        showLoader();
+        return true;
+    }
+
+    function onCertSaved(response) {
+        hideLoader();
+        if (response.success) {
+            swal(
+            {
+                title: "Success",
+                text: "Certificate saved",
+                type: "success",
+                timer: 1000
+            });
+            setTimeout(function() {
+                if (parseInt(@Model.CertificateId) < 0) {
+                    showLoader();
+                    window.location.reload();
+                }
+            }, 1000);
+
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+</script>
+
+@{
+    if (Model.CertificateId >= 0 && !Model.SendToStudents)
+    {
+        using (Ajax.BeginForm("DeleteCertificate", "Certificate", new {area = "AuthorAdmin", Model.CourseId}, new AjaxOptions {HttpMethod = "Post", OnBegin = "showLoader()", OnSuccess = "onCertDeleted"}, new {@id = "frm-delete-cert"}))
+        {
+            @Html.Hidden("certId", Model.CertificateId)
+        }
+        <script>
+            $(document).ready(function () {
+                $("#btn-delete-cert").die('click').live('click', function (e) {
+                    e.preventDefault();
+                    if (!window.confirm('Are You sure?')) return;
+                    
+                    showLoader();
+                    $('#frm-delete-cert').submit();
+                });
+            });
+            function onCertDeleted(response) {
+                hideLoader();
+                if (response.success) {
+                    swal(
+                    {
+                        title: "Success",
+                        text: "Certificate deleted",
+                        type: "success",
+                        timer: 1000
+                    });
+                    setTimeout(function() {
+                        showLoader();
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    sweetAlert("Oops...", response.error, "error");
+                }
+            }
+        </script>
+    }
+}
+
+

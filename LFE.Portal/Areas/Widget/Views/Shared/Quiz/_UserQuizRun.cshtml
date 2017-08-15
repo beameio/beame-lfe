@@ -1,0 +1,211 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.UserQuizQuestionToken
+           
+
+@{
+    if (Model.IsValid)
+    {
+
+        <script>
+            var g2TCountdown = null;
+            var quizModel = kendo.observable({
+                 attemptId:null
+                ,currentIndex: null
+                , answerId: null
+                , totalQ: null
+                , selectedOptionId: null
+                , backAllowed: null
+                , backBtnContainer: $('#q-back-container')
+                , nextBtnTitle: "next question"
+                , currentViewIndex: function () {
+                    return this.get("currentIndex") + 1;
+                }
+
+                , setNextBtnTitle: function () {
+                    if (this.currentViewIndex() === this.totalQ) {
+                        this.set('nextBtnTitle', "finish");
+                    } else {
+                        this.set('nextBtnTitle', "next question");
+                    }
+                }
+                , setBackBtnState: function () {
+                    if (!this.backAllowed) {
+                        this.backBtnContainer.addClass("invisible");
+                        return;
+                    }
+
+                    if (this.currentIndex === 0) {
+                        this.backBtnContainer.addClass("disabled");
+                        return;
+                    }
+
+                    this.backBtnContainer.removeClass("disabled");
+                }
+
+                , setNavState: function () {
+                    this.setBackBtnState();
+                    this.setNextBtnTitle();
+                }
+
+                //nav events
+                , next: function () {
+                    
+
+                    if (this.selectedOptionId == null || this.selectedOptionId == undefined || isNaN(this.selectedOptionId)) {
+                        alert('Select answer');
+                        return;
+                    }
+
+                    var data = {
+                        attemptId:this.attemptId,
+                        answerId:this.answerId,
+                        optionId:this.selectedOptionId,
+                        finish: this.currentViewIndex() === this.totalQ
+                    };
+                    var url = '@Url.Action("SaveUserAnswer","Quiz",new{area="Widget"})';
+
+                    if (data.finish && g2TCountdown != null) {                        
+                        g2TCountdown.stop();
+                        window.isQuizInProgress = false;
+                    }
+
+                    actionFormResultWithCallback(url, data, data.finish ? '#qz-user-inner' : '#d-quest-container', '.user-quiz-container', null);
+
+                    this.set('currentIndex', this.currentIndex + 1);
+                    this.setNavState();
+                }
+
+                , back: function () {
+                    if (!this.backAllowed || this.currentIndex === 0) return;
+                     var ind = this.currentIndex - 1;
+                    var data = {
+                        attemptId: this.attemptId,
+                        index:ind
+                    };
+                    var url = '@Url.Action("LoadQuestionContent","Quiz",new{area="Widget"})';
+
+                    actionFormResultWithCallback(url, data, '#d-quest-container', '.user-quiz-container', null);
+
+                    this.set('currentIndex',ind);
+                    this.setNavState();
+                }
+
+                //answer list
+                , onAnswerSelected: function (radio) {
+                    this.set("selectedOptionId", radio.val());
+                    radio.parent().siblings('li').removeClass('selected');
+                    radio.parent().addClass('selected');
+                }
+
+                //actions
+                ,onQuestLoaded:function(answerId,optionId) {
+                    this.set("answerId", answerId);
+                    this.set("selectedOptionId", optionId != null ? parseInt(optionId) : null);
+                 }
+
+                , init: function (settings) {
+                    $.extend(this, settings);
+                    this.setNavState();
+                }
+            });
+
+            var settings = {
+                attemptId:'@Model.AttemptId'
+                ,currentIndex: parseInt('@Model.CurrentIndex')
+                , totalQ: parseInt('@Model.NavToken.TotalQuest')
+                , backAllowed: '@Model.NavToken.IsBackAllowed'.toLowerCase() === 'true'
+            };
+
+            quizModel.init(settings);
+
+            kendo.bind($('#qz-user-inner'), quizModel);
+
+            isQuizInProgress = true;
+        </script>        
+
+        <div class="quiz-head run">
+            <div class="inner row">
+                <div class="float-left">
+                   @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_AttemptsCounter.cshtml", new AttemptCounterToken { Attempts = Model.NavToken.Attempts, UserAttempts = Model.NavToken.UserAttempts })
+                </div>
+
+                <div class="float-right">
+                    @{
+                        if (Model.NavToken.TimeLimit != null)
+                        {
+                            var minutesRemind = (Model.NavToken.QuizStarted.AddMinutes((double)Model.NavToken.TimeLimit) - DateTime.Now).TotalMinutes;
+                            
+                            <div class="quiz-countdown-container">
+                                <div class="title">time remaining</div>
+                                <div id="quiz-countdown" class="timer"></div>
+                            </div>
+
+                            <script>
+                                var now = new Date();
+                                var end = addMinutes(now, parseFloat('@minutesRemind'));
+                                g2TCountdown = new Countdown({
+                                    selector: '#quiz-countdown',
+                                    msgPattern: "<span>{hours}:</span><span>{minutes}:</span><span>{seconds}</span>",
+                                    msgAfter: "",
+                                    leadingZeros: "0",
+                                    dateStart: now,
+                                    dateEnd: end,
+                                    onEnd: onQuizTimeEnd
+                                });
+
+                                function onQuizTimeEnd() {
+                                    if (!isQuizInProgress) return;
+                                    showLoader();
+                                    var url = '@Url.Action("FinishQuiz","Quiz",new{area="Widget",id = Model.AttemptId})';
+                                    actionFormResultWithCallback(url, {}, '#qz-user-inner' , '.user-quiz-container', hideLoader);
+                                }
+                            </script>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="q-count-container">
+            <div class="inner">
+                <label>question <span id="lbl-curr-index" data-bind="html:currentViewIndex"></span> out of @Model.NavToken.TotalQuest</label>
+            </div>
+        </div>
+
+        <div class="quiz-content-container run">
+            <div id="d-quest-container">
+               @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_UserQuizQuestionContent.cshtml", Model.Question)
+            </div>
+
+            <div class="bottom-row run">
+                <div class="inner row">
+                    <div class="col-xs-12 col-sm-6 col-md-6  a-left" id="q-back-container">
+                        @{
+                            if (Model.NavToken.IsBackAllowed)
+                            {
+                                <div class="btn-nav back" data-bind="click:back">
+                                    <i class="tri left"></i>
+                                </div>
+                                <label class="nav-title">previous question</label>
+                            }
+                        }
+                    </div>                  
+                    <div class="col-xs-12 col-sm-6 col-md-6 a-right">
+                        <label class="nav-title" data-bind="html:nextBtnTitle"></label>
+                        <div class="btn-nav forward" data-bind="click:next">
+                            <i class="tri right"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}

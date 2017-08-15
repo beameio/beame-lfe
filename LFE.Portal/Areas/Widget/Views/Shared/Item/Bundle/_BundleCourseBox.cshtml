@@ -1,0 +1,14 @@
+﻿@model LFE.DataTokens.BundleCourseListDTO
+           
+<div class="content-item">
+    <div class="image-wrap rel">
+        <img src="@Model.url" alt="@Model.name" class="inline" />
+    </div>
+
+    <div class="details">
+        <div>
+            <h4>@Model.name</h4>
+            <span class="htmlSlot  ellipsis multiline">@(Html.Raw(Model.desc))</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+﻿@model LFE.Portal.Areas.AuthorAdmin.Models.WebStoreAddByCategoryToken
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmAddByCategory';
+	
+	$(document).ready(function () {
+		setReportScroll("#d-course-list-container");
+		var token = {
+			kind: StoreFormKinds.lfecategory
+			,title: 'Add full LFE Category' 
+			,id: -1
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : null
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.webstore.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onCategoryItemsSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Items saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+		    $("#CategoryId").data("kendoDropDownList").value(null);
+		    $("#d-course-list-content").html(null);
+		    window.getNotifManagerInstance().notify(notifEvents.webstore.lfeCategoryAdded, null);
+		    window.getNotifManagerInstance().notify(notifEvents.webstore.storeStateChanged, null);
+		}
+	}
+	
+	function onAddByCategorySubmit() {
+		var isCategoryValid = $(EDIT_FORM_SELECTOR).validate().element($('#CategoryId'));
+		if (!isCategoryValid) return false;		
+		return true;
+	}
+	
+	function onLfeCategorySelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var categoryId = dataItem.id;
+
+		var data = {
+			webCategoryId: '@Model.WebStoreCategoryId',
+			categoryId: categoryId
+		};
+		
+		ajaxAction('@Url.Action("GetCategoryItemsListPartial","WebStore")', data, onCourseListBound, null);	    
+	}
+	
+	function onCourseListBound(view) {		
+		$("#d-course-list-content").html(view).fadeIn("slow");
+		setTimeout(function () {
+			setReportScroll("#d-course-list-container");
+		}, 50);
+		
+	}
+</script>
+<style scoped="scoped">
+.ul-edit-form.cn li label {width: 140px}
+.ul-edit-form.cn li div.input-container {width: 330px;}
+.ul-edit-form.cn li div.input-container .txt-inp {width: 330px;}
+.l-combo{width: 330px;}
+.k-listview {border:none}
+#d-course-list-container{width: 450px;height:500px}
+</style>
+@using (Ajax.BeginForm("AddCategoryItems", "WebStore", null, new AjaxOptions { OnBegin = "onAddByCategorySubmit", OnSuccess = "onCategoryItemsSaved", LoadingElementId = "site-loader" }, new { @id = "frmAddByCategory", @style = "" }))
+{
+		@Html.HiddenFor(m => m.WebStoreCategoryId)
+		<fieldset>
+		<legend></legend>
+			<ul class="ul-edit-form cn">
+				<li>
+					@Html.Label("Select LFE Category")
+					<div class="input-container">
+						@(Html.Kendo().DropDownListFor(m => m.CategoryId)
+							  .HtmlAttributes(new { @class = "l-combo" })
+							  .OptionLabel("Select category...")
+							  .DataTextField("name")
+							  .DataValueField("id")
+							  .Events(e => e.Select("onLfeCategorySelected"))
+							  .DataSource(source => source.Read(read => read.Action("GetCategoriesLOV", "WebStore")))
+							  )
+					</div>
+					<div class="validator-container" style="height: 34px">
+						@Html.ValidationMessageFor(model => model.CategoryId)
+					</div>
+				</li>				
+			</ul>	
+			
+			<div id="d-course-list-container" class="nano" style="margin: 25px 0 0;">
+				<div class="content" id="d-course-list-content"></div>
+			</div>
+		</fieldset>		
+}

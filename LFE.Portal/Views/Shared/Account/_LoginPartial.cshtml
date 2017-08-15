@@ -1,0 +1,14 @@
+﻿   @model LFE.DataTokens.LoginDTO
+   
+
+    <label class="title" style="margin: 55px 0 20px">Registered LFE user? Please login:</label>
+    
+  
+    @Html.Partial("Account/_ExternalLoginPartial")
+    
+    <label  style="margin: 0 0 4px 0;" class="title">Or:</label>
+    
+    @using (Html.BeginForm("LfeLogin", "Account", new { ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-lfe-login" }))
+    {
+        @Html.Partial("Account/_LfeLoginPartial",Model)
+    }

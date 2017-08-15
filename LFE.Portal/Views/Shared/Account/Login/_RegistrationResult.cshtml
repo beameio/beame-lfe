@@ -1,0 +1,7 @@
+﻿@model LFE.Portal.Models.RegistrationConfirmToken
+
+<div class="wnd-reg-result @(Model.IsValid ? "" : "failure")">
+    <div class="confirm-msg">
+        @Html.Raw(Model.IsValid ? Model.ConfirmationMessage : Model.Message)
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model LFE.DataTokens.ItemViewerPageToken
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/Viewer/_Header.cshtml", Model)
+
+<div class="row">
+    <div class="col col-xs-12 col-sm-12 col-md-push-4 col-md-8">
+        <div class="row">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/Viewer/_NavTabs.cshtml")
+        </div>
+        <div class="row">
+            <div class="tab-content col col-xs-12" id="d-tab-content">
+                <div class="tab-pane fade" id="tabContent"></div>
+                <div class="tab-pane fade" id="tabDiscuss"></div>
+                <div class="tab-pane fade" id="tabLearner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col col-xs-12 col-sm-12 col-md-pull-8 col-md-4">
+        @{
+            if (Model.ItemState.ValidUntill != null)
+            {
+                <div class="countdown-container">
+                    <div id="countdown" class="timer"></div>
+                </div>
+            }        
+        }
+        <div id="d-chap-nav-container">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/Viewer/_ChaptersNavigation.cshtml", Model.Contents)
+        </div>
+
+        @using (Ajax.BeginForm("LoadCourseContentsTree", "Item", new { area = "Widget", id = Model.ItemId }, new AjaxOptions { UpdateTargetId = "d-chap-nav-container" }, new { @id = "frm-upd-content-tree" })) { }
+
+       
+    </div>
+</div>

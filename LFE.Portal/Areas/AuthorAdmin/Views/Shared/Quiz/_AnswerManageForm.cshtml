@@ -1,0 +1,43 @@
+﻿@using LFE.DataTokens
+@model QuizQuestionDTO
+
+
+<div class="d-answers-container">
+    @(Html.Kendo().ListView<QuizAnswerOptionDTO>()
+            .Name("AnswersListView-" + Model.QuestionId)
+            .TagName("ul")
+            .Events(e => e.DataBound("onAnswerListBound").Remove("adjustQuestionScroll").Edit("onAnswerEdit").Cancel("adjustQuestionScroll"))//.Save("onAnswerEditExit")
+            .ClientTemplateId("answer-template")
+            .HtmlAttributes(new { @class = "ul-quiz-a-list" })
+            .DataSource(dataSource => dataSource
+              .Model(model =>
+              {
+                  model.Id("OptionId");
+                  model.Field(f => f.OptionId).DefaultValue(-1);
+                  model.Field(f => f.QuestionId).DefaultValue(Model.QuestionId);
+                  model.Field(f => f.IsActive).DefaultValue(true);
+              })
+            //  .Create(create => create.Action("CreateAnswer", "Quiz"))
+            .Read(read => read.Action("ReadAnswers", "Quiz", new { id = Model.QuestionId }).Type(HttpVerbs.Get))
+            //  .Update(update => update.Action("UpdateAnswer", "Quiz"))
+            //  .Destroy(destroy => destroy.Action("DestroyAnswer", "Quiz"))
+          )
+          .Editable(e => e.Enabled(true))
+          .Pageable(p => p.Enabled(false))
+    )
+</div>
+
+<div class="add-new-answer">
+    <i></i><a href="#" id="add-new-ans-@Model.QuestionId">Add Answer</a>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#add-new-ans-@Model.QuestionId').die('click').live('click', function(e) {
+            e.preventDefault();
+            initNewAnswer(@Model.QuestionId);
+        });
+    });
+</script>

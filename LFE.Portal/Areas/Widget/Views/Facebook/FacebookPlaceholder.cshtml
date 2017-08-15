@@ -1,0 +1,20 @@
+﻿@model  LFE.DataTokens.ItemProductPageToken
+
+@{
+    ViewBag.Title = "FacebookPlaceholder";
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapLayout.cshtml";
+}
+
+@section css
+{
+    @Styles.Render("~/Areas/Widget/Content/styles/catalog")
+}
+
+@section JS
+{
+    @Scripts.Render("~/bundles/catalog")
+    @Scripts.Render("~/bundles/widget/catalog")
+    @Html.Partial("Item/_ProductPageScripts")
+}
+
+@Html.Partial("Item/_ProductPagePartial", Model)

@@ -1,0 +1,389 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.CouponDTO
+
+@{
+	var isUsed = Model.ActualUsage > 0;
+	
+	var months = new List<SelectListItem>();
+
+	for (var i = 1; i <=12; i++)
+	{
+		months.Add(new SelectListItem
+		{
+			Text = i + (i == 1 ? " Month" : " Months"),
+			Value = i.ToString()
+		});
+	}
+}
+
+<script type="text/javascript">
+  
+	var isUsed = '@(Model.ActualUsage > 0)'.toLowerCase()=='true';
+
+
+	var amountModel;
+
+	amountModel = kendo.observable({
+		type: '@((short)Model.Type)',
+		amountLabel: '%',
+		amountInfo: '',
+		subscriptionMonths:0,
+
+		getAmountLabel: function () {
+			
+			var typeId = parseInt(this.get("type"));
+
+			var label;
+			switch (typeId) {
+				case window.CouponTypes.FIXED:
+					label = '$';
+					break;
+				case window.CouponTypes.FREE:
+					label = 'Free';
+					break;
+				case window.CouponTypes.PERCENT:
+				case window.CouponTypes.SUBSCRIPTION:
+					label = '%';
+					break;
+				default:
+					label = '%';
+					break;
+			}
+		   
+			this.set('amountLabel', label);
+
+			return this.get("amountLabel");
+		},
+
+		getAmountInfo: function () {
+			var typeId = parseInt(this.get("type"));
+
+			var label ='';
+			switch (typeId) {
+				case window.CouponTypes.FIXED:
+					label += 'Discount amount in US Dollars (does not apply to subscriptions)';
+					break;
+				case window.CouponTypes.FREE:
+					label += 'Free';
+					break;
+				case window.CouponTypes.PERCENT:
+					label += 'Between 1-100% discount (does not apply to subscriptions)';
+					break;
+				case window.CouponTypes.SUBSCRIPTION:
+					//var months = this.get('subscriptionMonths');	                
+					//label = months <= 6 ? 'Note: Subscriptions are limited to percentage discounts and only up to 15% - due to a PayPal limitation' : '1-100 %';
+					label = 'Due to PayPal restrictions, subscription coupons have the following limitations: <br/>' +
+							'1. Discount can be given in % only <br/>' +
+							'2. For an offering period of 6 months or less the discount is limited to 1-15% <br/>';
+					break;
+				default:
+					label = '%';
+					break;
+			}
+		   
+			this.set('amountInfo', label);
+
+			return this.get("amountInfo");
+		}
+	});
+
+	kendo.bind($("#f-cpn"), amountModel);
+
+	function onCouponTypeSelected(e) {
+		window.isFormInEditMode = true;
+
+		var token = this.dataItem(e.item.index());
+
+		var id = parseInt(token.Value);
+
+		amountModel.set('type', id);
+
+		setAmountRange(id);
+
+		id == window.CouponTypes.SUBSCRIPTION ? $('#li-sub-m').show() : $('#li-sub-m').hide();
+
+		$('#SubscriptionMonths').data("kendoDropDownList").enable(id == window.CouponTypes.SUBSCRIPTION);
+
+		
+	}
+
+	function onMonthsSelected(e) {
+		var token = this.dataItem(e.item.index());
+	   
+		var m = parseInt(token.Value);
+
+		var amnt = $('#Amount').data("kendoNumericTextBox");
+
+		amnt.max(m <= 6 ? 15 : 100);
+
+		amountModel.set('subscriptionMonths', m);
+		
+		var current = amnt.value();
+
+		if (m > 6 || !hasValue(current)) return;
+
+		var ca = parseInt(current);
+
+		if (ca <= 15) return;
+
+		amnt.value(15);
+
+		$('#amnt-limits').css({ 'color': 'red' });
+
+		setTimeout(function () { $('#amnt-limits').css({ 'color': '#000' }); }, 10000);
+	}
+
+	function onCouponTypesBound(e) {
+		var id = e.sender.value();
+
+		setTimeout(function() {
+			setAmountRange(parseInt(id));
+		}, 500);
+		
+	}
+
+	function setAmountRange(typeId) {
+
+		var amnt = $('#Amount').data("kendoNumericTextBox");
+		
+		if (amnt == undefined) return;
+		//reset
+		amnt.enable(true);
+		$('#spn-amnt-container').find('.k-widget').removeClass('disabled');
+
+		switch (typeId) {
+		case window.CouponTypes.FIXED:			
+			break;
+		case window.CouponTypes.FREE:
+			amnt.enable(false);
+			amnt.value(null);
+			$('#spn-amnt-container').find('.k-widget').addClass('disabled');
+			break;
+		case window.CouponTypes.PERCENT:
+			amnt.max(100);
+			break;
+		case window.CouponTypes.SUBSCRIPTION:
+			var monthsCombo = $('#frmCourseCoupon #SubscriptionMonths').data("kendoDropDownList");
+			if (monthsCombo == undefined) {
+				amnt.max(15);
+				return;
+			}
+			var m = parseInt(monthsCombo.value());
+			amnt.max(m <= 6 ? 15 : 100);
+			break;
+		default:
+			return;
+		}
+	}
+
+	$(document).ready(function() {
+		$("#f-cpn input").on("input", function () {
+			window.isFormInEditMode = true;
+		});       
+	});
+	function onKendoInputChanged() {
+		window.isFormInEditMode = true;
+	}
+
+   
+</script>
+<style>
+	#cp-info{ height: 20px;margin-left: 130px}
+	#frmBundlePrice{ padding-bottom: 22px; border-bottom: 2px solid #9f9f9f}
+	.ul-edit-form.cpn-left { width: auto !important;}
+	.ul-edit-form.cpn-left li label {
+		font-size: 13px !important;
+		width: 150px !important;
+	}
+	.ul-edit-form li{position: relative}
+	.lbl1{font-size: 13px;color:#333}
+	.required{display: table-cell;margin-left: 3px}
+	.disabled{background-color: #cdcdcd !important}
+</style>
+
+@Html.HiddenFor(x=>x.CouponId)	
+
+	<fieldset id="f-cpn">
+	<legend></legend>
+		<ul class="ul-edit-form cpn-left">
+			<li>
+				@Html.LabelFor(m => m.Type)
+				<div class="input-container">
+					@{
+						if (isUsed)
+						{
+							<span>@(Utils.GetEnumDescription(Model.Type))</span>
+							@Html.HiddenFor(m => m.Type)
+						}
+						else
+						{
+							@Html.EditorFor(m => m.Type, new { @class = "txt-inp" })
+						}
+					}
+				</div>
+			   
+			</li>
+
+			<li>
+				@Html.LabelFor(m => m.CouponName)
+				@{
+					if (isUsed)
+					{
+						<div class="input-container">
+							<span style="display: block;font-size: 15px;padding: 4px 0 0 4px">@Model.CouponName</span>
+							@Html.HiddenFor(m => m.CouponName)
+						</div>
+
+					}
+					else
+					{
+						<div class="input-container">
+							@Html.TextBoxFor(m => m.CouponName, new { @class = "txt-inp", @onchange = "onTxtBoxChanged(this)" })
+						</div>
+						 @Html.Required()
+
+					}
+				}
+			</li>
+		</ul>
+
+		<hr />
+
+		<ul class="ul-edit-form cpn-left">
+
+			<li id="li-sub-m" style="display: @(Model.Type==CourseEnums.CouponType.SUBSCRIPTION ? "block":"none")">
+				@Html.LabelFor(m => m.SubscriptionMonths)
+				<div class="input-container">
+					@{
+						if (isUsed)
+						{
+							<span style="display: block;font-size: 15px;padding: 4px 0 0 4px">@Model.SubscriptionMonths</span>
+							@Html.HiddenFor(m => m.SubscriptionMonths)
+						}
+						else
+						{
+							@(Html.Kendo().DropDownListFor(m => m.SubscriptionMonths)
+									.OptionLabel(" select discount period")
+									.DataTextField("Text")
+									.DataValueField("Value")
+									.BindTo(months)
+									.Enable(Model.Type == CourseEnums.CouponType.SUBSCRIPTION)
+									.Events(e => e.Select("onMonthsSelected"))
+									.HtmlAttributes(new { @class = "c2", @style = "height:22px;font-size:12px" })
+							)
+						}
+					}
+				</div>
+				<div class="validator-container">
+				</div>
+			</li>
+
+
+
+			<li id="li-amount-editor" style="height:110px;">
+				@Html.LabelFor(m => m.Amount)
+
+				@{
+					if (isUsed)
+					{
+						<div class="input-container">
+							<span style="display: inline-block;font-size: 15px;padding: 4px 0 0 4px">@Model.Amount</span>
+							<span class="inline" style="margin: 4px 0 0" data-bind="text:getAmountLabel"></span>
+							@Html.HiddenFor(m => m.Amount)
+						</div>
+					}
+					else
+					{
+						<div class="input-container">
+							<span class="inline" id="spn-amnt-container" style="width: 270px;height: 30px;display: block">
+								@(Html.Kendo().NumericTextBoxFor(m => m.Amount)
+									  .Spinners(false)
+									  .Decimals(0)
+									  .Format("{0:F}")
+									  .Enable(Model.Type!=CourseEnums.CouponType.FREE)
+									  .Min(Model.ActualUsage > 0 ? Model.ActualUsage : 1)
+									  .Events(e => e.Change("onKendoInputChanged"))
+									  .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:270px" }))
+							</span>
+
+
+						</div>
+						@Html.Required()
+
+						<span class="t-cell" style="margin: 4px 0 0;padding-left: 10px" data-bind="text:getAmountLabel"></span>
+					}
+				}
+
+				<span id="amnt-limits" style="display: block;position: relative;top: 10px;left: 150px;font-size: 11px" data-bind="html:getAmountInfo">Info</span>
+			</li>
+
+
+			<li>
+				@Html.LabelFor(m => m.UsageLimit)
+				<div class="input-container">
+				   @(Html.Kendo().NumericTextBoxFor(m => m.UsageLimit)
+						  .Spinners(false)
+						  .Min(Model.ActualUsage > 0 ? Model.ActualUsage : 1)
+						  .Decimals(0)
+						  .Format("{0:F}")
+						  .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:270px", @onchange = "onTxtBoxChanged(this)" })
+						  )
+					<span class="input-info">For unlimited usage leave this field empty</span>
+				</div>
+
+				@Html.Required()
+
+				<div style="display: table-cell;padding-left: 10px;">
+					<span class="inline lbl1" style="margin: 4px 4px 0 0">
+						Actual usage
+					</span>
+					<span class="inline lbl1" style="margin: 4px 4px 0 0">
+						@Model.ActualUsage
+					</span>
+				</div>
+
+			</li>
+
+			
+		</ul>
+		
+		<hr/>
+
+        <ul class="ul-edit-form cpn-left">
+
+
+            <li>
+                @Html.LabelFor(m => m.ExpirationDate)
+                <div class="input-container">
+                    @(Html.Kendo().DatePickerFor(m => m.ExpirationDate)
+                            .Min(DateTime.Now)
+                            .Events(e => e.Change("onKendoInputChanged"))
+                            .HtmlAttributes(new { @class = "", style = "width:190px;border-color:#000 !important;font-size:12px" })
+                    )
+                </div>
+                <div class="validator-container"></div>
+            </li>
+
+            <li style="display: none;">
+                @Html.LabelFor(m => m.TotalInstances)
+                <div class="input-container">
+                    @(Html.Kendo().NumericTextBoxFor(m => m.TotalInstances)
+                        .Spinners(false)
+                        .Min(1)
+                        .Max(1000)
+                        .Step(1)
+                        .Decimals(0)
+                        .Format("{0:F}")
+                    )
+                </div>
+                <div class="validator-container"></div>
+            </li>
+        </ul>
+
+</fieldset>
+
+<script>
+
+</script>

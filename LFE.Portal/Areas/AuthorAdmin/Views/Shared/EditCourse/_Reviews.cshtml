@@ -1,0 +1,44 @@
+﻿@using LFE.DataTokens
+@model BaseEntityDTO
+
+
+<script>
+	function onReviewBound() {
+		$(".col-tooltip").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+			width: 250
+		}).data("kendoTooltip");
+	}
+</script>
+
+<div style="">
+	
+@(Html.Kendo().Grid <ReviewDTO>()    
+	  .Name("CourseReviewsReport")
+	  .HtmlAttributes(new{@style=""})
+	  .TableHtmlAttributes(new{@style="background-color: #f2f2f2 !important;background-image: none !important;"})
+	  .HtmlAttributes(new{@style=""})
+	  .Columns(columns => {
+			columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#'style='width:200px;'>${Title}</div>").Title("Title").Width(200);
+			columns.Bound(p => p.Text).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Text)#' style='width:500px'>${Text}</div>").Title("Text").Width(500);
+			columns.Bound(p => p.LearnerFullName).Title("Learner");//.Width(150);
+			columns.Bound(p => p.Date).Title("Date").Format("{0:d}");//.Width(70);
+	  })    
+	  .Events(e=>e.DataBound("onReviewBound"))
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true))
+	  .Filterable(f=>f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.ReviewId))
+							.Read(read => read.Action("GetCourseReviews", "Course",new{Model.id}).Type(HttpVerbs.Get))
+							.PageSize(6))
+	  )
+	  
+</div>
+
+<script id="tp-template" type="text/x-kendo-template">
+	<p class="ptp">
+		#=target.data('title')#
+	</p>    
+</script>

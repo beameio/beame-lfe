@@ -1,0 +1,14 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model TrainingTimerToken
+
+<div class="title-container">
+    <h3 class="title">live session begins in</h3>
+    @{
+        if (Model.LoadTimer)
+        {
+            <div id="gt2-head-timer" class="gt2-head-timer">
+                @Html.Partial("Training/_CountdownTimer", Model)
+            </div>
+        }
+    }   
+</div>

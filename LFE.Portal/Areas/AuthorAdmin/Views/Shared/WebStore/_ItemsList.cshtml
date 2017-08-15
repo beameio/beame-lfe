@@ -1,0 +1,20 @@
+﻿@using LFE.Core.Enums
+@model LFE.Portal.Areas.AuthorAdmin.Models.ItemListToken
+
+
+<ul>
+    @{
+        for (var i = 0; i < Model.ItemList.Count(); i++)
+        {
+            var cls = Model.ItemList[i].status == CourseEnums.CourseStatus.Draft ? "draft" : "";
+            
+            <li class="@cls">
+                @Html.HiddenFor(m => Model.ItemList[i].storeItemId)
+                @Html.HiddenFor(m => Model.ItemList[i].id)
+                @Html.HiddenFor(m => Model.ItemList[i].type)
+                @(Model.ItemList[i].storeItemId == null ? Html.CheckBoxFor(m => Model.ItemList[i].attach) : Html.CheckBoxFor(m => Model.ItemList[i].attach, new { @disabled = "disabled" }))
+                @Model.ItemList[i].name
+            </li>
+        }
+    }
+</ul>

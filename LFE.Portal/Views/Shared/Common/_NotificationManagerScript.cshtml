@@ -1,0 +1,10 @@
+﻿<script>
+    var notificationManager;
+
+    function getNotifManagerInstance() {
+        if (notificationManager == undefined || notificationManager == null) {
+            notificationManager = new NotificationManager();
+        }
+        return notificationManager;
+    }
+</script>

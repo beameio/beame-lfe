@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="704242d07a744b59824640e22ee99ceb" Name="Diagram1" ZoomLevel="88">
+        <EntityTypeShape EntityType="LfeAuthorModel.Categories" Width="1.5" PointX="6" PointY="39.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.ChapterLinks" Width="1.5" PointX="13.5" PointY="80.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.ChapterVideos" Width="1.5" PointX="13.5" PointY="84.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CourseCategories" Width="1.5" PointX="11.25" PointY="53.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CourseChapters" Width="1.5" PointX="11.25" PointY="82.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CourseLinks" Width="1.5" PointX="11.25" PointY="77.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserS3FileInterface" Width="1.5" PointX="3" PointY="78.875" IsExpanded="true" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CourseCategories_Categories" ManuallyRouted="false" />
+        <AssociationConnector Association="LfeAuthorModel.FK_ChapterLinks_CourseChapters" ManuallyRouted="false" />
+        <AssociationConnector Association="LfeAuthorModel.FK_ChapterVideos_CourseChapters" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserCourseReviews" Width="1.5" PointX="11.25" PointY="43.625" />
+        <EntityTypeShape EntityType="LfeAuthorModel.WebStoreCategories" Width="1.5" PointX="8.25" PointY="43" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStoreCategories_Categories" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_MessageUsers" Width="1.5" PointX="16.5" PointY="46.375" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_Followers" Width="1.5" PointX="14.25" PointY="42.625" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_ClassRoom" Width="1.5" PointX="6.75" PointY="51.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_ClassRoomFollowers_DSC_ClassRoom" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_Messages" Width="1.5" PointX="14.25" PointY="47.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_Messages_DSC_ClassRoom" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_Messages_DSC_MessagesParent" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_MessageUsers_DSC_Messages" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserNotifications" Width="1.5" PointX="19.5" PointY="45.5" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserNotifications_DSC_Messages" />
+        <EntityTypeShape EntityType="LfeAuthorModel.EMAIL_Messages" Width="1.5" PointX="21.75" PointY="45.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_EMAIL_Messages_UserNotifications" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_Hashtags" Width="1.5" PointX="3" PointY="76" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DSC_MessageHashtags" Width="1.5" PointX="18.5" PointY="61.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_DSC_MessageHashtags" Width="1.5" PointX="4.75" PointY="0.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_MessageTopics_DSC_Topics" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_MessageTopics_DSC_Messages" />
+        <EntityTypeShape EntityType="LfeAuthorModel.EMAIL_Templates" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.WebStoresChangeLog" Width="1.5" PointX="5.25" PointY="43.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserProfile" Width="1.5" PointX="3" PointY="48.125" />
+        <EntityTypeShape EntityType="LfeAuthorModel.WebStores" Width="1.5" PointX="3" PointY="42.125" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStoreCategories_WebStores" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStoresChangeLog_WebStores" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserSessions" Width="1.5" PointX="3" PointY="72.125" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserSessionsEventLogs" Width="1.5" PointX="5.25" PointY="72.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserEvents_UserSessions" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_CourseChangeLog" Width="1.5" PointX="14.125" PointY="4.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.FB_PostInterface" Width="1.5" PointX="21.75" PointY="50.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FB_PostInterface_UserNotifications" />
+        <EntityTypeShape EntityType="LfeAuthorModel.PAYPAL_PaymentRequests" Width="1.5" PointX="11.25" PointY="47.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_PaymentInstruments" Width="1.5" PointX="9.9054743786833583" PointY="22.791916559819093" />
+        <EntityTypeShape EntityType="LfeAuthorModel.GEO_States" Width="1.5" PointX="5.4669782004631022" PointY="21.389560068673248" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_Addresses" Width="1.5" PointX="11.100820943294476" PointY="28.409675030228531" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CON_ContactsLib_GEO_States" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_PaymentRequests_USER_Addresses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_PaymentRequests_USER_PaymentInstruments" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_PaymentRequests_PAYPAL_PaymentRequests" />
+        <EntityTypeShape EntityType="LfeAuthorModel.PAYPAL_IpnLogs" Width="1.5" PointX="0.75" PointY="8.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_Transactions" Width="1.5" PointX="24.25" PointY="50.625" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Transactions_PAYPAL_PaymentRequests" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_Transactions" Width="1.5" PointX="9.375" PointY="0.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Transactions_SALE_Transactions" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_Orders" Width="1.5" PointX="14.375" PointY="35.625" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Orders_USER_Addresses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Orders_USER_PaymentInstruments" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Orders_WebStores" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_OrderLinePaymentRefunds" Width="1.5" PointX="21.25" PointY="56.625" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Transactions_SALE_OrderLinePaymentRefunds" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_OrderLines" Width="1.5" PointX="16.625" PointY="49.5" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_SALE_Orders" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Transactions_SALE_OrderLines" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_Orders" Width="1.5" PointX="9.375" PointY="11.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_OrderLinePayments" Width="1.5" PointX="18.875" PointY="50.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLinePaymentRefunds_SALE_OrderLinePayments" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLinePayments_SALE_OrderLines" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Transactions_SALE_OrderLinePayments" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_BundleCategories" Width="1.5" PointX="11.25" PointY="37.5" />
+        <AssociationConnector Association="LfeAuthorModel.FK_BundleCategories_Categories" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_BundleCourses" Width="1.5" PointX="17.25" PointY="41.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CouponInstances" Width="1.5" PointX="19.5" PointY="36.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.Coupons" Width="1.5" PointX="17.25" PointY="35.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CouponInstances_Coupons" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_CouponInstances" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_Bundles" Width="1.5" PointX="21.875" PointY="40.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Bundles_SALE_OrderLines" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_Courses" Width="1.5" PointX="24.125" PointY="46" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_CourseWatchState" Width="1.5" PointX="11.25" PointY="56.5" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Courses_SALE_OrderLines" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Courses_USER_Bundles" />
+        <EntityTypeShape EntityType="LfeAuthorModel.WebStoreItems" Width="1.5" PointX="14.25" PointY="53.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebstoreCourses_WebStoreCategories" />
+        <EntityTypeShape EntityType="LfeAuthorModel.GEO_CountriesLib" Width="1.5" PointX="3.375" PointY="13" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CON_ContactsLib_GEO_CountriesLib" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_PaymentInstruments_USER_Addresses" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLinePaymentRefunds" Width="1.5" PointX="0.75" PointY="13.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.webpages_Membership" Width="1.5" PointX="13.375" PointY="0.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserSessionsEventLogs_WebStores" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_EVENT_Logs" Width="1.5" PointX="14.125" PointY="7.25" />
+        <EntityTypeShape EntityType="LfeAuthorModel.FACT_DailyStats" Width="1.5" PointX="15.375" PointY="0.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.FACT_DailyTotals" Width="1.5" PointX="15.375" PointY="14.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.FACT_EventAgg" Width="1.5" PointX="5.25" PointY="46.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_FACT_EventAggregates" Width="1.5" PointX="17.375" PointY="0.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FACT_Agg_WebStores" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_Videos" Width="1.5" PointX="3" PointY="51.125" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_EventsLog" Width="1.5" PointX="11.375" PointY="11.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FB_PostInterface_ChapterVideos" />
+        <EntityTypeShape EntityType="LfeAuthorModel.BILL_ItemsPriceList" Width="1.5" PointX="17.375" PointY="17.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.BASE_CurrencyLib" Width="1.5" PointX="15.125" PointY="19.125" />
+        <AssociationConnector Association="LfeAuthorModel.FK_BILL_ItemsPriceList_BASE_CurrencyLib" />
+        <EntityTypeShape EntityType="LfeAuthorModel.BILL_ItemsPriceRevisions" Width="1.5" PointX="19.625" PointY="18.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_BILL_ItemsPriceRevisioons_BILL_ItemsPriceList" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_BILL_ItemsPriceList" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_Bundles" Width="1.5" PointX="15" PointY="28.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Coupons_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_BundleCategories_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CRS_BundleCourses_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_PaymentRequests_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Bundles_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserSessionsEventLogs_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStoreItems_CRS_Bundles" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStores_BASE_CurrencyLib" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_Items" Width="1.5" PointX="19.375" PointY="0.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.APP_PluginInstallations" Width="1.5" PointX="3" PointY="55.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.APP_PluginInstallationStores" Width="1.5" PointX="5.25" PointY="56.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_APP_PluginInstallationStores_APP_PluginInstallations" />
+        <AssociationConnector Association="LfeAuthorModel.FK_APP_PluginInstallationStores_WebStores" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CHIMP_ListSegments" Width="1.5" PointX="22.25" PointY="36.125" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CHIMP_UserLists" Width="1.5" PointX="20" PointY="32.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CHIMP_ListSegments_CHIMP_UserLists" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CHIMP_ListSegments_CRS_Bundles" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CHIMP_Rejects" Width="1.5" PointX="3.375" PointY="18.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_Logins" Width="1.5" PointX="3" PointY="60.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.Users" Width="1.5" PointX="22.375" PointY="20.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_APP_PluginInstallations_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CHIMP_UserLists_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Coupons_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CourseBundles_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_ClassRoomFollowers_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_ClassRoomFollowers_Users1" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_Topics_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_MessageUsers_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_EMAIL_Messages_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FACT_Agg_FACT_Agg" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FB_PostInterface_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_PaymentRequests_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Orders_BuyerUser" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_Orders_SellerUsers" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CON_ContactsLib_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Users_USER_Addresses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Bundles_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Courses_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_CourseWatchState_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Logins_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_PaymentInstruments_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Videos_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserCourseReviews_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserNotifications_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserProfile_Users_RefUserId" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Users_WebStores" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserS3FileInterface_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserSessions_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStores_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_UserLogins" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_UsersLib" Width="1.5" PointX="19.375" PointY="6.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.SALE_RefundRequests" Width="1.5" PointX="24.5" PointY="56.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_RefundRequests_SALE_OrderLinePaymentRefunds" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_RefundRequests_SALE_OrderLinePayments" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLinePayments" Width="1.5" PointX="21.375" PointY="0.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLines" Width="1.5" PointX="23.375" PointY="0.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.ApiSessions" Width="1.5" PointX="24.625" PointY="28.625" />
+        <EntityTypeShape EntityType="LfeAuthorModel.FB_ActionsLOV" Width="1.5" PointX="19.5" PointY="77.375" />
+        <EntityTypeShape EntityType="LfeAuthorModel.PendingPayPalTransactions" Width="1.5" PointX="11.375" PointY="4.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.StatusLOV" Width="1.5" PointX="0.75" PointY="43" />
+        <EntityTypeShape EntityType="LfeAuthorModel.Tags" Width="1.5" PointX="16.375" PointY="12.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_RefundProgramRevisions" Width="1.5" PointX="24.625" PointY="25.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UsersAgents" Width="1.5" PointX="5.375" PointY="18.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserStatusTypes" Width="1.5" PointX="20.125" PointY="71.25" />
+        <EntityTypeShape EntityType="LfeAuthorModel.UserTypes" Width="1.5" PointX="20.125" PointY="23.875" />
+        <EntityTypeShape EntityType="LfeAuthorModel.webpages_OAuthMembership" Width="1.5" PointX="5.25" PointY="60.5" />
+        <EntityTypeShape EntityType="LfeAuthorModel.webpages_Roles" Width="1.5" PointX="3.375" PointY="25" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLinePaymentsTotalRefunds" Width="1.5" PointX="25.375" PointY="4.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLinesTotalRefunds" Width="1.5" PointX="25.375" PointY="7.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderLineTotalPayments" Width="1.5" PointX="25.375" PointY="10.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_SALE_OrderTotalPayments" Width="1.5" PointX="26.375" PointY="13.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_Authors" Width="1.5" PointX="3.375" PointY="27.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_USER_Statistics" Width="1.5" PointX="17.375" PointY="26.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_ApiSessions_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CRS_Bundles_StatusLOV" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FB_PostInterface_FB_ActionsLOV" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebStores_CourseStatusLOV" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_RefundProgramRevisions_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_webpages_OAuthMembership_UserProfile" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Users_UserStatusTypes" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Users_UserTypes" />
+        <AssociationConnector Association="LfeAuthorModel.webpages_UsersInRoles" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_WS_StoresLib" Width="1.5" PointX="27.375" PointY="4.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_WizardStepsLOV" Width="1.5" PointX="16.375" PointY="5.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.LogTable" Width="1.5" PointX="16.875" PointY="8.375" />
+        <EntityTypeShape EntityType="LfeAuthorModel.PO_PayoutExecutions" Width="1.5" PointX="25.375" PointY="32.25" />
+        <EntityTypeShape EntityType="LfeAuthorModel.PO_UserPayoutStatments" Width="1.5" PointX="27.625" PointY="22.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PO_UserPayoutStatments_BASE_CurrencyLib" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PO_UserPayoutStatments_PO_PayoutExecutions" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PO_UserPayoutStatments_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.DB_CustomEvents" Width="1.5" PointX="24.625" PointY="22.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DB_CustomEvents_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.Courses" Width="1.5" PointX="26.625" PointY="39" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CHIMP_ListSegments_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Coupons_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CourseCategories_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CourseChapters_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CourseLinks_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Courses_CourseStatusLOV" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Courses_DSC_ClassRoom" />
+        <AssociationConnector Association="LfeAuthorModel.FK_Courses_Users" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CRS_BundleCourses_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_ClassRoomFollowers_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_DSC_Messages_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_FB_PostInterface_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_PAYPAL_AccountPaymentRequests_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_SALE_OrderLines_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_Courses_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_CourseWatchState_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserCourseReviews_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_UserSessionsEventLogs_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_WebstoreCourses_Courses" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_VideoStats" Width="1.5" PointX="26.625" PointY="51.375" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_VideoStats_CourseChapters" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_VideoStats_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CRS_Assets" Width="1.5" PointX="28.875" PointY="41.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CRS_Assets_Courses" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_QuestionAnswerOptions" Width="1.5" PointX="35.125" PointY="34.25" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_StudentQuizAnswers" Width="1.5" PointX="39.625" PointY="29.375" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_StudentQuizAttempts" Width="1.5" PointX="37.375" PointY="29.25" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_StudentQuizAnswers_QZ_StudentQuizzes" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_QuizQuestionsLib" Width="1.5" PointX="32.875" PointY="34" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_StudentQuizzes" Width="1.5" PointX="24.625" PointY="61.125" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_QZ_QuizQuestionsLib" Width="1.5" PointX="23.375" PointY="13.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_QustionAnswerOptions_QZ_QuizQuestionsLib" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_StudentQuizAttempts_QZ_StudentQuizzes" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_StudentQuizzes_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.QZ_CourseQuizzes" Width="1.5" PointX="28.875" PointY="47" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_QZ_CourseQuizzes" Width="1.5" PointX="7.375" PointY="28.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_CourseQuizzes_Courses" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_QuizQuestionsLib_QZ_QuizzesLib" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_StudentQuizzes_QZ_CourseQuizzes" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CERT_CertificateLib" Width="1.5" PointX="28.875" PointY="53.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_CertificateLib_Courses" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CERT_TemplatesLOV" Width="1.5" PointX="14.375" PointY="23.875" />
+        <AssociationConnector Association="LfeAuthorModel.FK_QZ_CertificateLib_QZ_CertificateTemplatesLOV" />
+        <EntityTypeShape EntityType="LfeAuthorModel.CERT_StudentCertificates" Width="1.5" PointX="31.125" PointY="39.125" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CERT_StudentCertificates_CERT_CertificateLib" />
+        <AssociationConnector Association="LfeAuthorModel.FK_CERT_StudentCertificates_Users" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_CERT_StudentCertificates" Width="1.5" PointX="29.375" PointY="4.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.vw_WS_Items" Width="1.5" PointX="5.375" PointY="12.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.ADMIN_DeletedVideosLog" Width="1.5" PointX="11.375" PointY="8.75" />
+        <EntityTypeShape EntityType="LfeAuthorModel.USER_VideosRenditions" Width="1.5" PointX="5.25" PointY="63.75" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_VideosRenditions_USER_Videos" />
+        <AssociationConnector Association="LfeAuthorModel.FK_USER_VideosRenditions_USER_VideosRenditions" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

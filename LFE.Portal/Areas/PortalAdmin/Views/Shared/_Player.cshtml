@@ -1,0 +1,53 @@
+﻿@model LFE.DataTokens.VideoInfoToken
+@{
+    var wrapperId = "video-wrapper-" + Model.BcIdentifier;
+}
+
+
+@Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+
+
+<div class="video-wrapper-container">
+    <div class="video-wrapper" id="@wrapperId">
+        Loading the player...
+    </div>
+</div>
+
+<script>
+    var playerInstance = jwplayer("@wrapperId");
+
+    var sources = [];
+    var rend = @Html.Raw(Json.Encode(Model.Renditions));
+    var defaultRend = rend[0].CloudFrontPath;
+
+    var playList = '@Model.PlayListUrl';
+
+    if (playList.length > 0) {
+        sources.push({ file: playList,default:true });
+    }
+
+    for (var i = 0; i < rend.length; i++) {
+
+        var json = {
+            file:rend[i].CloudFrontPath,
+            label:rend[i].FrameWidth +'x'  +rend[i].FrameHeight
+        }
+
+        sources.push(json);
+    }
+
+    var settings = {
+        sources: sources,
+        image: '@Model.StillUrl'.replace(/amp;/g, ''),
+        autostart: true,
+        width: "100%",
+        aspectratio: "16:9",
+        skin: '/Scripts/jwplayer/jwplayer-skins-premium/vapor.xml',
+        primary: "html"
+    };
+
+    playerInstance.setup(settings);
+
+    
+</script>
+

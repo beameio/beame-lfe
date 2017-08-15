@@ -1,0 +1,13 @@
+﻿@model LFE.DataTokens.ItemPurchaseDataToken
+
+@Html.HiddenFor(m => m.PriceToken.PriceLineID)
+@Html.HiddenFor(m => m.PriceToken.Currency.ISO)
+@Html.HiddenFor(m => m.TrackingID)
+@Html.HiddenFor(m => m.Type)
+@Html.HiddenFor(m => m.PaymentMethod, new { @data_bind = "value:method" })
+@Html.HiddenFor(m => m.IsFree)
+@Html.HiddenFor(m => m.Price, new { @data_bind = "value:Price" })
+@Html.HiddenFor(m => m.CouponCode, new { @data_bind = "value:CouponCode" })
+@Html.HiddenFor(m => m.Author.fullName)
+@Html.HiddenFor(m => m.Author.userId)
+@Html.HiddenFor(m => m.PaymentInstrumentId, new { @data_bind = "value:PaymentInstrumentId" })

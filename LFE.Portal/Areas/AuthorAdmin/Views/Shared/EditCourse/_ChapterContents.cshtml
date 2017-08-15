@@ -1,0 +1,104 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.ChapterContentsToken
+
+    @(Html.Kendo().ListView<ChapterVideoEditDTO>()
+            .Name("ChapterVideos_" + Model.ChapterId)
+            .TagName("ul")
+            .HtmlAttributes(new { @class = "ul-second-level  ul-videos" })
+            .ClientTemplateId("kendo-chn-list-template")
+            .Editable(e => e.Enabled(true))
+            .Events(e => e.DataBound("onChapterContentsListBound").Edit("onVideoEdit").Remove("onVideoRemoved").Cancel("onChapterContentListStateChanged"))
+            .DataSource(ds => ds.Read(read => read.Action("GetChapterEditVideosList", "Course", new { id = Model.ChapterId }).Type(HttpVerbs.Get))
+            .Destroy(d => d.Action("DeleteChapterVideoFromList", "Course", new { area = "AuthorAdmin" }))
+            .Model(model => model.Id("VideoId")))
+    )
+
+    @*@(Html.Kendo().Sortable()
+        .For("#ChapterVideos_" + Model.ChapterId)
+        .Filter(".li-video:not(.k-edit-item)")
+        .HintHandler("onContentHint")
+        .PlaceholderHandler("placeholder")
+        .Handler(".drag")
+        .Events(events => events.Change("onVideoSortChanged"))
+    )*@
+
+    @(Html.Kendo().ListView<ChapterLinkEditDTO>()
+            .Name("ChapterLinks_" + Model.ChapterId)
+            .TagName("ul")
+            .HtmlAttributes(new { @class = "ul-second-level ul-links" })
+            .ClientTemplateId("kendo-chl-list-template")
+            .Editable(e => e.Enabled(true))
+            .Events(e => e.DataBound("onChapterContentsListBound").Edit("onLinkEdit").Remove("onLinkRemoved").Cancel("onChapterContentListStateChanged"))
+            .DataSource(ds => ds.Read(read => read.Action("GetChapterEditLinksList", "Course", new { id = Model.ChapterId }).Type(HttpVerbs.Get))
+            .Destroy(d => d.Action("DeleteChapterLinkFromList", "Course", new { area = "AuthorAdmin" }))
+            .Model(model => model.Id("LinkId")))
+    )
+
+    @*@(Html.Kendo().Sortable()
+        .For("#ChapterLinks_" + Model.ChapterId)
+        .Filter(".li-link:not(.k-edit-item)").HintHandler("onContentHint")
+        .PlaceholderHandler("placeholder")
+        .Handler(".drag")
+        .Events(events => events.Change("onLinksSortChanged"))
+    )*@
+
+
+<div class="ch-cmd-row">
+    <div class="inline ch-cmd-btn btn-add-video" onclick="addChapterVideo('@Model.ChapterId')">Add Video</div>
+    <div class="inline ch-cmd-btn btn-add-doc" onclick="addChapterLink('@Model.ChapterId',1)">Add Document</div>
+    <div class="inline ch-cmd-btn btn-add-link" onclick="addChapterLink('@Model.ChapterId',2)">Add Link</div>
+</div>
+
+
+
+<script type="text/x-kendo-template" id="kendo-chn-list-template">
+    <li data-val="${VideoId}" class="li-video">
+        <div class="content-head-row">
+            <span class="float-left drag-box drag cn-drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-second">&nbsp;</span>
+            <span title="#=Encoder.htmlEncode(Title)#" class="float-left cn-name cn-vd pt9 ellipsis">${Title}</span>
+            <span class="float-right" style="width:150px;">
+                <span class="row-btn right btn-edit inline" title="Edit video" onclick="handleEditClick(this,'#=ChapterId#')"><span class="ico"></span></span>
+
+                <span class="k-delete-button row-btn btn-remove inline pt9" title="Delete delete"><span class="ico"></span></span>
+            </span>
+
+        </div>
+        <div class="video-details cn-details" id="ch-vid-${VideoId}" style="display:none">
+            <div class="cn-box cn-vd-desc" style="display:#=hasValue(SummaryHTML) ? 'block' : 'none'#">
+                <p>#=Encoder.htmlDecode(SummaryHTML)#</p>
+            </div>
+            <div class="cn-box cn-vd-container" style="left:#=hasValue(SummaryHTML) ? '370px' : '0px'#">
+                <div class="float-left">
+                    <div class="v-thumb" id="d-video-thumb-${VideoId}">
+                        #if(VideoToken != null && VideoToken.identifier != undefined && Number(VideoToken.identifier) > 0 ){setTimeout(function(){buildThumbMediaPlayer({stillUrl: VideoToken.stillUrl, title: VideoToken.title, minutes: VideoToken.minutes, identifier: VideoToken.identifier,videoUrl:VideoToken.videoUrl}, emptyHref + 'd-video-thumb-' + VideoId);},300);}#
+                    </div>
+                </div>
+                <div class="" style="margin:0;display:none">
+                    <div class="vd-name ellipsis" title="${VideoToken.title}">${VideoToken.title}</div>
+                    <span class="vd-public">
+                        <span class="is-open #=IsOpen ? 'mark' : ''#"><span class="ico"></span></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </li>
+</script>
+
+<script type="text/x-kendo-template" id="kendo-chl-list-template">
+    <li data-val="${LinkId}" class="li-link">
+        <div class="content-head-row">
+            <span class="float-left drag-box drag cn-drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-second">&nbsp;</span>
+            <span title="#=Encoder.htmlEncode(Title)#" class="float-left cn-name #=Kind==1 ? 'cn-dc' : 'cn-lnk'# pt9 ellipsis">${Title}</span>
+            <span class="float-right" style="width:150px;">
+                <span class="row-btn right btn-edit inline" title="Edit video" onclick="handleLinkEditClick(this, '#=ChapterId#')"><span class="ico"></span></span>
+
+                <span class="k-delete-button row-btn btn-remove inline pt9" title="Delete delete"><span class="ico"></span></span>
+            </span>
+        </div>
+        <div class="cn-details" style="display:none">
+            <a href="#:LinkHref#" target="_blank">#:LinkHref#</a>
+        </div>
+    </li>
+</script>

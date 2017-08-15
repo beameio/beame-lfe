@@ -1,0 +1,40 @@
+﻿@using Kendo.Mvc.UI
+
+<script>
+	function onUserCourseSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		if (!hasValue(dataItem.CoursePageUrl)) return;
+		window.location.href = dataItem.CoursePageUrl;
+	}
+
+	function onUserCoursesBound(e) {
+		setFocusComboEvnt(e);
+				if (!hasValue(window.CURRENT_COURSE_ID)) return;
+		var combo = e.sender;
+		combo.select(function (dataItem) {
+			return dataItem.CourseId == window.CURRENT_COURSE_ID;
+		});
+	}		
+</script>
+
+@(Html.Kendo().ComboBox()
+				.Name("ddlMyCourses")
+				.DataValueField("CourseId")
+				.DataTextField("Name")
+				.Placeholder("My purchases")
+				.HighlightFirst(true)
+				.Filter(FilterType.Contains)
+				.Suggest(true)
+				.MinLength(2)
+				.Template("<div class=\"crs-link\">" +
+							"<img class=\"crs-thumb inline\" src=\"${ImageUrl}\" alt=\"${Name}\" />" +
+							"<span class=\"inline\" style=\"margin:0 0 0 10px\">" +
+								"<label class=\"ellipsis\">${Name}</label>" +
+								"<label class=\"au\">${ AuthorFullName }</label>" +
+							"</span>"
+							+ "</div>")
+				.HtmlAttributes(new { @class = "combo-uc" })
+				.Height(400)
+				.DataSource(ds=>ds.Read(r=>r.Action("GetUserCourses","User")).ServerFiltering(false))
+				.Events(e=>e.Select("onUserCourseSelected").DataBound("onUserCoursesBound"))
+)

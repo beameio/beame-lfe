@@ -1,0 +1,512 @@
+﻿@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Helpers
+
+
+
+
+@model BaseEntityDTO
+
+<script type="text/javascript">
+   
+	var FORM_HEIGHT     = 590;
+	var FORM_SELECTOR   = '#d-contents-container';
+	var CHAPTER_LIST_ID = '#CourseChapters';
+	var VIDEO_LIST_ID   = '#ChapterVideos';
+	var LINK_LIST_ID    = '#ChapterLinks';
+	var currentChapterId = -1, currentVideoId = -1,currentLinkId = -1, formUserNotifManager;
+	
+	$(document).ready(function () {
+		//disable caching
+		$.ajaxSetup({ cache: false });
+		
+		//bind command row position events
+		$(window).resize(function () {
+			adjustCmdPosition(FORM_SELECTOR);
+		});
+		$(document).scroll(function () {
+			adjustCmdPosition(FORM_SELECTOR);
+		});
+
+		//init form notification manager
+		formUserNotifManager = new UserNotificationManager('#cn-info', '.alert', false);
+
+		//bind add new chapter button
+		$('#a-add-chapter').unbind('click').bind('click', function () {
+			
+			if (isNewRowIncludes(CHAPTER_LIST_ID)) {
+				formUserNotifManager.show({ message: userMessages.SAVE_YOUR_WORK, kind: NotificationKinds.Info });
+				return;
+			}
+
+			$(CHAPTER_LIST_ID).data("kendoListView").clearSelection();
+
+			currentChapterId = -1;
+			currentVideoId = -1;
+			currentLinkId = -1;
+			
+			rebindContents();
+
+			$('#frmAddChapter').submit();
+
+			setPageState(true);
+
+			addNewRowOnInsert('New Chapter', window.CHAPTER_LIST_ID);
+		});
+		
+		//bind chapter add new content buttons
+		$.each($('#frmAddChapterContent > .add-btn'),function() {
+
+			var btn = $(this);
+
+			btn.unbind('click').bind('click', function () {
+				
+				if (currentChapterId < 0) {
+					window.formUserNotifManager.show({ message: userMessages.CHAPTER.SELECT_CHAPTER, kind: NotificationKinds.Info });
+					return;
+				}
+
+
+				$('#contentChapterId').val(currentChapterId);
+
+				var kind = btn.attr('data-val');
+				$('#contentKind').val(kind);
+				
+				$('#frmAddChapterContent').submit();
+
+				//reset new
+				removeNewRow(window.CHAPTER_LIST_ID);
+				resetContentListsState();
+
+				$(window.VIDEO_LIST_ID).data("kendoListView").wrapper.find('li').removeClass('k-state-selected');
+				$(window.LINK_LIST_ID).data("kendoListView").wrapper.find('li').removeClass('k-state-selected');
+
+				switch (kind) {
+					case 'Video':
+						addNewRowOnInsert('New Video', window.VIDEO_LIST_ID);
+
+						setContentListsHeight();
+
+						break;
+					case 'Document':
+					case 'Link':
+						var text = kind == 'Link' ? 'New link' : 'New document';
+						addNewRowOnInsert(text, window.LINK_LIST_ID);
+						
+						$(window.LINK_LIST_ID).data("kendoListView").wrapper.addClass('with-content');
+
+						//handle lists state
+						$('#video-list-container').removeClass('full');
+						setReportScroll("#video-list-container");
+						setReportScroll("#link-list-container");
+						
+						break;
+				}
+				//set chapter selected row style
+				$(window.CHAPTER_LIST_ID).data("kendoListView").wrapper.find('li[class=k-state-selected]').addClass('as-parent');
+				
+			});
+		});
+
+
+		// subscribe for form events
+		window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.formLoaded, onContentFormLoaded, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.chapter.formLoaded, onContentFormLoaded, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.chapterSaved, handleChapterSaveEvent, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.chapter.chapterSaved, handleChapterSaveEvent, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.videoSaved, handleVideoSaveEvent, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.chapter.videoSaved, handleVideoSaveEvent, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.linkSaved, handleLinkSaveEvent, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.chapter.linkSaved, handleLinkSaveEvent, null);
+	});
+	
+	
+	//form services
+	function onContentFormLoaded(token) {
+		//set title
+		$('#b-title-text').html(token.title);
+
+		//bind buttons
+		$('.btn-submit').unbind('click').bind('click', function () {
+			$(token.form).submit();
+		});
+		
+		$('.btn-delete').unbind('click').bind('click', function () {
+		   if (token.id < 0) {
+			   window.formUserNotifManager.show({ message: userMessages.SAVE_YOUR_WORK, kind: NotificationKinds.Info });
+		   } else {
+			   if (!window.confirm(userMessages.CONFIRM_DELETE)) return;
+
+				var data = { id: token.id};
+				var url = token.deleteUrl;
+				var callback = null;
+
+				switch (token.kind) {
+					case ChapterFormKinds.chapter:
+						callback = onChapterDeleted;
+						break;
+					case ChapterFormKinds.video:
+						callback = onVideoDeleted;
+						break;
+					case ChapterFormKinds.link:
+						callback = onLinkDeleted;
+						break;
+				}
+
+			   ajaxAction(url, data, callback);
+		   }
+		});
+	}
+	
+	function onChapterContentRequest() {
+		return { id: currentChapterId };
+	}
+	
+	function setPageState(isVisible) {
+		setVisibility('.cn-middle-col', isVisible);
+		setVisibility('.cn-form', isVisible);
+	}
+
+	//chapter
+	function onChapterDeleted(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Chapter deleted" : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			window.clearEditForm();
+			window.currentChapterId = -1;
+			$(window.CHAPTER_LIST_ID).data("kendoListView").dataSource.read();
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+	
+	function onChapterSelected(e) {
+		var ind = e.sender.select().index();
+
+		var index = isNewRowIncludes(CHAPTER_LIST_ID) ? ind - 1 : ind;
+		
+		if (index < 0) return;
+		
+		var chapterId = e.sender.dataSource.view()[index].id;
+
+		window.currentChapterId = chapterId;
+		window.currentVideoId = -1;
+
+		//remove new , if exists
+		removeNewRow(CHAPTER_LIST_ID);
+		resetContentListsState();
+		
+		$(window.CHAPTER_LIST_ID).data("kendoListView").wrapper.find('li').removeClass('as-parent');
+
+		var data = {
+			id: chapterId,
+			courseId: '@Model.id'
+		};
+
+		var url = '@Url.Action("ChapterEditForm","Course")';
+
+		actionResult(url, data, 'd-content-form-container');
+
+		setPageState(true);
+
+		rebindContents();
+	}
+	
+	function onChapterListBound() {
+
+		setReportScroll("#chapter-list-container");
+
+		setListSortable(window.CHAPTER_LIST_ID, '@Url.Action("SaveChapterOrder","Course")', onListReordered, 'data-val');
+	    
+		if (window.currentChapterId > 0) selectListItemById(window.CHAPTER_LIST_ID, window.currentChapterId, 'id');
+	}
+	
+	function handleChapterSaveEvent(token) {
+		$('#b-title-text').html('Edit ' + token.name);
+		window.currentChapterId = token.id;
+		$(window.CHAPTER_LIST_ID).data("kendoListView").dataSource.read();
+		window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+	}
+
+	function onChapterRequestEnd(e) {
+		var cnt = e.response.Data.length;
+		setPageState(cnt > 0);
+
+		if (cnt > 0 && window.currentChapterId < 0) //onload , no chapter selected
+		{
+			window.currentChapterId = e.response.Data[0].id; //select first
+		}
+	}
+
+	//video
+	function onVideoListBound() {
+
+		setReportScroll("#video-list-container");
+
+		setListSortable(window.VIDEO_LIST_ID, '@Url.Action("SaveChapterVideosOrder","Course")', onListReordered, 'data-val');
+
+		if (window.currentVideoId > 0) selectListItemById(window.VIDEO_LIST_ID, window.currentVideoId, 'id');
+	}
+	
+	function onChapterVideoSelected(e) {
+		if (currentChapterId < 0) {
+			window.formUserNotifManager.show({ message: userMessages.CHAPTER.SELECT_CHAPTER, kind: NotificationKinds.Info });
+			return;
+		}
+	
+		var ind = e.sender.select().index();
+
+		var index = isNewRowIncludes(VIDEO_LIST_ID) ? ind - 1 : ind;
+		
+		if (index < 0) return;
+
+		//check click on new video
+		var ds = e.sender.dataSource._data.length;
+		var li = e.sender.wrapper.find('li').length;
+		if (li > ds && index == 0) return;
+
+		var videoId = e.sender.dataSource.view()[index].id;
+		if (videoId < 0) return;
+
+		window.currentVideoId = videoId;
+
+		resetContentListsState();
+		setContentListsHeight();
+		
+		//reset link selection
+		$(window.LINK_LIST_ID).data("kendoListView").clearSelection();
+
+		//set chapter selected row style
+		$(window.CHAPTER_LIST_ID).data("kendoListView").wrapper.find('li[class=k-state-selected]').addClass('as-parent');
+	  
+		var data = {
+			id: videoId,
+			contentChapterId: currentChapterId,
+			contentKind: '@eChapterContentKinds.Video'
+		};
+
+		var url = '@Url.Action("ChapterContentEditForm","Course")';
+
+		actionResult(url, data, 'd-content-form-container');     
+	}
+	
+	function handleVideoSaveEvent(token) {
+		$('#b-title-text').html('Edit ' + token.name);
+		window.currentVideoId = token.id;
+		$(window.VIDEO_LIST_ID).data("kendoListView").dataSource.read();
+		
+	}
+	
+	function onVideoDeleted(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Video deleted" : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			window.clearEditForm();
+			window.currentVideoId = -1;
+			$(window.VIDEO_LIST_ID).data("kendoListView").dataSource.read();
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+	
+	//link
+	function onLinkListBound(e) {
+
+		var cnt = e.sender.dataSource._data.length;
+		if (cnt > 0) {
+			e.sender.wrapper.addClass('with-content');
+			$('#video-list-container').removeClass('full');
+			setListsSeparetorState(true);
+		} else {
+			e.sender.wrapper.removeClass('with-content');
+			$('#video-list-container').addClass('full');
+			setListsSeparetorState(false);
+		}
+		
+		setReportScroll("#video-list-container");
+		setReportScroll("#link-list-container");
+
+		setListSortable(window.LINK_LIST_ID, '@Url.Action("SaveChapterLinksOrder","Course")', onListReordered, 'data-val');
+
+		if (window.currentLinkId > 0) selectListItemById(window.LINK_LIST_ID, window.currentLinkId, 'id');
+	}
+
+	function onChapterLinkSelected(e) {
+		if (currentChapterId < 0) {
+			window.formUserNotifManager.show({ message: userMessages.CHAPTER.SELECT_CHAPTER, kind: NotificationKinds.Info });
+			return;
+		}
+
+		var ind = e.sender.select().index();
+
+		var index = isNewRowIncludes(LINK_LIST_ID) ? ind - 1 : ind;
+		
+		if (index < 0) return;
+
+		//check click on new link/doc
+		var ds = e.sender.dataSource._data.length;
+		var li = e.sender.wrapper.find('li').length;
+		if (li > ds && index == 0) return;
+
+		var linkId = e.sender.dataSource.view()[index].id;
+		if (linkId < 0) return;
+
+		window.currentLinkId = linkId;
+
+		//remove new , if exists
+		resetContentListsState();
+		
+		//reset video selection
+		$(window.VIDEO_LIST_ID).data("kendoListView").clearSelection();
+		
+		//set chapter selected row style
+		$(window.CHAPTER_LIST_ID).data("kendoListView").wrapper.find('li[class=k-state-selected]').addClass('as-parent');
+
+		var data = {
+			id: linkId,
+			contentChapterId: currentChapterId,
+			contentKind: '@eChapterContentKinds.Link'
+		};
+
+		var url = '@Url.Action("ChapterContentEditForm","Course")';
+
+		actionResult(url, data, 'd-content-form-container');
+	}
+
+	function handleLinkSaveEvent(token) {
+		$('#b-title-text').html('Edit ' + token.name);
+		window.currentLinkId = token.id;
+		$(window.LINK_LIST_ID).data("kendoListView").dataSource.read();
+		
+	}
+
+	function onLinkDeleted(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Link deleted" : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			window.clearEditForm();
+			window.currentLinkId = -1;
+			$(window.LINK_LIST_ID).data("kendoListView").dataSource.read();
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+</script>
+
+<div id="d-contents-container" style="position: relative;height: 620px">
+	<div class="cn-col cn-left-col" >
+		<div class="b-title">chapters</div>
+		<div class="actn-container">
+			@using (Ajax.BeginForm("ChapterEditForm", "Course", new { id = -1, courseId = Model.id }, new AjaxOptions { UpdateTargetId = "d-content-form-container", LoadingElementId = "site-loader" }, new { @id = "frmAddChapter" }))
+			{
+				<span title="ADD NEW CHAPTER" id="a-add-chapter" class="add-btn actn-link">add new chapter</span>
+			}
+		</div>
+		<div class="info">
+			drag to reorder, click to edit
+		</div>
+		<div class="list-container nano" id="chapter-list-container">
+			<div class="content">
+				@(Html.Kendo().ListView<BaseListDTO>()
+					.Name("CourseChapters")
+					.TagName("ul")  
+					.HtmlAttributes(new{@class="ul-cn-list"})  
+					.ClientTemplateId("kendo-ch-list-template") 
+					.Events(e=>e.DataBound("onChapterListBound").Change("onChapterSelected"))
+					.Selectable(selectable => selectable.Mode(ListViewSelectionMode.Single))         
+					.DataSource(ds => ds.Read( read => read.Action("GetCourseChaptersList", "Course",new{Model.id}).Type(HttpVerbs.Get)).Events(e=>e.RequestEnd("onChapterRequestEnd")).ServerOperation(false))
+				)
+			</div>
+		</div>
+	</div>
+	<div class="cn-col cn-middle-col" style="visibility: hidden">
+		<div class="b-title">chapter contents</div>
+		<div class="actn-container">
+			@using (Ajax.BeginForm("ChapterContentEditForm", "Course", new { id = -1 }, new AjaxOptions { UpdateTargetId = "d-content-form-container", LoadingElementId = "site-loader" }, new { @id = "frmAddChapterContent" }))
+			{
+				@Html.Hidden("contentChapterId")
+				@Html.Hidden("contentKind")
+				<span title="ADD NEW VIDEO" id="a-add-video" class="add-btn actn-link" data-val="@eChapterContentKinds.Video">add new video</span>
+				<span title="ADD NEW LINK" id="a-add-link" class="add-btn actn-link no-bg" data-val="@eChapterContentKinds.Link">add link</span>            
+				<span title="ADD NEW DOCUMENT" id="a-add-doc" class="add-btn actn-link no-bg" data-val="@eChapterContentKinds.Document">add document</span>
+			}			
+		</div>
+		<div class="info">
+			drag to reorder, click to edit
+		</div>
+	    <div class="list-container video-list full nano" style="" id="video-list-container">
+	        <div class="content">
+	            @(Html.Kendo().ListView<VideoListDto>()
+	                  .Name("ChapterVideos")
+	                  .TagName("ul")  
+	                  .HtmlAttributes(new{@class="ul-cn-list"})  
+	                  .ClientTemplateId("kendo-ch-list-template") 
+	                  .Events(e=>e.DataBound("onVideoListBound").Change("onChapterVideoSelected"))
+	                  .Selectable(selectable => selectable.Mode(ListViewSelectionMode.Single))
+	                  .AutoBind(false)
+	                  .DataSource(ds => ds.Read( read => read.Action("GetChapterVideosList", "Course").Data("onChapterContentRequest").Type(HttpVerbs.Get)).ServerOperation(false))
+	                  )
+	        </div>
+	    </div>
+        <div class="content-lists-sep">&nbsp;</div>
+		<div class="list-container link-list nano" style="" id="link-list-container">
+			<div class="content">
+				@(Html.Kendo().ListView<LinkListDto>()
+					.Name("ChapterLinks")
+					.TagName("ul")  
+					.HtmlAttributes(new{@class="ul-cn-list"})  
+					.ClientTemplateId("kendo-ch-list-template") 
+					.Events(e=>e.DataBound("onLinkListBound").Change("onChapterLinkSelected"))
+					.Selectable(selectable => selectable.Mode(ListViewSelectionMode.Single))
+					.AutoBind(false)
+					.DataSource(ds => ds.Read( read => read.Action("GetChapterLinksList", "Course").Data("onChapterContentRequest").Type(HttpVerbs.Get)).ServerOperation(false))
+				)
+			</div>
+		</div>
+	</div>
+	<div class="cn-form" style="visibility: hidden">
+		<div class="b-title">
+			<div style="float: left;height: 100%;max-width: 400px;" class="ellipsis" id="b-title-text">&nbsp;</div>
+			<div style="float: right;height: 100%;">
+				<a href="#content" class="btn-delete">delete</a>
+			</div>
+		</div>
+		<div id="d-content-form-container"></div>
+	</div>
+	<div class="form-cmd-row wrap" id="d-cn">
+		<div class="inner">
+			<div class="info-box" id="cn-info">
+				<p class="alert" style="width:425px"></p>
+			</div>
+			<div class="btn-container" style="text-align: right">
+				<a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.name,Constants.QS_COURSE_PREVIEW_PREFIX)" target="_blank" class="btn-prev-prod">preview product page</a>
+				<a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.name)" target="_blank" class="btn-prev-course">Preview course</a>
+				<a href="#content" class="btn-submit">save changes</a>
+			</div>
+		</div>
+	</div>  
+</div>
+
+
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		adjustCmdPosition(FORM_SELECTOR);        
+	});
+</script>
+
+<script type="text/x-kendo-template" id="kendo-ch-list-template">
+	<li data-val="${id}">
+		<span  title="#=Encoder.htmlEncode(name)#" class="list-btn">${name}</span>
+	</li>
+</script>

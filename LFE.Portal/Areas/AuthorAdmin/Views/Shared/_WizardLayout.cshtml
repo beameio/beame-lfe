@@ -1,0 +1,66 @@
+﻿@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>@ViewBag.Title</title>
+		<!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge" /><![endif]-->
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="~/Scripts/lfe/lfe.referrer.js"></script>
+		@Styles.Render("~/Content/kendo/"+ Url.ToKendoVersionUrl() + "/css")
+		   
+		@Styles.Render("~/Areas/AuthorAdmin/Content/styles/css")
+		@Styles.Render("~/Content/styles/common")
+		
+		
+			
+		@Scripts.Render("~/bundles/modernizr")		   
+		@Scripts.Render("~/bundles/jquery/jquery")
+		@Scripts.Render("~/bundles/jquery/jqueryval")
+		@Styles.Render("~/Content/plugin/scroll")
+		@Scripts.Render("~/bundles/plugin/scroll") 
+		<!--[if lt IE 9]>
+			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+			<script src="@Url.Content("~/Scripts/plugins/jquery.placeholder.min.js")"></script>
+			@* ReSharper disable once CssBrowserCompatibility *@
+			<style>
+			   
+			</style>
+		<![endif]-->
+		@Scripts.Render("~/bundles/kendo")
+		
+		<script>
+			kendo.culture("en-US");
+		</script> 
+        
+	    @Scripts.Render("~/bundles/lfe/common")	    
+        <script src="~/Scripts/plugins/htmlEncode.js"></script>
+	    @Scripts.Render("~/Areas/AuthorAdmin/bundles/lfe") 
+		@Scripts.Render("~/Areas/AuthorAdmin/bundles/wizard") 
+
+		
+
+		<script type="text/javascript">
+			var notificationManager;
+		 
+			function getNotifManagerInstance() {
+				if (notificationManager == undefined || notificationManager == null) {
+					notificationManager = new NotificationManager();
+				}
+				return notificationManager;
+			}
+		</script>
+		@RenderSection("css", false)	
+		@RenderSection("scripts", false)
+	</head>
+	<body>
+		<div class="wrap" id="main">
+			<section class="wrap clear" style="margin:2px">
+				@RenderBody()
+			</section>        			
+		</div>
+        @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+	</body>
+</html>

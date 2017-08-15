@@ -1,0 +1,13 @@
+﻿@model LFE.Portal.Areas.Widget.Models.TrainingButtonToken
+<a href="#" class="a-action-btn" id="g2t-btn-action">
+    <span class="inner">@Model.Text</span>
+</a>
+<script>
+    var el = document.getElementById("g2t-btn-action");
+    el.addEventListener("click", notifyActionClickEvent, false);
+    function notifyActionClickEvent(e) {
+        e.preventDefault();
+
+        window.getNotifManagerInstance().notify(notifEvents.training.actionButtonClicked, null);
+    }
+</script>

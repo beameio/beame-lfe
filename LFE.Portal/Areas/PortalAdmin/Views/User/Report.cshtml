@@ -1,0 +1,522 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "User Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	ViewData["typesLOV"] = Utils.EnumWithDescToList<UserEnums.eUserTypes>();
+	ViewData["statusLOV"] = Utils.EnumWithDescToList<UserEnums.eUserStatuses>();
+	var types = Utils.EnumWithDescToList<CommonEnums.eRegistrationSources>();
+	var roles = Utils.EnumWithDescToList<CommonEnums.UserRoles>();
+}
+
+@section css{
+	<style>
+		.user-thumb {
+			width: 25px;
+			height: 25px;
+		}
+
+		.k-grid-Edit {
+			text-align: left;
+		}
+
+		.old-login-row {
+			background: #c0c0c0 !important;
+		}
+
+		.picker-row label, .d-lbl {
+			padding-top: 4px;
+			font-size: 14px;
+		}
+
+		.lbl-title {
+			color: #333;
+			display: inline-block;
+			padding: 4px 10px 0 0;
+			width: 100px;
+		}
+	</style>
+}
+@section scripts{
+	<script>
+		var gridId = '#UserReport';
+
+		function clearRepFilters() {
+			$('#auUserName').val(null);
+			$('#auEmail').val(null);
+			$("#reg_start").data("kendoDatePicker") != undefined ? $("#reg_start").data("kendoDatePicker").value(null) : $('#reg_start').val(null);
+			$("#reg_end").data("kendoDatePicker") != undefined ? $("#reg_end").data("kendoDatePicker").value(null) : $('#reg_end').val(null);
+			$("#log_start").data("kendoDatePicker") != undefined ? $("#log_start").data("kendoDatePicker").value(null) : $('#log_start').val(null);
+			$("#log_end").data("kendoDatePicker") != undefined ? $("#log_end").data("kendoDatePicker").value(null) : $('#log_end').val(null);
+			$('#UserId').val(null);
+			$('#grp_chk')[0].checked = false;
+			if ($("#ddlTypes").data("kendoDropDownList") != undefined) $("#ddlTypes").data("kendoDropDownList").value(null);
+			if ($("#ddlRoles").data("kendoDropDownList") != undefined) $("#ddlRoles").data("kendoDropDownList").value(null);
+			rebindUserReport();
+		}
+
+		function rebindUserReport() {
+			if ($(gridId).data("kendoGrid")!=undefined) $(gridId).data("kendoGrid").dataSource.read();
+		}
+
+		function onUsersRead() {
+			var token =  {
+				regFrom: $("#reg_start").data("kendoDatePicker") != undefined ? kendo.toString($("#reg_start").data("kendoDatePicker").value(), "MM/dd/yy") : null,
+				regTo: $("#reg_end").data("kendoDatePicker") != undefined ? kendo.toString($("#reg_end").data("kendoDatePicker").value(), "MM/dd/yy") : null,
+				logFrom: $("#reg_start").data("kendoDatePicker") != undefined ? kendo.toString($("#log_start").data("kendoDatePicker").value(), "MM/dd/yy") : null,
+				logTo: $("#log_end").data("kendoDatePicker") != undefined ? kendo.toString($("#log_end").data("kendoDatePicker").value(), "MM/dd/yy") : null,
+				typeId: $("#ddlTypes").data("kendoDropDownList") != undefined ? $("#ddlTypes").data("kendoDropDownList").value() : null,
+				userId: $('#UserId').val(),
+				isGrp: $('#grp_chk')[0].checked,
+				roleId: $("#ddlRoles").data("kendoDropDownList") != undefined ? $("#ddlRoles").data("kendoDropDownList").value() : null
+			};
+			return token;
+		}
+
+		$(document).ready(function () {
+			clearRepFilters();
+
+			setFocusAuEvnt('auUserName');
+
+			setFocusAuEvnt('auEmail');
+
+			
+		});
+
+		function onUserNameAu() {
+			return {
+				name: $("#auUserName").val()
+				, email: null
+			};
+		}
+		function onEmailAu() {
+			return {
+				name: null
+				, email: $("#auEmail").val()
+			};
+		}
+
+		function onUserSelected(e) {
+			var dataItem = this.dataItem(e.item.index());
+			var id = dataItem.UserId;
+			$('#UserId').val(hasValue(id) ? id : null);
+			setTimeout(rebindUserReport, 100);
+		}
+
+		function onTypeSelected() {
+			setTimeout(rebindUserReport, 100);
+		}
+
+		function onUserChanged() {
+			try {
+				var value = this.value();
+
+				if (!hasValue(value)) {
+					rebindUserReport();
+				}
+			} catch (ex) {
+				if (window.console) console.log(ex);
+			}
+		}
+
+		function editUser(e) {
+			e.preventDefault();
+			var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			var id = dataItem.UserId;
+
+
+			var wnd = $("#wndEditUser").data("kendoWindow");
+
+			var url = '@Url.Action("GetUserEditForm", "User")' + '/' + id;
+			wnd.title("Edit " + dataItem.FullName);
+			wnd.refresh(url);
+			wnd.center();
+			wnd.open();
+		}
+
+		function viewDashboard(e) {
+			e.preventDefault();
+			var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			var id = dataItem.UserId;
+
+
+			var wnd = $("#wndUserDash").data("kendoWindow");
+
+			var url = '@Url.Action("AdminDashboard", "Home",new{area="AuthorAdmin"})' + '/' + id;
+		    wnd.title(dataItem.FullName + " Dashboard");		    
+			wnd.refresh(url);
+			wnd.center();
+			wnd.open();
+		}
+
+		function onUserReportDataBound(e) {
+			var grid = e.sender;
+			var data = grid.dataSource.data();
+			$.each(data, function (i, row) {
+				if (parseInt(row.UserProfileId) < 0)
+					$('tr[data-uid="' + row.uid + '"] ').addClass("old-login-row");
+			});
+		}
+
+		function loginAsUser(e) {
+			e.preventDefault();
+			var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			var email = dataItem.Email;
+			var form = $('#frmLogAs');
+			
+			form.find('#email').val(email);
+
+			showLoader();
+
+			form.submit();
+		}
+
+		function deleteUser(e) {
+			e.preventDefault();
+
+			if (!window.confirm('Are You sure ?')) return;
+
+			var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+			var id = dataItem.UserId;
+
+
+			var url = '@Url.Action("DeleteUser", "User")' + '/' + id;
+
+			$.ajax({
+				url: url,
+				cache: false,
+				type: "Post",
+				datatype: "json",
+				contentType: "application/json; charset=utf-8"
+				, success: function (response) {
+					if (response.success) {
+						rebindUserReport();
+					} else {
+						alert(response.error);
+					}
+				}
+			});
+		}
+	</script>
+}
+<h2>Users Report</h2>
+
+@using (Html.BeginForm("LoginAsUser", "User", FormMethod.Post,new{id="frmLogAs"}))
+{
+	@Html.Hidden("email")
+}
+
+<div style="margin: 10px 0">
+	<div class="inline">
+		@(Html.Kendo().AutoComplete()
+				.Name("auUserName")
+				.DataTextField("FullName")
+				.Placeholder(" find by name")
+				.Filter("contains")
+				.MinLength(2)
+				.Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+						"<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+				.HtmlAttributes(new { style = "width:250px;font-size:13px;" })
+				.Events(e => e.Select("onUserSelected").Change("onUserChanged"))
+				.DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onUserNameAu")).ServerFiltering(true))
+		)
+	  
+	</div>
+	<div class="inline">
+		@(Html.Kendo().AutoComplete()
+				.Name("auEmail")
+				.DataTextField("Email")
+				.Placeholder(" find by email")
+				.Filter("contains")
+				.MinLength(2)
+				.Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+						"<label class=\"inline\" style=\"margin:0 0 0 10px\">${Email} - ${FullName}</label>")
+				.HtmlAttributes(new { style = "width:400px;font-size:13px;" })
+				.Events(e => e.Select("onUserSelected").Change("onUserChanged"))
+				.DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onEmailAu")).ServerFiltering(true))
+		)
+		
+	</div>
+	
+	<div class="inline">
+		<span class="inline btn-clear" onclick="clearRepFilters()" style="cursor: pointer; padding: 4px 0 0 25px; text-decoration: underline;font-size: 12px">Clear filters</span>
+	</div>
+</div>
+
+<div style="margin: 10px 0 0">
+	<div class="inline">
+
+		<label class="d-lbl lbl-title">UserId</label>
+
+		@Html.TextBox("UserId",null, new { @onkeypress = "validateNumeric(event)" ,@style="width:100px;font-size:13px"})
+		
+		<div class="inline">
+			<span class="inline btn-clear" onclick="rebindUserReport()" style="cursor: pointer; padding: 4px 0 0 25px; text-decoration: underline;font-size: 13px">Find</span>
+		</div>
+	</div>   
+</div>
+
+<div style="margin: 10px 0 0;">
+	
+	<label for="ddlTypes" class="d-lbl lbl-title">Registration Type</label>
+	@(Html.Kendo().DropDownList()
+		  .Name("ddlTypes")
+		  .OptionLabel("..select type")
+		  .DataTextField("Title")
+		  .DataValueField("Value")
+		  .BindTo(types)
+		  .HtmlAttributes(new { @class = "combo-ps", @style = "width:150px;font-size:13px;" })
+				  .Events(e => e.Select("onTypeSelected"))
+		  )
+	<script>
+		$(document).ready(function () {
+			$('#ddlTypes').data("kendoDropDownList").value(null);
+		});
+	</script>
+
+	<div style="display:inline-block;margin-left:116px;">
+		<label for="ddlRoles" class="d-lbl lbl-title" style="width:33px;">Roles</label>
+		@(Html.Kendo().DropDownList()
+		  .Name("ddlRoles")
+		  .OptionLabel("..select type")
+		  .DataTextField("Title")
+		  .DataValueField("Value")
+		  .BindTo(roles)
+		  .HtmlAttributes(new { @class = "combo-ps", @style = "width:150px;font-size:13px;" })
+				  .Events(e => e.Select("onTypeSelected"))
+		)
+		<script>
+			$(document).ready(function () {
+				$('#ddlTypes').data("kendoDropDownList").value(null);
+			});
+		</script>
+	</div>
+
+	<div style="display:inline-block;margin-left:30px;" title="Guaranteed Refund Program Authors">
+		<label for="grp_chk">GRP Authors</label>
+		<input type="checkbox" onchange="onTypeSelected();" id="grp_chk" />
+	</div>
+</div>
+
+
+
+
+<div style="margin: 10px 0 0">
+
+	<div class="inline">
+
+		<label class="d-lbl lbl-title">Register Date</label>
+
+		@Html.Partial("User/_FromToFilter", model: "reg")
+
+
+	</div>    
+</div>
+
+<div style="margin: 10px  0">
+
+	<div class="inline">
+
+		<label class="d-lbl lbl-title">Last login Date</label>
+
+		@Html.Partial("User/_FromToFilter", model: "log")
+
+
+	</div>
+</div>
+<span style="display:none">
+    <a class="btn-export-csv inline" href="#"><span>Export to CSV</span></a>
+    @using (Html.BeginForm("ExportUserReport", "User", new { area = "PortalAdmin" }, FormMethod.Post, new { @id = "frm-export" }))
+    {
+        @Html.Hidden("userId")
+        @Html.Hidden("typeId")
+        @Html.Hidden("logFrom")
+        @Html.Hidden("logTo")
+        @Html.Hidden("regFrom")
+        @Html.Hidden("regTo")
+    }    
+</span>
+
+
+<div>
+	@(Html.Kendo().Grid<UserGridViewDto>()
+		  .Name("UserReport")
+		  .Columns(columns =>
+		  {
+			  columns.Command(c => c.Custom("Login").Click("loginAsUser")).Title("Login");
+			  columns.Bound(p => p.UserId).Title("Id").Width(60);
+			  columns.Bound(p => p.PictureUrl).Width(30).ClientTemplate("<img class='user-thumb' alt='${FullName}' src='${PictureUrl}' />").Title(" ");
+			  columns.Bound(p => p.Email);
+			  columns.Bound(p => p.RegisterDate).Title("Registered").Width(80).Format("{0:MM/dd/yy}");
+			  columns.Bound(p => p.LastLogin).Title("Last").Width(80).Format("{0:MM/dd/yy}");
+			  columns.Bound(p => p.Nickname);
+			  columns.Bound(p => p.FirstName);
+			  columns.Bound(p => p.LastName);
+			  columns.Bound(p => p.ActivityScore).ClientTemplate("<a href='#=emptyHref#' class='und' data-id='#=UserId#'>${ActivityScore}</a>").Title("Score");
+			  columns.Bound(p => p.LoginsCount).Title("Logins");              
+			  columns.Bound(p => p.Status).Width(80).Title("Status");
+			  columns.Bound(p => p.IsConfirmed).Width(80).Title("Confirmed");
+			  columns.Bound(p => p.IsSocialLogin).Width(80).Title("Social");
+			  columns.Bound(p => p.RegistrationSource).Width(80).Title("Type");
+			  columns.Command(c => c.Custom("Edit").Click("editUser")).Title("Edit");
+			  columns.Command(c => c.Custom("ViewDash").Click("viewDashboard")).Title("Dashboard");
+			  columns.Command(c => c.Custom("Delete").Click("deleteUser")).Title("Delete").Visible(false);
+		  })
+		  .Sortable()
+		  .AutoBind(false)
+            .ToolBar(tools => tools.Excel())
+            .Excel(excel => excel
+                .FileName(DateTime.Now.ToShortDateString() + " User Report.xlsx")
+                .Filterable(false).AllPages(true)
+                .ProxyURL(Url.Action("Export_Save", "Home",new{area=""}))
+            )
+		  //.Mobile(MobileMode.Phone)
+		  .Pageable(pager => pager.Numeric(true).PreviousNext(true).PageSizes(true).Refresh(true))
+		  .Filterable(f => f.Enabled(false))
+		  .Events(e => e.DataBound("onUserReportDataBound"))
+		  .ClientDetailTemplateId("template-user-tabs")
+		  .DataSource(dataSource => dataSource.Ajax().ServerOperation(true)
+			  .Model(model => model.Id(p => p.UserId))
+			  .Read(read => read.Action("SearchUsers", "User").Data("onUsersRead").Type(HttpVerbs.Get))
+			  .PageSize(20)))
+</div>
+
+
+
+@(Html.Kendo().Tooltip()
+	.For("#UserReport")
+	.Filter(".und")
+	.LoadContentFrom("GetStatisticsPartial", "User")
+	.Position(TooltipPosition.Top)
+	.Width(220)
+		// .Height(280)
+	.Events(events => events.RequestStart("tooltipRequestStart"))
+	  )
+
+<script>
+	
+	function tooltipRequestStart(e) {
+		e.options.data = {
+			id: e.target.data("id")
+		};
+	}
+
+	$(document).ready(function () {
+
+		rebindUserReport();
+
+		$('.btn-export-csv').unbind('click').bind('click', function (e) {
+
+			e.preventDefault();
+
+			var token = onUsersRead();
+
+			var form = $('#frm-export');
+
+			form.find('#userId').val(token.userId);
+			form.find('#typeId').val(token.typeId);
+			form.find('#logFrom').val(token.logFrom);
+			form.find('#logTo').val(token.logTo);
+			form.find('#regFrom').val(token.regFrom);
+			form.find('#regTo').val(token.regTo);
+
+			form.submit();
+
+			//var dataSource = $("#UserReport").data("kendoGrid").dataSource;
+
+			//var filteredDataSource = new kendo.data.DataSource( {
+			//    data: dataSource.data(),
+			//    filter: dataSource.filter()
+			//});
+
+			//console.log(dataSource);
+
+			//filteredDataSource.read();
+
+			//var data = filteredDataSource.view();
+
+			//var result = "data:application/vnd.ms-excel,";
+
+			//result += "<table><tr><th>UserId</th><th>Email</th><th>FirstName</th><th>LastName</th></tr>";
+
+			//for (var i = 0; i < data.length; i++) {
+			//    result += "<tr>";
+
+			//    result += "<td>";
+			//    result += data[i].UserId;
+			//    result += "</td>";
+
+			//    result += "<td>";
+			//    result += data[i].Email;
+			//    result += "</td>";
+
+			//    result += "<td>";
+			//    result += data[i].FirstName;
+			//    result += "</td>";
+
+			//    result += "<td>";
+			//    result += data[i].LastName;
+			//    result += "</td>";
+
+
+			//    result += "</tr>";
+			//}
+
+			//result += "</table>";
+			//if (window.navigator.msSaveBlob) {
+			//    window.navigator.msSaveBlob(new Blob([result]), 'ExportUsers.csv');
+			//}
+			////else if (window.webkitURL != null) {
+			////    // Chrome allows the link to be clicked programmatic.
+			////    var a = document.createElement('a');
+			////    var table_div = (document.getElementById('UserReport').getElementsByTagName('tbody')[0]);
+			////    var table_html = table_div.innerHTML.replace();
+			////    a.href = result;
+			////    a.download = 'ExportUsers.csv';
+			////    a.click();
+			////}
+			//else {
+			//    window.open(result);
+			//}
+
+
+
+		});
+	});
+</script>
+
+
+
+@(Html.Kendo().Window()
+		.Name("wndEditUser")
+		.Title(" ")
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(250)
+		.Width(960)
+		.Modal(true)
+		.Events(e => e.Close("clearWndContent"))
+	  )
+
+
+@(Html.Kendo().Window()
+		.Name("wndUserDash")
+		.Title(" ")
+        .HtmlAttributes(new { @style = "background:#efefef" })
+		.Draggable(false)
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Width(1200)
+        .Height(1100)
+		.Modal(true)
+		.Iframe(true)
+		.Events(e => e.Close("clearWndContent"))
+)	

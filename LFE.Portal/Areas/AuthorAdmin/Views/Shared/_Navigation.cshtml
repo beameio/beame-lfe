@@ -1,0 +1,90 @@
+﻿@using LFE.Portal.Helpers
+
+
+@{
+    var currentController = ViewContext.RouteData.GetRequiredString("controller");
+    var currentAction = ViewContext.RouteData.Values["action"] as string ?? "Index";
+
+    var content = (currentController == "Author" && (currentAction == "Videos" || currentAction == "Courses")) || (currentController=="Course" && currentAction=="EditCourse") ? "current" : "";
+    var report = (currentController == "Author" && (currentAction == "SalesReport" || currentAction == "PurchaseReport" || currentAction == "SubscribersReport" || currentAction == "AffiliateItems") ||
+                  currentController == "WebStore" && ( currentAction == "SalesReport" ) ||
+                  currentController == "Discussion" && ( currentAction == "AuthorClassRooms" ) ) ? "current" : "";
+}
+
+<script>
+  
+    $(document).ready(function () {
+        $('#a-db-btn').bind("click", function (e) {
+            e.preventDefault();  
+        });
+    });
+</script>
+
+<nav>
+    <ul>
+        <li>@Html.MenuLink("Dashboard", "Index", "Home", null, new { @class = "current", @title = "Dashboard" }, new { @title = "Dashboard" })</li>
+        <li>@Html.MenuLink("Videos", "Videos", "Author", null, new { @class = "current", @title = "Video Manager" }, new { @title = "Video Manager" })</li>
+        <li>@Html.MenuLink("Courses", "Courses", "Author", null, new { @class = "current", @title = "My courses & bundles" }, new { @title = "My courses & bundles" })</li>
+        <li style="position: relative;" class="li-sub cb">
+            <span class="a">Integrations</span>
+            <div class="sub" style="width: 160px;">
+                <div class="inner">
+                    <div class="menu-name">Integrations</div>                    
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Mailchimp", "Index", "Mailchimp")
+                    </div>                 
+                </div>
+            </div>
+        </li>
+        <li style="position:relative;" class="li-sub cb">
+            <span class="a">Quizzes</span>
+            <div class="sub" style="width: 105px;">
+                <div class="inner">
+                    <div class="menu-name">Quizzes</div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Quiz Report", "Report", "Quiz")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Student Certificates", "Report", "Certificate")
+                    </div> 
+                </div>
+            </div>
+        </li>
+        <li>@Html.MenuLink("My stores", "Report", "WebStore", null, new { @class = "current", @title = "My stores" }, new { @title = "My stores" })</li>
+        <li>@Html.MenuLink("Coupons", "Coupons", "Author", null, new {@class = "current", @title = "Coupons"}, new {@title = "Coupons"})</li>
+      
+        <li style="position:relative;border-right: none;" class="li-sub cb">
+            <span class="a @report">reports</span>
+            <div class="sub" style="width: 110px;">
+                <div class="inner">
+                    <div class="menu-name">reports</div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Sales Report", "SalesReport", "Author")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Payments Report", "PaymentsReport", "Author")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("WebStores Sales Report", "SalesReport", "WebStore")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Subscribers Report", "SubscribersReport", "Author")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("File Upload Report", "FileInterfaceLogs", "Author")
+                    </div>                    
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Affiliate Items", "AffiliateItems", "Author")
+                    </div>
+                    <div class="sub-menu-link" style="display: none;">    
+                        @Html.ActionLink("My ClassRooms", "AuthorClassRooms", "Discussion")
+                    </div>
+                </div>
+            </div>
+        </li>
+
+
+    </ul>
+    @*@Html.ActionLink("Settings", "Settings", "Author", new { area = "AuthorAdmin" }, new { @class = "sett-link", @title = "Personal account settings" })*@
+</nav>
+

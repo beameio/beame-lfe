@@ -1,0 +1,8 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Helpers
+
+
+@model LFE.Core.Enums.BillingEnums.eCreditCardType
+
+
+@Html.Kendo().EnumComboBoxFor(x => x, Model, null, null, new { @style = "", @class = "form-control form-drop" })

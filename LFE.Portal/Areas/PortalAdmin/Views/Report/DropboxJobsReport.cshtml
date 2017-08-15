@@ -1,0 +1,66 @@
+﻿
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+
+@{
+	ViewBag.Title = "Dropbox Jobs Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	var dates = ( ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all ).ToTranslatedArray();
+
+
+}
+
+<script>
+	function onPeriodKindSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, dataItem);
+	}
+
+	function getDropboxRepData() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())'
+			
+		};
+	}
+	function clearFilters() {
+		
+		$('#periodSelectionKind').data("kendoDropDownList").value(null);
+	}
+</script>
+
+	<h2 class="page-title">Dropbox Jobs report</h2>
+	
+	
+<div id="rep-param-row" style="margin: 0 0 25px 0">
+	<div id="period-combo-container"  class="inline"  style="visibility: hidden;">
+		@(Html.Kendo().DropDownList()
+			  .Name("periodSelectionKind")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo(dates)
+			  .HtmlAttributes(new { @class = "combo-ps" })
+			  .Events(e=>e.Select("onPeriodKindSelected"))
+			  )
+		<script>
+			$(document).ready(function () {
+				$('#periodSelectionKind').data("kendoDropDownList").value('@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())');
+				setVisibility('#period-combo-container', true);
+			  //  window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+			});
+		</script>
+	</div>
+	 
+	
+	<div class="inline">
+		<a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+	</div>
+</div>
+
+@Html.Partial("Report/_DropboxJobsGrid")

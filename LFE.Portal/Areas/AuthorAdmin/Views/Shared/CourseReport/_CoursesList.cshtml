@@ -1,0 +1,132 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+
+@{
+	var kinds = new List<DataSourceSortToken>
+		{
+			new DataSourceSortToken
+				{
+					name    = "Name of Course"
+					,field  = "Name"
+					,dir    = "asc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "Date Added"
+					,field  = "AddOn"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name   = "Price"
+					,field = "Price"
+					,dir   = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "Number of Subscribers"
+					,field  = "LearnerCount"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "Reviews"
+					,field  = "ReviewCount"
+					,dir    = "desc"
+				}
+		};
+}
+
+@* ReSharper disable once UnknownCssClass *@
+<script type="text/javascript">
+
+	function onCourseListBound(e) {
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.report.courseBound, total);
+		window.getNotifManagerInstance().unsubscribe(notifEvents.report.sortCourse, sortCourseList, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.sortCourse, sortCourseList, null);
+
+		//bind delete button
+		var ds = e.sender.dataSource;
+		$.each(e.sender.wrapper.find('li'), function () {
+			var li = $(this);
+			var uid = li.attr('data-uid');
+			var token = ds.getByUid(uid);
+			var btn = li.find('.rem');
+			btn.unbind('click').bind('click', function () {
+			    if (token.IsPurchased) {
+			        alert("Course already purchased and can't be deleted");
+			        return;
+			    }
+				window.deleteCourse(token.CourseId, token.Name);
+			});
+			var aWiz = li.find('[data-role="open-wizard"]');
+			aWiz.bind("click", function (ev) {
+				ev.preventDefault();
+				window.openWizardWindow(token.Uid);
+			});
+		});
+	}
+	
+	
+
+	function onCourseDeleted(response) {
+		if (response.success) {
+			$('#AuthorCourses').data("kendoListView").dataSource.read();
+		} else {
+			alert(response.error);
+		}
+	}
+
+	function sortCourseList(filter) {
+	   $('#AuthorCourses').data("kendoListView").dataSource.sort(filter);
+   }
+</script>
+   
+
+<div class="d-sort-row">
+	<label>Sort by:</label>
+	@(Html.Kendo().ListView<DataSourceSortToken>()
+			.Name( "lvCourseSort" )
+			.TagName( "ul" )
+			.ClientTemplateId( "kendo-sort-template" )
+			.BindTo( kinds )
+			.HtmlAttributes(new{@data_role="course"})
+			.Events( e => e.DataBound( "onSortFiltersBound" ) )     
+	)
+</div>
+
+<div style="width: 100%;text-align: center; ">
+	@(Html.Kendo().ListView<CourseListDTO>()
+		  .Name("AuthorCourses")
+		  .TagName("ul")  
+		  .HtmlAttributes(new{@class="ul-cb-list"})  
+		  .ClientTemplateId("kendo-cb-template") 
+		  .Events(e=>e.DataBound("onCourseListBound"))
+		  .DataSource(ds => ds.Read( read => read.Action("GetAuthorCoursesList", "Course").Type(HttpVerbs.Get)).ServerOperation(false))
+	)
+</div>
+
+<script type="text/x-kendo-template" id="kendo-cb-template">
+	<li title="${Name}" class="#=Status==1 ? 'draft' : (Status==2 ? 'pub' : '')#">
+		<a href="#=emptyHref#" data-role="open-wizard">
+			<div class="thumb" style="background-image: url('${ImageUrl}');">&nbsp;</div>
+		</a>
+		<label class="name ellipsis" title="${Name}">${Name}</label>
+		<div class="ul-f">
+			<span class="inline addon" title="add on">#= kendo.toString(AddOn,"MM/dd/yy") #</span>
+			<span class="inline price">${PriceDisplayName}</span>			
+			<span class="inline stud" title="subscribers">${LearnerCount}</span>
+			@*<span class="inline rev">${ReviewCount}</span>*@
+		</div>
+		<div class="cmd">
+            <span class="float-left status #=Status==1 ? 'draft' : (Status==2 ? 'pub' : '')#">&nbsp;</span>
+            
+            <a href="#=emptyHref#" class='list-cmd float-right rem' style="margin: 0 0 0 10px; display: #=LearnerCount==0 ? '' : 'none !important' #; " title=''>Delete</a>
+
+            <a href="#='@Url.Action("EditCourse","Course")' + '/' + Uid#" class='list-cmd float-right'>Edit</a>
+
+		</div>
+	</li>
+</script>

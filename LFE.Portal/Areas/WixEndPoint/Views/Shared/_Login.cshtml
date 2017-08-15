@@ -1,0 +1,107 @@
+﻿@using LFE.Portal.Areas.WixEndPoint.Helpers
+@using LFE.Portal.Areas.WixEndPoint.Models
+
+@model LFE.DataTokens.WixLoginDTO
+
+@{
+    var returnUrl = Url.ToWixLoginHandlerUrl(Model.instanceToken, Model.compId, Model.origCompID);
+
+    var facebookReturnUrl = Url.Action("AppSettingsNew", "Home", new { instance = Model.instanceToken, origCompId = Model.origCompID, compId = Model.compId });
+
+}
+
+<style>
+    .btn-fb-login{display: block;width: 205px;height: 40px;border: 0;cursor: pointer;background: url('@Url.Content("/Content/images/icons/btn-bf-login.png")') no-repeat}
+</style>
+@if(Request.Browser.Browser.ToLower().Trim() == "safari" )
+      {
+    <text>
+        <script>
+            var newwindow, newdocument;
+
+            function PopSafariSessionWindow() {
+                OpenForm('@(Url.Action("SafariLoginSession", "Account", new { area = "Widget" }))');
+            }
+
+            function OpenForm(url) {
+                //newwindow = window.open(url);
+
+                newwindow = window.open(url, "", "resizable=yes, top=0, left=0, width=50, height=50");
+                if (open == null || typeof (open) == 'undefined') {
+                    alert("Please turn off your pop-up blocker in order to login.");
+                }
+                else {
+                    newdocument = newwindow.document;
+
+                    var i = 0;
+                    var formLoaded = false;
+                    while (formLoaded == false) {
+                        formLoaded = IsFormLoaded(newdocument);
+                        i++;
+                        if (i > 20000)  // break out if hanging
+                        {
+                            break;
+                        }
+                    }
+                    
+                }
+            }
+
+            function IsFormLoaded(doc) {
+                if (doc.forms(0) == undefined) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+
+            $(document).ready(function () {
+                $('#btnLogin').click(function () {
+                    var form = $('.form-lfe-login');
+                    PopSafariSessionWindow();
+                    form.submit();
+                });
+
+                $('.btn-fb-login').click(function () {
+                    var form = $('.frm-fb-login');
+                    PopSafariSessionWindow();
+                    form.submit();
+                });
+            });
+
+
+        </script>
+    </text>
+}
+    <div>
+
+        @Html.Partial("Account/_WixExternalLoginPartial", new WixExternalLoginToken
+                                                                                {
+                                                                                    returnUrl   = facebookReturnUrl
+                                                                                    ,wixUid     = Model.uid
+                                                                                    ,trackingId = Model.instanceId.ToString()
+                                                                                })
+
+        @using (Html.BeginForm("WixLfeLogin", "Account", new { area = "", ReturnUrl = returnUrl }, FormMethod.Post, new { @class = "form-lfe-login" }))
+        {
+                <ul class="simple-list">
+                    <li>
+                        <div style="font-weight:bold; font-size:16px">Or:</div>
+                    </li>
+                    <li>
+                        @Html.TextBoxFor(model => model.Email, new { placeholder = "Email" })
+                    </li>
+                    <li>
+                        <div class="password-wrapper">
+                            @Html.PasswordFor(model => model.Password, new { placeholder = "Password" })
+                            <input type="submit" value="Login" class="submit btn connect" id="btnLogin" />
+                        </div>
+                    </li>
+                    <li>
+                        <a class="forgotPassword">Forgot Password?</a>
+                        @Html.HiddenFor(model => model.TrackingID, new { Value = Model.TrackingID })
+                    </li>
+                </ul>
+        }
+    </div>

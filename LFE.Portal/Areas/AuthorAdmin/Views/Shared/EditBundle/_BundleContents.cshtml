@@ -1,0 +1,225 @@
+﻿@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.BundleCoursesPageToken
+
+
+<script>
+    var FORM_HEIGHT = 590;
+    var FORM_SELECTOR = '#d-contents-container';
+    var COURSE_LIST_ID = '#BundleCourses';
+    var currentCategoryId = -1, currentCourseId = -1, formUserNotifManager;
+    var isPurchased = false;
+
+    $(document).ready(function () {
+        isPurchased = '@Model.IsPurchased'.toLowerCase() == 'true';
+        //disable caching
+        $.ajaxSetup({ cache: false });
+
+        //bind command row position events
+        $(window).resize(function () {
+            adjustCmdPosition(FORM_SELECTOR);
+        });
+        $(document).scroll(function () {
+            adjustCmdPosition(FORM_SELECTOR);
+        });
+
+        //init form notification manager
+        formUserNotifManager = new UserNotificationManager('#cn-info', '.alert', false);
+
+        $('.btn-submit').unbind('click').bind('click', function () {
+            $('#frmBundleCourses').submit();
+        });
+
+        //window.getNotifManagerInstance().unsubscribe(notifEvents.webstore.authorAdded, handleMassCoursesSaveEvent, null);
+        //window.getNotifManagerInstance().subscribe(notifEvents.webstore.authorAdded, handleMassCoursesSaveEvent, null);
+    });
+
+    function onBundleCoursesListBound(e) {
+
+        setReportScroll("#bc-list-container");
+
+        setListSortable(window.COURSE_LIST_ID, '@Url.Action("SaveBundleCoursesOrder","Course")', onListReordered, 'data-val');
+
+        var list = e.sender;
+
+        list.wrapper.find('li .btn-del').click(function () {
+            var id = $(this).parent().attr('data-val');
+            var data = { rowId: id };
+
+            if (isPurchased) {
+                if (!window.confirm('Bundle is already purchased. Are You sure?')) return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("RemoveCourseFromBundle","Course",new{area="AuthorAdmin"})',
+                cache: false,
+                type: "Post",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8"
+				, success: function (response) {
+				    var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+				    var msg = response.success ? "Courses removed from bundle" : response.error;
+
+				    window.formUserNotifManager.show({ message: msg, kind: kind });
+
+				    if (response.success) {
+				        list.dataSource.read();
+				        $('#AuthorCourses').data("kendoListView").dataSource.read();
+				    }
+				}
+            });
+
+        });
+    }
+    function onAuthorCoursesListBound(e) {
+        setReportScroll("#ac-list-container");
+        var list = e.sender;
+
+        list.wrapper.find('li').click(function () {
+            var id = $(this).attr('data-val');
+
+            var data = { courseId: id };
+            $.ajax({
+                url: '@Url.Action("AddCourse2Bundle","Course",new{area="AuthorAdmin",bundleId=Model.id})',
+                cache: false,
+                type: "Post",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8"
+				, success: function (response) {
+				    var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+				    var msg = response.success ? "Courses attached to bundle" : response.error;
+
+				    window.formUserNotifManager.show({ message: msg, kind: kind });
+
+				    if (response.success) {
+				        list.dataSource.read();
+				        $('#BundleCourses').data("kendoListView").dataSource.read();
+				    }
+				}
+            });
+
+            //var litem = $(this).clone();
+            //litem.appendTo($('#BundleCourses'));
+            //$(this).remove();
+
+        });
+    }
+    function onBundleCourseSaved(response) {
+
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? "Courses saved" : response.error;
+
+        window.formUserNotifManager.show({ message: msg, kind: kind });
+
+        if (response.success) {
+            $('#BundleCourses').data("kendoListView").dataSource.read();
+        }
+    }
+
+    function rebindContents() {
+        $(COURSE_LIST_ID).data("kendoListView").dataSource.read();
+    }
+</script>
+<style>
+
+</style>
+<div id="d-contents-container" style="position: relative;height: 620px">
+    <div class="cn-col bndl-crs-col cn-form cn-bndl-crs" style="left:0">
+        <div class="bc-title">
+            <div style="float: left;height: 100%;max-width: 400px;" class="ellipsis" id="b-title-text">Available Courses</div>
+        </div>
+        <div class="info">
+            click to attach
+        </div>
+        <div id="d-content-form-container" style="">
+            <div class="list-container nano" id="ac-list-container">
+                <div class="content">
+                    @(Html.Kendo().ListView<BundleCourseListDTO>()
+                          .Name("AuthorCourses")
+                          .TagName("ul")
+                          .HtmlAttributes(new { @class = "ul-ac-list ul-ac-list-plus" })
+                          .ClientTemplateId("kendo-ach-list-template")
+                          .Events(e => e.DataBound("onAuthorCoursesListBound"))
+                          .DataSource(ds => ds.Read(read => read.Action("GetAvailableBundleCourses", "Course", new { area = "AuthorAdmin", Model.id }).Type(HttpVerbs.Get)).ServerOperation(false))
+                    )
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="arrow-ph">
+        <div id="arrow">
+            <span>Add to bundle</span>
+        </div>
+    </div>
+
+    <div class="cn-col bndl-crs-col" style="left:568px">
+        <div class="bc-title">courses in bundle</div>
+        <div class="info">
+            drag to reorder
+        </div>
+        <div class="list-container nano" id="bc-list-container">
+            <div class="content">
+                @(Html.Kendo().ListView<BundleCourseListDTO>()
+                      .Name("BundleCourses")
+                      .TagName("ul")
+                      .HtmlAttributes(new { @class = "ul-cn-list" })
+                      .ClientTemplateId("kendo-bc-list-template")
+                      .Events(e => e.DataBound("onBundleCoursesListBound"))
+                      .DataSource(ds => ds.Read(read => read.Action("GetBundleCourses", "Course", new { area = "AuthorAdmin", Model.id }).Type(HttpVerbs.Get)).ServerOperation(false))
+                )
+            </div>
+        </div>
+    </div>
+
+    <div class="form-cmd-row wrap" id="d-cn">
+        <div class="inner">
+            <div class="info-box" id="cn-info">
+                <p class="alert" style="width:425px"></p>
+            </div>
+            <div class="btn-container" style="text-align: right">
+                @*<a href="@Url.BundlePageUrl(this.CurrentUserFullName(),Model.name,Constants.QS_COURSE_PREVIEW_PREFIX)" target="_blank" class="btn-prev-prod">preview product page</a>*@
+                <a href="@Url.BundlePageUrl(this.CurrentUserFullName(),Model.name)" target="_blank" class="btn-prev-course">Preview bundle</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        adjustCmdPosition(FORM_SELECTOR);
+    });
+</script>
+@*<script type="text/x-kendo-template" id="cat-tag-template">
+        <img class="tag-image" src="#:data.ImageUrl#" alt="#:data.Name#" /> ${Name}
+    </script>
+    <script type="text/x-kendo-template" id="cat-item-template">
+        <span class="item-image">	<img width="45" height="45" src="#:data.ImageUrl#" alt="#:data.Name#" /> </span>
+        <h4 class="cat-h4"> ${Name}</h4>
+    </script>*@
+<script type="text/x-kendo-template" id="kendo-bc-list-template">
+    <li data-val="${rowId}" class="#=status==1 ? 'draft' : ''#">
+        <span class="inline" style="width:50px;">
+            # if(hasValue(url)) { #
+            <img width="45" height="45" src="#:data.url#" alt="#:data.name#" />
+            # } #
+        </span>
+        <span title="#=Encoder.htmlEncode(name)#" class="it-name inline ellipsis multiline">${name}</span>
+        <span class="btn-del" title="remove course from bundle"></span>
+    </li>
+</script>
+<script type="text/x-kendo-template" id="kendo-ach-list-template">
+    <li data-val="${id}" class="#=status==1 ? 'draft' : ''#" title="click to attach">
+        <span class="inline" style="width:50px;">
+            # if(hasValue(url)) { #
+            <img width="45" height="45" src="#:data.url#" alt="#:data.name#" />
+            # } #
+        </span>
+        <span title="#=Encoder.htmlEncode(name)#" class="it-name inline ellipsis multiline">${name}</span>
+    </li>
+</script>

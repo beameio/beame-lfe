@@ -1,0 +1,94 @@
+﻿@model LFE.DataTokens.CourseUserReviewDTO
+
+<script>
+	var REVIEW_FORM_SELECTOR = '#frmCourseReview';
+	var formUserNotifManager;
+	
+	$(document).ready(function () {
+		var form = $(REVIEW_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+		
+		formUserNotifManager = new UserNotificationManager('#cr-info', '.alert', false);
+
+		$('#crs-rating').rateit({ max: 5, step: 1, resetable: false ,value:'@Model.Rating'});
+		$('#crs-rating').bind('rated', function(event, value) {
+			$('#Rating').val(parseInt(value));
+		});
+	});
+
+    function onReviewSaveBegin() {
+        window.showFormLoader("#wndReviewCourse");
+    }
+	
+    function onReviewSaved(response) {
+        window.hideFormLoader();
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? userMessages.REVIEW_SAVED : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+		    window.getNotifManagerInstance().notify(notifEvents.course.ratingUpdated, response.result);
+			setTimeout(function () {			    
+				window.closeReviewWnd();
+			}, 2500);
+
+		}
+	}
+</script>
+@using (Ajax.BeginForm("SaveReview", "Course", new { id = Model.CourseId }, new AjaxOptions {OnBegin = "onReviewSaveBegin" ,OnSuccess = "onReviewSaved" }, new { @id = "frmCourseReview", @style = "" }))
+{
+	@Html.HiddenFor(m=>m.ReviewId)
+	@Html.HiddenFor(m=>m.CourseId)
+	@Html.HiddenFor(m=>m.Rating)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cr">
+			<li>
+				<label>Rate this course (1-5 stars)</label>
+				<div class="input-container">
+					<div id="crs-rating"></div>
+				</div>    
+			</li>
+			<li>
+				<label>
+					<span>Title of the review</span>			        
+					<span class="add-info">(not more than 10 words, please)</span>
+				</label>
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.Title,new{@rows=2,@cols=20,@class="area"})
+				</div>
+				<div class="validator-container">                    
+					@Html.ValidationMessageFor(model => model.Title)
+				</div>
+			</li>
+			<li>
+				<label>
+					<span>Review Text</span>
+					<span class="add-info">(no more than 200 word, please)</span>
+				</label>
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.Text,new{@rows=4,@cols=20,@class="area",@style="height: 190px"})
+				</div>
+				<div class="validator-container">                    
+					@Html.ValidationMessageFor(model => model.Text)
+				</div>
+			</li>
+		</ul>
+	</fieldset>
+	
+	
+	
+	<div class="form-cmd-row " id="d-cr" style="margin: 0 25px;width: 525px;">
+		<div class="inner">
+			<div class="info-box" id="cr-info">
+				<p class="alert"></p>
+			</div>
+			<div class="btn-container">
+				<a href="javaScript:closeReviewWnd()" class="btn-cancel" id="btn-video-close">cancel</a>     
+				<a href="javaScript:submitForm('frmCourseReview')" class="btn-submit">save changes</a>
+			</div>
+		</div>
+	</div>		
+}

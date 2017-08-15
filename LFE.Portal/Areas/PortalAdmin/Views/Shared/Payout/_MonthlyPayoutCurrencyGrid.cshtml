@@ -1,0 +1,57 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model PayoutCurrencySummaryDTO
+
+<h3 class="" style="margin: 50px 0 15px;font-size: 22px">@Model.Currency.CurrencyName Summary</h3>
+<script>
+    var plus_symbol = "+";
+</script>
+
+
+
+@(Html.Kendo().Grid<PayoutUserMonthlyStatementDTO>()
+            .Name("SummaryReportGrid_" + Model.Currency.CurrencyId)
+            .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+            .Columns(columns =>
+            {
+                columns.Template(@<text></text>).ClientTemplate("<input type='checkbox' class='check_row' checked value='#=SellerId#' />").HeaderTemplate("<input type='checkbox' checked id='masterCheckBox'/>").Width(40).Title("Include"); 
+                columns.Bound(p => p.Seller.FullName).Title("Seller").Width(150).ClientFooterTemplate("Total: ");
+                columns.Bound(p => p.Sales).ClientFooterTemplate("#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.Fees).ClientTemplate("-#=kendo.toString(Fees, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.AffiliateSales).ClientTemplate("+#=kendo.toString(AffiliateSales, 'n2')#").ClientFooterTemplate("+#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.AffiliateFees).ClientTemplate("-#=kendo.toString(AffiliateFees, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100).Title("Affiliate Fees");
+                //columns.Bound(p => p.AffiliateCommission).ClientTemplate("+#=kendo.toString(AffiliateCommission, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.Refund).ClientTemplate("-#=kendo.toString(Refund, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.RefundFees).ClientTemplate("#=plus_symbol##=kendo.toString(RefundFees, 'n2')#").ClientFooterTemplate("#=plus_symbol##=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.RefundProgrammToRelease).ClientTemplate("+#=kendo.toString(RefundProgrammToRelease, 'n2')#").ClientFooterTemplate("+#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100).Title("MBG+");
+                columns.Bound(p => p.RefundProgrammToHold).ClientTemplate("-#=kendo.toString(RefundProgrammToHold, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100).Title("MBG-");
+                columns.Bound(p => p.Balance).ClientTemplate("=#=kendo.toString(Balance, 'n2')#").ClientFooterTemplate("=#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.LfeCommission).ClientTemplate("-#=kendo.toString(LfeCommission, 'n2')#").ClientFooterTemplate("-#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.Payout).ClientTemplate("=#=kendo.toString(Payout, 'n2')#").ClientFooterTemplate("=#=kendo.toString(sum, 'n2')#" + Model.Currency.Symbol).Width(100);
+                columns.Bound(p => p.PayoutSettings.PayoutType).Width(120);
+                columns.Bound(p => p.PayoutStatus).Width(60).Title("Status");                
+                //columns.Bound(p => p.PayoutSettings.Email).Width(150);
+                //columns.Bound(p => p.PayoutSettings.Address).ClientTemplate("<div title='${PayoutSettings.Address}' class='ellipsis' style='width:150px'>#=hasValue(PayoutSettings.Address) ? PayoutSettings.Address : ''#</div>");
+            })
+            .Events(e => e.DataBound("onCurrencyReportBound"))
+            .BindTo(Model.Rows)
+            .ClientDetailTemplateId("template-payments-detail")
+            .Sortable(s => s.Enabled(true))
+            .Pageable(pager => pager.Enabled(false))
+            .Filterable(f => f.Enabled(false))
+            .DataSource(dataSource => dataSource.Ajax().ServerOperation(false).Aggregates(aggregates =>
+            {
+                aggregates.Add(p => p.Sales).Sum();
+                aggregates.Add(p => p.AffiliateCommission).Sum();
+                aggregates.Add(p => p.AffiliateSales).Sum();
+                aggregates.Add(p => p.AffiliateFees).Sum();
+                aggregates.Add(p => p.RefundProgrammToRelease).Sum();
+                aggregates.Add(p => p.RefundProgrammToHold).Sum();
+                aggregates.Add(p => p.Refund).Sum();
+                aggregates.Add(p => p.Payout).Sum();
+                aggregates.Add(p => p.Fees).Sum();
+                aggregates.Add(p => p.LfeCommission).Sum();
+                aggregates.Add(p => p.RefundFees).Sum();
+                aggregates.Add(p => p.Balance).Sum();
+            }))
+)

@@ -1,0 +1,13 @@
+﻿@{
+	ViewBag.Title = "Monthly Payout Statement";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+@section css{
+
+    <link href="@Url.Content("~/Content/styles/sweet-alert.css")" rel="stylesheet" />
+}
+@section scripts
+{    
+    <script src="@Url.Content("~/Scripts/plugins/sweet-alert.min.js")"></script>
+}
+@Html.Partial("Payout/_PayoutReport")

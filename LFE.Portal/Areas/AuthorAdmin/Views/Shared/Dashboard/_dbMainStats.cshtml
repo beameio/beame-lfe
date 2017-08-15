@@ -1,0 +1,202 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Areas.PortalAdmin.Models
+@model DashboardToken
+    
+
+@{
+    ViewBag.Title = "Dashboard";
+    
+    var groups = new List<NameValue>
+    {
+        new NameValue { Name = "days", Title = "Days", Value = "0" },
+        new NameValue { Name = "weeks", Title = "Weeks", Value = "1" },
+        new NameValue { Name = "months", Title = "Months", Value = "2" }
+    };
+
+    var ctrlFilters = new FiltersSectionModel { Filters = Model.Filters, OnFiltersChanged = "LoadDynamicContent", Currencies = Model.Currencies, StoreList = Model.StoreList };
+    var ddlGroupBy = new CTRL_EnumDropDown { NameValueList = groups, Width = 150, SelectedItemCallback = "charts.groupBy" };
+    var charts = new ChartsModel { GetFilter = "GetFilter", GetGroupBy = ddlGroupBy.GetValueCallback };
+
+    var payoutToken = new NextPayoutViewToken
+    {
+        Statments = Model.NextPayoutList
+        ,UserId = Model.UserId
+    };
+}
+<script>
+    var charts;
+    function animateBoxes(selector) {
+        $(selector).addClass('zoomIn animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+            // $(this).removeClass();
+        });
+    }
+
+    Date.prototype.toDateString = function(){ return this.toLocaleDateString();/*.replace(/\//g, '.')*/ }
+    Date.prototype.DaysDiff = function(date) { return (this.getTime() - date.getTime()) / 1000 / 60 / 60 / 24; }
+    String.prototype.toDate = function() { try { return new Date(Number(/\d+/.exec(this)[0])); }catch(e) { return null; } }
+
+    var GROUPBY_DDL_ID = '@ddlGroupBy.ElementId';
+    var urlGetSalesSecion = '@Url.Action("GetSalesSecion", "Home",new{area="AuthorAdmin"})';
+    
+    $(window).load(function () {
+        LoadDynamicContent();
+    });
+
+    function GetFilter() {
+        return @ctrlFilters.GetFilter();
+    }
+
+    function GetPeriods(filter, callback) {
+        function _setPeriod(period) { if (!period) return; period.from = period.from.toDate(); period.to = period.to.toDate(); }
+        var url = '@Url.Action("GetPeriods", "Home")';
+        $.post(url, filter)
+            .done(function(data) {
+                _setPeriod(data.Period);
+                _setPeriod(data.ComparePeriod);
+                PeriodsToken = data;
+                callback();
+                $('.chart-main span').html(data.Period.from.toDateString() + ' - ' + data.Period.to.toDateString());
+                if (data.ComparePeriod)
+                    $('.chart-comp span').html(data.ComparePeriod.from.toDateString() + ' - ' + data.ComparePeriod.to.toDateString());
+            }).fail(function(error) { console.log(error); });
+    }
+
+    function GetSalesSection(filter) {
+        showContainerLoader('#div_your_sales');
+        $.post(urlGetSalesSecion, filter)
+            .done(function(data) {
+                $('#div_your_sales').html(data);
+            }).fail(function(error) { console.log(error); })
+            .always(function(){
+                hideLoader('#div_your_sales');
+            });
+    }
+
+    var PeriodsToken = null;
+
+    function reloadCharts() {
+        @charts.Reload();
+    }
+
+    function LoadDynamicContent() {
+        var filter = GetFilter();
+        GetPeriods(filter, reloadCharts);
+        GetSalesSection(filter);
+    }
+
+    var _eventsState = {};
+
+    function saveEventState(name, key, value) {
+        if (!_eventsState[name])
+            _eventsState[name] = {};
+        _eventsState[name][key] = value;
+    }
+
+    function maintainEventsState() {
+        $('.win-content input[type="checkbox"]').each(function(){
+            var chkBox = this;
+            $(chkBox).parent().parent().find('.name label').each(function() {
+                var label = this.innerHTML;
+                if (!$(chkBox).attr('disabled') && _eventsState[label] && _eventsState[label].Checked) {
+                    chkBox.checked = _eventsState[label].Checked;
+                    $(chkBox).parent().parent().addClass("row-selected");
+                }
+                if (_eventsState[label] && _eventsState[label].Date != undefined) {
+                    $(this).closest('div.inner').find('.date input[type="text"].ev-dp').each(function() {
+                        var dp = $(this).data('kendoDatePicker');
+                        if (dp) dp.value(_eventsState[label].Date);
+                    });
+                }
+            });
+        });
+    }
+</script>
+
+
+@Html.Partial("Dashboard/_dbNextPayout", payoutToken)
+@Html.Partial("Dashboard/_dbAuthorStats", Model.Stats)
+@Html.Partial("Dashboard/_dbFilters", ctrlFilters)
+
+<div id="div_your_sales"></div>
+
+<div class="chart_controls">
+    <button onclick="openEventWindow()">SHOW EVENTS</button>
+    <div>
+        <label for="@ddlGroupBy.ElementId">GROUP BY:</label>
+        @Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_EnumDropDown.cshtml", ddlGroupBy)
+    </div>
+</div>
+
+@Html.Partial("Dashboard/_dbCharts", charts)
+
+
+<script>
+
+    function clearWndContent(e) {
+        e.sender.wrapper.find('.k-window-content').html("...");
+        //$('.k-window, .k-overlay').remove();
+    }
+    function openEventWindow() {
+        var wnd = $("#wndEvents").data("kendoWindow");
+        var filters = GetFilter();
+        var url = '@Url.Action("GetEventWindow", "Home", new { area = "AuthorAdmin" })' + '?period=' + filters.PeriodTypeId + '&isCompare=' + filters.IsCompareMode + '&userId=' + filters.UserId;
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+    function closeEventWindow() {
+        $("#wndEvents").data("kendoWindow").close();
+    }
+
+
+    function closeSalesDetailWindow() {
+        $("#wndSalesDetail").data("kendoWindow").close();
+    }
+
+    function setSalesDetailWindowTitle(title) {
+        $("#wndSalesDetail > .wnd-head > span").html(title);
+    }
+
+    function openActiveSubscribersWindow() {
+        var wnd = $("#wndSalesDetail").data("kendoWindow");
+        var filters = window.GetFilter();
+        var url = '@Url.Action("GetActiveSubscribersWindow", "Home", new { area = "AuthorAdmin" })' + '?UserId=' + filters.UserId;
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+    function onDbWindownOpen() {
+        this.wrapper.css({ top: 102 });
+    }
+</script>
+
+@(Html.Kendo().Window()
+        .Name("wndEvents")
+        .HtmlAttributes(new { @class = "wnd-events" })
+        .Title(false)
+        .Draggable(false)
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Width(480)
+        .Height(540)
+        .Modal(true)
+        .Events(e => e.Close("clearWndContent").Open("onDbWindownOpen"))
+ )	
+
+@(Html.Kendo().Window()
+        .Name("wndSalesDetail")
+        .HtmlAttributes(new { @class = "wnd-events" })
+        .Title(false)
+        .Draggable(false)
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Width(1020)
+        //.Height(800)
+        .Modal(true)
+        .Events(e => e.Close("clearWndContent").Open("onDbWindownOpen"))
+)

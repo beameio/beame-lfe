@@ -1,0 +1,51 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindSystemLogGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindSystemLogGrid, null);
+	});
+
+	function rebindSystemLogGrid() {
+		$('#SystemLogReport').data("kendoGrid").dataSource.read();
+	}
+	
+</script>
+
+@(Html.Kendo().Grid<SystemLogDTO>()
+	  .Name("SystemLogReport")
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.id);
+          columns.Bound(p => p.User.FullName).ClientTemplate("<span data-val='${User.UserId}' title='click to view #=User.FullName# details' class='list-cmd usr-btn ellipsis col-tooltip' style='width:120px' >#=hasValue(User.FullName) ? User.FullName : ''#</a>").Width(120).Title("User");
+		  columns.Bound(p => p.Level);
+		  columns.Bound(p => p.Module);
+		  columns.Bound(p => p.Message).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Message)#' style='width:200px'>${Message}</div>");
+		  columns.Bound(p => p.Exception).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Exception)#' style='width:200px'>#=Encoder.htmlEncode(Exception)#</div>");
+          columns.Bound(p => p.SessionId);
+          columns.Bound(p => p.IpAddress);     
+		  columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");          
+	  })
+	  .Events(e=>e.DataBound("onSystemLogsBound"))
+	  .Sortable()
+	//  .AutoBind(false)
+	  .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+	  .Filterable(f => f.Enabled(true)).Groupable(g=>g.Enabled(true))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.id))
+							.Read(read => read.Action("GetSystemLogs", "Report").Data("getSystemLogRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+	  )
+	  
+<script>
+    function onSystemLogsBound(e) {
+        window.boundGridUserDetails(e);
+		$(".col-tooltip").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+			width: 250
+		}).data("kendoTooltip");
+	}
+</script>
+

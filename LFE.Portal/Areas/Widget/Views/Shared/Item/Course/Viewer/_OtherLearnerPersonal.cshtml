@@ -1,0 +1,13 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.AuthorProfilePageToken
+
+<div class="title-row col-xs-12" style="margin: 10px 0;padding: 0">
+	<h4 class="float-left" style="margin: 0">Who else is taking this course?</h4>
+		
+	<div class="float-right">
+		<span class="back btn" onclick="showFullList()">back to full list</span>
+	</div>
+</div>
+
+<div id="d-ol-profile-container" class="col-xs-12" style="padding: 0">    
+    @Html.Partial("User/_AuhtorProfile",Model)
+</div>

@@ -1,0 +1,62 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+<script>
+	$(document).ready(function () {
+	    window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindDropboxGrid, null);
+	    window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindDropboxGrid, null);
+	});
+
+	function rebindDropboxGrid() {
+	    $('#DropboxReport').data("kendoGrid").dataSource.read();
+	}
+	
+</script>
+
+    @(Html.Kendo().Grid<DropboxJobDTO>()
+	    .Name("DropboxReport")
+	    .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	    .Columns(columns =>
+	    {
+            columns.Bound(p => p.JobId);
+            columns.Bound(p => p.User.FullName).Title("Author").ClientTemplate("<span data-val='${User.UserId}' title='click to view user details' class='list-cmd usr-btn'>#=User.FullName#</a>");          
+            columns.Bound(m => m.Course.Name).ClientTemplate("<a href='#=Course.CoursePageUrl#' style='' title='click to view course page' class='list-cmd'  target='_blank'>#=Course.Name#</a>").Title("Name of Course");
+		    columns.Bound(p => p.Name);
+		    columns.Bound(p => p.Path);		  
+		    columns.Bound(p => p.Status);
+		    columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy}");
+		    columns.Bound(p => p.UpdateOn).Format("{0:MM/dd/yyyy}");
+	    })
+	    .Sortable()
+	    .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+	    .Filterable(f => f.Enabled(false))
+       // .Events(e => e.DataBound("boundGridUserDetails"))
+        .ClientDetailTemplateId("template-dropbox-files")
+	    .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.JobId))
+                            .Read(read => read.Action("GetDropboxJobLogs", "Dropbox").Data("getDropboxRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+	)
+	  
+
+<script id="template-dropbox-files" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<DropboxJobFileDTO>()
+            .Name("files_#=JobId#")
+            .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.Name);
+                columns.Bound(p => p.ChapterName);
+                columns.Bound(p => p.Type).Width(80).Title("Type");
+                columns.Bound(p => p.Status).Width(80).Title("Status");
+                columns.Bound(p => p.IsContentCreated).Width(80).Title("Created");
+                columns.Bound(p => p.BcIdentifier).Width(80);               
+                columns.Bound(p => p.AddOn).Width(80).Format("{0:MM/dd/yy}").Title("Add");
+                columns.Bound(p => p.DownloadOn).Width(80).Format("{0:MM/dd/yy}").Title("Download");
+                columns.Bound(p => p.UploadOn).Width(80).Format("{0:MM/dd/yy}").Title("Upload");
+            })
+            .Sortable(s => s.Enabled(false))
+            .Pageable(pager => pager.Enabled(false))
+            .Filterable(f => f.Enabled(false))
+            .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.FileId)).Read(read => read.Action("GetDropboxJobFiles", "Dropbox", new { id = "#=JobId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+    )
+</script>

@@ -1,0 +1,23 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.UserEditDTO
+           
+
+@Html.Partial("User/_EditUserForm",Model)
+
+<div style=" margin: 40px 0 0">
+    @(Html.Kendo().TabStrip()
+    .Name("tabStrip_" + Model.UserId)
+    .SelectedIndex(0)
+    .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+    .Items(items =>
+    {
+        items.Add().Text("Courses").LoadContentFrom("GetCourseReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Bundles").LoadContentFrom("GetBundleReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Purchases").LoadContentFrom("GetPurchaseReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Sales").LoadContentFrom("GetSalesReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Stores").LoadContentFrom("GetStoresReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Statistic").LoadContentFrom("GetStatisticsPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Videos").LoadContentFrom("GetVideoReportPartial", "User", new { id = Model.UserId });
+        items.Add().Text("Events").LoadContentFrom("GetEventsReportPartial", "User", new { id = Model.UserId});
+    }))    
+</div>

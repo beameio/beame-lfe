@@ -1,0 +1,235 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.EventWindowToken
+
+
+<script>
+    $(document).ready(function () {
+        $('#add-cust').on('click', function() {
+            var lv = $('#lvDashCustomEvents').data('kendoListView');
+            lv.add();
+        });
+
+    });
+    function onStaticEventBound(e) {
+        $.each(e.sender.wrapper.find('input[type=checkbox]'),function() {
+            var check = $(this);
+            check.on('click', function () {
+                if (check.is(":checked")) {
+                    check.parent().parent().addClass("row-selected");
+                } else {
+                    check.parent().parent().removeClass("row-selected");
+                }
+            });
+            check.bind('change', function(ev){
+                $(ev.target).parent().parent().find('.name label').each(function(){
+                    window.saveEventState(this.innerHTML, 'Checked', ev.target.checked);
+                });
+            });
+            window.maintainEventsState();
+        });
+
+        var date_inputs = e.sender.wrapper.find('.ev-dp');
+
+        $.each(date_inputs,function(){
+            $(this).kendoDatePicker({
+                min: '@Model.DateRange.from'
+                ,max: '@Model.DateRange.to'
+                //,format: 'MM.dd.yyyy'
+                ,change: function(ev){
+                    var date = ev.sender.value();
+                    $(ev.sender.element).closest('div.inner').each(function(){
+                        $(this).find('.name label').each(function(){
+                            window.saveEventState(this.innerHTML, 'Date', date);
+                        });
+                    });
+                }
+            });
+        });
+    }
+
+    function onCustomEventBound(e) {
+        $.each(e.sender.wrapper.find('input[type=checkbox]'),function() {
+            var check = $(this);
+            check.on('click', function () {
+                if (check.is(":checked")) {
+                    check.parent().parent().addClass("row-selected");
+                } else {
+                    check.parent().parent().removeClass("row-selected");
+                }
+            });
+            check.bind('change', function(ev){
+                $(ev.target).parent().parent().find('.name label').each(function(){
+                    window.saveEventState(this.innerHTML, 'Checked', ev.target.checked);
+                });
+            });
+        });
+        window.maintainEventsState();
+    }
+
+    var _selectedColor = null;
+    function setColorPicker(e) {
+        var defaultColor = _selectedColor = (e.model.Color == '' ? '#66FF66' : e.model.Color);
+        var colorPicker = null, colorSpan = null;
+        $(e.item).find('.date-picker').each(function(){
+            colorSpan = $(this).next();
+            if (colorSpan) 
+                colorSpan.css('background-color', defaultColor);
+            colorPicker = $(this).kendoColorPicker({
+                buttons: false,
+                select: function(ev) { 
+                    _selectedColor = ev.value;
+                    if (colorSpan)
+                        colorSpan.css('background-color', ev.value);
+                }
+            }).data('kendoColorPicker');
+            colorPicker.value(defaultColor);
+        });
+        $(e.item).find('.calendar').each(function(){
+            $(this).unbind('click').bind('click', function(){
+                if (colorPicker) colorPicker.toggle();
+            });
+        });
+    }
+    
+    function onCustomEventEdit(e){
+        setColorPicker(e);
+        var picker = e.item.find("#Date").data("kendoDatePicker");
+        picker.min('@Model.DateRange.from');
+        picker.max('@Model.DateRange.to');
+    }
+    function onCustomEventSave(e) {
+        if (e.model.Name.trim() == '' || e.model.Date == null) {
+            e.preventDefault();
+            alert('all fields required');
+            return;
+        }
+        if (isNameDuplicateExists(e)) {
+            e.preventDefault();
+            alert('name already exists');
+        }
+        if (_selectedColor) {
+            e.model.Color = _selectedColor;
+            e.model.dirty = true;
+        }
+    }
+    function isNameDuplicateExists(e) {
+        for (var i=0; i<e.sender.dataSource._data.length; i++) {
+            if (e.sender.dataSource._data[i].Name == e.model.Name && e.sender.dataSource._data[i].Uid != e.model.Uid)
+                return true;
+        }
+        return false;
+    }
+
+    function closeAndUpdateCharts() {
+        var data = [];
+        $('li.row[data-uid]').each(function(){
+            var checked = false, item = {};
+            $(this).find('input[type="checkbox"]').each(function(){ checked = this.checked; });
+            if (!checked) return;
+            $(this).find('i').each(function(){ item.Color = $(this).css( "background-color" ); });
+            $(this).find('.name label').each(function(){ item.Name = this.innerHTML; });
+            $(this).find('.date label').each(function(){ item.Date = this.innerHTML; });
+            $(this).find('.date input[type="text"]').each(function(){ item.Date = this.value; });
+            if (item.Date != undefined && item.Date != '') {
+                data.push(item);
+                item.Date = new Date(item.Date);
+            }
+        });
+        window.closeEventWindow();
+        charts.addNotes(data);
+    }
+</script>
+
+<div class="wnd-head">
+    <span>Display Events</span>
+</div>
+
+<div class="event-title">
+   Report Period from <b>@Model.DateRange.from.ToString("MM/dd/yyyy")</b> to <b>@Model.DateRange.to.ToString("MM/dd/yyyy")</b>
+</div>
+
+<div class="win-content">
+    <div id="static-events-list">
+        @(Html.Kendo().ListView<DashboardEventToken>()
+              .Name("lvDashEvents")
+              .TagName("ul")
+              .HtmlAttributes(new { @class = "event-list" })
+              .ClientTemplateId("ev-row-template")
+              .Editable(e => e.Enabled(false))                
+              .Events(e => e.DataBound("onStaticEventBound"))
+             .DataSource(ds => ds.Read(read => read.Action("GetDashboardEventsList", "Home", new { area = "AuthorAdmin", Model.DateRange.from, Model.DateRange.to,userId = Model.UserId }).Type(HttpVerbs.Get)))
+        )    
+    </div>
+    
+    <div id="custom-events-list">
+        <ul class="event-list">
+            <li class="row no-bord">
+                <div class="inner">
+                    <div class="inline color" style="padding-left:16px"><i style="background-color:#d9c2ec"></i></div>
+                    <div class="inline name"><label>Create custom event:</label></div> 
+                    <div class="inline"><div id="add-cust"></div></div>
+                </div>
+            </li>
+        </ul>
+        
+        @(Html.Kendo().ListView<DashboardEventToken>()
+                    .Name("lvDashCustomEvents")
+                    .TagName("ul")
+                    .HtmlAttributes(new { @class = "event-list" })
+                    .ClientTemplateId("ev-custom-row-template")
+                    .Editable(e => e.Enabled(true))
+                    .Events(e => e.DataBound("onCustomEventBound").Edit("onCustomEventEdit").Save("onCustomEventSave"))
+                            .DataSource(ds => ds.Read(read => read.Action("GetDashboardCustomEventsList", "Home", new { area = "AuthorAdmin", userId = Model.UserId }).Type(HttpVerbs.Get))
+                                                                .Create(d => d.Action("CreateCustomeEvent", "Home", new { area = "AuthorAdmin", userId = Model.UserId }))
+                                                                .Update(d => d.Action("UpdateCustomeEvent", "Home", new { area = "AuthorAdmin", userId = Model.UserId }))
+                                                                .Destroy(d => d.Action("DestroyCustomeEvent", "Home", new { area = "AuthorAdmin", userId = Model.UserId }))
+                    .Model(model => model.Id("Uid")))
+                    .Editable()
+        )
+
+    </div>
+
+</div>
+
+<div class="foot">
+    <div class="foot-btn ok" onclick="closeAndUpdateCharts();">OK</div>
+    <div class="foot-btn" onclick="closeEventWindow()">Close</div>
+</div>
+
+<script id="ev-row-template" type="text/x-kendo-template">
+    <li class="row">
+        <div class="inner">
+            <div class="inline chk"><input type="checkbox" # if(!Enabled) { # disabled #}# /></div>
+            <div class="inline color"><i style="background-color:#=Color#"></i></div>
+            <div class="inline name"><label>#: Name #</label></div>
+            <div class="inline date">
+                # if(IsStatic) { #
+                    <label>#=kendo.toString(Date, 'MM/dd/yyyy')#</label>
+                # } else {#                    
+                    <div class="" style="margin:-4px 0 0">
+                        <input type="text" class="ev-dp" />
+                    </div>
+                #}#
+            </div>
+            <div class="inline controls">
+            </div>
+        </div>
+    </li>
+</script>
+
+<script id="ev-custom-row-template" type="text/x-kendo-template">
+    <li class="row">
+        <div class="inner">
+            <div class="inline chk"><input type="checkbox" /></div>
+            <div class="inline color"><i class="custom_event-bg" style="background-color:#=Color#"></i></div>
+            <div class="inline name"><label>#: Name #</label></div>
+            <div class="inline date">
+                <label>#=kendo.toString(Date, 'MM/dd/yyyy')#</label>
+            </div>
+            <div class="inline controls">
+                <a class="k-button k-button-icontext k-edit-button" href="\\#"></a> 
+                <a class="k-button k-button-icontext k-delete-button" href="\\#"></a>
+            </div>
+        </div>
+    </li>
+</script>

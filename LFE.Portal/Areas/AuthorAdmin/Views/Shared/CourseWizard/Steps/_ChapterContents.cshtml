@@ -1,0 +1,21 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model WizardChapterContentManageDTO
+
+@{
+	if (Model.IsValid)
+	{
+
+	    <style scoped>
+            .ul-second-level li .cn-name{width: calc(100% - 225px);}    	    
+    	    .ul-second-level li .cn-name > input[type=text]{width:80%;}
+    	</style>
+        
+		@Html.Partial("EditCourse/_CourseContents", new CourseContentsManageToken { id = Model.CourseId, name = Model.CourseName,TotalQuizzes = Model.TotalQuizzes})
+	}
+	else
+	{
+		<h2>@Model.Message</h2>
+	}
+}

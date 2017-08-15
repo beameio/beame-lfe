@@ -1,0 +1,8 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model BundleContentsPageToken
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Item/_ItemIntro.cshtml", Model.Item)
+<div class="item-contents-container">
+    <h3>Courses included in this bundle:</h3>
+    @Html.Partial("~/Areas/Widget/Views/Shared/Item/Bundle/_BundleCoursesList.cshtml", Model)  
+</div>

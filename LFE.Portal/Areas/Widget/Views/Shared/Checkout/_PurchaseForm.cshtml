@@ -1,0 +1,254 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+
+@model ItemPurchaseDataToken
+
+@{
+    if (!Model.IsValid)
+    {
+        <script>
+            $(document).ready(function () {
+                hideLoader();
+            });
+        </script>
+        <h2>
+            @Model.Message
+        </h2>
+    }
+    else
+    {
+        var smallItemTypeName = Model.Type == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+
+        if (Model.IsPurchased)
+        {
+            var pageUrl = ViewData["ItemPageUrl"] ?? "";
+            
+            <script>
+                var url = '@(Html.Raw(pageUrl))';
+                if (url != null && url.length > 0) {
+                    window.location.href = url;
+                }
+            </script>
+            
+            <h2>
+                You have already purchased this @smallItemTypeName
+            </h2>            
+        }
+        else
+        {
+            <script>
+                var basePrice = '@Model.PriceToken.Price';
+            </script>
+            
+            <div class="row" id="sc-cart">
+                <div class="col col-xs-12">
+                    <div class="pay-course-head">
+                        <div class="item-title">@Model.Author.fullName - @Model.ItemName</div>
+                        <div class="item-price-title">
+                            @{
+                                switch (Model.PriceToken.PriceType)
+                                {
+                                    case BillingEnums.ePricingTypes.ONE_TIME:
+                                        <span class="lbl-title inline">purchase @smallItemTypeName  @Model.PriceToken.Currency.Symbol</span>
+                                        break;
+                                    case BillingEnums.ePricingTypes.SUBSCRIPTION:
+                                    <span class="lbl-title inline">purchase monthly subscription for @smallItemTypeName  @Model.PriceToken.Currency.Symbol</span>
+                                        break;
+                                    case BillingEnums.ePricingTypes.RENTAL:
+                                    <span class="lbl-title inline">rent for @Model.PriceToken.NumOfPeriodUnits @(String.Format("{0}{1}",Model.PriceToken.PeriodType,Model.PriceToken.NumOfPeriodUnits > 1 ? "s":"").ToUpper())  @Model.PriceToken.Currency.Symbol</span>
+                                        break;
+                                }
+                            }
+                            <span class="inline" data-bind="text: Price"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span id="msg-container" style="display: none;" data-bind="text: infoMessage, attr: { class: getMessageClass }"></span>
+                    </div>
+
+                    <div class="coupon-container">
+                        @using (Ajax.BeginForm("GetItemPriceWithCoupon", "Checkout",
+                                            new { area = "Widget", lineId = Model.PriceToken.PriceLineID, itemType = Model.Type, ownerId = Model.Author.userId },
+                                            new AjaxOptions { OnSuccess = "onCouponChecked" },
+                                            new { @id = "frmCheckCoupon", @class = "form-inline" }))
+                        {
+                            @Html.Hidden("itemId", Model.ItemId)
+
+
+                            <div class="" style="margin-bottom: 5px">
+                                <a href="#" data-bind="events: { click: onShowCouponClicked }" class="inline toggle-coupon">Do you have a coupon-code?</a>
+                            </div>
+
+                            <div class="form-row" id="d-coupon-input-container" style="display: none">
+                                <input id="couponCode" name="couponCode" type="text" class="sc-input sc-input-coupon" />
+                                <div id="btn-submit-coupon" class="sc-btn sc-btn-coupon" data-bind="events: { click: onCheckCouponClicked }">Apply</div>
+                            </div>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div id="po-options-area-container" style="visibility: hidden">
+                        <div id="po-options-area">
+                            <div id="po-container">
+                                <div class="pay-method-container">
+                                    <label class="inline" style="margin: 7px 7px 0 0">Payment Method:</label>
+                                    <div class="po-row" >
+                                        <div class="col col-xs-4 col-sm-3 sc-btn sc-btn-paypal no-pad">
+                                            <span data-val="@BillingEnums.ePaymentMethods.Paypal.ToString()" data-bind="events: { click: onPaymentMethodChanged }" class="po-box">
+                                                PayPal
+                                            </span>
+                                        </div>
+                                        <div class="col col-xs-4 col-sm-3 sc-btn no-pad">
+                                            <span data-val="@BillingEnums.ePaymentMethods.Credit_Card.ToString()" data-bind="events: { click: onPaymentMethodChanged }" class="po-box">
+                                                Credit Card
+                                            </span>
+                                        </div>
+                                        <div class="col col-xs-4 col-sm-6 sc-btn sc-btn-saved-cc no-pad" >
+                                            @{
+                                                if (Model.UserSavedCards.Any())
+                                                {
+
+                                                    <div class="scc-ddl" data-bind="style:{display:isCCAreaVisible}">
+                                                        <div class="" style="height: 100%" data-toggle="dropdown">
+                                                            <div id="scc-selected">
+                                                                <div class="scc-opt-container">
+                                                                    <span data-bind="attr: {@("data-val"): emptyGuid }" class="po-box scc">
+
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <b class="caret scc-ddl-caret"></b>
+                                                        </div>
+                                                        <ul class="dropdown-menu" id="ul-scc">
+
+                                                            @foreach (var cc in Model.UserSavedCards)
+                                                            {
+                                                                <li>
+                                                                    <div id="scc-selected" class="scc-opt-container">
+                                                                        <span data-val="@cc.InstrumentId" class="po-box">
+                                                                            @cc.DisplayName
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr />
+                            </div>
+                            @*@using (Ajax.BeginForm("ExecuteItemPurchase", "Checkout", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, new AjaxOptions { OnSuccess = "onPurchaseRequestComplete" }, new { @id = "frm-pay-cc" }))*@
+                            @using (Html.BeginForm("ExecuteItemPurchase", "Checkout", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, FormMethod.Post, new { @id = "frm-pay-cc" }))
+                            {
+                                @Html.Partial("Checkout/_PurchaseFormParams")
+                                @Html.Hidden("actionKind", eActionKinds.POST)
+
+                                <div class="d-po-selection-container">
+                                    <div id="d-pp-container" data-bind="style:{display:isPaypalAreaVisible}">
+                                        <label class="inline info-label" data-bind="text: instrumentInfoMessage"></label>
+                                    </div>
+                                    <div id="d-cc-container" class="row no-pad" data-bind="style:{display:isCCAreaVisible}" style="display: none">
+                                        <div class="mandatory">* All fields are mandatory</div>
+                                        <div class="col-xs-12 col-sm-6 cc-editor" id="cc-editor-box">
+                                            @Html.EditorFor(m => m.CreditCard)
+
+                                            <div class="form-horizontal" role="form" style="margin: 10px 0">
+                                                <div class="form-group" data-bind="style:{display:isSaveCreditCardVisible}">
+                                                    <div class="inline col col-xs-1">
+                                                        @Html.CheckBoxFor(m => m.SavePaymentInstrument, new {@class = "inline", @data_bind = "checked:isSaveInstrumentChecked,disabled:isSaveInstrumentDisabled"})
+                                                    </div>
+                                                    <div class="inline col col-xs-11">
+                                                        <label data-bind="text: saveInstrMessage" class="inline" style="font-size: 12px; width: auto"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-6 cc-editor" id="cc-addr-editor-box">
+                                            <div id="d-ba-box">
+                                                <div class="form-horizontal" role="form">
+                                                    <div class="form-group">
+                                                        <label class="control-label col col-xs-12 col-sm-4">Billing Address</label>
+                                                        <div class="inline  col  col-xs-11 col-sm-7">
+                                                            @(Html.Kendo().DropDownList()
+                                                                    .Name("ddlUserAdresses")
+                                                                    .DataTextField("DisplayName")
+                                                                    .DataValueField("AddressId")
+                                                                    .BindTo(Model.BillingAddresses)
+                                                                    .Enable(Model.BillingAddresses.Count > 0)
+                                                                    .OptionLabel("-- select saved address")
+                                                                    .HtmlAttributes(new {@style = "width:165px;", @class = "form-control form-drop"})
+                                                                    .Events(e => e.Select("onAddressSelected"))
+                                                            )
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="inline">
+                                                            <input type="checkbox" id="chkUseNewAddress" style="margin: 4px 0 0 0;" class="inline" data-bind="events: { click: onNewAddressClicked },checked: isNewAddrChecked, disabled: isNewAddrDisabled" />
+                                                        </div>
+                                                        <div class="inline">
+                                                            <label style="margin: 0 10px 0 0; font-size: 12px;" for="chkUseNewAddress" class="inline">Use new</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="d-ba-container">
+                                                @Html.Partial("EditorTemplates/BillingAddressDTO", Model.BillingAddress)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="cc-error-pane" class="error-pane"></div>
+                                </div>
+                            }
+                        </div>
+                        
+                        
+                        @using (Ajax.BeginForm("GetBillingAddressEditForm", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-ba-container", InsertionMode = InsertionMode.Replace }, new { @id = "frmLoadAddress" }))
+                        {
+                            @Html.Hidden("addressId")
+                        }
+                        
+                        
+                        @using (Html.BeginForm("ExecuteItemPurchase", "Checkout", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, FormMethod.Post, new { @id = "frm-pay-paypal" }))
+                        {
+                            @Html.Partial("Checkout/_PurchaseFormParams")
+                            @Html.Hidden("actionKind", eActionKinds.POST)
+                        }
+                        
+                        <script>
+                            if (window.top != window.self) {
+                                $('#frm-pay-paypal').attr('target', '_blank');
+                            }
+                        </script>
+
+                        @using (Html.BeginForm("ExecuteItemPurchase", "Checkout", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, FormMethod.Post, new { @id = "frm-pay-scc" }))
+                        {
+                            @Html.Partial("Checkout/_PurchaseFormParams")
+                            @Html.Hidden("actionKind", eActionKinds.POST)
+                        }
+                    
+                        @using (Html.BeginForm("ExecuteItemPurchase", "Checkout", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, FormMethod.Post, new { @id = "frm-pay-free" }))
+                        {
+                            @Html.Partial("Checkout/_PurchaseFormParams")
+                            @Html.Hidden("actionKind", eActionKinds.POST)
+                        }
+                        @using (Html.BeginForm("PurchaseErrorResult", "Checkout", new { area = "Widget", id = Model.PriceToken.PriceLineID, Model.ItemId, Model.ItemName, Model.TrackingID, referral = ViewData["ref"] }, FormMethod.Post, new { @id = "frm-purchase-error", target = "_self" }))
+                        {
+                            @Html.Hidden("error")
+                        }
+                    </div>                    
+                </div>
+            </div>
+        }
+    }
+}

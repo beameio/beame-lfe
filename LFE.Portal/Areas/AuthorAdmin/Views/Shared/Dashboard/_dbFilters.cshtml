@@ -1,0 +1,105 @@
+﻿@using LFE.Portal.Areas.PortalAdmin.Models;
+@using LFE.Core.Utils;
+@using LFE.Core.Enums;
+@model LFE.Portal.Areas.AuthorAdmin.Models.FiltersSectionModel
+@{
+
+    var periods = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.previousMonth | ReportEnums.ePeriodSelectionKinds.week | ReportEnums.ePeriodSelectionKinds.last90 | ReportEnums.ePeriodSelectionKinds.last180).ToTranslatedArray();
+    var ctrl_periods = new CTRL_EnumDropDown { NameValueList = periods.ToList(), SelectedCallback = "filters.onPeriodSelected", Width = 150 };
+    Model.OnFiltersChanged = string.IsNullOrEmpty(Model.OnFiltersChanged) ? "filters.dummy" : Model.OnFiltersChanged;
+}
+<script>
+    var filters = { dummy : function() { alert('OnFiltersChanged no set!!!'); } };
+    (function(){
+        var _callback = window['@Model.OnFiltersChanged'];
+        var _filter = {
+            CurrencyId : '@Model.Filters.CurrencyId'
+            ,PeriodTypeId : '@Model.Filters.PeriodTypeId'
+            ,IsCompareMode : '@Model.Filters.IsCompareMode.ToString().ToLower()' == 'true'
+            ,StoreId: '@Model.Filters.StoreId'
+            ,UserId :'@Model.Filters.UserId'
+            ,clone: function() { var obj = {}; for (var key in _filter) obj[key] = _filter[key]; return obj; }
+        };
+        filters = {
+            getFilter: function() {
+                return _filter.clone();
+            },
+            onPeriodSelected: function (value) {
+                $('#frmFilters #PeriodTypeId').val(value);
+                _filter.PeriodTypeId = value;
+                _callback(_filter.clone());
+            },
+            onStoreSelected: function (e) {
+                var dataItem = this.dataItem(e.item.index());
+                $('#frmFilters #StoreId').val(dataItem.StoreId);
+                _filter.StoreId = dataItem.StoreId;
+                _callback(_filter.clone());
+            },
+            onCurrencySelected: function (e) {
+                var dataItem = this.dataItem(e.item.index());
+                $('#frmFilters #CurrencyId').val(dataItem.CurrencyId);
+                _filter.CurrencyId = dataItem.CurrencyId;
+                _callback(_filter.clone());
+            },
+            onCompareToChanged: function (e) {
+                _filter.IsCompareMode = e.target.checked;
+                _callback(_filter.clone());
+            }
+        }
+    })();
+    $(function (e) {
+        $('#chkCompare').bind('change', function (e) {
+            filters.onCompareToChanged(e);
+        });
+        $('#chkCompare').removeAttr('checked');
+    });
+    function onDDLStoresDataBound(e) {
+        e.sender.value(null);
+    }
+    function onDDLCarrenciesDataBound(e) {
+        e.sender.value(null);
+    }
+</script>
+
+<div id="div_filters">
+    <label for="ddlStores">Store</label>
+    <div style="display:inline-block;">
+        @(Html.Kendo().DropDownList()
+        .Name("ddlStores")
+        .OptionLabel("All My Stores")
+        .Events(e => e.Select("filters.onStoreSelected").DataBound("onDDLStoresDataBound"))
+        .DataTextField("Name")
+        .DataValueField("StoreId")
+        .BindTo(Model.StoreList)
+        .HtmlAttributes(new { style = "width:200px;", @class = "combo-ps" })
+        )
+    </div>
+
+    <label for="@ctrl_periods.ElementId" style="margin-left:10px;">Time range</label>
+    @Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_EnumDropDown.cshtml", ctrl_periods)
+    <script>
+    $(document).ready(function () {
+            $('#@ctrl_periods.ElementId').data('kendoDropDownList').value('@Model.Filters.PeriodTypeId');
+        });
+    </script>
+
+    <div class="compareTo" style="margin-left:20px;">
+        <input type="checkbox" id="chkCompare" />
+        <label for="chkCompare">Compare</label>
+    </div>
+
+
+    <label for="ddlCurrency" style="margin-left:50px;">Currency</label>
+    <div style="display:inline-block;">
+        @(Html.Kendo().DropDownList()
+                    .Events(e => e.Select("filters.onCurrencySelected").DataBound("onDDLCarrenciesDataBound"))
+                    .Name("ddlCurrency")
+                    //.OptionLabel("...")
+                    .DataTextField("CurrencyName")
+                    .DataValueField("CurrencyId")
+                    .BindTo(Model.Currencies)
+                    .Value(Model.Filters.CurrencyId.ToString())
+                    .HtmlAttributes(new { style = "width:150px;", @class = "combo-ps" })
+        )
+    </div>
+</div>

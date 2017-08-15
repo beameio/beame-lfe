@@ -1,0 +1,63 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.BundleViewerPageToken 
+@{
+    Layout = "~/Areas/UserPortal/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    if (!Model.IsValid)
+    {
+        <h1>@Model.Message</h1>
+    }
+    else
+    {
+        ViewBag.Title = Model.Bundle.BundleName + " by " + Model.Author.fullName;
+
+        if (!Model.ItemState.IsOwnedByUser && !Model.ItemState.IsPublished)
+		{
+			<h1 class="h-viewer-msg">Unfortunately this bundle not published yet for public view. Please try later</h1>
+		}
+		else
+		{
+			if (!Model.ItemState.IsPreview && (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed))
+			{
+				@section css
+			    {
+                    @Styles.Render("~/Areas/UserPortal/Content/styles/courseviewer")
+
+                    <style></style>
+                }
+
+                @section scripts
+                {
+                    <script type="text/javascript" src="http://admin.brightcove.com/js/BrightcoveExperiences.js"></script>
+                    <script type="text/javascript" src="http://admin.brightcove.com/js/APIModules_all.js"></script>
+                    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.video.js"></script>
+                    
+                    <script>
+                        saveEventApi(USER_EVENTS.COURSE_VIEWER_ENTER, '@Model.TrackingID', null, '@Model.Bundle.BundleId',null, null);
+                    </script>
+                }
+            
+                @Html.Partial("Bundle/_BundleViewer",Model)
+			}
+			else
+			{
+				@section css{
+                    <link href="~/Areas/Widget/Content/styles/CourseIntro.css" rel="stylesheet" />
+                }
+                @section scripts
+			    {
+                    @Scripts.Render("~/bundles/jquery/jqueryval")
+                    <script>
+                        saveEventApi(USER_EVENTS.COURSE_PREVIEW_ENTER, '@Model.TrackingID', null, '@Model.Bundle.BundleId',null, null);
+                    </script>
+                }
+
+                @Html.Partial("~/Areas/Widget/Views/Shared/Course/_BuyPlaceHolder.cshtml", false)
+                @Html.Action("_BundleProductPage", "Course", new { Area = "Widget", id = Model.Bundle.BundleId, isPreview = Model.ItemState.IsPreview })
+			}
+		}        
+    }
+}
+
+

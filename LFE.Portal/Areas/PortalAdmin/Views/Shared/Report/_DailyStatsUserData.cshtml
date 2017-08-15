@@ -1,0 +1,33 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<UserGridViewDto>
+           
+
+@(Html.Kendo().Grid<UserGridViewDto>()
+          .Name("UserReport")
+          .Columns(columns =>
+          {
+              columns.Bound(p => p.UserId).Title("Id").Width(60);
+              columns.Bound(p => p.PictureUrl).Width(30).ClientTemplate("<img class='user-thumb' alt='${FullName}' src='${PictureUrl}' />").Title(" ");
+              columns.Bound(p => p.Email);
+              columns.Bound(p => p.RegisterDate).Title("Registered").Width(80).Format("{0:MM/dd/yy}");
+              columns.Bound(p => p.LastLogin).Title("Last").Width(80).Format("{0:MM/dd/yy}");
+              columns.Bound(p => p.Nickname);
+              columns.Bound(p => p.FirstName);
+              columns.Bound(p => p.LastName);
+              columns.Bound(p => p.ActivityScore).ClientTemplate("<a href='#=emptyHref#' class='und' data-id='#=UserId#'>${ActivityScore}</a>").Title("Score");
+              columns.Bound(p => p.LoginsCount).Title("Logins");
+              columns.Bound(p => p.Status).Width(80).Title("Status");
+              columns.Bound(p => p.IsConfirmed).Width(80).Title("Confirmed");
+              columns.Bound(p => p.IsSocialLogin).Width(80).Title("Social");
+              columns.Bound(p => p.RegistrationSource).Width(80).Title("Type");
+          })
+            .Sortable()
+            .Pageable(pager => pager.Numeric(true).PageSizes(true))
+            .Filterable(f => f.Enabled(false))
+            .BindTo(Model)
+            .ClientDetailTemplateId("template-user-tabs")
+            .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+            .Model(model => model.Id(p => p.UserId))
+            .PageSize(10))
+)

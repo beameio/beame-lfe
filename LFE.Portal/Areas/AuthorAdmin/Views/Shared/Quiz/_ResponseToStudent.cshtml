@@ -1,0 +1,39 @@
+﻿@using LFE.DataTokens
+@model  QuizBaseToken
+<script>
+    function onRespondRepBound(e) {
+        var records = e.sender.dataSource._data.length;
+        if (records > 0) return;
+
+        closeRespondWindow();
+    }
+    function closeRespondWindow() {
+        $(window.WND_QUIZ_RESPONSE_SELECTOR).data("kendoWindow").close();
+    }
+</script>
+@(Html.Kendo().Grid<StudentQuizDTO>()
+        .Name("QuizRequestRep")
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.Student.FullName).Title("Student").Width(200);
+            columns.Bound(p => p.Student.Email).Title("Email").Width(150).ClientTemplate("<a  style='width:100px;color:blue;' href='mailto:${Student.Email}'>${Student.Email}</a>");
+            columns.Bound(p => p.UserScore).Title("Score").Width(80);
+            columns.Bound(p => p.IsSuccess).Title("Pass").Width(80);
+            columns.Bound(p => p.QuizAttempts).Title("Quiz Attempts").Width(80);
+            columns.Bound(p => p.AvailableAttempts).Title("Attempts Rest").Width(120);
+            columns.Bound(p => p.LastAttemptDate).Title("Last").Format("{0:d}").Width(80);
+            columns.Command(c => c.Custom("Reset Attempts").Click("onResetAttemptsClicked")).Width(100).Title(" ");
+        })
+        .Sortable(s => s.Enabled(false))
+        .Pageable(pager => pager.Enabled(false))
+        .Filterable(f => f.Enabled(false))
+        .Events(e=>e.DataBound("onRespondRepBound"))
+        .ClientDetailTemplateId("template-quiz-student-attempts")
+        .DataSource(dataSource => dataSource.Ajax()
+                                                .Read(read => read.Action("GetQuizOpenRequests", "Quiz", new { id = Model.QuizId }).Type(HttpVerbs.Get))
+                                                .Model(model =>
+                                                {
+                                                    model.Id(p => p.StudentQuizId);
+                                                }))
+)

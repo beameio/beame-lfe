@@ -1,0 +1,17 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+<div class="rel">
+    
+    <div id="login-form-container" class="flip">
+        
+        @using (Html.BeginForm("LfeLogin", "Account", new { ReturnUrl = ViewBag.ReturnUrl ?? Model.RedirectUrl }, FormMethod.Post, new { @id = "frm-lfe-login", @class = "form-lfe-login" }))
+        {
+           @Html.Partial("Account/MainLogin/_LoginForm")
+        }
+
+        <div class="d-forgot-pwd">
+            <a href="#" class="link-button" id="a-fp">Forgot Password</a>
+        </div>
+
+    </div>
+</div>

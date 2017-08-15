@@ -1,0 +1,282 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model System.Collections.Generic.List<FactDailyStatsDTO>
+
+@{
+    var colors = new[]
+    {
+        "#129a00","#006d9a","#ff8d00","#ad00de","#e80000"
+    };
+}
+
+<script>
+    var DAILY_STATS_CHART_ITEM_SELECTOR = '#dailyStatsChartI';
+    var DAILY_STATS_CHART_USER_SELECTOR = '#dailyStatsChartU';
+    var DAILY_STATS_CHART_STORE_SELECTOR = '#dailyStatsChartS';
+    var DAILY_STATS_CHART_PURCHASE_SELECTOR = '#dailyStatsChartP';
+    var DAILY_STATS_VIDEOS_CHART_SELECTOR = '#dailyVideosUploadChart';
+
+    function onDailyStatsSeriesClicked(e) {
+        var d = kendo.toString(kendo.parseDate(e.dataItem.FactDate), 'MM/dd/yyyy');
+        var f = e.series.field;
+        openPointDetails(f, d);
+    }
+
+    function onDailyVideoSeriesClicked(e) {
+        var d = kendo.toString(kendo.parseDate(e.dataItem.UploadDate), 'MM/dd/yyyy');
+        var f = e.series.field;
+        openPointDetails(f, d);
+    }
+
+    function openPointDetails(f,d) {
+        var qs = 'field=' + f + '&date=' + d;
+
+        var url = '@Url.Action("GetDailyStatsDataRows", "Report")' + '?' + qs;
+
+        var wnd = $('#wndStatsData').data("kendoWindow");
+        wnd.title("Daily Stats data for  " + f + " series on  " + d);
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+</script>
+
+<div class="d-chart-row">
+    <div class="inline chart-wrapper">
+        <div class="chart-box">
+            @(Html.Kendo().Chart(Model)
+                  .Name("dailyStatsChartI")
+                  .Title("Daily Items Stats")
+                    .HtmlAttributes(new { @style = "height:400px" })
+                  .Legend(legend => legend
+                      .Position(ChartLegendPosition.Top)
+                  )
+                  // .DataSource(ds => ds.Read(read => read.Action("GetFactDailyStatsData", "Report").Data("getReportPeriod")))
+                  .Series(series =>
+                  {
+                      series.Line(model => model.ItemsCreated).Color(colors[0]);
+                      series.Line(model => model.ItemsPublished).Color(colors[4]);
+                  })
+                .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+                  .CategoryAxis(axis => axis
+                      .Date()
+                      .BaseUnit(ChartAxisBaseUnit.Days)
+                      .Categories(model => model.FactDate)
+                      .Labels(labels => labels.Rotation(-90))
+                  )
+                  .ValueAxis(axis => axis.Numeric()
+                      .Labels(labels => labels.Format("{0:N0}"))
+                  )
+                  .Tooltip(tooltip => tooltip
+                      .Visible(true)
+                      .Format("{0:N0}")                 
+                  )
+                  .Events(e => e.SeriesClick("onDailyStatsSeriesClicked"))
+                  )
+        </div>
+        
+        <div class="chart-box">
+            @(Html.Kendo().Chart<VideoUploadsChartDTO>()
+                  .Name("dailyVideosUploadChart")
+                    .HtmlAttributes(new { @style = "height:400px" })
+                  .Title("Daily Video Uploads")
+                  .Legend(legend => legend
+                      .Position(ChartLegendPosition.Top)
+                  )
+                  .DataSource(ds => ds.Read(read => read.Action("GetVideoUploadsDailyStatsData", "Report").Data("getReportPeriod")))
+                  .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+                  .Series(series =>
+                  {
+                      series.Line(model => model.TotalVideos).Color(colors[0]);
+                      series.Line(model => model.TotalUsedVideos).Color(colors[4]);
+                  })
+                  .CategoryAxis(axis => axis
+                      .Date()
+                      .BaseUnit(ChartAxisBaseUnit.Days)
+                      .Categories(model => model.UploadDate)
+                      .Labels(labels => labels.Rotation(-90))
+                  )
+                  .ValueAxis(axis => axis.Numeric()
+                      .Labels(labels => labels.Format("{0:N0}"))
+                  )
+                  .Tooltip(tooltip => tooltip
+                        .Visible(true)
+                        .Format("{0:N0}")
+                        .Color("#fff")
+                  )
+                .Events(e => e.SeriesClick("onDailyVideoSeriesClicked")))
+        </div>
+
+        <div class="chart-box">
+            @(Html.Kendo().Chart(Model)
+                  .Name("dailyStatsChartU")
+                  .Title("Daily User Stats")
+                  .HtmlAttributes(new { @style = "height:400px" })
+                  .Legend(legend => legend
+                      .Position(ChartLegendPosition.Top)
+                  )
+                    .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+                  .Series(series =>
+                  {
+                      series.Line(model => model.UsersCreated).Color(colors[0]);
+                      series.Line(model => model.WixUsersCreated).Color(colors[1]);
+                      series.Line(model => model.UserLogins).Color(colors[2]);
+                      series.Line(model => model.AuthorLogins).Color(colors[3]);
+                      series.Line(model => model.ReturnUsersLogins).Color(colors[4]);
+                  })
+                  .CategoryAxis(axis => axis
+                      .Date()
+                      .BaseUnit(ChartAxisBaseUnit.Days)
+                      .Categories(model => model.FactDate)
+                      .Labels(labels => labels.Rotation(-90))
+                  )
+                  .ValueAxis(axis => axis.Numeric()
+                      .Labels(labels => labels.Format("{0:N0}"))
+                  )
+                  .Tooltip(tooltip => tooltip
+                      .Visible(true)
+                      .Format("{0:N0}")
+                              .Color("#fff")
+                  )
+                    .Events(e => e.SeriesClick("onDailyStatsSeriesClicked")))
+        </div>
+
+        <div class="chart-box">
+            @(Html.Kendo().Chart(Model)
+                  .Name("dailyStatsChartS")
+                    .HtmlAttributes(new { @style = "height:400px" })
+                  .Title("Daily Stores Stats")
+                  .Legend(legend => legend
+                      .Position(ChartLegendPosition.Top)
+                  )
+                    .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+                  .Series(series =>
+                  {
+                      series.Line(model => model.StoresCreated).Color(colors[0]);
+                      series.Line(model => model.WixStoresCreated).Color(colors[4]);
+                  })
+                  .CategoryAxis(axis => axis
+                      .Date()
+                      .BaseUnit(ChartAxisBaseUnit.Days)
+                      .Categories(model => model.FactDate)
+                      .Labels(labels => labels.Rotation(-90))
+                  )
+                  .ValueAxis(axis => axis.Numeric()
+                      .Labels(labels => labels.Format("{0:N0}"))
+                  )
+                  .Tooltip(tooltip => tooltip
+                      .Visible(true)
+                      .Format("{0:N0}")
+                              .Color("#fff")
+                  )
+                    .Events(e => e.SeriesClick("onDailyStatsSeriesClicked")))
+        </div>
+
+        <div class="chart-box">
+            @(Html.Kendo().Chart(Model)
+              .Name("dailyStatsChartP")
+              .HtmlAttributes(new { @style = "height:400px" })
+              .Title("Daily Purchase Stats")
+              .Legend(legend => legend
+                  .Position(ChartLegendPosition.Top)
+              )
+                      .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+              .Series(series =>
+              {
+                  series.Line(model => model.ItemsPurchased).Color(colors[0]);
+                  series.Line(model => model.FreeItemsPurchased).Color(colors[4]);
+              })
+              .CategoryAxis(axis => axis
+                  .Date()
+                  .BaseUnit(ChartAxisBaseUnit.Days)
+                  .Categories(model => model.FactDate)
+                  .Labels(labels => labels.Rotation(-90))
+              )
+              .ValueAxis(axis => axis.Numeric()
+                  .Labels(labels => labels.Format("{0:N0}"))
+              )
+              .Tooltip(tooltip => tooltip
+                  .Visible(true)
+                  .Format("{0:N0}")
+                          .Color("#fff")
+                      ).Events(e => e.SeriesClick("onDailyStatsSeriesClicked")))
+        </div>
+    </div>
+    <div class="config-section inline">
+        <span class="configHead">Base date unit</span>
+        <ul id="daily-stats-options" class="options">
+            <li>
+                <input id="baseUnitAutoS" name="baseUnitS" type="radio" value="" autocomplete="off" />
+                <label for="baseUnitAuto">
+                    Automatic (default)
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitYearsS" name="baseUnitS" type="radio" value="years" autocomplete="off" />
+                <label for="baseUnitYears">
+                    Years
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitMonthsS" name="baseUnitS" type="radio" value="months" autocomplete="off" />
+                <label for="baseUnitMonths">
+                    Months
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitWeeksS" name="baseUnitS" type="radio" value="weeks" autocomplete="off" />
+                <label for="baseUnitWeeks">
+                    Weeks
+                </label>
+            </li>
+            <li>
+                <input id="baseUnitDaysS" name="baseUnitS" type="radio" value="days" autocomplete="off" checked="checked" />
+                <label for="baseUnitDays">
+                    Days
+                </label>
+            </li>
+        </ul>
+
+        <hr />
+
+        <span class="configHead">Chart State</span>
+        <ul id="daily-stats-types" class="options">
+            <li>
+                <input id="typeLineS" name="seriesTypeS"
+                       type="radio" value="line" autocomplete="off" checked="checked" />
+                <label for="typeLine">Lines</label>
+            </li>
+            <li>
+                <input id="typeColumnS" name="seriesTypeS"
+                       type="radio" value="column" autocomplete="off" />
+                <label for="typeColumn">Columns</label>
+            </li>
+            @*<li>
+                <input id="typeBarS" name="seriesTypeS"
+                       type="radio" value="bar" autocomplete="off" />
+                <label for="typeBar">Bars</label>
+            </li>*@
+            <li>
+                <input id="stackS" type="checkbox" autocomplete="off" />
+                <label for="stack">Stacked</label>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#daily-stats-options").bind("change", refreshStatsCharts);
+        $("#daily-stats-types").bind("change", refreshStatsCharts);
+    });
+
+    function refreshStatsCharts() {
+       
+        var type = $("input[name=seriesTypeS]:checked").val(),
+            stack = $("#stackS").prop("checked"),
+            baseUnit = $("input:radio[name=baseUnitS]").filter(":checked").val();
+
+        window.setChartState($('#EventsChart').data("kendoChart"), type, stack, baseUnit);
+    }
+</script>
+

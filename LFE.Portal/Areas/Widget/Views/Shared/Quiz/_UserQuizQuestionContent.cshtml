@@ -1,0 +1,118 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.UserQuizQuestionBaseToken
+           
+
+<p class="quest">
+    @Html.Raw(Model.QuestionText)
+</p>
+
+@{
+    if (Model.BcIdentifier != null || !String.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <script>
+            function clearWndContent(e) {
+                e.sender.wrapper.find('.k-window-content').html("...");
+                //$('.k-window, .k-overlay').remove();
+            }
+
+            function showQuizContent(url, title) {
+                var wnd = $("#wndVideoPlayer").data("kendoWindow");
+                wnd.title(title);
+                wnd.refresh(url);
+                wnd.center();
+                wnd.open();
+            }
+        </script>
+
+        <div class="assets">
+            @{
+                if (Model.BcIdentifier != null)
+                {
+                    <div class="">
+                        <a href="#" id="btn-q-v">Watch video</a>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#btn-q-v').live('click', function(e) {
+                                e.preventDefault();
+                                var url = '@Url.Action("GetPlayer", "Quiz", new {area = "Widget", id = Model.BcIdentifier})';
+                                showQuizContent(url, "Watch Question Video");
+                            });
+                        });
+                    </script>
+                }
+
+                if (!String.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="">
+                        <a href="#" id="btn-q-i">Watch Image</a>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#btn-q-i').live('click', function(e) {
+                                e.preventDefault();
+                                var wnd = $("#wndVideoPlayer").data("kendoWindow");
+                                wnd.title("Watch Question Image");
+                                wnd.content("<img src='@Model.ImageUrl' class='q-img' />" );
+                                wnd.center();
+                                wnd.open();
+                                //showQuizContent("@Model.ImageUrl", "Watch Question Video");                              
+                            });
+                        });
+                    </script>
+                   
+                }
+}
+        </div>
+
+        @(Html.Kendo().Window()
+                .Name("wndVideoPlayer")
+                .Draggable(false)
+                .Actions(actions => actions.Close())
+                .Resizable(builder => builder.Enabled(false))
+                .Visible(false)
+                .Height(440)
+                .Width(640)
+                .Modal(true)
+                .Events(e => e.Close("clearWndContent"))
+        )
+    }
+}
+
+<div class="ans-opt-container">
+    <ul class="ans-opt-list">
+        @{
+            int? optionId = null;
+
+            foreach (var opt in Model.AnswerOptions)
+            {
+                if (opt.Selected)
+                {
+                    optionId = opt.OptionId;
+                }
+
+                <li>
+                    <input type="radio" name="answer-opt" id="answer-opt-@opt.OptionId" value="@opt.OptionId" @(opt.Selected ? "checked" : null)/>
+                    <p>
+                        @Html.Raw(opt.OptionText)
+                    </p>
+                </li>
+
+            }
+        }
+    </ul>
+    <script>
+        $(document).ready(function() {
+
+            window.quizModel.onQuestLoaded(parseInt("@Model.AnswerId"), "@optionId");
+
+            $('.ans-opt-list > li > input[type=radio]').live('change', function() {
+                var radio = $(this);
+                window.quizModel.onAnswerSelected(radio);
+            });
+        });
+
+     
+    </script>
+</div>
+

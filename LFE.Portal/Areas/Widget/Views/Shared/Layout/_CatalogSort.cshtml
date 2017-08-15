@@ -1,0 +1,57 @@
+﻿@using LFE.Portal.Areas.Widget.Helpers
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.IndexModelViewToken
+@{
+    
+    const string linkActionName     = "Index";
+    const string linkControllerName = "Widget";
+
+    var viewModel     = ViewBag.MainLayoutViewModel == null ? null : (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+    var target        = string.IsNullOrEmpty(wixSectionUrl) ? "_self" : "_top";
+    var trackingId    = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "";
+
+    int? width  = null;
+    int? height = null;
+    var compId  = this.GetWixCompId(); 
+    
+    if (viewModel != null)
+    {
+        width  = viewModel.Width;
+        height = viewModel.Height;
+    }
+
+    var categoryName = string.Empty;
+
+    if (viewModel != null)
+    {
+        if (viewModel.Category != null)
+        {
+            var selectedCategory = viewModel.Category.CategoryName;
+            categoryName         = selectedCategory;
+        }
+   
+    }
+
+    var sortedBy = String.IsNullOrEmpty(Model.Sort) ? "Ordinal" : Model.Sort.Sort2DisplayName();
+}
+<div class="dropdown">
+    <a href="#" class="dropdown-toggle nav-ico nav-sort-ico" data-toggle="dropdown">Sorted by @sortedBy <b class="caret nav-ddl ddl-caret"></b></a>
+    <ul class="dropdown-menu" id="ul-sort">
+        <li>
+            <a target="@target" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {area="Widget", trackingID = trackingId, categoryName, page = 1, sort = "default", width , height,compId }))">Ordinal</a>
+        </li>
+        <li>
+            <a target="@target" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {area = "Widget", trackingID = trackingId, categoryName, page = 1, sort = "ordinal", width, height, compId}))">Name</a>
+        </li>
+        <li>
+            <a target="@target" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {area = "Widget", trackingID = trackingId, categoryName, page = 1, sort = "popularity", width, height, compId}))">Popularity</a>
+        </li>
+        <li>
+            <a target="@target" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {area = "Widget", trackingID = trackingId, categoryName, page = 1, sort = "cost", width, height, compId}))">Price</a>
+        </li>
+        <li>
+            <a target="@target" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {area = "Widget", trackingID = trackingId, categoryName, page = 1, sort = "rating", width, height, compId}))">Ranking</a>
+        </li>
+    </ul>
+</div>

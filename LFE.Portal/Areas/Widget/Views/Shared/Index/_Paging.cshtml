@@ -1,0 +1,63 @@
+﻿@model LFE.DataTokens.IndexModelViewToken
+
+@{ string linkActionName = "Index"; }
+@{ string linkControllerName = "Widget"; }
+@{ int totalPages = (Model.TotalCourses + Model.PageSize - 1) / Model.PageSize;}
+
+@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    string wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+}
+
+@if (totalPages > 1)
+{   
+    <div id="pagination-digg" class="paging">
+
+        @if (Model.ItemsList.Count > 1 && Model.PageIndex > 1)
+        {
+             <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {
+                                                                                             trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "",
+                                                                                             categoryName = viewModel != null && viewModel.CategoryName != null ? viewModel.CategoryName : "",
+                                                                                             page = Model.PageIndex - 1, sort = Model.Sort,
+                                                                                             width = viewModel != null ?  viewModel.Width : null,
+                                                                                             height = viewModel != null ?   viewModel.Height : null }))" >
+                <img alt="Previous" src="~/Content/images/webstore/prev.jpg" class="nextButton" />&nbsp;
+            </a>                    
+        }
+
+
+
+        @for (int iPage = 1; iPage <= totalPages; iPage++)
+        {
+            if (Model.PageIndex == iPage)
+            {
+                <a class="current">@iPage</a>
+                @:&nbsp;
+            }
+            else
+            {
+            <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : ""
+                                                                                                                                                                  ,categoryName = viewModel != null && viewModel.CategoryName != null ? viewModel.CategoryName : "",
+                                                                                                                                                                  page = iPage,
+                                                                                                                                                                  sort = Model.Sort,
+                                                                                                                                                                  width = viewModel != null ? viewModel.Width : null,
+                                                                                                                                                                  height = viewModel != null ? viewModel.Height : null }))" >@iPage.ToString()</a> 
+            @:&nbsp;
+            }
+        }
+
+        @if (totalPages > Model.PageIndex)
+        {    
+            <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action(linkActionName, linkControllerName, new {trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : ""
+                                                                                                                                                                , categoryName = viewModel != null && viewModel.CategoryName != null ? viewModel.CategoryName : ""
+                                                                                                                                                                ,  page = Model.PageIndex + 1
+                                                                                                                                                                , sort = Model.Sort
+                                                                                                                                                                , width =  viewModel != null ? viewModel.Width : null
+                                                                                                                                                                , height =  viewModel != null ? viewModel.Height  : null}))" >
+                <img alt="Next" src="~/Content/images/webstore/next.jpg" class="nextButton" />
+            </a>          
+        }
+    </div>
+}
+

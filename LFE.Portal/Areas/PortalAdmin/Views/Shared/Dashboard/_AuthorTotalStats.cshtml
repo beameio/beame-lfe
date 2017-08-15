@@ -1,0 +1,33 @@
+﻿
+@model LFE.DataTokens.AuthorTotalStatsToken
+           
+<div class="total-box">
+    <div class="box-inner">
+        <div class="title">Avg. Number of chapters</div>
+        <div class="total">
+            @Model.AverageCourseChapters
+        </div>
+    </div>
+</div>
+
+<div class="total-box">
+    <div class="box-inner">
+        <div class="title">Avg. Number</div>
+        <div class="total">
+            <div class="cb">courses <span class="num">@Model.AverageCoursesPerAuthor</span></div>
+            <div class="cb">bundles <span class="num">@Model.AverageBundlesPerAuthor</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="total-box">
+    <div class="box-inner">
+        <div class="title">Total free courses</div>
+        <div class="total">
+            @Model.TotalFreeCourses
+        </div>
+        <div class="total">            
+            <div class="cb">Avg. <span class="num">@Model.AverageFreeCoursesPerAuthor</span></div>
+        </div>
+    </div>
+</div>

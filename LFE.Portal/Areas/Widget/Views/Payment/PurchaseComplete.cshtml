@@ -1,0 +1,140 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Extensions
+@using LFE.Core.Utils
+@model LFE.DataTokens.ItemPurchaseCompleteToken
+
+@{
+    ViewBag.Title = "Purchase Complete";
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseCompleteLayout.cshtml";
+
+    var smallItemTypeName = Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+}
+
+
+@{
+    if (Model.IsValid)
+    {
+        <div class="container pc-container">
+            <div class="content">
+                <div class="row">
+                    <div class="col col-xs-12">
+                        <div id="d-head" class="d-head">
+                            <h3 class="reset-all">Congratulations <span class="name">@Model.BuyerInfo.FullName</span> !</h3>
+                            <h4 class="reset-all">You have purchased the following @smallItemTypeName from <span class="name">@Model.Author.FullName</span>:</h4>
+                        </div>
+
+                        <div id="d-item" class="d-item">
+                            <div class="image-wrap">
+                                <img src="@Model.ThumbUrl" alt="@Model.ItemName" />
+                            </div>
+                            <div class="details">
+                                <h5 class="reset-all">@Model.Author.FullName</h5>
+                                <h6 class="reset-all">@Model.ItemName</h6>
+                            </div>
+                        </div>
+
+                        <div id="d-price" class="d-price">
+                            <div class="inner">
+                                @{
+                                    if (Model.PriceToken != null && Model.FinalPrice > 0)
+                                    {
+                                        <span class="price">
+                                            @Model.PriceToken.Currency.Symbol  @Model.FinalPrice.FormatPrice(2)
+                                        </span>
+                                        <span class="txt">
+                                            @{
+                                                switch (Model.PriceToken.PriceType)
+                                                {
+                                                    case BillingEnums.ePricingTypes.ONE_TIME:
+                                                        <span>one-time payment</span>
+                                                        break;
+                                                    case BillingEnums.ePricingTypes.SUBSCRIPTION:
+                                                        <span>monthly subscription</span>
+                                                        break;
+                                                    case BillingEnums.ePricingTypes.RENTAL:
+                                                        <span>rent for @Model.PriceToken.NumOfPeriodUnits @Model.PriceToken.PeriodType</span>
+                                                        break;
+                                                }
+                                            }
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="price">
+                                            FREE @smallItemTypeName
+                                        </span>
+                                    }
+                                }                                
+                            </div>
+                        </div>
+
+                        <div class="d-mail-info">
+                            An e-mail with the full purchase details has been sent to you, at <b>@Model.BuyerInfo.Email</b>.
+                            We hope you will enjoy your course and make the most out of it.
+                        </div>
+
+                        <div class="whats-now">
+                            what now?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-foot">
+            <div class="container pc-container">
+                <div class="row">
+                    <div class="col col-xs-12 col-sm-4">
+                        <span class="ico ico-view">&nbsp;</span>
+                        <span class="title">VIEW YOUR COURSE</span>
+                        <a href="@this.GenerateItemFullPageUrl(Model.Author.FullName,Model.ItemName,Model.ItemType,Model.TrackingID)" target="_blank">
+                            <span>
+                                Click here to access your course. You’ll need your username and password to start learning!
+                            </span>
+                            <span class="a-title view">Access to my course</span>
+                        </a>
+                    </div>
+                    <div class="col col-xs-12 col-sm-4">
+                        <span class="ico ico-chat">&nbsp;</span>
+                        <span class="title">CONTACT US</span>
+                        <a href="mailto:support@lfe.com">
+                            <span>
+                                For any question, idea or comments (we love constructive critique!).
+                            </span>
+                            <span class="a-title ask">
+                                Click above, or mail us at support@lfe.com
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col col-xs-12 col-sm-4">
+                        <span class="ico ico-study">&nbsp;</span>
+                        <span class="title">become an author</span>
+                        <a href="@Url.Action("Index","Home",new{area="AuthorAdmin"})" target="_blank">
+                            <span>
+                                Do you have a specialized skill? A unique knowledge you want to share with others? Why not publish your own course?
+                            </span>
+                            <span class="a-title">
+                                Learn more
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="container pc-container">
+            <div class="content">
+                <div class="row">
+                    <div class="col col-xs-12">
+                        <h2 style="margin: 25px auto 0;font-size: 22pt;">@Model.Message</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+
+

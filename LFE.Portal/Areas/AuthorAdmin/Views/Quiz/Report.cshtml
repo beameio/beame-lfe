@@ -1,0 +1,253 @@
+﻿@using LFE.DataTokens
+@{
+	ViewBag.Title = "Quiz Report";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminCommonLayout.cshtml";
+}
+<style scoped>
+	.list-cmd > .k-icon{display: none}
+</style>
+<link href="~/Content/styles/common.css" rel="stylesheet" />
+<script>
+	var quizEditWndUrl             = '@Url.Action("_QuizManageForm", "Quiz", new {area = "AuthorAdmin"})';
+	var quizResponseWndUrl         = '@Url.Action("_ResponseToStudent", "Quiz", new {area = "AuthorAdmin"})';
+	var attemptsWndUrl             = '@Url.Action("_StudentAttemptsWnd", "Quiz", new {area = "AuthorAdmin"})';
+	var WND_QUIZ_MANAGE_SELECTOR   = '#wndQuizManage';
+	var WND_QUIZ_RESPONSE_SELECTOR = '#wndQuizResponse';
+	var QUIZ_REP_SELECTOR          = '#UserQuizzesReport';
+</script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.js"></script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.rep.js"></script>
+<script>
+
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.courseQuizSaved, rebindQuizRep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.quiz.courseQuizSaved, rebindQuizRep, null);
+	});
+
+	function openQuizWnd(id,cid, title) {
+
+		var wnd = $(window.WND_QUIZ_MANAGE_SELECTOR).data("kendoWindow");
+		var url = window.quizEditWndUrl + '?id=' + id + '&cid=' + cid;
+
+		var t = title == null ? "Add Quiz" : title;
+		wnd.title(t);
+		wnd.bind("close", onQuizEditWndClosed);
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+	function onQuizEditClicked(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        if (dataItem.IsAttached) {
+            showAttachWarning();
+            return;
+        }
+		window.openQuizWnd(dataItem.QuizId,dataItem.CourseId, dataItem.Title);
+	}
+
+	function onQuizResponseClicked(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+		window.openQuizResponseWnd(dataItem.QuizId, dataItem.Title);
+	}
+
+	function openQuizResponseWnd(id, title) {
+
+		var wnd = $(window.WND_QUIZ_RESPONSE_SELECTOR).data("kendoWindow");
+		var url = window.quizResponseWndUrl + '?id=' + id;
+		var t = "Response to Students for Quiz " + title;
+		wnd.bind("close", onQuizEditWndClosed);
+		wnd.title(t);
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+   
+
+	function onViewAttemptsClicked(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		var wnd = $(window.WND_QUIZ_RESPONSE_SELECTOR).data("kendoWindow");
+		var url = window.attemptsWndUrl + '?id=' + dataItem.StudentQuizId;
+		var t = "Student " + dataItem.Student.FullName + " attempts report";
+		wnd.title(t);
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+	function onResetAttemptsClicked(e) {
+		e.preventDefault();
+		
+		var grid = $(e.delegateTarget).data("kendoGrid");
+		
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		if (!dataItem.HasOpenRequest) return;
+
+		var data = { id: dataItem.StudentQuizId, num: dataItem.QuizAttempts };
+
+		showLoader();
+
+		$.ajax({
+			url: '@Url.Action("ResetSingleStudentAttempts","Quiz",new{area="AuthorAdmin"})',
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8"
+			, success: function (response) {
+				hideLoader();
+				if (response.success) {
+					swal(
+					   {
+						   title: "Success",
+						   text: "Student Attempts reset",
+						   type: "success",
+						   timer: 1500
+					   });
+					grid.dataSource.read();
+				} else {
+					alert(response.error);
+				}
+			}
+			,error:function() {
+				hideLoader();
+				alert('Unexpected error');
+			}
+		});
+	}
+</script>
+
+<h2 style="margin-bottom: 10px; font-size: 20pt;color: #333">Quiz Report</h2>
+
+@(Html.Kendo().Grid<QuizListDTO>()
+		.Name("UserQuizzesReport")
+		.HtmlAttributes(new { @style = "" })
+		.TableHtmlAttributes(new { @style = "background-image: none !important;" })
+		.HtmlAttributes(new { @style = "" })
+		.Columns(columns =>
+		{
+			columns.Bound(p => p.CourseName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(CourseName)#'style='width:130px;'>${CourseName}</div>").Title("Course").Width(130);
+			columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#'style='width:130px;'>${Title}</div>").Title("Quiz Name").Width(130);
+			columns.Bound(p => p.NumOfAttempts).Width(50).Title("Attempts");
+			columns.Bound(p => p.TimeLimitation).Width(80).Title("Time Limit");
+			columns.Bound(p => p.TotalPass).Width(80).Title("Total Pass");
+			columns.Bound(p => p.TotalFailed).Width(80).Title("Total Failed");
+			//columns.Bound(p => p.AttachCertificate).Title("Certificate").ClientTemplate("<input type='checkbox' #=AttachCertificate ? 'checked' : ''# disabled />").Width(50);
+			columns.Bound(p => p.Status).Title("Status").Width(100);            
+			columns.Bound(p => p.OpenRequests).Title("Attempt reset requests").Width(100);
+			columns.Command(c => c.Custom("Respond").Click("onQuizResponseClicked")).Width(120).Title(" ");
+			columns.Command(c => c.Custom("Edit").Click("onQuizEditClicked")).Width(50).Title(" ");
+			columns.Command(c => c.Destroy().HtmlAttributes(new { @class = "list-cmd" })).Width(50).Title(" ");
+		})
+		.Events(e => e.DataBound("onCourseQuizzesBound").Remove("onQuizRemoved"))
+		.ClientDetailTemplateId("template-quiz-students")
+		.Sortable()
+		.Pageable(pager => pager.Refresh(true))
+		.Filterable(f => f.Enabled(false))
+		.DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.QuizId))
+								.Read(read => read.Action("GetUserQuizzes", "Quiz", new { area="AuthorAdmin"}).Type(HttpVerbs.Get))
+								.Destroy(d => d.Action("DestroyCourseQuiz", "Quiz", new { area = "AuthorAdmin" }))
+							.PageSize(6))
+)
+
+
+<script id="template-quiz-students" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentQuizDTO>()
+		  .Name("lines_#=QuizId#")
+		  .TableHtmlAttributes(new {@style = "background-image: none !important;"})
+		  .Columns(columns =>
+		  {
+			  columns.Bound(p => p.Student.FullName).Title("Student").Width(200);
+			  columns.Bound(p => p.Student.Email).Title("Email").Width(150).ClientTemplate("<a  style='width:100px;color:blue;' href='mailto:\\#= Student.Email \\#'>\\#= Student.Email \\#</a>");
+			  columns.Bound(p => p.UserScore).Title("Score").Width(80);
+			  columns.Bound(p => p.IsSuccess).Title("Pass").Width(80).ClientTemplate("\\#= IsSuccess ? 'Yes' : 'No' \\#");
+			  columns.Bound(p => p.AvailableAttempts).Title("Attempts Rest").Width(120);
+			  columns.Bound(p => p.LastAttemptDate).Title("Last").Format("{0:d}").Width(80);
+			  columns.Command(c => c.Custom("Reset Attempts").Click("onResetAttemptsClicked")).Width(100).Title(" ");
+			  columns.Command(c => c.Custom("View Attempts").Click("onViewAttemptsClicked")).Width(100).Title(" ");
+		  })
+		  .Sortable(s => s.Enabled(false))
+		  .Pageable(pager => pager.Enabled(false))
+		  .Filterable(f => f.Enabled(false))
+		  .Events(e => e.DataBound("onQuizStudentsBound"))
+		 // .ClientDetailTemplateId("template-quiz-student-attempts")
+		  .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.StudentQuizId)).Read(read => read.Action("GetQuizStudents", "Quiz", new {id = "#=QuizId#"}).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+<script id="template-quiz-student-attempts" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentQuizAttemptDTO>()
+		.Name("lines_#=StudentQuizId#")
+		.TableHtmlAttributes(new {@style = "background-image: none !important;"})
+		.Columns(columns =>
+		{
+			columns.Bound(p => p.UserScore).Title("Score").Width(80);
+			columns.Bound(p => p.IsSuccess).Title("Pass").Width(80).ClientTemplate("\\#= IsSuccess ? 'Yes' : 'No' \\#");              
+			columns.Bound(p => p.StartOn).Title("Completion Date").Format("{0:d}").Width(80);
+			  
+		})
+		.Sortable(s => s.Enabled(false))
+		.Pageable(pager => pager.Enabled(false))
+		.Filterable(f => f.Enabled(false))
+		.ClientDetailTemplateId("template-student-attempt-answers")
+		.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.AttemptId)).Read(read => read.Action("GetStudentsQuizAttempts", "Quiz", new {id = "#=StudentQuizId#"}).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+<script id="template-student-attempt-answers" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentAnswerToken>()
+					.Name("lines_#=AttemptId#")
+		   .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+		   .Columns(columns =>
+			{
+				columns.Bound(p => p.Question).Title("Question").Width(250);
+				columns.Bound(p => p.Answer).Title("Answer").Width(250);
+				columns.Bound(p => p.IsCorrect).Title("Correct").Width(80).ClientTemplate("\\#= IsCorrect ? 'Yes' : 'No' \\#");
+				columns.Bound(p => p.Score).Width(80);
+			})
+			.Sortable(s => s.Enabled(false))
+			.Pageable(pager => pager.Enabled(false))
+			.Filterable(f => f.Enabled(false))
+							.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.AttemptId)).Read(read => read.Action("GetStudentsAttemptAnswers", "Quiz", new { id = "#=AttemptId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+
+
+@(Html.Kendo().Window()
+	.Name("wndQuizManage")
+	.Title(" ")
+	.Draggable(false)
+	.HtmlAttributes(new { @style = "overflow:hidden;" })
+	.Actions(actions => actions.Close())
+	.Resizable(builder => builder.Enabled(false))
+	.Visible(false)
+	.Height(700)
+	.Width(1160)
+	.Iframe(true)
+	.Modal(true)
+	.Animation(false)
+	.Content("loading .....")
+)
+
+@(Html.Kendo().Window()
+	.Name("wndQuizResponse")
+	.Title(" ")
+	.Draggable(false)
+	.HtmlAttributes(new { @style = "overflow:hidden;" })
+	.Actions(actions => actions.Close())
+	.Resizable(builder => builder.Enabled(false))
+	.Visible(false)
+	.Height(600)
+	.Width(960)
+	.Modal(true)
+	.Animation(false)    
+	.Content("loading .....")
+)

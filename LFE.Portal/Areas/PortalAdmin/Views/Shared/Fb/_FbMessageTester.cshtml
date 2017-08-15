@@ -1,0 +1,49 @@
+﻿@model LFE.Portal.Areas.PortalAdmin.Models.FbTesterToken
+
+<script>
+    function onPostSaved(response) {
+        $('#res').html(response.result);
+    }
+</script>
+@using (Ajax.BeginForm("PostMessage", "Fb", null, new AjaxOptions { OnSuccess = "onPostSaved", LoadingElementId = "site-loader" }, new { @id = "frmFbPost", @class = "ajax-form" }))
+{
+	
+    <fieldset>
+        <legend style="display: block;font-size: 22px; margin: 25px 0 15px">Message tester</legend>
+        <ul class="ul-edit-form crs price">
+            <li>
+                @Html.LabelFor(m=>m.BaseAccessToken)
+                <div class="input-container">
+                    @Html.TextAreaFor(m=>m.BaseAccessToken,new{@rows=2,@cols=80})
+                </div>				
+            </li>
+            <li>
+                @Html.LabelFor(m=>m.MessageAccessToken)
+                <div class="input-container">
+                    @Html.TextAreaFor(m=>m.MessageAccessToken,new{@rows=2,@cols=80})
+                </div>				
+            </li>
+            <li>
+                @Html.LabelFor(m=>m.Message)
+                <div class="input-container">
+                    @Html.TextAreaFor(m=>m.Message,new{@rows=2,@cols=80})
+                </div>				
+            </li>
+            <li>
+                @Html.LabelFor(m=>m.UsePageId)
+                <div class="input-container">
+                    @Html.CheckBoxFor(m=>m.UsePageId)
+                </div>
+            </li>
+        </ul>
+    </fieldset>
+    
+    <p>
+        <input type="submit" value="post"/>
+    </p> 
+}
+
+
+<div style="margin: 25px 0 0;font-size: 18px;" id="res">
+    
+</div>

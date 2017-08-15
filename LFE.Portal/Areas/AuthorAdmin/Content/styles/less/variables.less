@@ -1,0 +1,56 @@
+﻿@aportal_images_root: "../../images/g2t";
+@quiz_images_root: "../../images/quiz";
+@fontOpenSans: 'Open Sans', Arial;
+/*#region colors */
+@h2_page_title:#3c4645;
+@sched_wind_head_bg_color:#0187cb;
+@sp_head_bg_color:#4278c2;
+@sp_student_color:#3c4645;
+
+//quiz
+@tab_quiz_index_bg_color_active:#045d9b;
+@tab_quiz_index_bg_color:#cccccc;
+
+@tab_quiz_manage_bg_color_active:#ebebeb;
+@tab_quiz_manage_bg_color:transparent;
+
+@tab_quest_manage_bg_color_active:#ebebeb;
+@tab_quest_manage_bg_color:transparent;
+
+@action_btn_bg_color:#26a65b;
+@publish_btn_bg_color:#214d96;
+@qest_list_form_cancel_btn_color:#cc0001;
+/*#endregion */
+
+/*#region dimensions */
+@quiz_head_font_size:22px;
+@quiz_tab_row_height:46px;
+@quiz_ind_tab_w:240px;
+@quiz_manage_tab_w:260px;
+@quiz_quest_cmd_row_h:56px;
+@quest_manage_tab_w:230px;
+
+@quest_edit_thumb_w:180px;
+@quest_edit_thumb_h:140px;
+
+@quest_list_inner_padding:7px;
+
+@quest_list_delete_btn_w:60px;
+
+@qest_list_form_btn_h:34px;
+@qest_list_form_btn_font_size:16pt;
+/*#endregion */
+
+/*#region fonts */
+
+/*#endregion */
+
+
+.bg(@image_name,@bg_color){
+        .bg_color(@bg_color);     
+        background-image:url("@{quiz_images_root}/ico-@{image_name}.png");    
+        background-repeat:no-repeat;
+}
+.bg_color(@bg_color){
+    background-color:@bg_color !important;
+}

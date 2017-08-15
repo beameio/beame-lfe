@@ -1,0 +1,65 @@
+﻿<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+
+        var video = window.CURRENT_VIDEO_TOKEN;
+
+        if (video == null) return;
+
+        handleChangeVideo(video);
+    });
+
+    function handleChangeVideo(video) {
+        setVideoContent(video);
+
+        setNavButtonsState(video);
+    }
+
+
+    function loadJWPlayer(id) {
+        $('#frmLoadJW').find('#bcid').val(id);
+        $('#frmLoadJW').submit();
+    }
+</script>
+
+@using (Ajax.BeginForm("LoadPlayer", "Item", new { area = "Widget" }, new AjaxOptions { UpdateTargetId = "bc-player-container" }, new { @id = "frmLoadJW", @style = "" }))
+{
+    <input type="hidden" id="bcid" name="bcid" />
+}
+
+<div class="d-chapter-content-container">
+    <div class="ch-cnt-header row">
+        <div class="col-xs-12 col-sm-12 col-md-7">
+            <label id="lbl-video-title" class="float-left ellipsis"></label>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-5">
+            <div id="d-player-nav" class="float-right player-nav-container">
+                <div class="pl-nav-btn">
+                    <span onclick="onNavButtonClicked('prev',this)" class="btn-player-nav prev off" title="Previous Video">Previous</span>    
+                </div>
+                <div class="pl-nav-btn">
+                    <span onclick="onNavButtonClicked('next',this)" class="btn-player-nav next" title="Next Video">Next</span>
+                </div>                                
+            </div>
+        </div>
+    </div>
+
+    <div id="d-ch-pd" class="" style="width: 100%">
+        <div id="d-player-content-container">
+            <div class="video-wrapper-container">
+                <div class="video-wrapper" id="bc-player-container" style="display: block">
+                    
+                </div>
+                <div class="user-quiz-container"><div class="qz-wrapper"><div class="qz-user-inner" id="qz-user-inner"></div></div></div>
+                <div class="user-g2t-container"><div class="g2t-wrapper"><div class="g2t-user-inner" id="g2t-user-inner"></div></div></div>
+            </div>
+            <div class="d-content-bottom-row row">
+                <div class="ch-desc col-xs-12 col-sm-12 col-md-9"></div>
+                <div class="d-chapted-links  col-xs-12 col-sm-12 col-md-3">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/Viewer/_ChapterLinks.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

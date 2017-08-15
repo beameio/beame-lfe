@@ -1,0 +1,66 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<BaseChartPointToken>
+           
+
+@*@(Html.Kendo().Sparkline(Model)
+      .Name(Guid.NewGuid().ToString())
+      .Series(series => series.Line(l=>l.value))
+      .Data(Model)
+      .ValueAxis(axis => axis.Numeric())
+      .CategoryAxis(axis => axis.Visible(false).Date().BaseUnit(ChartAxisBaseUnit.Days)
+      )
+      .ChartArea(area => area.Background("transparent"))
+      .RenderAs(RenderingMode.Canvas)
+      .HtmlAttributes(new { style = "height: 40px;width:100%;" }))*@
+
+@{
+    var chartId = Guid.NewGuid().ToString();
+    var lastVal = Model[Model.Count - 1].value;
+    var lastDate = Model[Model.Count - 1].date;
+}
+
+
+ 
+
+@(Html.Kendo().Chart(Model)
+      .Name(chartId)
+      .Title(t=>t.Visible(false))
+      .HtmlAttributes(new { @style = "height:40px;width:100%;" })
+      .Legend(legend => legend.Visible(false))
+          .Series(series => series.Line(l => l.value).Style(ChartLineStyle.Smooth).Markers(x => x.Visible(false).Type(ChartMarkerShape.Circle).Background("#0086db")).Color("#a3a3a3")
+      //.Notes(n => n.Line(line=>line.Length(lastVal).Width(0)).Position(ChartNotePosition.Top).Label(lab => lab.Visible(true).Background("#0086db").Border(b => b.Color("#0086db"))))
+      )
+      .ValueAxis(va=>va.Numeric().MajorGridLines(mg=>mg.Visible(false)).MinorGridLines(mg=>mg.Visible(false)).Line(l=>l.Visible(false)).Labels(l=>l.Visible(false)))
+      .CategoryAxis(axis => axis
+          .Date()
+          .BaseUnit(ChartAxisBaseUnit.Days)
+          .Categories(model => model.date)
+          .Labels(labels => labels.Visible(false))
+          .MajorGridLines(mg => mg.Visible(false))
+          .MinorGridLines(mg => mg.Visible(false))
+          .Line(l=>l.Visible(false))
+      )            
+      .Tooltip(tooltip => tooltip.Visible(false)
+      ))
+
+@*<script>
+    $(document).ready(function () {
+        var chart = $('#' + '@chartId').data("kendoChart");
+
+        chart.setOptions({
+            series: [{
+                markers: {
+                    visible: function (e) {
+                        console.log(e.category);
+                        console.log('@lastDate');
+                        return false;// (e.category.Date == '@lastDate');
+                    }
+                }
+            }]           
+        });
+
+
+    });
+
+</script>*@

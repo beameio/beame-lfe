@@ -1,0 +1,131 @@
+﻿@model LFE.DataTokens.WizardCourseNameDTO
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmCourseName';
+	
+	$(document).ready(function () {
+	    window.isFormInEditMode = false;
+	    
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, submitStep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, submitStep, null);
+	});
+	
+	function submitStep() {
+		
+		$(EDIT_FORM_SELECTOR).submit();
+	}
+
+	function onCourseNameSaved(response) {
+		hideFormLoader();
+
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Course name saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+			window.isFormInEditMode = false;
+			setTimeout(function() {
+				window.getNotifManagerInstance().notify(notifEvents.wizard.stepSaved, null);
+			},500);
+			
+			var cid = Number($('#frmCourseName  #CourseId').val());
+			var courseId = response.result.courseId;
+
+			if (cid < 0 && hasValue(courseId)) {
+				window.getNotifManagerInstance().notify(notifEvents.wizard.courseCreated, courseId);
+			} else {
+				window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+			}
+
+			window.getNotifManagerInstance().notify(notifEvents.wizard.courseNameChanged, $('#frmCourseName #CourseName').val());
+			
+		}
+	}
+
+	function validateCourseNameForm() {
+		var multiselect = $("#Categories").data("kendoMultiSelect");
+
+		// get the value of the multiselect.
+		var value = multiselect.value();
+		if (value.length == 0) {
+			var kind = NotificationKinds.Info;
+			var msg = "Select categories";
+			window.formUserNotifManager.show({ message: msg, kind: kind });
+			return false;
+		}
+		
+		showFormLoader(EDIT_FORM_SELECTOR);
+		return true;
+	}
+	
+</script>
+
+
+@using (Ajax.BeginForm("SaveCourseName", "Course", null, new AjaxOptions { OnBegin = "return validateCourseNameForm()", OnSuccess = "onCourseNameSaved" }, new { @id = "frmCourseName", @class = "ajax-form" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.Uid)
+	
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form crs name">
+			<li>
+				@Html.LabelFor(m=>m.CourseName)
+				<div class="input-container">
+					<div class="inline">
+						@Html.TextBoxFor(m=>m.CourseName,new{@class="txt-inp",@onkeydown="onTxtBoxInEdit(this)"})    
+					</div>
+					<div class="validator-container inline">
+						@Html.ValidationMessageFor(model => model.CourseName)
+					</div>
+				</div>
+			</li>
+		    <li>
+		        @Html.LabelFor(m => m.CourseDescription)
+		        <div class="input-container">
+		            <div class="inline">
+		                @*@Html.TextAreaFor(m=>m.Description,new{@rows=4,@columns=3,@class="txt-inp",@style="height:160px",@onkeydown="onTxtBoxInEdit(this)"})*@
+		                @(Html.Kendo().EditorFor(m => m.CourseDescription)
+		                      .HtmlAttributes(new {@style = "width:420px;height:200px;"})
+		                      .Encode(false)
+		                      .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+		                      )
+		            </div>
+		            <div class="validator-container inline">
+		                @Html.ValidationMessageFor(model => model.CourseDescription)
+		            </div>
+		        </div>
+		    </li>
+		    <li>
+                <div class="input-container" style="width: 60px;display: inline-block">
+                    @Html.CheckBoxFor(m => m.DisplayOtherLearnersTab, new { @style = "width:25px;height: 25px;" })
+                </div>
+                @Html.LabelFor(m => m.DisplayOtherLearnersTab, new { @style = "padding:7px 0 0;display: inline-block;" })
+		    </li>
+			<li style="margin-top:25px;">
+				@Html.LabelFor(m=>m.Categories)
+				<div class="input-container">
+					<div class="inline">
+					@(Html.Kendo().MultiSelectFor(model => model.Categories)
+						  .DataTextField("name")
+						  .DataValueField("id")
+						  .Placeholder("-- select categories --")
+						  .Filter("contains")
+						  .BindTo(Model.CategoriesData)
+						  .Events(e=>e.Select("setEditMode"))
+						  .HtmlAttributes(new {@class="l-combo" ,@style = "width:420px;height:auto !important" })
+						  )
+					</div>
+					<div class="validator-container inline">
+						@Html.ValidationMessageFor(model => model.Categories)
+					</div>
+				</div>                
+			</li>
+		</ul>
+	</fieldset>
+}

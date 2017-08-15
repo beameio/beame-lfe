@@ -1,0 +1,25 @@
+﻿@model LFE.DataTokens.QuizDTO
+           
+@using (Ajax.BeginForm("AttchQuiz2Contents", "Quiz", new { area = "AuthorAdmin" }, new AjaxOptions { HttpMethod = "Post", OnBegin = "onCourseQuizSaving", OnSuccess = "onCourseQuizSaved" }, new { @id = "frmEditQuiz", @style = "" }))
+{
+    <div class="chap-row">
+        <span class="float-left drag-box">&nbsp;</span>
+        <span class="float-left btn-collapse-first expanded">&nbsp;</span>
+        <span class="float-left" style="padding-top: 4px">
+            @(Html.Kendo().DropDownListFor(m => m.QuizId)
+                .DataSource(ds => ds.Read("GetAuthorQuizzesLOV", "Quiz", new { area = "AuthorAdmin", id ="#=CourseId#" }))
+                .HtmlAttributes(new { @style = "width:400px" ,@class="ul-qz"})
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .ToClientTemplate()
+            )
+        </span>
+
+        <span class="float-right" style="width:150px;">
+            <span class="k-update-button row-btn right btn-save inline" title="Add quiz"><span class="ico"></span></span>
+
+            <span class="k-cancel-button row-btn btn-cancel inline pt9" title="Cancel"><span class="ico"></span></span>
+        </span>
+    </div>
+
+}

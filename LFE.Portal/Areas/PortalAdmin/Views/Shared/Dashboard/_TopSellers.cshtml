@@ -1,0 +1,23 @@
+﻿@model LFE.DataTokens.TopSellersToken
+
+<div class="top-seller-container">
+    <ul class="ul-ts">
+        <li>
+            <div class="total-box">
+                <div class="box-inner">
+                    <h3>Top Sellers:</h3>
+                </div>
+            </div>
+        </li>
+        @{
+            for (var i = 0; i < Math.Min(Model.Top_USD.Count,4); i++)
+            {
+                <li>
+                    @Html.Partial("Dashboard/_TopSellerBox", Model.Top_USD[i])
+
+                    @Html.Partial("Dashboard/_TopSellerBox", Model.Top_EUR[i])
+                </li>
+            }
+        }
+    </ul>
+</div>

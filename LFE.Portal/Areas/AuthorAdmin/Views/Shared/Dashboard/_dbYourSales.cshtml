@@ -1,0 +1,86 @@
+﻿@using LFE.DataTokens;
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model DashboardSaleBoxTokenLists
+
+<h1 class="yoursales">YOUR SALES:</h1>
+
+
+@{
+     
+    var boxWidth = Model.List != null && Model.List.Count > 8 ? string.Format("width:{0}%;", (100 / (float)Model.List.Count)) : string.Empty;
+    
+    if (Model.List != null && Model.List.Any())
+    {
+        <div class="yoursales">
+        @{
+            foreach (var token in Model.List)
+            {
+                @Html.Partial("Dashboard/_dbSalesBox",new DashboardSaleBoxPageToken
+                {
+                    StatsToken = token
+                    ,Currency  = Model.Currency
+                    ,BoxWidth  = boxWidth
+                    ,ShowTitle = true
+                    ,IsCompareBox = false
+                })
+            }
+        }
+        </div>
+
+    }
+
+    if (Model.CompareToList != null && Model.CompareToList.Any())
+    {
+        <div class="yoursales compare" style="margin-top:5px;">
+        @{
+            foreach (var token in Model.CompareToList)
+            {
+                
+                @Html.Partial("Dashboard/_dbSalesBox",new DashboardSaleBoxPageToken
+                {
+                    StatsToken = token
+                    ,Currency  = Model.Currency
+                    ,BoxWidth  = boxWidth
+                    ,ShowTitle = false
+                    ,IsCompareBox = true
+                })                              
+            }
+        }
+        </div>
+    }
+}
+
+
+<script>
+    $(document).ready(function() {
+        $.each($('.ys-box'), function() {
+            var btn = $(this);
+            var type = btn.attr('data-type');
+            var compareBox = btn.attr('data-compare');
+            var cnt = Number(btn.attr('data-cnt'));
+            btn.unbind('click').click(function () {
+                if (cnt < 1) {
+                    swal({ title: "No data available", text: '', type: 'warning', confirmButtonColor: '#2c82c9',timer:1000000 });
+                    return;
+                }
+                openSalesDetailWindow(type, compareBox);
+            });
+        });
+
+        window.animateBoxes('.ys-box');
+    });
+
+    function openSalesDetailWindow(type, compareBox) {
+        var wnd = $("#wndSalesDetail").data("kendoWindow");
+        var filters = window.GetFilter();
+        var url = '@Url.Action("GetSalesDetailsWindow", "Home", new { area = "AuthorAdmin" })' + '?PeriodTypeId=' + filters.PeriodTypeId + '&CurrencyId=' + filters.CurrencyId + '&UserId=' + filters.UserId + '&StoreId=' + filters.StoreId + '&IsCompareMode=' + filters.IsCompareMode + '&type=' + type + '&compareBox=' + compareBox;
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+
+  
+</script>
+
+	

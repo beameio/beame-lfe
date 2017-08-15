@@ -1,0 +1,98 @@
+﻿@model LFE.DataTokens.RegisterDTO
+
+
+<script>
+    document.cookie = "username=John Doe";
+
+    $(document).ready(function () {
+        $('#btnRegister').click(function () {
+            ToggleRegister();
+        });
+        $('.close_register').click(function () {
+
+            ToggleRegister();
+        });
+        FitLRegisterScreen();
+
+    });
+
+
+    function ToggleRegister() {
+        var div = $('.dark');
+        if ($('#loginWrapper').is(":hidden") && $('#registerWrapper').is(":visible")) {
+            div.fadeOut();
+        }
+        else if (div.is(":hidden") && $('#registerWrapper').is(":hidden")) {
+            div.fadeIn();
+        }
+
+        if ($('#registerWrapper').is(":hidden") && ($('#loginWrapper').is(":visible"))) {
+            toggleButtonClass($('#btnLogin'));
+            $('#loginWrapper').slideToggle();
+        }
+
+
+        toggleButtonClass($('#btnRegister'));
+        $('#registerWrapper').slideToggle();
+    }
+
+    function registerCompleted() {
+        if (loginSucceeded) {
+            $(".register-loader").show();
+            location.reload();
+        } else {
+            $('#register-submit').removeAttr('disabled');
+            $(".register-loader").hide();
+            $(".registerWrapper").show();
+        }
+    }
+
+    function registerBegin() {
+        PopSafariSessionWindow();
+
+        $('#register-submit').attr('disabled', 'disabled');
+        $(".register-loader").show();
+        $('.invalidFormMessage').hide();
+
+        return true;
+    }
+
+    function getParentUrl() {
+        var isInIframe = (parent !== window),
+            parentUrl = null;
+
+        if (isInIframe) {
+            parentUrl = document.referrer;
+        }
+
+        return parentUrl;
+    }
+
+    function FitLRegisterScreen() {
+        var width = $(window).width();
+        if (width <= 800 ){
+            $('#registerBlockWrapper').removeClass('block-wrapper').addClass('block-wrapper2');
+           // $('#registerWrapper').css({ margin: '0px' });
+            $('.sub_tool_bar2').css({ height: '315px' });
+        }
+        else {
+            $('#registerBlockWrapper').removeClass('block-wrapper2').addClass('block-wrapper');
+          //  $('#registerWrapper').css({ margin: '20px' });
+            $('.sub_tool_bar2').css({ height: '200px' });
+        }
+    }
+
+    $(window).resize(function() {
+        FitLRegisterScreen();
+    });
+</script>
+@*OnBegin = "javascript:return registerBegin()",*@
+<div class="indent">
+@*    @using (Ajax.BeginForm("WidgetRegisterUser", "Account", new { area = "Widget" }, new AjaxOptions { UpdateTargetId = "registerWrapper", OnComplete = "registerCompleted", HttpMethod = "Post"}, new { id = "formRegister" })) *@
+    
+      @using (Ajax.BeginForm("WidgetRegisterUser", "Account", new { area = "Widget" }, new AjaxOptions { HttpMethod = "Post", UpdateTargetId = "registerWrapper", OnComplete = "registerCompleted", OnBegin = "javascript:return registerBegin()" }, new { id = "widget_reg_form" }))
+      {           
+        @Html.Partial("~/Areas/Widget/Views/Shared/Account/_WidgetRegisterForm.cshtml", Model)
+      }
+</div>
+

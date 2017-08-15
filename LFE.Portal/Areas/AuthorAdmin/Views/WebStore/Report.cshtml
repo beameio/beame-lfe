@@ -1,0 +1,30 @@
+﻿@{
+	ViewBag.Title = "Report";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/ws.css" )" rel="stylesheet" type="text/css"  />    
+}
+@section scripts
+{
+	<script>
+		$(document).ready(function () {
+			window.getNotifManagerInstance().subscribe(notifEvents.report.storesBound, setStoresTotal, null);
+		});
+
+		function setStoresTotal(total) {
+			$('#d-ws-total').html(total);
+		}
+	</script>
+}
+
+<div id="d-ws-rep-container">
+	<div class="list-manage-row">
+		<div class="count-title" id="d-ws-total">0</div>
+		<a href="@Url.Action("EditStore","WebStore")/@Guid.NewGuid()" class="add-btn-h">add new store</a>
+	</div> 
+	
+	@Html.Partial("WebStore/_StoresGrid")
+</div>

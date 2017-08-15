@@ -1,0 +1,95 @@
+﻿@using LFE.Portal.Areas.UserPortal.Models
+
+<style type="text/css">
+    .k-grid-footer {display: none !important;}
+</style>
+
+<script>
+	var purchaseRepModel;
+	var ONE_TIME_TITLE = 'One-time';
+	var SUBSCRIPTION_TITLE = 'Monthly subscription';
+	var ONE_TIME_CONTAINER_SELECTOR = '#d-onetime-c';
+	var SUBSCRIPTION_CONTAINER_SELECTOR = '#d-subscription-c';
+
+	$(document).ready(function () {
+
+	  //  window.getNotifManagerInstance().unsubscribe(notifEvents.report.oneTimeRepBound, setOneTimeTotal, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.oneTimeRepBound, setOneTimeTotal, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.subscriptionRepBound, setSubscriptionTotal, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.oneTimeSalesTotal, setOneTimeTotalSales, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.subscriptionSalesTotal, setSubscriptionTotalSales, null);
+
+
+		purchaseRepModel = kendo.observable({
+			method: '@ePurchaseReportType.OneTime',
+			oneTimeTitle: ONE_TIME_TITLE,
+			oneTimeSalesTotal:0,
+			oneTimeLabelClass:'active',
+			subscriptionTitle: SUBSCRIPTION_TITLE,
+			subscriptionLabelClass: '',
+			subscriptionSalesTotal:0,
+
+			onReportTypeChanged: function () {
+
+				this.set('method', $("input:radio[name=PurchaseReportType]:checked").val());
+
+				var method = this.get("method");
+				var otc = '';
+				var subc = '';
+				var c2hide,c2show;
+				switch (method) {
+					case '@ePurchaseReportType.OneTime':
+						otc = 'active';
+						c2show = ONE_TIME_CONTAINER_SELECTOR;
+						c2hide = SUBSCRIPTION_CONTAINER_SELECTOR;
+						break;
+					case '@ePurchaseReportType.Subscription':
+						subc = 'active';
+						c2hide = ONE_TIME_CONTAINER_SELECTOR;
+						c2show = SUBSCRIPTION_CONTAINER_SELECTOR;
+						break;
+					default:
+						return;
+				}
+
+				this.set('oneTimeLabelClass', otc);
+				this.set('subscriptionLabelClass', subc);
+
+				$(c2hide).slideToggle(300, function() {
+					$(c2show).slideToggle(300);
+				});
+
+			},
+
+			salesTotal: function () {
+				return Math.round(parseFloat(this.get("oneTimeSalesTotal")) + parseFloat(this.get("subscriptionSalesTotal")),2);
+			},
+
+			onFilterChanged: function () {
+			    onFilterChanged();
+			}
+
+		});
+
+
+		kendo.bind($("#d-rep-manage"), purchaseRepModel);
+
+		function setOneTimeTotal(total) {
+			purchaseRepModel.set('oneTimeTitle', ONE_TIME_TITLE + '(' + total + ')');
+		}
+		function setSubscriptionTotal(total) {
+			purchaseRepModel.set('subscriptionTitle', SUBSCRIPTION_TITLE + '(' + total + ')');
+		}
+
+		function setOneTimeTotalSales(total) {
+			purchaseRepModel.set('oneTimeSalesTotal',total);
+		}
+		function setSubscriptionTotalSales(total) {
+			purchaseRepModel.set('subscriptionSalesTotal',total);
+		}
+	});
+
+   
+
+   
+</script>

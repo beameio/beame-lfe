@@ -1,0 +1,26 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.Portal.Models.FbAdminAuthenticationResult
+    
+@{
+    var user = this.CurrentUser();
+    if (User.Identity.IsAuthenticated && user != null)
+    {
+        <script>
+            window.socialConnectUrl += '?userId=@user.UserId&trackingId=@Model.trackingId';
+        </script>
+    
+        <div class="fb-admin-sub" id="nfna-box-1-sub">Connect my Facebook account to @User.Identity.Name</div>
+        <div class="inner">
+            <div class="conn-btn-container" id="aFacebookConnect">
+                <a title="" class="conn-btn" href="#" target="">
+                    Connect Your FB Account to LFE Login
+                </a>
+            </div>                        
+        </div>
+        <div id="fb-login-info-panel" class="login-info-error">
+            <div class="inner">
+                <div class="e-row"></div>
+            </div>
+        </div>
+    }
+}

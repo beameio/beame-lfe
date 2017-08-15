@@ -1,0 +1,51 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+
+@{
+    var viewModel = (BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    bool isWixDraft = false;
+    if (viewModel != null)
+    {
+        isWixDraft = viewModel.Status == WebStoreEnums.StoreStatus.Draft && !string.IsNullOrEmpty(viewModel.WixViewMode) && viewModel.WixViewMode == "editor";
+    }
+    
+}
+
+<!-- tools bar -->
+<div class="tool_bar@(isWixDraft ? " placeholderTopper" : "")">
+    <div class="logo">
+        <img src="http://@Request.Url.Authority/content/images/webstore/logo.jpg" width="16" height="16" alt="logo" />
+    </div>
+
+    <div class="power"><a href="@(Utils.GetKeyValue("homeUrl"))" target="_blank">@(Constants.APP_OFFICIAL_NAME)</a></div>
+
+    @{ Html.RenderAction("_UserIndicator", "User", new { area = "Widget" }); }
+
+</div>
+
+<!-- sub tools bar -->
+<div id="loginWrapper" class="sub_tool_bar@(isWixDraft ? " subPlaceHolder" : "")">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Account/_Login.cshtml", new LoginDTO { IsWidget = true, TrackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : ""})
+</div>
+
+<div id="registerWrapper" class="sub_tool_bar2@(isWixDraft ? " subPlaceHolder" : "")">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Account/_Register.cshtml", new RegisterDTO
+    {
+        ParentWindowURL = viewModel != null ? viewModel.ParentURL : ""
+        ,RequiredConfirmation = true
+    })
+</div>
+
+<div id="searchWrapper" class="sub_tool_bar_search@(isWixDraft ? " subPlaceHolder" : "")">
+    @{
+        Html.RenderPartial("~/Areas/Widget/Views/Shared/Index/_SearchCoursesForm.cshtml"); 
+    }
+</div>
+@Html.Partial("~/Areas/Widget/Views/Shared/Course/_BuyPlaceHolder.cshtml", isWixDraft)
+
+
+<!-- dark opacity background -->
+<!-- defult hidden by css [display:none / block] -->
+<div class="dark" style="display: none"></div>

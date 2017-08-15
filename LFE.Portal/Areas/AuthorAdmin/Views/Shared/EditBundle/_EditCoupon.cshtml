@@ -1,0 +1,60 @@
+﻿@model LFE.DataTokens.BundleCouponDTO
+
+<script type="text/javascript">
+    var EDIT_FORM_SELECTOR = '#frmBundleCoupon';
+    var formCouponUserNotifManager;
+    var FORM_HEIGHT = COUPON_FORM_HEIGHT;
+    $(document).ready(function () {
+		
+        $(window).resize(function () {
+            adjustCmdPosition(EDIT_FORM_SELECTOR);
+        });
+        $(document).scroll(function () {
+            adjustCmdPosition(EDIT_FORM_SELECTOR);
+        });
+
+        formCouponUserNotifManager = new UserNotificationManager('#cpn-info', '.alert', false);
+
+        var form = $(EDIT_FORM_SELECTOR);
+
+        initUnobstructiveFormValidation(form);
+
+        setTimeout(adjustValidatorsH,50);
+		
+				
+    });
+	
+    function onCouponSaved(response) {
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? "Coupon saved successfully" : response.error;
+
+        formCouponUserNotifManager.show({ message: msg, kind: kind });
+
+        if (!response.success) return;
+        window.isFormInEditMode = false;
+        window.getNotifManagerInstance().notify(notifEvents.coupon.couponSaved, null);
+        window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+        window.getNotifManagerInstance().notify(notifEvents.coupon.switch2List, null);
+    }    
+</script>
+<style>
+	#cp-info{ height: 20px;margin-left: 130px}
+	#frmBundlePrice{ padding-bottom: 22px; border-bottom: 2px solid #9f9f9f}
+</style>
+@using (Ajax.BeginForm("SaveBundleCoupon", "Course", new { id = Model.BundleId}, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#f-cpn', null)", OnSuccess = "onCouponSaved", LoadingElementId = "site-loader" }, new { @id = "frmBundleCoupon", @style = "height:160px" }))
+{
+	@Html.HiddenFor(x=>x.BundleId)	
+	@Html.Partial("Coupons/_EditCouponForm",Model)
+	
+    <div class="form-cmd-row wrap" id="d-cpn" style="display: none">
+        <div class="inner">
+            <div id="cpn-info" class="info-box">
+                <p class="alert"></p>
+            </div>
+            <div class="btn-container">
+                <a href="javaScript:cancelEditCoupon()" class="btn-cancel inline" title="cancel coupon editing">cancel</a>
+                <a href="javaScript:submitForm('frmBundleCoupon')" class="btn-submit inline" title="save coupon">save changes</a>
+            </div>
+        </div>
+    </div>
+}

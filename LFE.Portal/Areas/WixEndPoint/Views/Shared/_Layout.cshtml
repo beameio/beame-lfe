@@ -1,0 +1,72 @@
+﻿@using LFE.Portal.Areas.WixEndPoint.Helpers
+@using LFE.Portal.Helpers
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>@ViewBag.Title</title>
+		@Styles.Render("~/Content/kendo/"+ Url.ToKendoVersionUrl() + "/css")		   
+		@Styles.Render("~/Areas/WixEndPoint/Content/styles/css")
+		
+		@Styles.Render("~/Content/styles/common")	
+		@Scripts.Render("~/bundles/modernizr")		   
+		@Scripts.Render("~/bundles/jquery/jquery")
+		@Scripts.Render("~/bundles/jquery/jqueryval")
+
+		<script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.core.min.js")"></script>
+		<script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.data.min.js")"></script>
+		<script src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.aspnetmvc.min.js")"></script>
+		
+		
+		<script>
+			kendo.culture("en-US");
+		</script> 
+		@Scripts.Render("~/bundles/lfe/common")
+
+		<!-- Wix JS SDK -->	    
+	@Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+		
+		<script type="text/javascript">
+			var notificationManager;
+
+			function getNotifManagerInstance() {
+				if (notificationManager == undefined || notificationManager == null) {
+					notificationManager = new NotificationManager();
+				}
+				return notificationManager;
+			}
+			
+		//$(document).ready(function () {
+
+			//    Wix.currentMember(function(memberDetails) {
+			//        console.log(memberDetails);
+			//    });
+			//});
+
+		</script>
+		<style>
+			html{background: #343C43}
+		</style>
+		@RenderSection("css", false)	
+		@RenderSection("scripts", false)
+	</head>
+	<body>
+		<header class="login"></header>
+		<div id="main" class="wrap">			
+			<section class="content-wrapper main-content clear-fix">
+				@RenderBody()
+			</section>
+		</div>
+		<div id="site-loader" class="k-loading-mask">
+			<span class="k-loading-text">Loading...</span>
+			<div class="k-loading-image"></div>
+			<div class="k-loading-color"></div>
+		</div>
+		<script type="text/x-kendo-template" id="form-loader-template">
+				<span class="k-loading-text">Loading...</span>
+				<div class="k-loading-image"></div>
+				<div class="k-loading-color"></div>		    
+		</script>
+	</body>
+</html>

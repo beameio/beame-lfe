@@ -1,0 +1,289 @@
+﻿@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+    ViewBag.Title = "Payment Report";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var months = new NameValue[12];
+    for (var i = 1; i <= 12; i++)
+    {
+        months[i - 1] = new NameValue { Name = i.ToString(), Value = i.ToString() };
+    }
+
+    var l = 1 + DateTime.Now.Year - 2012;
+
+    var years = new NameValue[l];
+    var j = 0;
+    for (var i = 2012; i <= DateTime.Now.Year; i++)
+    {
+        years[j] = new NameValue { Name = i.ToString(), Value = i.ToString() };
+        j++;
+    }
+
+    var previousMonth = DateTime.Now.AddMonths(-1);
+
+    var y = Request.QueryString["y"];
+    int year;
+    int selectedYear;
+    if (!String.IsNullOrEmpty(y) && Int32.TryParse(y, out year))
+    {
+        selectedYear = year;
+    }
+    else
+    {
+        selectedYear = previousMonth.Year;
+    }
+
+    var m = Request.QueryString["m"];
+    int month;
+    int selectedMonth;
+    if (!String.IsNullOrEmpty(m) && Int32.TryParse(m, out month))
+    {
+        selectedMonth = month;
+    }
+    else
+    {
+        selectedMonth = previousMonth.Month;
+    }
+}
+<style>
+    .k-grouping-row td, .k-group-footer td, .k-grid-footer td{border:none !important}
+</style>
+<script>
+    
+    function onPaymentRequest() {
+        var data = {
+            year: $('#comboYears').data('kendoDropDownList').value()
+            , month: $('#comboMonths').data('kendoDropDownList').value()
+        };
+        paymentRepModel.set('year', data.year);
+        paymentRepModel.set('month', data.month);
+        return data;
+    }
+    function setRepParams() {
+        setTimeout(rebindPaymentReports, 200);
+    }
+    function rebindPaymentReports() {
+        $('#payments').data("kendoGrid").dataSource.read();
+        $('#refunds').data("kendoGrid").dataSource.read();
+    }
+    function onPaymentReportRequestEnd(e) {
+        try {
+            if(e.type!='read') return ;
+            if (e.response.AggregateResults.length == 0) return;
+            var total = e.response.AggregateResults[4].FormattedValue;
+            paymentRepModel.set('paymentSalesTotal', total);
+        } catch (ex) {
+            if (window.console) console.log(ex);
+        }
+    }
+</script>
+
+<div id="d-rep-manage">
+    <div class="page-title">
+        <div class="float-left">Payments Report for</div>
+        <div class="float-left" style="margin: 0 0 0 15px;"><span data-bind="text:month"></span> <span data-bind="text:periodDash"></span> <span data-bind="text:year"></span></div>
+        <div id="total-title" class="float-right hidden">Total payment: <span data-bind="text:paymentSalesTotal"></span> $</div>
+    </div>
+    
+
+    <div class="inline picker-row">
+        <span class="inline" style="margin:  4px 0 0;width: 120px;">
+            <input type="radio" id="PaymentReportType" name="PaymentReportType" value="payment" data-bind="events: { click: onReportTypeChanged }" checked="checked"> <label class="inline" data-bind="attr: { class: paymentLabelClass }">Payments</label>
+        </span>
+        <span class="inline" style="margin:4px 0 0;width: 180px">
+            <input type="radio" id="PaymentReportType" name="PaymentReportType" value="refund" data-bind="events: { click: onReportTypeChanged }"> <label class="inline" data-bind="attr: { class: refundLabelClass }">Refunds</label>
+        </span>
+    
+        <div class="inline">
+            @(Html.Kendo().DropDownList()
+                  .Name("comboMonths")
+                  .DataTextField("Name")
+                  .DataValueField("Value")
+                  .BindTo(months)
+                  .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                  .Events(e => e.Select("setRepParams"))
+                  )
+        </div>
+
+        <div class="inline">
+            @(Html.Kendo().DropDownList()
+                  .Name("comboYears")
+                  .DataTextField("Name")
+                  .DataValueField("Value")
+                  .BindTo(years)
+                  .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                  .Events(e => e.Select("setRepParams"))
+                  )
+        </div>
+    </div>
+
+    <div id="d-payment-c">
+        @(Html.Kendo().Grid<PaymentViewDTO>()
+              .Name("payments")
+              .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+              .Columns(columns =>
+              {
+                  columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                  columns.Bound(p => p.OrderDate).Width(80).Format("{0:MM/dd/yy}").Title("Order Date");
+                  columns.Bound(p => p.ItemName).Width(150).Title("Item").ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(ItemName)#'style='width:150px'>${ItemName}</div>");
+                  columns.Bound(p => p.Buyer.FullName).Width(120).Title("Buyer").ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#'style='width:120px'>${Buyer.FullName}</div>");
+                  columns.Bound(p => p.Number).Width(60).Title("Pay. N").Sortable(false);
+                  columns.Bound(p => p.TypeName).Width(80).Title("Type").ClientTemplate("<div class='ellipsis col-tooltip' title='#=TypeName#'style='width:80px'>${TypeName}</div>");
+                  columns.Bound(p => p.Amount).Width(80).ClientTemplate("#=kendo.toString(Amount, \"n2\")##=Currency.Symbol#");//.ClientFooterTemplate("#=kendo.toString(sum, 'c')#");
+                  columns.Bound(p => p.Fee).Width(80).ClientTemplate("#=kendo.toString(Fee, \"n2\")##=Currency.Symbol#");//.ClientFooterTemplate("#=kendo.toString(sum, 'c')#");
+                  columns.Bound(p => p.Commission).Width(80).ClientTemplate("#=kendo.toString(Commission, \"n2\")##=Currency.Symbol#");//.ClientFooterTemplate("#=kendo.toString(sum, 'c')#");
+                  columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("#=kendo.toString(TotalRefunded, \"n2\")##=Currency.Symbol#").Width(100);//.ClientFooterTemplate("#=kendo.toString(sum, 'c')#");
+                  columns.Bound(p => p.Payout).Width(80).ClientTemplate("#=kendo.toString(Payout, \"n2\")##=Currency.Symbol#");//.ClientFooterTemplate("#=kendo.toString(sum, 'c')#");                  
+                  columns.Bound(p => p.CompletedDate).Width(80).Format("{0:MM/dd/yy}").Title("Payment Date");
+              })
+        
+              .AutoBind(false)
+              .Sortable(s => s.Enabled(true))
+              .Pageable(pager => pager.Numeric(true).Enabled(true))
+              .Filterable(f => f.Enabled(false))        
+              .DataSource(dataSource => dataSource.Ajax()      
+                  .Aggregates(dag =>
+                  {
+                      dag.Add(d => d.Amount).Sum();
+                      dag.Add(d => d.Fee).Sum();
+                      dag.Add(d => d.Commission).Sum();
+                      dag.Add(d => d.TotalRefunded).Sum();
+                      dag.Add(d => d.Payout).Sum();
+                  })
+                  .Model(model => model.Id(p => p.PaymentId))
+                  .Read(read => read.Action("GetSellerPayments", "Author").Data("onPaymentRequest").Type(HttpVerbs.Get)).Events(e => e.RequestEnd("onPaymentReportRequestEnd")).PageSize(10))
+              )
+    
+    
+        @(Html.Kendo().Tooltip()
+              .For("#payments")
+              .Filter(".col-tooltip")
+              .Position(TooltipPosition.Top)    
+              )
+    </div>
+    <div id="d-refund-c" style="display: none">
+        @(Html.Kendo().Grid<RefundViewDTO>()
+              .Name("refunds")
+              .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+              .Columns(columns =>
+              {
+                  columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                  columns.Bound(p => p.ItemName).Width(150).Title("Item").ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(ItemName)#'style='width:150px'>${ItemName}</div>");
+                  columns.Bound(p => p.Buyer.FullName).Width(120).Title("Buyer").ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#'style='width:120px'>${Buyer.FullName}</div>");
+                  columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                  columns.Bound(p => p.RefundTypeName).Width(60).Title("Type");
+                  columns.Bound(p => p.RefundAmount).Width(80).Format("{0:c}");
+                  columns.Bound(p => p.RefundDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+              })
+              .AutoBind(false)
+              .Sortable(s => s.Enabled(true))
+              .Pageable(pager => pager.Numeric(true).Enabled(true))
+              .Filterable(f => f.Enabled(false))
+              .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                  .Aggregates(dag =>
+                  {
+                      dag.Add(d => d.Amount).Sum();
+                      dag.Add(d => d.TotalRefunded).Sum();
+                  })
+                  .Model(model => model.Id(p => p.PaymentId))
+                  .Read(read => read.Action("GetSellerRefunds", "Author").Data("onPaymentRequest").Type(HttpVerbs.Get)).PageSize(10))
+              )
+        
+        @(Html.Kendo().Tooltip()
+              .For("#refunds")
+              .Filter(".col-tooltip")
+              .Position(TooltipPosition.Top)
+              )
+    </div>
+</div>
+<script>
+    var paymentRepModel;
+    var PAYMENT_TITLE = 'Payments';
+    var REFUND_TITLE = 'Refunds';
+    var PAYMENT_CONTAINER_SELECTOR = '#d-payment-c';
+    var REFUND_CONTAINER_SELECTOR = '#d-refund-c';
+
+    $(document).ready(function () {
+
+        //  window.getNotifManagerInstance().unsubscribe(notifEvents.report.paymentRepBound, setOneTimeTotal, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.report.paymentRepBound, setOneTimeTotal, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.report.refundRepBound, setSubscriptionTotal, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.report.paymentSalesTotal, setOneTimeTotalSales, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.report.refundSalesTotal, setSubscriptionTotalSales, null);
+
+        $('#comboYears').data('kendoDropDownList').value('@selectedYear.ToString()');
+        $('#comboMonths').data('kendoDropDownList').value('@selectedMonth.ToString()');
+
+        setTimeout(rebindPaymentReports, 500);
+
+        paymentRepModel = kendo.observable({
+            method: 'payment',
+            paymentTitle: PAYMENT_TITLE,
+            paymentSalesTotal: 0,
+            paymentLabelClass: 'active',
+            refundTitle: REFUND_TITLE,
+            refundLabelClass: '',
+            refundSalesTotal: 0,
+            year: null,
+            month: null,
+            
+
+            onReportTypeChanged: function () {
+
+                this.set('method', $("input:radio[name=PaymentReportType]:checked").val());
+                console.log(this.get('method'));
+                var method = this.get("method");
+                var otc = '';
+                var subc = '';
+                var c2hide, c2show;
+                switch (method) {
+                case 'payment':
+                    otc = 'active';
+                    c2show = PAYMENT_CONTAINER_SELECTOR;
+                    c2hide = REFUND_CONTAINER_SELECTOR;
+                    break;
+                case 'refund':
+                    subc = 'active';
+                    c2hide = PAYMENT_CONTAINER_SELECTOR;
+                    c2show = REFUND_CONTAINER_SELECTOR;
+                    break;
+                default:
+                    return;
+                }
+
+                this.set('paymentLabelClass', otc);
+                this.set('refundLabelClass', subc);
+
+                $(c2hide).slideToggle(300, function () {
+                    $(c2show).slideToggle(300);
+                });
+
+            },
+
+            periodDash:function() {
+                return hasValue(this.get('year')) && hasValue(this.get('month')) ? "-" : null;
+            }
+        });
+
+
+        kendo.bind($("#d-rep-manage"), paymentRepModel);
+
+        function setOneTimeTotal(total) {
+            paymentRepModel.set('paymentTitle', PAYMENT_TITLE + '(' + total + ')');
+        }
+        function setSubscriptionTotal(total) {
+            paymentRepModel.set('refundTitle', REFUND_TITLE + '(' + total + ')');
+        }
+
+        function setOneTimeTotalSales(total) {
+            paymentRepModel.set('paymentSalesTotal', total);
+        }
+        function setSubscriptionTotalSales(total) {
+            paymentRepModel.set('refundSalesTotal', total);
+        }
+    });
+</script>
+

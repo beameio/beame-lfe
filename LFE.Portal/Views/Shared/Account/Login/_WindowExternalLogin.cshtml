@@ -1,0 +1,6 @@
+﻿
+@using (Html.BeginForm("ExternalLogin", "Account", new { provider = "facebook",returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @id = "frm-fb-login" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="submit" class="btn-fb-login" title="Connect with Facebook" value=" " />     
+}

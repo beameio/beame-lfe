@@ -1,0 +1,30 @@
+﻿@model LFE.Portal.Areas.Widget.Models.TrainingTimerToken
+@{
+    var minutesRemind = (Model.Start - DateTime.Now).TotalMinutes;               
+}
+
+<span id="@Model.ContainerId" class="timer"></span>
+<script>
+
+    var seconds = 60;
+    var now = new Date();
+    var end = addMinutes(now, parseInt('@minutesRemind'));
+    var g2TCountdown = new Countdown({
+        selector: '#@Model.ContainerId',
+        msgPattern: '@Html.Raw(Model.Template)',
+        msgAfter: "",
+        leadingZeros: "0",
+        dateStart: now,
+        dateEnd: end,
+        onEnd: onTimerEnd
+    });
+
+
+    function onTimerEnd() {
+        window.location.href = window.location.href;
+    }
+
+    //function addMinutes(date, minutes) {
+    //    return new Date(date.getTime() + minutes * 60000);
+    //}
+</script>

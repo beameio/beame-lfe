@@ -1,0 +1,87 @@
+﻿@using LFE.Core.Utils
+@model LFE.DataTokens.InvoiceViewDTO
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Invoice</title>
+
+    <link href="@Url.Content("~/Content/styles/reset.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/styles/invoice.css")" rel="stylesheet" type="text/css" />    
+</head>
+<body>
+    <div id="page">
+        <header><img src="@Url.Content("~/Content/images/invoice-logo.jpg")" alt=""/></header>
+        <section>
+            <div class="left">
+                <table>
+                    <tr>
+                        <td class="blue" >TO:</td>
+                        <td>@Model.UserFullName</td>
+                    </tr>      
+                    <tr>
+                        <td></td>
+                        <td>@Model.UserEmail</td>
+                    </tr>                           
+                </table>
+            </div>
+            <div class="right">
+                <div class="blue">FROM:</div>
+                <div>@(Constants.APP_OFFICIAL_NAME)</div>
+                <div>3428 NW 63 Place</div>
+                <div>Gainesville, FL  32653-8861</div>
+                <div class="phone">Phone: 352.870.3000</div>
+            </div>
+            <div class="clear"></div>
+            <table class="invoice">
+                <tr>
+                    <td class="blue">Invoice Date</td>
+                    <td class="blue">Invoice #</td>
+                </tr>
+                <tr>
+                    <td class="border">@Model.TransactionDate.ToString("MM/dd/yyyy")</td>
+                    <td class="border">@Model.TransactionId</td>
+                </tr>
+            </table>
+            <table class="items">
+                <thead>
+                    <tr>
+                        <td class="blue">Item</td>
+                        <td class="blue width70">Price</td>
+                        <td class="blue width70">Quantity</td>
+                        <td class="blue width70">Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border">
+                        <td>LFE Course - @Model.CourseName</td>
+                        <td class="width70">@Model.Amount USD</td>
+                        <td class="width70">1</td>
+                        <td class="width70">@Model.Amount USD</td>
+                    </tr>
+                   
+                    <tr>
+                        <td rowspan="5"></td>
+                        <td colspan="2" class="blue right">Total:</td>
+                        <td class="border">@Model.Amount USD</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="blue right">Amount Paid:</td>
+                        <td class="border">@Model.Amount USD</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="blue right">Balance Due:</td>
+                        <td class="border">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <footer></footer>
+    </div>
+</body>
+</html>

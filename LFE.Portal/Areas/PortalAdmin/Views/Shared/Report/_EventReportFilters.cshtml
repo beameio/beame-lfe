@@ -1,0 +1,228 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+
+@model LFE.Portal.Areas.PortalAdmin.Models.EventFiltersToken
+
+@{
+    var dates = (ReportEnums.ePeriodSelectionKinds.week | ReportEnums.ePeriodSelectionKinds.thisMonth
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    ViewData["periodKinds"] = dates;
+
+    var events = Utils.EnumWithDescToList<CommonEnums.eUserEvents>();
+
+    var additionalDisplayStyle = Model.ShowOnlyPeriodCombo ? "none" : "block";
+}
+
+<script>
+	var fltrCourseId, fltrBundleId, fltrStoreId,fltrUserId;
+
+	function onUserSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var id = dataItem.UserId;
+		window.fltrUserId = id;
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onUserAu() {
+		return {
+			name: $("#ddlUser").val()
+			, email: null
+		};
+	}
+
+	function onCourseAu() {
+		return {
+			name: $("#ddlCourses").val()
+		};
+	}
+
+	function onCourseSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var id = dataItem.id;
+		window.fltrCourseId = id;
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onBundleAu() {
+		return {
+			name: $("#ddlBundles").val()
+		};
+	}
+
+	function onBundleSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var id = dataItem.id;
+		window.fltrBundleId = id;
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onStoreAu() {
+		return {
+			name: $("#ddlStores").val()
+		};
+	}
+
+	function onStoreSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var id = dataItem.id;
+		window.fltrStoreId = id;
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onPeriodKindSelected() {
+		//var dataItem = this.dataItem(e.item.index());
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onEventTypeSelected() {
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function getEventRepData() {
+	    var period = $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())';
+	    return {
+			periodSelectionKind: period
+			, eventTypeId: $('#ddlEventTypes').data("kendoDropDownList") != undefined ? $('#ddlEventTypes').data("kendoDropDownList").value() : null
+			,userId : fltrUserId
+			,courseId : fltrCourseId
+			,bundleId : fltrBundleId
+			,storeId : fltrStoreId
+		};
+	}
+	function clearFilters() {
+		$('#ddlEventTypes').data("kendoDropDownList").value(null);
+		$('#periodSelectionKind').data("kendoDropDownList").value('@(((int)Model.PeriodKind).ToString())');
+
+		var c2 = $('#ddlUser').data("kendoAutoComplete"); if (c2 != undefined) c2.value(null);
+		var c4 = $('#ddlCourses').data("kendoAutoComplete"); if (c4 != undefined) c4.value(null);
+		var c5 = $('#ddlBundles').data("kendoAutoComplete"); if (c5 != undefined) c5.value(null);
+		var c6 = $('#ddlStores').data("kendoAutoComplete"); if (c6 != undefined) c6.value(null);
+
+		window.fltrUserId = null;
+		window.fltrCourseId = null;
+		window.fltrBundleId = null;
+		window.fltrStoreId = null;
+
+		setTimeout(function() {
+		    window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null); 
+		    
+		}, 500);
+
+		
+	}
+</script>
+
+<h2 class="page-title">Events logs report</h2>
+
+
+<div id="rep-param-row" style="margin: 0 0 25px 0">
+    <div id="period-combo-container" class="inline" style="visibility: hidden;">
+        @(Html.Kendo().DropDownList()
+              .Name("periodSelectionKind")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["periodKinds"])
+              .HtmlAttributes(new { style = "width:250px", @class = "combo-ps" })
+              .Events(e => e.Select("onPeriodKindSelected"))
+                //  .Value(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())
+        )
+        <script>
+            $(document).ready(function () {
+             //   $('#periodSelectionKind').data("kendoDropDownList").value('@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())');
+             	setVisibility('#period-combo-container', true);
+			});
+        </script>
+    </div>
+
+    <div id="type-combo-container" class="inline" style="visibility: hidden;margin: 0 0 0 25px;display: @additionalDisplayStyle">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlEventTypes")
+              .OptionLabel("..select event type")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo(events)
+              .HtmlAttributes(new { style = "width:250px", @class = "combo-ps" })
+              .Events(e => e.Select("onEventTypeSelected"))
+        )
+        <script>
+			$(document).ready(function () {
+				$('#ddlEventTypes').data("kendoDropDownList").value(null);
+				setVisibility('#type-combo-container', true);
+			});
+        </script>
+    </div>
+
+    <div class="inline" style="margin-left: 25px;display: @additionalDisplayStyle">
+        @(Html.Kendo().AutoComplete()
+                        .Name("ddlUser")
+                        .DataTextField("FullName")
+                        .Placeholder(" find by user")
+                        .Filter("contains")
+                        .MinLength(2)
+                        .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                                 "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+                        .HtmlAttributes(new { style = "width:250px", @class = "au-filt" })
+                                .Events(e => e.Select("onUserSelected"))
+                                .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onUserAu")).ServerFiltering(true))
+        )
+    </div>
+</div>
+
+<div style="display: @additionalDisplayStyle">
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlStores")
+              .DataTextField("name")
+              .Placeholder(" find by store")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px", @class = "au-filt" })
+              .Events(e => e.Select("onStoreSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindStores", "Report").Data("onStoreAu")).ServerFiltering(true))
+        )
+    </div>
+
+    <div class="inline" style="margin-left: 25px;">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlCourses")
+              .DataTextField("name")
+              .Placeholder(" find by course")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px", @class = "au-filt" })
+              .Events(e => e.Select("onCourseSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindCourses", "Report").Data("onCourseAu")).ServerFiltering(true))
+        )
+    </div>
+
+    <div class="inline" style="margin-left: 25px;">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlBundles")
+              .DataTextField("name")
+              .Placeholder(" find by bundle")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px", @class = "au-filt" })
+              .Events(e => e.Select("onBundleSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindBundles", "Report").Data("onBundleAu")).ServerFiltering(true))
+        )
+    </div>
+</div>
+
+<div style="margin: 10px 0">
+    <a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        clearFilters();
+
+    });
+</script>

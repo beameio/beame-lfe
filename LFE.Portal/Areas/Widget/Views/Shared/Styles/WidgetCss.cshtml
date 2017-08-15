@@ -1,0 +1,534 @@
+﻿@model LFE.DataTokens.WidgetWebStoreDTO
+
+@{
+    Layout = null;
+    var fontColor         = "#000";
+    var backgroundColor   = "#FFF";
+    //var tabsColor         = "#006699";
+    var titleHeight       = "100px";
+    var bodyBorder        = "";
+    var bodyTransparent   = "";
+    var selectedPageColor = "#fb2d00";   
+    
+    if (Model != null)
+    {    
+        fontColor = string.IsNullOrEmpty(Model.FontColor) ? "#000" : Model.FontColor;
+        backgroundColor = string.IsNullOrEmpty(Model.BackgroundColor) ? "#FFF" : Model.BackgroundColor;
+        //tabsColor = string.IsNullOrEmpty(Model.TabsFontColor) ? "#006699" : Model.TabsFontColor;
+
+        titleHeight = Model.IsShowTitleBar ? "100px" : "70px";
+        
+
+        if (Model.IsShowBorder)
+        {
+            bodyBorder = "border:solid 2px " + fontColor  + ";";
+        }
+    
+        if (Model.IsTransParent)
+        {
+            bodyTransparent = "background-color: transparent;";
+        }
+
+        if (!string.IsNullOrEmpty(Model.TabsFontColor))
+        {
+            selectedPageColor = Model.TabsFontColor;
+        }
+    }
+}
+
+html{
+  height: 99%;
+}
+body {
+  min-height: 99%;
+}
+
+@@media screen and (max-width: 900px) {
+    #buyFrameWrapper {  height:1150px  !important;}
+}
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', Arial;
+            background-color: @backgroundColor;
+            @bodyBorder
+            color : @fontColor;
+            @bodyTransparent
+        }
+
+        a {
+            color:@fontColor;
+            cursor:pointer;
+                    }
+
+        a:hover {
+            /*color: #fb2d00;*/
+            opacity:0.5;
+        }
+
+        a:visited {
+            color:@fontColor
+;
+        }
+
+        .page_head {
+            background: #f5f8f9;
+            height: @titleHeight ;
+            width:100%;             
+        }
+
+            .page_head .indent {    
+                margin-left: 20px;
+                margin-top: 10px;
+                padding-top: 30px;
+            }
+
+                .page_head .indent .title {
+                    font-size: 23px;
+                    font-weight: bolder;
+                    text-transform: uppercase;
+                    text-decoration:none;
+                }
+
+            .page_head .subtitle {
+                margin-left: 20px;
+                padding-top: 5px;
+                font-size: 14px;
+                float: left;
+                width: 98%;
+            }
+
+                .page_head .subtitle .opened {
+                    display: inline-block;
+                    padding: 3px 8px 0 8px;
+                    margin: 0 5px;
+                    color: #fff;
+                    background: #e3e3e3;
+                    color: #000;
+                    padding-bottom: 20px;
+                    text-decoration: none;
+                }
+
+                .page_head .subtitle .arrow {
+                    display: inline-block;
+                    color: #000;
+                    text-decoration: none;
+                    background: url(/content/images/webstore/arrow_black.png) no-repeat right 9px;
+                    padding-right: 15px;
+                    margin-right: 3px;
+                }
+
+        nav {
+            height: 30px;
+        }
+
+            nav ul {
+                height: 26px;
+                display: block;
+                width: auto;
+                float: left;
+            }
+
+                nav ul li {
+                    padding: 0 10px 0 0;
+                    border-right: 2px solid @fontColor;
+                    margin: 0 0 0 10px;
+                    text-transform: uppercase;
+                    float: left;
+                    display: block;
+                }
+
+                    nav ul li.cb {
+                        padding-right: 25px;
+                        background: url(/content/images/webstore/arrow_black.png) no-repeat;
+                        background-position: 95% 7px;
+                    }
+
+                    nav ul li:first-child {
+                        margin-left: 0;
+                    }
+
+                    nav ul li:last-child {
+                        border-right: none;
+                    }
+
+                    nav ul li a {
+                        /*color: #323335;*/
+                        text-decoration: none;
+                        font-size: 14px;
+                    }
+
+                nav ul .bold {
+                    font-weight: bold;
+                }
+
+                nav ul li span.a {
+                    color: @fontColor; /*#323335;*/
+                    font-size: 14px;
+                    cursor: pointer;
+                }
+
+                nav ul li .bold {
+                    color: #323335;
+                    font-size: 14px;
+                    cursor: pointer;
+                    font-weight: bold;
+                }
+
+                nav ul li a:hover {
+                    color: #fb2d00;
+                }
+                /*nav ul li a.current,nav ul li span.a.current{color: #006699}*/
+
+                nav ul li.li-sub:hover .sub {
+                    display: block;
+                }
+
+                nav ul li div.sub {
+                    position: absolute;
+                    top: -10px;
+                    left: -6px;
+                    width: 270px;
+                    background: #1d1d1d;
+                    display: none;
+                    text-align: left;
+                    padding-bottom: 10px;
+                    z-index: 100001;
+                }
+
+                    nav ul li div.sub .inner {
+                        padding: 0 5px;
+                    }
+
+                    nav ul li div.sub .menu-name {
+                        padding-right: -20px;
+                        color: #FFF;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        margin: 5px auto 0;
+                        padding-bottom: 15px;
+                        background: url(/content/images/webstore/arrow.png) no-repeat right 7px;
+                        background-position: 64% 7px;
+                    }
+
+                    nav ul li div.sub .sub-menu-link {
+                        height: 12px;
+                        padding-bottom: 10px;
+                        margin-top: 10px;
+                        text-align: left;
+                    }
+
+                        nav ul li div.sub .sub-menu-link a {
+                            color: #FFF;
+                            font-size: 12px;
+                            text-decoration: none;
+                            text-transform: capitalize;
+                            font-weight: normal;
+                        }
+
+                            nav ul li div.sub .sub-menu-link a:hover {
+                                color: #fb2d00;
+                            }
+
+
+        .subtitle .share {
+           /* background: url("/content/images/webstore/arrow_black.png") no-repeat scroll right 10px transparent;*/
+            float: right;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-top: -29px;
+            width: 110px;
+        }
+
+            .subtitle .share a {
+                display: inline-block;
+                padding: 3px 8px 0 8px;
+                /*color: #323335;*/
+                text-decoration: none;
+            }
+
+        ul, ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        .page_content {
+        }
+
+            .page_content .indent {
+                margin: 20px;
+            }
+
+        .tool_bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: #fff;
+            background: url(/content/images/webstore/header_bg01.png) repeat-x top;
+            height: 34px;
+            width: 100%;
+            z-index: 100;
+        }
+
+        z
+       
+
+         .tool_bar_placeholder {
+            position: absolute;
+            
+            left: 0;
+            color: #fff;
+            background: url(/content/images/webstore/header_bg01.png) repeat-x top;
+            height: 34px;
+            width: 100%;
+            z-index: 100;
+        }
+
+            .tool_bar .logo {
+                float: left;
+                margin-left: 10px;
+                font: normal 12px arial;
+                line-height: 29px;
+                margin-top: 7px;
+                margin-right: 3px;
+            }
+
+            .tool_bar .power {
+                float: left;
+                margin-left: 5px;
+                font: normal 12px arial;
+                line-height: 29px;
+            }
+
+                .tool_bar .power a {
+                    color: #fff;
+                }
+
+                    .tool_bar .power a:hover {
+                        color: #fb2d00;
+                    }
+
+
+
+            .tool_bar .links {
+                float: right;
+                font: normal 12px arial;
+                margin-top: 5px;
+            }
+
+                .tool_bar .links a {
+                    display: inline-block;                 
+                    color: #fff;
+                    text-decoration: none;
+                }
+
+                .tool_bar .links .link {
+                    padding: 3px 8px 0 8px;
+                    display:inline-block;
+                }
+
+                    .tool_bar .links a:hover {
+                        color: #fb2d00;
+                    }
+
+                .tool_bar .links .opened {
+                    display: inline-block;
+                    padding: 3px 8px 0 8px;
+                    margin: 0 5px;
+                    color: #fff;
+                    background: #e3e3e3;
+                    color: #000;
+                    padding-bottom: 20px;
+                    text-decoration: none;
+                }
+
+                .tool_bar .links .arrow {
+                    background: url(/content/images/webstore/arrow.png) no-repeat right 9px;
+                    padding-right: 15px;
+                    margin-right: 3px;
+                }
+
+        
+
+        .dark {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            background: #000;
+            filter: alpha(opacity=75);
+            opacity: 0.75;
+            z-index: 20;
+        }
+
+        /*list sorting*/
+
+        .d-sort-row {
+            height: 30px;
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #000;
+        }
+
+            .d-sort-row label {
+                display: inline-block;
+                vertical-align: top;
+                margin: 0 5px 0 0;
+            }
+
+            .d-sort-row ul {
+                display: inline-block;
+                vertical-align: top;
+                border: none;
+            }
+
+                .d-sort-row ul li {
+                    float: left;
+                    margin: 0 10px 0 0;
+                }
+
+                    .d-sort-row ul li a {
+                        color: #000;
+                        cursor: pointer;
+                        text-decoration: none;
+                    }
+
+                        .d-sort-row ul li a.active {
+                            font-weight: bold;
+                            text-decoration: underline;
+            
+                        }
+
+
+
+        .CourseTitle {
+            margin-left: 2px;
+            margin-right: 2px;
+            min-height : 130px;
+        }
+
+            .CourseTitle h3 {                
+                font-size: 13px;
+                margin-top: 0;
+                font-weight: normal;
+            }
+
+            .CourseTitle h4 {
+                text-decoration: none;
+                margin-top: -12px;
+                font-size: 15px;
+                min-height: 100px;
+            }
+
+            #d-tab-content .promo .promo-item-wrapper .thumb-container CourseTitle .header4 {
+                color: #000;
+                text-decoration: none;
+                margin-top: 0px;
+                font-size: 15px;
+                min-height: 100px;
+            }
+
+             .CourseTitle .header4 {
+                color: #000;
+                text-decoration: none;
+                margin-top: 0px;
+                font-size: 15px;
+                min-height: 100px;
+            }
+
+        div {
+            display: block;
+        }
+
+        .navigationdiv {
+            padding-bottom: 5px;
+        }
+
+            .navigationdiv .sort {
+                font-size: 13px;
+                float: left;
+                display: inline-block;
+            }
+
+                .navigationdiv .sort a {
+                    text-decoration: none;
+                    color: @fontColor;
+                }
+
+                    .navigationdiv .sort a:hover {
+                        color: #fb2d00;
+                    }
+
+                .navigationdiv .sort .current {
+                    font-weight: bold;
+                    text-decoration: underline;
+                }
+
+            .navigationdiv .paging {
+                float: right;
+                display: inline-block;
+            }
+
+                .navigationdiv .paging a {
+                    font-size: 14px;                   
+                    text-decoration: none;
+                }
+
+
+                 .navigationdiv .paging .nextButton{
+                    vertical-align:middle;
+                    margin-top:-5px;
+                }
+
+                    .navigationdiv .paging a:hover {
+                        color: @selectedPageColor;
+                    }
+
+                .navigationdiv .paging .current {
+                    color: @selectedPageColor;
+                    font-weight: bold;
+                }
+
+                #li-not { display:inline-block;padding: 3px 8px 0 8px;}
+
+
+/*misc*/
+.inline{ display: inline-block !important;vertical-align: top}
+.inline-na{ display: inline-block !important}
+.no-bord{border:none !important}
+.float-left{float: left !important}
+.float-right{float: right !important}
+.btn{cursor: pointer}
+.loading-panel{width: 100%; height: 100%; top: 0; left: 0;display: none;opacity: 0.5;background-color: #cfcfcf}
+.ul-inline li{ display: inline-block;vertical-align: top}
+.rel{position: relative}
+
+/*user notifications*/
+#notif-container{position: absolute;top:25px;height: 425px;width: 264px;background:transparent;text-align: center;z-index: 1000}
+#notif-container .tri{width: 0;height: 0;border-style: solid;border-width: 0 10px 10px 10px;border-color: transparent transparent #dedede transparent;margin: 0 auto}
+#notif-container .ul-not-list{width: 235px;background: #dedede;padding: 7px}
+#notif-container .view-all{ height: 30px;display: block;background: #000;border-top: dotted 1px #fff; }
+#notif-container .view-all a{ display: block;font-size: 13px;color: #fff;text-decoration: underline;margin: 4px 0 0}
+
+
+
+.ul-not-list { border: none;text-align: left}
+.ul-not-list li{ height: auto;margin: 0;min-height: 30px;width: 100%;border-bottom: solid 1px #fff}
+.ul-not-list li .img-container{ width: 25px;height: 25px;margin: 5px 0 0}
+.ul-not-list li .img-container img{ width: 100%;height: 100%}
+.ul-not-list li .row{ width: 200px;margin: 0 0 0 5px}
+.ul-not-list li .txt{ font-size: 12px;color: #333;margin: 0 0 5px 0;max-height: 35px;}
+.ul-not-list li .auth{ height:14px;margin: 3px 0 5px;width: 100%;color: #000;font-size:12px}
+.ul-not-list li .room{ height:14px;margin: 3px 0 5px;width: 100%;font-size: 12px;color:#006699}
+.ul-not-list li .auth .cr-name{ float: left;color: #000;font-size: 12px;text-transform: capitalize;font-weight: bolder;text-decoration: underline}
+.ul-not-list li .auth .cr-name.topic{font-size: inherit}
+.ul-not-list li .auth .cr-name:hover{color:#006699}
+.ul-not-list li .auth .post-on{ float: right;font-size: 11px;color: #666}
+.ul-not-list li .auth .replay{ float: right;font-size: 11px;color: #000;text-transform: capitalize;cursor: pointer;text-decoration: underline;margin-left: 15px}
+.ul-not-list li span.btn{ color: #006699;text-decoration: underline;cursor: pointer}
+.d-user-not-container{ height:370px !important;overflow-y: hidden;background: none repeat scroll 0 0 #dedede}
+

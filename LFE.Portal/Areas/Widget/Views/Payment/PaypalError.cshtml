@@ -1,0 +1,23 @@
+﻿@model string
+
+@{
+	ViewBag.Title = "Paypal Error";
+	Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+}
+@section scripts
+{
+	<script>
+        $(document).ready(function () {
+            hideLoader();
+			try {
+				window.opener.showMessage('@Model','error');
+				window.close();
+			} catch(e) {
+
+			} 
+			
+		});
+	</script>
+}
+
+<h2 style="width: 600px; margin: 25px auto 0" id="hm">@Model</h2>

@@ -1,0 +1,36 @@
+﻿@model LFE.DataTokens.ChimpUserListDTO
+
+@{
+    ViewBag.Title = "Save Mailchimp Credentials";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="~/Areas/AuthorAdmin/Content/styles/mailChimp.css" rel="stylesheet" />
+}
+
+<div class="mc-header">
+    <h1>MAILCHIMP INTEGRATION</h1>
+</div>
+
+@{
+    if (!Model.IsValid)
+    {
+        <div class="mc-errorBox">
+            <div class="header"><h2>Errors</h2></div>
+            <div class="content">
+                @Html.Raw(Model.Message)
+            </div>
+        </div>
+    }
+}
+
+<div class="mc-content">
+    <h2>Welcome to your MailChimp LFE Extension</h2>
+    <div style="margin-bottom: 50px;">We want to see your classrooms grow, and your sales to sky rocket. This means ensuring you can communicate with your learners as a routine.  Our goal is to make this communication simple and effective. Here are 3 easy steps to set up your MailChimp - LFE mailing list and segments:</div>
+    
+    @Html.Partial("Mailchimp/_LoginPartial",Model)
+    
+</div>
+

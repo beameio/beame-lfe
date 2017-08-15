@@ -1,0 +1,39 @@
+﻿@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    var isTransparent = false;
+    var bgColor = string.Empty;
+    var customSettings = false;
+
+    if (viewModel != null && viewModel.WebStore != null)
+    {
+        var store = viewModel.WebStore;
+        isTransparent = store.IsTransParent;
+        bgColor = String.IsNullOrEmpty(store.BackgroundColor) ? string.Empty : store.BackgroundColor;
+
+        customSettings = isTransparent || !String.IsNullOrEmpty(bgColor);
+    }
+
+    if (customSettings)
+    {
+
+        if (isTransparent)
+        {
+            <style>
+                body {
+                    background-color: transparent !important;
+                }
+            </style>
+        }
+        else
+        {
+            if (!String.IsNullOrEmpty(bgColor))
+            {
+                <style>
+                    body {background-color: @bgColor !important}
+                    .pp-price-row .bg-overlay{background-color: @bgColor !important}
+                </style>
+            }
+        }
+    }
+}

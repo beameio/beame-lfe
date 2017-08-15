@@ -1,0 +1,118 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@model LFE.DataTokens.ChimpUserListDTO
+
+@{
+    int totalActive = 0, totalInActive = 0;
+    List<ChimpListSegmentDTO> bundleList = null;
+    if (Model.Segments != null)
+    {
+        bundleList = Model.Segments.Where(x => x.BundleId != null).ToList();
+
+        var activeList = Model.Segments.Where(x => x.SegmentType == eSegmentTypes.Active).Select(x => x.TotalSubscribers).ToList();
+        totalActive = activeList.Count > 0 ? activeList[0] : 0;
+
+        var inactiveList = Model.Segments.Where(x => x.SegmentType == eSegmentTypes.InActive).Select(x => x.TotalSubscribers).ToList();
+        totalInActive = inactiveList.Count > 0 ? inactiveList[0] : 0;
+    }
+}
+
+
+
+<div class="mc-table">
+    <div class="mc-row">
+        <div class="mc-cell">
+
+            <h1>All Subscribers</h1>
+            <div class="info-row"><div><h2>Segment</h2></div><div><h2>No. of learners</h2></div></div>
+
+            <div class="info-row">
+                <div class="ellipsis">My LFE Learners</div>
+                <div>@Model.TotalSubscribers</div>
+            </div>
+            <div class="info-row">
+                <div class="ellipsis">LFE My Active Subscribers</div>
+                <div>@totalActive</div>
+            </div>
+            <div class="info-row">
+                <div class="ellipsis">LFE My Non-Active Subscribers</div>
+                <div>@totalInActive</div>
+            </div>
+
+        </div>
+        <div class="mc-cell">
+
+            @{
+                if (bundleList != null && bundleList.Count > 0)
+                {
+                    <h1>Subscribers per bundle</h1>
+                    <div class="info-row"><div><h2>Segment</h2></div><div><h2>No. of learners</h2></div></div>
+                    foreach (var segmentToken in bundleList.Where(x => x.SegmentType == eSegmentTypes.Item))
+                    {
+                        <div class="info-row">
+                            <div class="ellipsis" title="@segmentToken.Name">@segmentToken.Name</div>
+                            <div>@segmentToken.TotalSubscribers</div>
+                        </div>
+                    }
+                    <div style="height: 30px;"></div>
+                }
+            }
+
+
+            <h1>Subscribers per course</h1>
+            <div class="info-row"><div><h2>Segment</h2></div><div><h2>No. of learners</h2></div></div>
+
+            @{
+                if (Model.Segments != null)
+                {
+                    foreach (var segmentToken in Model.Segments.Where(x => x.SegmentType == eSegmentTypes.Item && x.CourseId != null))
+                    {
+                        <div class="info-row">
+                            <div class="ellipsis" title="@segmentToken.Name">@segmentToken.Name</div>
+                            <div>@segmentToken.TotalSubscribers</div>
+                        </div>
+                    }
+                }
+            }
+
+
+        </div>
+        <div class="mc-cell">
+
+            @{
+                if (bundleList != null && bundleList.Count > 0)
+                {
+                    <h1>New learners per bundle</h1>
+                    <div class="info-row"><div><h2>Segment</h2></div><div><h2>No. of learners</h2></div></div>
+                    foreach (var segmentToken in bundleList.Where(x => x.SegmentType == eSegmentTypes.ItemNew))
+                    {
+                        <div class="info-row">
+                            <div class="ellipsis" title="@segmentToken.Name">@segmentToken.Name</div>
+                            <div>@segmentToken.TotalSubscribers</div>
+                        </div>
+                    }
+                    <div style="height: 30px;"></div>
+                }
+            }
+
+            <h1>New learners per course</h1>
+            <div class="info-row"><div><h2>Segment</h2></div><div><h2>No. of learners</h2></div></div>
+
+            @{
+                if (Model.Segments != null)
+                {
+                    foreach (var segmentToken in Model.Segments.Where(x => x.SegmentType == eSegmentTypes.ItemNew && x.CourseId != null))
+                    {
+                        <div class="info-row">
+                            <div class="ellipsis" title="@segmentToken.Name">@segmentToken.Name</div>
+                            <div>@segmentToken.TotalSubscribers</div>
+                        </div>
+                    }
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+

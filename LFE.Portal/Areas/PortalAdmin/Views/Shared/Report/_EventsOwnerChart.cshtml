@@ -1,0 +1,166 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+@{
+    var colors = new[]
+    {
+        "#7f003d", "#00b3af", "#4e516a", "#00deff", "#ff544e", "#29abe2", "#c7b299", "#f7931e", "#662d91", "#ed1e79","#de4542", "#ffcfaa", "#825730", "#7c999c", "#8ec4b3", "#29abe2", "#fbb03b", "#ff7bac", "#8cc63f", "#c1272d"
+    };
+}
+
+  
+
+<script>
+    var palettes = [
+      { id: 0, colors: ["#7f003d", "#00b3af", "#4e516a", "#00deff", "#ff544e", "#29abe2", "#c7b299", "#f7931e", "#662d91", "#ed1e79"] }
+    , { id: 1, colors: ["#45c4ae", "#e0cd95", "#477f77", "#fff6ad", "#d93e38", "#1e88ad", "#fcb465", "#fc4700", "#3fa7aa", "#ff037c"] }
+    , { id: 2, colors: ["#de4542", "#ffcfaa", "#825730", "#7c999c", "#8ec4b3", "#29abe2", "#fbb03b", "#ff7bac", "#8cc63f", "#c1272d"] }
+    , { id: 3, colors: ["#c25c31", "#4e6a82", "#dea863", "#ffe3b6", "#a84d81", "#6f9337", "#ef8e0c", "#ce0557", "#03dbd0", "#7670c1"] }
+    , { id: 4, colors: ["#adaca2", "#828594", "#614b59", "#bfc47d", "#e3e2b", "#6f9337", "#ff9b24", "#ef036f", "#11f7e6", "#8484d3"] }
+    , { id: 5, colors: ["#a69e22", "#c0c44a", "#f28f6b", "#f14518", "#e21b02", "#bdf74d", "#00bdff", "#ff57ab", "#64a09a", "#111196"] }
+    , { id: 6, colors: ["#516363", "#b5b214", "#de9729", "#857c43", "#782121", "#f4dc4e", "#258aa5", "#b20865", "#20baa7", "#cc5a05"] }
+    , { id: 7, colors: ["#2cb4c6", "#1be6c7", "#b0d547", "#e2ffa4", "#9ad7f0", "#f25151", "#00dbff", "#ff069a", "#52fc1a", "#fc6600"] }
+    , { id: 8, colors: ["#326b3f", "#b9d65d", "#e9ffc9", "#78d6c2", "#18445c", "#bc3f3f", "#31a3af", "#a31771", "#45ad14", "#93ccce"] }
+    , { id: 9, colors: ["#252326", "#f87259", "#8fbfa4", "#a9d7da", "#a93447", "#fcb981", "#21d2db", "#c950a4", "#a9d891", "#3f9e4a"] }
+    ];
+
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindEventReport, rebindEventsChart, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.rebindEventReport, rebindEventsChart, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindKpiEventReport, rebindEventsChart, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.rebindKpiEventReport, rebindEventsChart, null);
+    });
+
+    function rebindEventsChart() {
+        $('#EventsOwnerChart').data("kendoChart").dataSource.read();
+    }
+
+</script>
+
+<div class="inline d-chart-row">
+
+
+    @(Html.Kendo().Chart<FactOwnerDailyEventStatsDTO>()
+          .Name("EventsOwnerChart")
+          .Title("Events chart report by roles")
+            .HtmlAttributes(new { @style = "height:400px" })
+          .Legend(legend => legend
+              .Position(ChartLegendPosition.Top)
+          )
+          .AutoBind(false)
+          .DataSource(ds => ds.Read(read => read.Action("EventOwnerChartData", "Report").Data("getEventRepData")))
+          .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff").Template("#=series.name# - #=value #")))
+          .Series(series =>
+          {
+              series.Line(model => model.TotalEvents).Name("Total Events").Color(colors[15]);
+              
+              series.Line(model => model.LearnerEvents).Name("Learner Events").Color(colors[0]);
+              series.Line(model => model.AuthorEvents).Name("Author Events").Color(colors[1]);
+
+          })
+          .CategoryAxis(axis => axis
+              .Date()
+              .BaseUnit(ChartAxisBaseUnit.Weeks)
+              .Categories(model => model.FactDate)
+              .Labels(labels => labels.Rotation(-90))
+          )
+          .ValueAxis(axis => axis.Logarithmic()
+              .Labels(labels => labels.Format("{0:N0}"))
+          )
+          .Tooltip(tooltip => tooltip
+              .Visible(true)
+              .Format("{0:N0}")
+              .Color("#fff")
+          )
+    )
+</div>
+
+<div class="config-section inline">
+    <span class="configHead">Base date unit</span>
+    <ul id="daily-stats-options" class="options">
+        <li>
+            <input id="baseUnitAutoS" name="baseUnitS" type="radio" value="" autocomplete="off" />
+            <label for="baseUnitAuto">
+                Automatic (default)
+            </label>
+        </li>
+        <li>
+            <input id="baseUnitYearsS" name="baseUnitS" type="radio" value="years" autocomplete="off" />
+            <label for="baseUnitYears">
+                Years
+            </label>
+        </li>
+        <li>
+            <input id="baseUnitMonthsS" name="baseUnitS" type="radio" value="months" autocomplete="off" />
+            <label for="baseUnitMonths">
+                Months
+            </label>
+        </li>
+        <li>
+            <input id="baseUnitWeeksS" name="baseUnitS" type="radio" value="weeks" autocomplete="off" checked="checked" />
+            <label for="baseUnitWeeks">
+                Weeks
+            </label>
+        </li>
+        <li>
+            <input id="baseUnitDaysS" name="baseUnitS" type="radio" value="days" autocomplete="off"  />
+            <label for="baseUnitDays">
+                Days
+            </label>
+        </li>
+    </ul>
+
+    <hr />
+
+    <span class="configHead">Chart State</span>
+    <ul id="daily-stats-types" class="options">
+        <li>
+            <input id="typeLineS" name="seriesTypeS"
+                   type="radio" value="line" autocomplete="off" checked="checked" />
+            <label for="typeLine">Lines</label>
+        </li>
+        <li>
+            <input id="typeColumnS" name="seriesTypeS"
+                   type="radio" value="column" autocomplete="off" />
+            <label for="typeColumn">Columns</label>
+        </li>
+        @*<li>
+                <input id="typeBarS" name="seriesTypeS"
+                       type="radio" value="bar" autocomplete="off" />
+                <label for="typeBar">Bars</label>
+            </li>*@
+        <li>
+            <input id="stackS" type="checkbox" autocomplete="off" />
+            <label for="stack">Stacked</label>
+        </li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#daily-stats-options").bind("change", refreshStatsCharts);
+        $("#daily-stats-types").bind("change", refreshStatsCharts);
+    });
+    function setChartState(chart, type, stack, baseUnit) {
+        var series = chart.options.series,
+            categoryAxis = chart.options.categoryAxis;
+
+        categoryAxis.baseUnit = baseUnit;
+
+        for (var i = 0, length = series.length; i < length; i++) {
+            series[i].stack = stack;
+            series[i].type = type;
+        };
+
+        chart.refresh();
+    }
+    function refreshStatsCharts() {
+     
+        var type = $("input[name=seriesTypeS]:checked").val(),
+            stack = $("#stackS").prop("checked"),
+            baseUnit = $("input:radio[name=baseUnitS]").filter(":checked").val();
+
+        window.setChartState($('#EventsOwnerChart').data("kendoChart"), type, stack, baseUnit);
+    }
+</script>

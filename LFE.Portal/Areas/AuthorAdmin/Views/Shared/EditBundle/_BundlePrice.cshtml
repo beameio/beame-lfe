@@ -1,0 +1,64 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model BundlePriceDTO
+
+<script type="text/javascript">
+	var formPriceUserNotifManager;
+	$(document).ready(function () {
+		
+	    formPriceUserNotifManager = new UserNotificationManager('#cp-info', '.alert', false);
+
+	    $('#btn-submit-bp').unbind('click').click(function (e) {
+	        e.preventDefault();
+	        $('#frmBundlePrice').submit();
+	    });
+	});
+	
+	function onPriceSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Bundle price saved successfully" : response.error;
+
+		if (response.success) {
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+
+		formPriceUserNotifManager.show({ message: msg, kind: kind });
+	}
+</script>
+
+<div style="width: 540px;">
+    @using (Ajax.BeginForm("SaveBundlePrice", "Course", new { id = Model.BundleId }, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#f-cp', null)", OnSuccess = "onPriceSaved", LoadingElementId = "site-loader" }, new { @id = "frmBundlePrice", @class = "rel", @style = "width: 640px" }))
+    {
+        @Html.HiddenFor(x => x.BundleId)
+        <fieldset id="f-cp">
+            <legend></legend>
+            <ul class="ul-edit-form cp1 inline">
+                <li>
+                    <div class="input-container" style="width: 90px;">
+                        @(Html.Kendo().NumericTextBoxFor(m => m.AffiliateCommission).Format("{0:N0}").Decimals(0).Min(0).Max(100).Spinners(false).HtmlAttributes(new { @class = "k-tb-reset", @style = "width:85px" }))
+                    </div>
+                    <label class="symb">%</label>
+                    @Html.LabelFor(m => m.AffiliateCommission, new { @style = "width: auto" })
+                </li>
+            </ul>
+        </fieldset>
+
+        <a href="#" id="btn-submit-bp" style="right:2px;bottom:10px;" class="action-button">Save</a>       
+    }
+    
+     @Html.Partial("Pricing/_ManageItemPrices", new PriceLinesManageToken
+        {
+            Item = new BaseItemToken { ItemId = Model.BundleId, ItemType = BillingEnums.ePurchaseItemTypes.BUNDLE }
+            ,Currency = Model.Currency
+        })
+
+    <div id="cp-info" class="info-box" style="width: 960px;height: 40px;margin-left: 0;">
+        <p class="alert inline"></p>
+        @*<div class="inline btn-container">
+                <label class="price-info inline">Bundle can have a one-time or monthly subscription price, or both</label>
+                <a href="javaScript:submitForm('frmBundlePrice')" class="inline btn-submit">save changes</a>
+            </div>*@
+    </div>    
+</div>
+

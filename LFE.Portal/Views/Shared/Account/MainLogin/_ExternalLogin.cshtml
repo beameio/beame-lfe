@@ -1,0 +1,75 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+
+@Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+
+<div  id="btn-fb-login" onclick="javascript: showFormLoader('.wnd-login');"  title="Connect with Facebook" class="btn-fb-login"></div>
+
+<script>
+    var socialLoginUrl = '@Url.Action("FbLogin", "Account", new { area = "Widget"})';
+
+    $(document).ready(function () {
+
+
+        $('#btn-fb-login').unbind('click').click(function () {
+
+            if (typeof FB !== 'undefined' && typeof FB.login === 'function') {
+                FB.login(function(response) {
+                    if (response.authResponse && response.status === 'connected') {
+                        onFacebokLoginSuccess(response.authResponse);
+                    } else {
+                        hideFormLoader();
+                    }
+                }, { scope: 'email,user_birthday,publish_stream' });
+            } else {
+                console.log('FB undefined');
+            }
+        });
+    });
+
+    function onFacebokLoginSuccess(response) {
+        var fbData = { provider: 'facebook', token: response.accessToken, typeId: '@((byte)Model.RegistrationSource)', trackingId: '@Model.TrackingID',returnUrl:'@(Html.Raw(Model.RedirectUrl))' };
+        console.log(fbData);
+
+        //$.ajax({
+        //    url: socialLoginUrl,
+        //    cache: false,
+        //    type: "Post",
+        //    data: JSON.stringify(fbData),
+        //    datatype: "json",
+        //    contentType: "application/json; charset=utf-8"
+		//    , success: function (data) {
+		//        if (data.isSuccess) {
+
+		//            //document.location.reload();
+		//            if (hasValue(data.responseUrl)) {
+		//                document.location.href = data.responseUrl;
+		//            } else {
+		//                document.location.reload();
+		//            }
+		//        } else {
+		//            hideFormLoader();
+		//            $('#loginError').text('Failed to login with facebook').show();
+		//        }
+		//}
+		//, error: function () {
+		//    hideLoader();
+		//}
+        //});
+
+        $.post(window.socialLoginUrl,fbData, function (data) {
+            if (data.isSuccess) {
+                console.log(data.responseUrl);
+                //document.location.reload();
+                if (hasValue(data.responseUrl)) {
+                    document.location.href = data.responseUrl;
+                } else {
+                    document.location.reload();
+                }
+            } else {
+                hideFormLoader();
+                $('#loginError').text('Failed to login with facebook').show();
+            }
+        });
+    }
+</script>

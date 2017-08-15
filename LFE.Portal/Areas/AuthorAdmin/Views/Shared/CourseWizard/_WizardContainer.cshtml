@@ -1,0 +1,11 @@
+﻿@using LFE.DataTokens
+@model CourseWizardDto
+@Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+<div class="head">&nbsp;</div>
+<div class="nav-tree-container">
+	@Html.Partial("CourseWizard/_WizardNavTree",Model)
+</div>
+<div class="step-container" id="step-container">
+	@Html.Partial("CourseWizard/_StepContainer",Model)
+</div>
+  

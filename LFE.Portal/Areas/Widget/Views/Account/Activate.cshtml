@@ -1,0 +1,37 @@
+﻿@using LFE.Portal
+@model string
+
+@{
+    ViewBag.Title = "Register";
+    ViewBag.ActivePage = Consts.PAGE_ACCOUNT_LFE;
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetLayout.cshtml";
+}
+
+
+
+@{
+    ViewBag.Title = "Activate";
+   
+}
+@section CSS
+{
+   
+@*         <link href="@Url.Content("~/Content/register.css")?ver="2" rel="stylesheet" type="text/css" />*@
+
+}
+
+<h1>REGISTRATION</h1>
+<div id="register-confirmation">
+    @if (ViewBag.IsSuccess)
+    { 
+        <h2>Thank you for completing the registration, @Model!</h2>
+        <h2>Your account is now active.</h2>
+    }
+    else { 
+        <h2>@Model</h2>
+    }
+    
+  @*  <div class="thank-wrapper">
+        <div class="thank-image"></div>
+    </div>*@
+</div>

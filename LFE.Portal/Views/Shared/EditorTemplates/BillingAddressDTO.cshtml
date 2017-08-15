@@ -1,0 +1,213 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.BillingAddressDTO
+@{
+    var hasStates = Model.CountryId != null && this.HasStates(Model.CountryId);
+}
+<script type="text/javascript">
+    var countries_with_states = [13 //Australia
+                             , 38 //Canada
+                             , 840 //India
+                             , 973 //USA
+    ];
+    var currentCountryId;
+    $(document).ready(function () {
+        var addressId = $('#AddressId').val();
+
+        if (!hasValue(addressId)) $('#AddressId').val(-1);
+
+        $.validator.setDefaults({ ignore: '' });
+    });
+
+    function onCountriesBound(e) {
+        
+        var combo = e.sender;
+
+        var comboVal = combo.value();
+
+        var cid = '@Model.CountryId';
+
+        var id = hasValue(cid) ? cid : comboVal;
+
+        currentCountryId = id;
+
+        setTimeout(function() {
+            handleCountryEvents(id);
+            window.getNotifManagerInstance().notify(notifEvents.object.addressFormLoaded);
+        }, 500); 
+
+        
+    }
+
+    function onStatesBound(e) {
+        handleStateCombo(e.sender,currentCountryId);
+    }
+
+    function countrySelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.id;
+        currentCountryId = id;
+        handleCountryEvents(id);
+    };
+
+    function countryChanged(e) {        
+        var id = e.sender.value();
+        currentCountryId = id;
+        handleCountryEvents(id);        
+    };
+
+    function handleCountryEvents(id) {
+        var comboState = $('#StateId').data("kendoDropDownList");
+        if (comboState == undefined) return;
+        handleStateCombo(comboState, id);      
+    }
+    
+   function hasStates(id) {
+        
+        if (!hasValue(id)) return false;
+
+        try {
+            var countryId = Number(id);
+
+           // console.log('hasState result' + $.inArray(countryId, countries_with_states));
+
+            return $.inArray(countryId, countries_with_states) >= 0;
+
+        } catch (e) {
+            return false;
+        }
+    }
+
+   function handleStateCombo(comboState, id) {
+       console.log('handleStateCombo id' + id);
+
+        if (!hasValue(id)) return;
+
+        var hasState = hasStates(id);
+        
+        comboState.enable(hasState);
+       // alert('hasState ' + hasState);
+        console.log('hasState ' + hasState);
+       
+        if (hasState) {
+            $.validator.setDefaults({ ignore: '' });
+            comboState.dataSource.read();
+            //show required
+            //if (!hasValue(comboState.value())) $('span[data-valmsg-for="StateId"]').html('<span for="StateId" generated="true" class="">*</span>').removeClass('field-validation-valid').addClass('field-validation-error');
+        } else {
+            // $(comboState.element).attr("disabled", "disabled");
+            console.log('set validator');
+            $.validator.setDefaults({ ignore: ':disabled #StateId' });
+            comboState.value(null);            
+            ////hide required state
+            //$('span[data-valmsg-for="StateId"]').empty();
+        }
+    }
+    
+
+    function resetContactForm() {
+        $('#Street1').val(null);
+        $('#Street2').val(null);
+        $('#PostalCode').val(null);
+        $('#City').val(null);
+
+        try {
+            var comboState = $('#StateId').data("kendoDropDownList");
+            comboState.value(null);
+            var comboCounty = $('#CountryId').data("kendoDropDownList");
+            comboCounty.value(null);
+        } catch(e) {
+
+        } 
+    }
+
+    function onAddressStatesRead() {
+        return {
+            countryId: $('#CountryId').data("kendoDropDownList").value()
+        };
+    }
+</script>
+
+@Html.HiddenFor(m=>m.AddressId)
+@Html.HiddenFor(m=>m.IsDefault)
+@Html.HiddenFor(m=>m.IsActive)
+
+
+<div class="form-horizontal" role="form">
+    <div class="form-group">
+        @Html.LabelFor(m => m.BillingFirstName, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.BillingFirstName)
+            @Html.TextBoxFor(m => m.BillingFirstName, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.BillingLastName, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.BillingLastName)
+            @Html.TextBoxFor(m => m.BillingLastName, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.Street1, new { @class = "control-label col col-xs-12 col-sm-4" })
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.Street1)
+            @Html.TextBoxFor(m => m.Street1, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Street2, new { @class = "control-label col col-xs-12 col-sm-4" })
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.TextBoxFor(m => m.Street2, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.City, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.City)
+            @Html.TextBoxFor(m => m.City, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PostalCode, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.PostalCode)
+            @Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(m => m.CountryId, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.CountryId)
+            @(Html.Kendo().DropDownListFor(model => model.CountryId)
+                    .DataTextField("CountryName")
+                    .DataValueField("CountryId")
+                    .OptionLabel("select country")
+                    .HtmlAttributes(new { @class = "form-control form-drop" })
+                    .Value(Model.CountryId.ToString())
+                    .Events(e => e.Select("countrySelected").DataBound("onCountriesBound").Change("countryChanged"))
+                    .BindTo(this.ActiveCountriesLOV())
+            )
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.StateId, new { @class = "control-label col col-xs-12 col-sm-4" })
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.StateId)
+            @(Html.Kendo().DropDownListFor(model => model.StateId)
+                    .OptionLabel("-- select state --")
+                    .DataTextField("StateName")
+                    .DataValueField("StateId")
+                    .HtmlAttributes(new { @class = "form-control form-drop" })
+                    .Enable(hasStates)
+                    .AutoBind(hasStates)
+                   // .Events(e => e.DataBound("onStatesBound"))
+                    .DataSource(action => action.Read(read => read.Action("GetCountryStates", "Geo", new { area = "" }).Data("onAddressStatesRead")).ServerFiltering(true))
+            )
+        </div>
+    </div>
+
+</div>

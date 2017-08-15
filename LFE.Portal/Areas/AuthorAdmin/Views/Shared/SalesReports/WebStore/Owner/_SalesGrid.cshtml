@@ -1,0 +1,28 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+
+@(Html.Kendo().Grid<OrderLineDTO>()
+        .Name("SalesReport")
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.WebStore.Name).Title("Store");
+            columns.Bound(p => p.ItemName).Title("Item Name");
+            columns.Bound(p => p.Seller.FullName).Title("Seller");
+            columns.Bound(p => p.Buyer.FullName).Title("Buyer");
+            columns.Bound(p => p.OrderDate).Title("Date").Format("{0:d}");
+            columns.Bound(p => p.TotalAmount).Title("Amount").ClientTemplate("#=kendo.toString(TotalAmount, \"n2\")##=Currency.Symbol#").Width(100);//.ClientFooterTemplate("Total: #= kendo.toString(sum, 'c0') #");            
+        })
+        .Sortable()
+        .Pageable(pager => pager.Numeric(true).Refresh(true).PageSizes(true))
+        .Filterable(f => f.Enabled(false))
+        .ClientDetailTemplateId("template-payment")
+        .DataSource(dataSource => dataSource.Ajax()
+                            .Aggregates(aggregates => aggregates.Add(p => p.TotalAmount).Sum())
+                            .Model(model => model.Id(p => p.LineId))
+                            .Read(read => read.Action("GetOwnerStoresOnetimeSales", "WebStore", new { area = "AuthorAdmin" }).Data("getRequestParams").Type(HttpVerbs.Get)).Events(e => e.RequestEnd("onSalesReportRequestEnd"))
+                            .PageSize(20))
+)
+
+

@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html style="background: #efefef !important">
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    <title>Author Dashboard</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    @Html.Partial("Dashboard/_dbHeaderScripts")
+
+    @RenderSection("css", false)
+    @RenderSection("scripts", false)
+</head>
+<body>
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">        
+        <div class="d-body row">@RenderBody()</div>
+    </div>
+   @Html.Partial("Dashboard/_dbFooterScripts")
+</body>
+
+</html>

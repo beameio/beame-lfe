@@ -1,0 +1,78 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Extensions
+@using LFE.Portal.Areas.Widget.Helpers
+@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.ItemProductPageToken
+
+
+
+<div itemscope itemtype="http://schema.org/Product">
+    <div class="pp-head">
+        @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_ItemProductPageHeader.cshtml", Model)
+    </div>
+
+
+    <div class="pp-price-row rel">
+        <div class="bg-overlay">&nbsp;</div>
+        @{
+            var g2tRight = 0;
+
+            if (Model.IsItemUnderRGP)
+            {
+                g2tRight = 110;
+
+                <div class="icon-grp"></div>
+            }
+
+           
+            if (Model.ItemState != null && (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed) && !Model.ItemState.IsPreview)
+            {
+                var pageUrl = this.GenerateItemPageUrl(Model.Author.FullName, Model.ItemName, Model.ItemType, Model.TrackingID);
+                <a class="price-container own-course" href="@pageUrl" target="_blank">
+                    <label class="free">Click to learn</label>
+                    <span style="display: block" class="buy-now">open it!</span>
+                </a>
+            }
+            else
+            {
+                @Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemProductPagePrices.cshtml", Model)
+                if (Model.IsFreeItem)
+                {
+                    var price = Model.PriceLines.Any(x => x.PriceType == BillingEnums.ePricingTypes.FREE) ? Model.PriceLines.FirstOrDefault(x => x.PriceType == BillingEnums.ePricingTypes.FREE) : null;
+
+                    using (Ajax.BeginForm("PurchaseFreeCourse", "Checkout", new { area = "Widget", courseId = Model.ItemId, trackingId = Model.TrackingID, id = price != null ? price.PriceLineID : -1 }, new AjaxOptions { OnSuccess = "onFreeItemPurchaceComplete" }, new { @id = "frm-free-item" })) { }
+                }
+            }
+        }
+
+    </div>
+
+    <div class="pp-nav row">        
+        @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_ItemProductPageTabsNav.cshtml")
+    </div>
+
+    <div class="row">
+        <div class="tab-content">
+            <div class="tab-pane active col-xs-12" id="tp-content">
+                @{
+                    switch (Model.ItemType)
+                    {
+                        case BillingEnums.ePurchaseItemTypes.COURSE:
+                            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/_CourseContent.cshtml", Model)
+                            break;
+                        case BillingEnums.ePurchaseItemTypes.BUNDLE:
+                        @Html.Partial("~/Areas/Widget/Views/Shared/Item/Bundle/_BundleContent.cshtml", new BundleContentsPageToken { Item = Model.ProductPageToken2ItemIntroToken(), courses = Model.BundleDetails.BundleCourses, mode = ePageMode.Product })
+                            break;
+                    }
+                }
+            </div>
+            <div class="tab-pane col-xs-12" id="tp-author"></div>
+            @{
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+                {
+                    <div class="tab-pane col-xs-12" id="tp-reviews"></div>
+                }
+            }
+        </div>
+    </div>
+</div>

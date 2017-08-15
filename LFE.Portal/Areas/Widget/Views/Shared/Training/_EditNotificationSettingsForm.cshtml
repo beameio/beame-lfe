@@ -1,0 +1,51 @@
+﻿@model LFE.DataTokens.WidgetTrainingRegistrantDTO
+    
+<div class="head">
+    <h3 class="name">@Model.Title</h3>
+    <h4 class="start">
+        Live session will take place: @Model.Start.ToUniversalTime().ToString("r")
+    </h4>
+</div>
+<div class="places-left-container">
+    <div class="inner">
+        <span class="cnt">@Model.PlacesLeft</span>
+        <span class="info">places left</span>
+    </div>
+</div>
+<div class="user-notif-opt">
+    <label class="info">Get notification one hour before session begins:</label>
+    <div class="opt-form">
+        @using (Ajax.BeginForm("UpdateNotificationSettings", "Training", new { area = "Widget", id = Model.RegistrantId }, new AjaxOptions { OnSuccess = "onSettingsUpdated" }, new { @id = "frmG2tUserSettings" }))
+        {
+            @Html.Partial("Training/_UserNotificationSettings",Model.NotificationSettings)
+        }
+        <script>
+            setTimeout(function() {
+                window.getNotifManagerInstance().unsubscribe(notifEvents.training.actionButtonClicked, submitNotifSettings, null);
+                window.getNotifManagerInstance().subscribe(notifEvents.training.actionButtonClicked, submitNotifSettings, null);
+            }, 2000);
+
+            function submitNotifSettings() {
+                showLoader();
+                $('#frmG2tUserSettings').submit();
+            }
+
+            function onSettingsUpdated(response) {
+                window.hideLoader();
+
+                if (response.success) {
+                    swal(
+                        {
+                            title: "Success",
+                            text: "Notification settings updated",
+                            type: "success"
+                        }, function () {
+                            window.loadUserG2TForm();
+                        });
+                } else {
+                    sweetAlert("Oops...", response.error, "error");
+                }
+            }
+        </script>
+    </div>
+</div>

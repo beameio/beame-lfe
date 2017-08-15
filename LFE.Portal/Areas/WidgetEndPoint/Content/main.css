@@ -1,0 +1,69 @@
+﻿body, html { width: 100%;height: 100%;margin: 0;padding: 0;}
+body { color: #444444;background-color: #f1f1f1; font-family: 'Open Sans',Arial; }
+* {
+    box-sizing: border-box;
+    moz-box-sizing: border-box;
+    font-size: 1em;
+}
+.wep_topbox, .wep_bottombox {
+    padding: 25px 70px 30px 115px;position: relative;
+}
+.wep_topbox {
+    background: #FFFFFF url(assets/logo.png) no-repeat 20px 20px;
+}
+.wep_bottombox { padding-top: 0px; }
+.wep_bottombox .welcomeBox { padding: 20px 0px; border-bottom: solid 1px #cdcdcd; }
+.wep_bottombox .hidden { visibility: hidden; }
+.wep_bottombox .cell {
+    position: relative;
+    width:45%; 
+    text-align: center;
+    margin-left: 5%;
+    float: left;
+}
+.wep_bottombox .cell:last-of-type { margin-left: 0px; }
+.vert_separator {
+    border-left: solid 1px #3b3b3b;
+    position: absolute;
+    height: 235px;
+    right: 0px;bottom: 0px;
+}
+/* font styling */
+.wep_bottombox a:link, .wep_bottombox a:visited, .wep_bottombox a:hover, .wep_bottombox a:active {
+    color: inherit;
+    text-decoration: none;
+    outline: 0;
+}
+.wep_bottombox span { font-size: 1.2em; }
+.wep_bottombox .welcomeBox a { float: right;text-decoration: underline; }
+.wep_topbox h2, .wep_bottombox h2 { font-weight: normal;font-size: 1.2em;margin-bottom: 0px; border: solid 0px red; }
+.wep_topbox h1, .wep_bottombox h1 { font-weight: normal;font-size: 1.6em;margin: 0px 0px 25px 0px; }
+.wep_topbox h3, .wep_bottombox h3 { font-weight: normal;font-size: 1.3em;margin: 10px 0px 25px 0px; }
+.wep_topbox h4, .wep_bottombox h4 { font-weight: bold;font-size: 1.4em;margin: 0px 0px 0px 0px; }
+.wep_topbox span { font-size: 0.9em; }
+
+
+#wep_msgCont {
+    top: 0;left: 0;
+    width: 100%;height: 100%;
+    position: absolute;
+    display: none;
+}
+
+#wep_msgCont .cover {
+    top: 0;left: 0;
+    width: 100%;height: 100%;
+    position: absolute;
+    background-color: #000000;
+    opacity: 0.7;
+    -moz-opacity: 0.7;
+}
+
+#wep_msgCont #divMsg {
+    position: relative;
+    background-color: #B22222;
+    padding: 30px 20px;
+    top: 312px;
+    text-align: center;
+    color: #FFFFFF;
+}

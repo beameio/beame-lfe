@@ -1,0 +1,51 @@
+﻿@model LFE.DataTokens.QuizAnswerOptionDTO
+
+<li class="k-widget">
+
+    <div class="inner">
+
+        @using (Ajax.BeginForm("SaveAnswer", "Quiz", new { area = "AuthorAdmin" }, new AjaxOptions { HttpMethod = "Post",OnBegin = "validateAnswerForm", OnSuccess = "onAnswerSaved" }, new { id = "frmEditAns-${QuestionId}-${OptionId}" }))
+        {
+            @Html.HiddenFor(m => m.QuestionId)
+            @Html.HiddenFor(m => m.OptionId)
+            @Html.HiddenFor(m => m.IsActive)
+            @Html.HiddenFor(m => m.Index)
+
+            <div class="drag-box in-edit">&nbsp;</div>
+            <div class="a-container">
+                <div class="ot">
+                    @(Html.Kendo().EditorFor(m => m.OptionText)
+                        .HtmlAttributes(new { @style = "width:90%;height:200px !important;" })
+                        .Encode(false)
+                        .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+                    )
+
+                    @Html.ValidationMessageFor(model => model.OptionText, null, new { })
+                </div>
+
+                <div class="chk-field">
+                    @Html.EditorFor(model => model.IsCorrect)
+                    <label for="IsCorrect">Correct</label>
+                </div>
+            </div>            
+
+            <div class="btn-action cancel-edit">
+                <a  href="\\#" class="k-cancel-button">Cancel</a>
+            </div>
+
+            <div class="btn-action">
+                <a href="\\#" class="l-save-button">Save</a>
+            </div>
+        }
+        <span class="frm-hidden">
+            <input type="submit" class="l-f-delete-button" value="Delete" />    
+        </span>
+        
+        @*@using (Ajax.BeginForm("DeleteAnswer", "Quiz", new { area = "AuthorAdmin" }, new AjaxOptions { HttpMethod = "Post", OnBegin = "onAnswerDeleting", OnSuccess = "onAnswerSaved" }, new { @data_val = "${QuestionId}", @class = "frm-hidden", id = "frmDeleteAns-${QuestionId}-${OptionId}" }))
+        {
+            <input type="hidden" id="id" name="id" value="${OptionId}" />
+            
+        }*@
+        
+    </div>
+</li>

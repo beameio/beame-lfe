@@ -1,0 +1,52 @@
+﻿@using LFE.Core.Enums
+
+
+<script type="text/javascript">
+    function getRequestParams() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)ReportEnums.ePeriodSelectionKinds.thisMonth).ToString())'
+			,storeId: $('#StoresLOV').data("kendoDropDownList") != undefined ? $('#StoresLOV').data("kendoDropDownList").value() : null
+			, onlyMy: $('#chkOnlyMe').is(":checked")
+		};
+	}	
+</script>
+
+@Html.Partial("SalesReports/_SalesReportsScripts")
+
+<div id="d-rep-manage">
+	<div class="page-title">
+		<div class="float-left">Webstore Sales Report</div>
+		<div id="total-title" class="float-right">Total: <span data-bind="text:salesTotal"></span> $</div>
+	</div>
+
+	@Html.Partial("SalesReports/_SalesReportMVVMFilters")
+	
+	<div class="inline" style="margin: 0 0 0 25px">
+		@(Html.Kendo().DropDownList()
+			  .Name("StoresLOV")
+			  .OptionLabel("All my webstores")
+			  .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+			  .DataTextField("Name")
+			  .DataValueField("StoreId")
+			  .Events(e => e.Select("onFilterChanged"))
+			  .DataSource(ds => ds.Read(r => r.Action("GetOwnerStoresLOV", "WebStore")))
+			  )	  
+	</div>
+	
+	<div class="inline" style="margin: 4px 0 0 25px">
+		<label for="chkOnlyMy" class="inline" style="color: #333;font-size: 14px">show only my courses</label>
+		<input type="checkbox" id="chkOnlyMe" data-bind="events: { click: onFilterChanged }" class="inline" />
+	</div>
+</div>
+
+<div style="margin: 20px 0 0">
+	<div id="d-onetime-c">
+		@Html.Partial("SalesReports/WebStore/Owner/_SalesGrid")
+	</div>
+	<div id="d-subscription-c" style="display: none">
+		@Html.Partial("SalesReports/WebStore/Owner/_SubscriptionSalesGrid")
+	</div>
+</div>
+
+@Html.Partial("SalesReports/_SalesReportMVVM")
+

@@ -1,0 +1,98 @@
+﻿
+@using LFE.Portal.Areas.Widget.Models
+@model PurchaseResultToken
+@{
+    ViewBag.Title = "Purchase " + Model.ItemName;
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseFormLayout.cshtml";
+
+}
+@section css
+{
+    <style>
+        h2.pr{margin: 25px auto;font-size: 24pt;color: #000;}
+    </style>
+}
+<div class="row">
+    <div class="col col-xs-12">
+        @{
+            if (Model.IsValid)
+            {
+                if (Model.ActionKind == eActionKinds.AJAX)
+                {
+                    <script>
+                        $(document).ready(function () {
+                            if (window.parent) {
+                                window.parent.location.href = '@Model.RedirectUrl';
+                            } else {
+                                window.location.href = '@Model.RedirectUrl';
+                            }
+                        });
+                    </script>
+                }
+                else
+                {
+                    <script>
+                        $(document).ready(function () {
+                            if (window.opener.parent) {
+                                window.opener.parent.location.href = '@Model.RedirectUrl';
+                                window.close();
+                            } else {
+                                window.location.href = '@Model.RedirectUrl';
+                            }
+                        });
+                    </script>
+                }
+                <h2 class="pr reset-all">You will be redirected shortly to Purchase Complete Page</h2>
+            }
+            else
+            {
+
+                if (Model.ShowPage)
+                {
+                    <div style="text-align: center">
+                        <h2 class="pr reset-all">@Model.Message</h2>
+                    </div>
+
+                    <div class="row foot rel">
+                        <a href="@Url.Action("LoadPurchaseForm", "Payment", new { area = "Widget", id = Model.PriceLineId, trackingId = Model.TrackingId})">
+                            <div class="btn-buy" id="btn-buy">
+                                <span class="inner">
+                                    OK
+                                </span>
+                            </div>
+                        </a>                        
+                    </div>
+            
+                    <script>
+                        $(document).ready(function () {
+                            console.log('adjust');
+                            adjustScModalH();
+                        });                        
+                    </script>
+                }
+                else
+                {
+                    <script>
+                        $(document).ready(function () {
+                            if (window.opener) {
+                                window.opener.showErrorPage('@Model.Message');
+                             
+                            }
+                            window.close();
+                        });
+                    </script>
+                }
+            }
+}
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+
+        });
+    </script>
+}

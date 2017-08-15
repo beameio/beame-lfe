@@ -1,0 +1,123 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+
+@{
+	var dates = ( ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all ).ToTranslatedArray();
+}
+
+<script>
+    function onPeriodKindSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, dataItem);
+    }
+
+    function getDropboxRepData() {
+        return {
+            periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())'
+
+        };
+    }
+</script>
+
+<div style="position: absolute;right: 5px;top:8px;">
+    @(Html.Kendo().DropDownList()
+			.Name("periodSelectionKind")
+			.DataTextField("Title")
+			.DataValueField("Value")
+			.BindTo(dates)
+			.HtmlAttributes(new { @class = "combo-ps", @style = "width:150px;font-size:12px;" })
+			.Events(e=>e.Select("onPeriodKindSelected"))
+    )
+    <script>
+        $(document).ready(function () {
+            $('#periodSelectionKind').data("kendoDropDownList").value('@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())');
+            setVisibility('#period-combo-container', true);
+        });
+    </script>
+</div>
+
+
+
+<script>
+	$(document).ready(function () {
+	    window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindGrid, null);
+	    window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindGrid, null);
+	});
+
+	function rebindGrid() {
+	    $('#UdemyReport').data("kendoGrid").dataSource.read();
+	}
+    function onJobsGridBound(e) {
+        var grid = this;
+        var currentRecords = grid.dataSource.view();
+        for (var i = 0; i < currentRecords.length; i++) {
+                grid.tbody.find("tr[data-uid='" + currentRecords[i].uid + "']").addClass(getRowCssClass(currentRecords[i].Status));
+        }
+    }
+    function getRowCssClass(status) {
+        switch (status) {
+            case 0:     return 'job-row-green';     //created
+            case 1:     return 'job-row-yellow';    //in progress
+            case 2:     return 'job-row';           //success
+            case 4:     return 'job-row-blue';      //partial_success
+            case 8:     return 'job-row-red';       //failed
+            case 16:    return 'job-row-green';     //cancelled
+            default:    return 'job-row';
+        }
+    }
+</script>
+<style>
+#UdemyReport { margin: 0 5px; }
+.job-row        { background-color: transparent; outline: solid 1px #DDDDDD; }
+.job-row-yellow { background-color: #faf5df; outline: solid 1px #eecf75; }
+.job-row-blue   { background-color: #def0f2; outline: solid 1px #88cac8; }
+.job-row-red    { background-color: #f2dedf; outline: solid 1px #f2cad3; }
+.job-row-green  { background-color: #def2e0; outline: solid 1px #bed8c0; }
+
+.c-name{font-weight: bold;font-size:1em;}
+</style>
+@(Html.Kendo().Grid<UdemyJobReportToken>()
+        .Name("UdemyReport")
+                .TableHtmlAttributes(new { @style = "border-collapse: separate;border-spacing:0 4px; background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.CourseName).ClientTemplate("<span class='c-name'>#: CourseName#</span>").Title("Course name");
+            columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy}").Title("Import date");
+            columns.Bound(p => p.Status).Title("Import status");
+        })
+        .Sortable()
+        .Filterable(f => f.Enabled(false))
+        .Pageable(p=>p.Enabled(false))
+        .Events(e => e.DataBound("onJobsGridBound"))
+        .ClientDetailTemplateId("template-udemy-files")
+        .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.JobId))
+                            .Read(read => read.Action("GetUdemyJobLogs", "Udemy").Data("getDropboxRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+                            .PageSize(20))
+)
+
+<script id="template-udemy-files" type="text/kendo-tmpl">
+@(Html.Kendo().Grid<UdemyJobFileDTO>()
+        .Name("files_#=JobId#")
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.FileName);
+            columns.Bound(p => p.Type).Width(80).Title("Type");
+            columns.Bound(p => p.Status).Width(80).Title("Status");
+            columns.Bound(p => p.BcIdentifier).Width(80);
+            columns.Bound(p => p.AddOn).Width(80).Format("{0:MM/dd/yy}").Title("Add");
+            columns.Bound(p => p.DownloadOn).Width(80).Format("{0:MM/dd/yy}").Title("Download");
+            columns.Bound(p => p.UploadOn).Width(80).Format("{0:MM/dd/yy}").Title("Upload");
+        })
+        .Sortable(s => s.Enabled(true))
+        .Pageable(pager => pager.Refresh(true))
+        .Filterable(f => f.Enabled(false))
+        .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.FileId)).Read(read => read.Action("GetJobFiles", "Udemy", new { id = "#=JobId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+        )
+</script>

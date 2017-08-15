@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "UDEMY Jobs Report";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="~/Areas/AuthorAdmin/Content/styles/udemy.css" rel="stylesheet" />
+}
+
+<div class="mc-header" style="margin-bottom: 30px;">
+    <h1>UDEMY IMPORT STATUS</h1>
+</div>
+
+<div class="mc-content">
+    
+    <div style="margin-bottom: 50px;"></div>
+    
+    
+    <div class="mc-gridBox">
+        <h1 style="margin-left:5px;">Import Status:</h1>
+
+        @Html.Partial("Udemy/_UdemyJobsReport")
+
+        <a href="@Url.Action("CourseSelection", "Udemy")" class="blueBtn" style="position: absolute;right: -2px;bottom:-55px;">Import more Udemy courses</a>
+    </div>    
+    
+
+</div>
+
+

@@ -1,0 +1,33 @@
+﻿@model LFE.DataTokens.UserStatisticToken
+
+<div class="d-stats">
+    
+    <h3>@Model.FullName</h3>
+    
+    <h4>Total score: @Model.Score</h4>
+
+    <ul>
+        <li>
+            @Html.LabelFor(m => m.courses) : @Model.courses
+        </li>
+        <li>
+            @Html.LabelFor(m => m.bundles) : @Model.bundles
+        </li>
+        <li>
+            @Html.LabelFor(m => m.stores) : @Model.stores
+        </li>
+        <li>
+            @Html.LabelFor(m => m.purchases) : @Model.purchases
+        </li>
+        <li>
+            @Html.LabelFor(m => m.chapters) : @Model.chapters
+        </li>
+        <li>
+            @Html.LabelFor(m => m.videos) : @Model.videos
+        </li>
+        <li>
+            @Html.LabelFor(m => m.logins) : @Model.logins
+        </li>
+    </ul>    
+</div>
+        

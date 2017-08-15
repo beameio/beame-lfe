@@ -1,0 +1,62 @@
+﻿@model LFE.DataTokens.TrainingViewToken
+<script>
+    var SUCCESS_UPLOAD_MSG = "We are processing your video. This can take some time. You can keep working in other screens in the meantime";
+
+    function onVideoUploadSuccess(e) {
+        var operation = e.operation;
+        var response = e.response;
+        if (!response) return;
+
+        if (!response.success) {
+            sweetAlert("Oops...", response.error, "error");
+            return;
+        }
+
+        setTimeout(function () {
+            var filesInProgress = $('.k-file-progress > .k-upload-status > button').find('.k-cancel').length;
+            switch (operation) {                
+            case "upload":
+                if (filesInProgress == 0) {
+                    swal(SUCCESS_UPLOAD_MSG, "", "success");
+                }
+                break;
+            }
+        }, 100);
+    }
+
+    function onVideoUploadAction(e) {
+        var files = e.files;
+        var maxSize = 2000000000; 
+        
+        $.each(files, function () {
+            
+            if (this.size > maxSize) {
+                sweetAlert("Oops...", "File size should not exceed 2GB", "error");
+                e.preventDefault();
+                return;
+            }
+            if ($.inArray(this.extension.toLocaleLowerCase(), VIDEO_EXTENSIONS) < 0) {
+                sweetAlert("Oops...", userMessages.UPLOAD.ONLY_VIDEO, "error");
+                e.preventDefault();
+                return;
+            } 
+        });
+
+    }
+</script>       
+<div id="async-upload" style="position: relative">
+    @(Html.Kendo().Upload()
+            .Name("VideoFile")
+            .Multiple(false)
+            .ShowFileList(true)
+            .Events(e => e.Upload("onVideoUploadAction").Success("onVideoUploadSuccess"))
+            .Async(a => a.AutoUpload(true)
+            .Save("SaveRecordedFiles", "Upload",new{id=Model.TrainingId})
+    ))
+</div>
+
+<span style="display: block;margin: 4px 0 0;font-size: 11px; color:#666">
+    Allowed extensions: .mov,.mpg, .mpeg4, .mp4,.mv4,.wmv,.avi,.ogv,.3gp,.3g2
+</span>
+
+<div id="async-upload-console" class=""></div>

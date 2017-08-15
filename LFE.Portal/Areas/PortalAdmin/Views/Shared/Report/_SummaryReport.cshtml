@@ -1,0 +1,69 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@{
+
+    var periodKinds = (ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.thisMonth
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.week | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    var groupKinds = (ReportEnums.eChartGroupping.Month | ReportEnums.eChartGroupping.Week | ReportEnums.eChartGroupping.Quarter | ReportEnums.eChartGroupping.Year | ReportEnums.eChartGroupping.Day).ToTranslatedArray();
+}
+
+<h2>Summary Report</h2>
+
+<div style="margin: 10px 0">
+    <div class="inline">
+        @(Html.Kendo().DropDownList()
+                .Name("periodSelectionKind")
+                .DataTextField("Title")
+                .DataValueField("Value")
+                .Value(((short)ReportEnums.ePeriodSelectionKinds.last180).ToString())
+                .BindTo(periodKinds)
+                .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                .Events(e => e.Select("setRepParams"))
+        )
+    </div>
+
+    <div class="inline">
+        @(Html.Kendo().DropDownList()
+                .Name("groupKinds")
+                .DataTextField("Title")
+                .DataValueField("Value")
+                .Value(((short)ReportEnums.eChartGroupping.Month).ToString())
+                .BindTo(groupKinds)
+                .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                .Events(e => e.Select("setRepParams"))
+        )
+    </div>
+
+    <div class="inline" style="margin-left: 25px;">
+        @using (Ajax.BeginForm("GenerateSummaryReport", "Report", new { area = "PortalAdmin" }, new AjaxOptions { UpdateTargetId = "d-rep-container", LoadingElementId = "site-loader" }, new { @id = "frmSubmitRep" }))
+        {
+            @Html.Hidden("periodKind")
+            @Html.Hidden("groupKind")
+
+            <span class="" style="text-decoration: underline;cursor: pointer;color: #000;font-size: 16px;" id="btn-submit-rep">Generate Report</span>
+        }
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btn-submit-rep').unbind('click').click(submitReport);
+        setTimeout(submitReport, 300);
+    });
+
+    function submitReport() {
+        setRepParams();
+        $('#frmSubmitRep').submit();
+    }
+
+    function setRepParams() {
+        $('#frmSubmitRep #periodKind').val($('#periodSelectionKind').data('kendoDropDownList').value());
+        $('#frmSubmitRep #groupKind').val($('#groupKinds').data('kendoDropDownList').value());
+    }
+</script>
+
+<div id="d-rep-container"></div>

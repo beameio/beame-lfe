@@ -1,0 +1,137 @@
+﻿@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+}
+
+@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width" />
+    <title>@(viewModel != null && viewModel.WebStore != null ?  viewModel.WebStore.WebStoreName : "")</title>
+
+    <link href="@Url.Action("WidgetCss", "Style", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "",
+                                                    lastUpdate =viewModel != null && viewModel.WebStore != null ? (int)(viewModel.WebStore.LastUpdate - new DateTime(1970, 1, 1)).TotalSeconds : 0 })" rel="stylesheet" />
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    <link href="/Content/styles/toolbar.css" rel="stylesheet"/>
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jquery/jquery")
+
+    @Scripts.Render("~/bundles/jquery/jqueryval")
+
+    @Scripts.Render("~/bundles/kendo")
+
+    @Styles.Render("~/Content/plugin/scroll")
+
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+    <script src="~/Areas/Widget/Scripts/Html5PlaceHolder.js"></script>
+    
+     
+
+    <script>
+        kendo.culture("en-US");
+        var saveEventUrl = '@Url.Action("SaveEvent","EventApi",new{area=""})';
+    </script>
+    @Scripts.Render("~/bundles/lfe/common")
+
+    @if (viewModel != null && viewModel.WebStore != null && viewModel.WebStore.WixInstanceID != null && viewModel.WebStore.WixInstanceID != "" && viewModel.WebStore.WixInstanceID != "00000000-0000-0000-0000-000000000000")
+    {
+        @Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+        @*<script src="~/Areas/Widget/Scripts/wix/wixlayout.js"></script>*@
+        @Html.Partial("_WixLayoutScript")
+        <script type="text/javascript" >            
+            var wixLogAppDeletedUrl = '@Url.Action("LogAppDeletedEvent", "Account", new { area = "WixEndPoint", instaceId = "instanceId_PlaceHolder", wixSiteUrl = "wixSiteUrl_PlaceHolder" })';
+            var wixLogAppPublishUrl = '@Url.Action("LogAppPublishEvent", "Account", new { area = "WixEndPoint", instaceId = "instanceId_PlaceHolder", wixSiteUrl = "wixSiteUrl_PlaceHolder" })';
+        </script>
+        if (viewModel.WebStore != null)
+        {
+        <script>
+            var lfeStoreId = '@viewModel.WebStore.WebStoreID.ToString()';
+            var lfeWixSiteUrl = '@(String.IsNullOrEmpty(viewModel.WebStore.WixSiteUrl) ? "" : viewModel.WebStore.WixSiteUrl)';
+        </script>  
+        }
+    }
+    else
+    {
+    <script>
+        var windowParentUrl = encodeURIComponent(getParameterByName('parentUrl'));
+     
+        $(document).ready(function () {
+            AddParentUrl();
+            window.parent.postMessage(document.location.href, '*');
+        });        
+
+        function AddParentUrl() {
+            if (!lfeIsEmpty(windowParentUrl)) {
+                    $('a').each(function () {
+                    var href = $(this).attr('href');
+
+                    if (href) {
+                        href += (href.match(/\?/) ? '&' : '?') + "parentUrl=" + windowParentUrl;
+                        $(this).attr('href', href);
+                    }
+                });
+            }
+        }
+        function lfeIsEmpty(str) {
+            return (!str || 0 === str.length);
+        }
+
+        function getParameterByName(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+    </script>
+    }
+  
+
+    @RenderSection("CSS", false)
+   
+
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-35089799-1']);
+        _gaq.push(['_setDomainName', 'lfe.com']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>      
+
+    @Html.Partial("~/Areas/Widget/Views/Shared/_Header.cshtml", viewModel)
+    <!-- page content -->
+    <div class="page_content" id="main">
+        <div class="indent">
+            @RenderBody()
+        </div>
+    </div>
+
+    @Html.Partial("~/Areas/Widget/Views/Shared/_ToolBar.cshtml", viewModel)
+
+   
+
+    @RenderSection("JS", required: false)  
+  
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+
+    @Html.Action("_FeedWindow", "Home", new { area = "UserPortal" })
+    
+    <script>
+        saveEventApi(USER_EVENTS.STORE_VIEW, '@(viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "")', null, null, null,null);
+    </script>   
+</body>
+</html>

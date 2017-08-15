@@ -1,0 +1,29 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<OrderLineDTO>
+           
+@(Html.Kendo().Grid<OrderLineDTO>()
+           .Name("lines")
+           .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+           .Columns(columns =>
+            {
+                columns.Bound(p => p.ItemName).Width(200);
+                columns.Bound(p => p.Seller.FullName).Title("Seller").Width(150);
+                columns.Bound(p => p.Buyer.FullName).Title("Buyer").Width(150);
+                columns.Bound(p => p.PaymentTermName).Title("Term").Width(100);
+                columns.Bound(p => p.LineType).Title("Type").Width(80);
+                columns.Bound(p => p.Price).Title("Price").Format("{0:c}").Width(80);
+                columns.Bound(p => p.Discount).Title("Discount").Format("{0:c}").Width(80);
+                columns.Bound(p => p.TotalPrice).Title("Amount").Format("{0:c}").Width(80);
+                columns.Bound(p => p.TotalRefunded).Title("Refunded").Format("{0:c}").Width(80);
+                columns.Bound(p => p.CouponValue).Title("Coupon").Width(80);
+                columns.Bound(p => p.PaypalProfileID).Title("ProfileID").Width(80);
+            })
+            //.Events(e => e.DataBound("onLinesBound"))
+            .Sortable(s => s.Enabled(true))
+                .Pageable(pager => pager.Numeric(true).PageSizes(true))
+            .Filterable(f => f.Enabled(false))            
+            .BindTo(Model)
+            .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+            .PageSize(10))
+)

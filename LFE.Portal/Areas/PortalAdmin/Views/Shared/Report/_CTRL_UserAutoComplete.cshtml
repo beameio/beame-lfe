@@ -1,0 +1,47 @@
+﻿@using LFE.Portal.Areas.PortalAdmin.Models
+@using Kendo.Mvc.UI
+@model CTRL_UserAutoComplete
+
+@{
+    Model.SelectedCallback = string.IsNullOrEmpty(Model.SelectedCallback) ? Model.ElementId + ".dummy" : Model.SelectedCallback;
+}
+<script>
+(function(){
+    var _selectedData = null;
+    window['@Model.ElementId'] = {
+        onUserAu: function() {
+		    return { name: $("#@Model.ElementId").val(), email: null };
+        },
+        onUserSelected: function(e) {
+		    var dataItem = this.dataItem(e.item.index());
+            var callback = @Model.SelectedCallback;
+            _selectedData = dataItem;
+            callback(dataItem.UserId);
+        },
+        clear: function() {
+            _selectedData = null;
+            $('#@Model.ElementId').data("kendoAutoComplete").value(null);
+        },
+        value: function() {
+            return _selectedData;
+        },
+        dummy: function(value) {
+            alert('Model.SelectedCallback not set! value: [' + value + ']');
+        }
+    }
+})();
+</script>
+<div style="display:inline-block; @Model.Style">
+    @(Html.Kendo().AutoComplete()
+                        .Name(Model.ElementId)
+                        .DataTextField("FullName")
+                        .Placeholder(" find by user")
+                        .Filter("contains")
+                        .MinLength(2)
+                        .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                                 "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+                        .HtmlAttributes(new { style = "width:250px", @class = "au-filt" })
+                        .Events(e => e.Select(Model.ElementId + ".onUserSelected"))
+                        .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data(Model.ElementId + ".onUserAu")).ServerFiltering(true))
+    )
+</div>

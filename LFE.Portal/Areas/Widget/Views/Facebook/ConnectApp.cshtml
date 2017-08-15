@@ -1,0 +1,91 @@
+﻿@using LFE.Portal.Helpers
+
+@{
+    var user = this.CurrentUser();
+
+   // var newCourseGuid = Guid.NewGuid();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LFE Admin Settings Login</title>
+     
+     
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery/jquery")
+    @Scripts.Render("~/bundles/jquery/jqueryval")
+    @Scripts.Render("~/bundles/lfe/common")
+    
+    <link href="~/Areas/WixEndPoint/Scripts/wix/components/dropdown/dropdown.css" rel="stylesheet" />
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/common.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/buttons.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/Widget/Content/Styles/facebooksettings.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/css/color-picker.css" rel="stylesheet" />
+    <link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/glued-position-min/glued.min.css" rel="stylesheet" />
+  <script type="text/javascript">
+
+    
+      var socialLoginUrl = '@Url.Action("WidgetFbLogin", "Account", new { area = "Widget" } )';
+
+
+      function PopSafariSessionWindow() {
+           @if(Request.Browser.Browser.ToLower().Trim() == "safari" )
+           {
+               <text>    
+                if (window.top != window.self) {
+                    OpenForm('@( Request.Url.Scheme + "://" + Request.Url.Authority + Url.Action("SafariLoginSession", "Account", new { area = "Widget" }))');
+                }
+               </text>
+           }
+        
+      }
+    </script>
+</head>
+<body>
+    <div>   
+        @if (ViewBag.IsTabAdded)
+        { 
+        <div class="box">
+            <div class="feature" style="text-align:center">                
+                <div style="text-align:center; padding-top:10px">
+                   LFE app was successfully added to your facebook page. Thank you for using LFE. 
+                </div>   
+                <div>
+                    <a href="@ViewBag.PageUrl" >Take me back to my Facebook page</a>
+                </div>             
+            </div>
+
+        </div>
+        }
+        else
+        {
+             <div class="box">
+            <div class="feature" style="text-align:center">                
+                <div style="text-align:center; padding-top:10px">
+                  It seems LFE app was not added to your page please check it on you facebook page..... 
+                </div>                
+            </div>
+
+        </div>
+        }
+        @if (user == null)
+        {     
+            <div class="box">
+                <div class="feature" style="text-align:center" >
+                            In order to create a course or manage your webstore, you first have to connect LFE with facebook:
+                    <div style="text-align:center; padding-top:10px">
+                        <a id="facebookLogin">
+                            <img src="/Content/images/webstore/Connect-with-FB-btn.png" alt="Connect with Facebook" />
+                        </a>
+                    </div>
+                    <div style="color:red" id="loginError"></div>    
+                </div>      
+            </div>
+        }
+    </div>
+
+
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+</body>
+</html>

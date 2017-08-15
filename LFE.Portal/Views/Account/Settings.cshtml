@@ -1,0 +1,22 @@
+﻿
+@model LFE.DataTokens.AccountSettingsDTO
+
+@{
+    ViewBag.Title = "Account Settings";
+    Layout = "~/Views/Shared/_AccountSettingsLayout.cshtml";
+}
+
+@section css
+{
+  
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/common.css" )" rel="stylesheet" type="text/css"  />        
+    <style>       
+         #d-settings-container h2{border-top: none !important}
+    </style>    
+}
+
+
+
+<div style=" margin: 0 0 25px 0">
+    @Html.Partial("Account/_UserAccountSettings")
+</div>

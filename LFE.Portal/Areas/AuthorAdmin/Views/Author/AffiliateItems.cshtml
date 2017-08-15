@@ -1,0 +1,178 @@
+﻿@using System.Collections
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+    ViewBag.Title = "Affiliate Items";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var itemTypes = Utils.EnumWithDescToList<BillingEnums.ePurchaseItemTypes>();    
+}
+
+
+
+
+@section css
+{
+    <style>  
+        .item-link{color: blue !important;text-decoration: underline}     
+    </style>
+}
+@section scripts
+{
+    <script>
+        var gridId = 'AffiliateItemsReport';
+
+        function filterItems(id, fieldName,additionalFilter) {
+            var filter;
+            var grid = $("#" + gridId).data("kendoGrid");
+            var $filter = grid.dataSource.filter() == undefined ? [] : grid.dataSource.filter().filters;
+
+            if ($filter.length == 0) {
+                filter = {
+                    logic: "and",
+                    filters: []
+                };
+            } else {
+                filter = $filter[0];
+
+                for (var i = 0; i < filter.filters.length; i++) {
+                    if (filter.filters[i].field == fieldName) {
+                        filter.filters.splice(i, 1);
+                    }
+                }
+            }
+
+            if (hasValue(id)) {
+                var f = { field: fieldName, operator: "eq", value: id };
+                filter.filters.push(f);
+                if (additionalFilter != null) filter.filters.push(additionalFilter);
+            }
+
+            if (filter.filters.length > 0) {
+                filterReport(filter, gridId, "kendoGrid");
+            }
+            else {
+                filterReport(null, gridId, "kendoGrid");
+            }
+        }
+
+        function onTypeSelected(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var id = dataItem.Value;
+            filterItems(id, 'ItemType');
+        }
+
+        function onStoreSelected(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var id = dataItem.id;
+            filterItems(id, 'WebStore.StoreId');
+        }
+
+        function onCourseSelected(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var id = dataItem.CourseId;
+            filterItems(id, 'ItemId', { field: 'ItemType', operator: "eq", value: 1 });
+        }
+
+        function onBundleSelected(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var id = dataItem.BundleId;
+            filterItems(id, 'ItemId', { field: 'ItemType', operator: "eq", value: 2 });
+        }
+
+        function clearItemFilters(rebind) {
+            $.each($('#d-affiliate-filter-container  input'), function () {
+                var combo = $(this).data("kendoDropDownList");
+                if (combo != null) combo.value(null);
+            });
+            if (rebind) filterReport(null, gridId, "kendoGrid");
+        }
+    
+    $(document).ready(function () {
+        setTimeout(function () {
+            clearItemFilters(false);
+        }, 500);
+    });
+</script>
+}
+
+<h1 style="font-size: 24px;color: #666;display: block;margin-bottom: 20px">Affiliates items report</h1>
+
+<div style="height: 40px;width: 100%" id="d-affiliate-filter-container">
+    <span class="inline" style="font-size: 14px;color: #666;margin: 6px 10px 0 0">
+        Filter by:
+    </span>
+    <span class="inline" style="margin: 0 20px 0 0">
+        @(Html.Kendo().DropDownList()
+                .Name("TypesLOV")
+                .OptionLabel("-- by type --")
+                .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                .DataTextField("Title")
+                .DataValueField("Value")
+                .Events(e => e.Select("onTypeSelected"))
+                .BindTo(itemTypes)
+        )
+    </span>
+    <span class="inline" style="margin: 0 20px 0 0">
+        @(Html.Kendo().DropDownList()
+                .Name("StoresLOV")
+                .OptionLabel("-- by store --")
+                .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                .DataTextField("name")
+                .DataValueField("id")
+                .Events(e => e.Select("onStoreSelected"))
+                .BindTo((IEnumerable) ViewData["StoresLOV"]))
+    </span>
+    <span class="inline" style="margin: 3px 20px 0;">
+        @(Html.Kendo().DropDownList()
+                .Name("CourseFilterLOV")
+                .DataTextField("Name")
+                .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                .DataValueField("CourseId")
+                .OptionLabel(" by course")
+                .Events(e => e.Select("onCourseSelected"))
+                .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course"))))
+    </span>
+    <span class="inline" style="margin: 3px 20px 0;">
+        @(Html.Kendo().DropDownList()
+                .Name("BundleFilterLOV")
+                .DataTextField("Name")
+                .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                .DataValueField("BundleId")
+                .OptionLabel(" by bundle")
+                .Events(e => e.Select("onBundleSelected"))
+                .DataSource(ds => ds.Read(r => r.Action("GetAuthorBundleLOV", "Course"))))
+    </span>
+    <span class="inline" style="font-size: 14px;color: #666;margin: 6px 10px 0 0;cursor: pointer" onclick="clearItemFilters(true)">
+        clear filters
+    </span>
+</div>
+
+
+<div>
+    @(Html.Kendo().Grid<WebStoreAffiliateItemDTO>()
+      .Name("AffiliateItemsReport")
+      .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.ItemName).Title("Item").ClientTemplate("<a href='${ItemUrl}' alt='go to item page' class='item-link' target='_blank'>${ItemName}</a>");
+          columns.Bound(p => p.ItemTypeName).Title("Type");
+          columns.Bound(p => p.WebStore.Name).Title("Store name");
+          columns.Bound(p => p.StoreOwner.FullName).Title("Store owner");
+          columns.Bound(p => p.WebStoreCategory.CategoryName).Title("Category");
+          columns.Bound(p => p.Price).Title("Price").Format("{0:c}");
+          columns.Bound(p => p.MonthlySubscriptionPrice).Title("Subscription").Format("{0:c}"); 
+      })
+      .Sortable()
+      .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()
+                                .Model(model => model.Id(p => p.WebStoreItemId))
+                                .Read(read => read.Action("GetAffiliateItems", "Author").Type(HttpVerbs.Get)).ServerOperation(false)
+                                .PageSize(20)
+                    )
+    )
+</div>

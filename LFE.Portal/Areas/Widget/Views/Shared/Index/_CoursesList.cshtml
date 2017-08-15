@@ -1,0 +1,122 @@
+@using Kendo.Mvc.UI
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model LFE.Portal.Areas.Widget.Models.IndexModelView
+
+@{
+	//  Popularity Rating Date Cost
+	var kinds = new List<DataSourceSortToken>
+		{
+				new DataSourceSortToken
+			{
+				name    = "Relevance"
+				,field  = "ordinal"
+				,dir    = "asc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Popularity"
+				,field  = "NumSubscribers"
+				,dir    = "desc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Date"
+				,field  = "CourseName"
+				,dir    = "asc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Cost"
+				,field  = "Price"
+				,dir    = "asc"
+			}
+		};
+}
+<script type="text/javascript">
+
+	function onCourseListBound(e) {
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.report.courseBound, total);     
+	}
+
+	function onSortFiltersBound(e) {
+		var listView = e.sender;
+
+		$.each(listView.element.children().find('a'), function (i) {
+			var token = listView.dataSource._data[i];
+			var link = $(this);
+			link.unbind('click');
+
+			link.bind('click', function () {
+				listView.element.children().find('a').removeClass('active');
+				$(this).addClass('active');
+				
+				var filter = { field: token.field, dir: token.dir };
+
+				var dataSource = new kendo.data.DataSource({
+					data: $('#IndexCourses').data("kendoListView").dataSource._data
+				});
+
+				dataSource.sort(filter);
+
+				$("#IndexCourses").data("kendoListView").setDataSource(dataSource);
+				$('#IndexCourses').data("kendoListView").refresh();
+			});
+			if (i == 0) link.addClass('active');
+		});
+	}
+
+   
+</script>
+
+ 
+<div class="d-sort-row">
+	<label>Sort by:</label>
+	@(Html.Kendo().ListView<DataSourceSortToken>()
+			.Name("lvCourseSort")
+			.TagName("ul")
+			.ClientTemplateId("kendo-sort-template")
+			.BindTo(kinds)
+			.HtmlAttributes(new { @data_role = "course" })
+			.Events(e => e.DataBound("onSortFiltersBound"))
+	)
+</div>
+<div id="pager" class="k-pager-wrap"></div>
+<div class="promo">
+	@(Html.Kendo().ListView(Model.CoursesList)
+		  .Name("IndexCourses")
+		  .TagName("ul")
+		  .HtmlAttributes(new { @class = "ul-cb-list" })
+		  .ClientTemplateId("kendo-cb-template")
+		  .BindTo(Model.CoursesList))
+</div>
+
+
+
+<script type="text/x-kendo-template" id="kendo-sort-template">
+  <li>
+		<a data-val="${field}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+  </li>
+</script>
+
+
+<script type="text/x-kendo-template" id="kendo-cb-template">
+	 <div class="promo-item-wrapper">
+			<div class="headline">
+				<div class="price"><strong>#=IsFreeCourse ? 'Free' : '$' + Price#</strong></div>
+				<div class="suscribers">#=NumSubscribers && NumSubscribers > 0 ? NumSubscribers + ' Subscribers' : ''#</div> 
+			</div>
+	<div>
+		<a href="">
+			<div class="promo-item" style="background-image:url('${ImageURL}')"></div>
+			<div class="CourseTitle">
+				<h3>${AuthorName}</h3>
+				<h4>${CourseName}</h4>
+			</div>
+		</a>
+		</div>
+	</div>
+	
+</script>
+

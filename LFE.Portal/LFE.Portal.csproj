@@ -1,0 +1,2289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8A2F4380-3DE5-4315-9935-7581A24C0D49}</ProjectGuid>
+    <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LFE.Portal</RootNamespace>
+    <AssemblyName>LFE.Portal</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Autofac.Mvc4.3.1.0\lib\net40\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.WebApi.3.1.0\lib\net40\Autofac.Integration.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
+      <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.AspNet, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.AspNet.4.3.4.13329\lib\net45-full\DotNetOpenAuth.AspNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Consumer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Consumer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.Consumer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.RelyingParty, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DropNet">
+      <HintPath>..\packages\DropNet.1.9.6\lib\net40\DropNet.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Facebook, Version=6.0.10.0, Culture=neutral, PublicKeyToken=58cb4f2111d1e6de, processorArchitecture=MSIL">
+      <HintPath>..\packages\Facebook.7.0.6\lib\net45\Facebook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Kendo.Mvc, Version=2014.3.1119.440, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Shared DLL\Kendo\2016.1.112\Kendo.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="MailChimp, Version=1.1.41.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MailChimp.NET.1.1.41.0\lib\net35\MailChimp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Mvc.Facebook, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.Facebook.4.0.30506\lib\net45\Microsoft.AspNet.Mvc.Facebook.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm, Version=5.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.7.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.OData.5.7.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPal, Version=1.7.2.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPal.1.7.2\lib\net45\PayPal.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPalAdaptivePaymentsSDK, Version=2.15.117.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPalAdaptivePaymentsSDK.2.15.117\lib\net20\PayPalAdaptivePaymentsSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPalCoreSDK, Version=1.7.0.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPalCoreSDK.1.7.0\lib\net45\PayPalCoreSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPalMerchantSDK, Version=2.16.117.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPalMerchantSDK.2.16.117\lib\net20\PayPalMerchantSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.71\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="Svg">
+      <HintPath>..\packages\Svg.1.6.1\lib\Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Selectors" />
+    <Reference Include="System.identitymodel.services" />
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Spatial, Version=5.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Spatial.5.7.0\lib\net40\System.Spatial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.OData, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.0.0\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization.Less, Version=1.3.0.0, Culture=neutral, PublicKeyToken=9b7581e0240fe480, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Web.Optimization.Less.1.3.4\lib\net40\System.Web.Optimization.Less.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Providers">
+      <HintPath>..\packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\System.Web.Providers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebGrease, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.Data.2.0.20710.0\lib\net40\WebMatrix.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebPages.OAuth, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.OAuth.2.0.20710.0\lib\net40\Microsoft.Web.WebPages.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="WebMatrix.WebData, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.WebData.2.0.30506.0\lib\net40\WebMatrix.WebData.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_GlobalResources\GlobalResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GlobalResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="App_Start\AuthConfig.cs" />
+    <Compile Include="App_Start\BundleConfigAuthorPortal.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FacebookConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\BundleConfigPortalAdmin.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\BundleConfigUserPortal.cs" />
+    <Compile Include="App_Start\ServicesConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="App_Start\BundleConfigWidget.cs" />
+    <Compile Include="App_Start\BundleConfigWix.cs" />
+    <Compile Include="Areas\AuthorAdmin\AuthorAdminAreaRegistration.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\AuthorController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\BaseController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\CertificateController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\CourseController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\ErrorController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\MailchimpController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\QuizController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\UploadController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Controllers\WebStoreController.cs" />
+    <Compile Include="Areas\AuthorAdmin\Helpers\HelperExtensions.cs" />
+    <Compile Include="Areas\AuthorAdmin\Helpers\HtmlExtensions.cs" />
+    <Compile Include="Areas\AuthorAdmin\Helpers\WebConstants.cs" />
+    <Compile Include="Areas\AuthorAdmin\Helpers\WebHelper.cs" />
+    <Compile Include="Areas\AuthorAdmin\Models\DashboardTokens.cs" />
+    <Compile Include="Areas\AuthorAdmin\Models\DateGreaterThan.cs" />
+    <Compile Include="Areas\AuthorAdmin\Models\GeneralToken.cs" />
+    <Compile Include="Controllers\ApiBaseController.cs" />
+    <Compile Include="Controllers\ApiBaseProvisionController.cs" />
+    <Compile Include="Controllers\ApiPaypalController.cs" />
+    <Compile Include="Controllers\ApiWixCourseController.cs" />
+    <Compile Include="Controllers\ApiWixWebStoreController.cs" />
+    <Compile Include="Filters\EnableCors.cs" />
+    <Compile Include="Filters\ExceptionFilters.cs" />
+    <Compile Include="Helpers\ApiExtension.cs" />
+    <Compile Include="Interfaces\IApiInterface.cs" />
+    <Compile Include="Models\ApiModels.cs" />
+    <Compile Include="Models\S3Config.cs" />
+    <Compile Include="Areas\AuthorAdmin\Models\WebPageTokens.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\BaseController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\BillingController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\DashboardController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\FbController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\HomeController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\PayoutController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\ReportController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\SettingsController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\UserController.cs" />
+    <Compile Include="Areas\PortalAdmin\Controllers\WebStoreController.cs" />
+    <Compile Include="Areas\PortalAdmin\Helpers\HtmlExtensions.cs" />
+    <Compile Include="Areas\PortalAdmin\Helpers\WebHelper.cs" />
+    <Compile Include="Areas\PortalAdmin\Models\CTRLModels.cs" />
+    <Compile Include="Areas\PortalAdmin\Models\GeneralToken.cs" />
+    <Compile Include="Areas\PortalAdmin\PortalAdminAreaRegistration.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\BaseController.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\CourseController.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\ErrorController.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\HomeController.cs" />
+    <Compile Include="Areas\UserPortal\Controllers\UserController.cs" />
+    <Compile Include="Areas\UserPortal\Helpers\GeneralExtensions.cs" />
+    <Compile Include="Areas\UserPortal\Helpers\HtmlExtensions.cs" />
+    <Compile Include="Areas\UserPortal\Models\WebPageTokens.cs" />
+    <Compile Include="Areas\UserPortal\UserPortalAreaRegistration.cs" />
+    <Compile Include="Areas\WidgetEndPoint\Controllers\PluginController.cs" />
+    <Compile Include="Areas\WidgetEndPoint\Controllers\WepApiController.cs" />
+    <Compile Include="Areas\WidgetEndPoint\Models\PluginModels.cs" />
+    <Compile Include="Areas\Widget\Controllers\AccountController.cs" />
+    <Compile Include="Areas\Widget\Controllers\BaseController.cs" />
+    <Compile Include="Areas\Widget\Controllers\BundleController.cs" />
+    <Compile Include="Areas\Widget\Controllers\CheckoutBaseController.cs" />
+    <Compile Include="Areas\Widget\Controllers\CheckoutController.cs" />
+    <Compile Include="Areas\Widget\Controllers\CourseController.cs" />
+    <Compile Include="Areas\Widget\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\Widget\Controllers\ErrorController.cs" />
+    <Compile Include="Areas\Widget\Controllers\FacebookController.cs" />
+    <Compile Include="Areas\Widget\Controllers\ItemController.cs" />
+    <Compile Include="Areas\Widget\Controllers\QuizController.cs" />
+    <Compile Include="Areas\Widget\Controllers\StyleController.cs" />
+    <Compile Include="Areas\Widget\Controllers\UserController.cs" />
+    <Compile Include="Areas\Widget\Controllers\WidgetController.cs" />
+    <Compile Include="Areas\Widget\Controllers\FacebookBaseController.cs" />
+    <Compile Include="Areas\Widget\Controllers\WixBaseController.cs" />
+    <Compile Include="Areas\Widget\Controllers\WixController.cs" />
+    <Compile Include="Areas\Widget\Controllers\WixFrameController.cs" />
+    <Compile Include="Areas\Widget\Helpers\HtmlExtensions.cs" />
+    <Compile Include="Areas\Widget\Helpers\ItemExtensions.cs" />
+    <Compile Include="Areas\Widget\Helpers\PaymentExtensions.cs" />
+    <Compile Include="Areas\Widget\Helpers\WidgetExtensions.cs" />
+    <Compile Include="Areas\Widget\Models\WebPageTokens.cs" />
+    <Compile Include="Areas\Widget\WidgetAreaRegistration.cs" />
+    <Compile Include="Areas\WixEndPoint\Controllers\AccountController.cs" />
+    <Compile Include="Areas\WixEndPoint\Controllers\BaseController.cs" />
+    <Compile Include="Areas\WixEndPoint\Controllers\HomeController.cs" />
+    <Compile Include="Areas\WixEndPoint\Helpers\HtmlExtensions.cs" />
+    <Compile Include="Areas\WixEndPoint\Models\SiteTokens.cs" />
+    <Compile Include="Areas\WixEndPoint\WixEndPointAreaRegistration.cs" />
+    <Compile Include="Areas\WidgetEndPoint\Controllers\BaseController.cs" />
+    <Compile Include="Areas\WidgetEndPoint\Controllers\HomeController.cs" />
+    <Compile Include="Areas\WidgetEndPoint\WidgetEndPointAreaRegistration.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\BillingController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\EventApiController.cs" />
+    <Compile Include="Controllers\GeoController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
+    <Compile Include="Filters\CacheFilter.cs" />
+    <Compile Include="Filters\CompressFilter.cs" />
+    <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
+    <Compile Include="Filters\LessTransform.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\HtmlExtensions.cs" />
+    <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\BaseAppModels.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Areas\AuthorAdmin\Content\images\btn-add.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\circle-green.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\circle-red.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\cn-handle.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\download.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-cancel.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-db-foot-plus.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-ev-add.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-ev-date.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-ev-delete.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico-ev-edit.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico_widget_chimp.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico_widget_course.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\ico_widget_fb.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\img-footer-lfe.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\pc-bundles.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\pc-courses.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\pc-unpublished.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\pc_act_sub.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\pc_stores.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\sales-arrow-down.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\sales-arrow_up.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\total-arrow-down.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\dashboard\total-arrow-up.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\g2t\citrix.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\g2t\ico-timer.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\glyphicons-halflings-white.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\glyphicons-halflings.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\handle.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-%24-52.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-%24-64.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-%24.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-add.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-arrow-left.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-cancel.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-clock.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-cmnt-xs.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-cmnt.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-col.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-csv.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-down-blue.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-drop-create.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-drop-head.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-drop-simulate.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-expand.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-fff-right.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-grid-down.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-grid.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-line.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list-%24.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list-add.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list-cmnt.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list-down.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list-lrnr.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-list.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-minus.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-move-selected.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-move.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-move2-selected.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-move2.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-onetime.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-plus.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-preview-crs.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-preview-page.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-pub.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-quest.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-save.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-sett.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-st-draft.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-st-pub.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-star.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-subscr.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-v.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-warn.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\ico-x.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\links-top-bg.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\logo-wiz.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\logo.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\mc_icoClock.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\mc_icoError.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\mc_icoHelp.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\mc_icoNotify.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\quiz\ico-add.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\quiz\ico-back.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\quiz\ico-cert.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\quiz\ico-novalid.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\quiz\ico-quiz.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\stats-repeater.png" />
+    <Content Include="Areas\AuthorAdmin\Content\images\two.png" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\anime.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\chapters.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\common.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\course.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\dash.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\dashboard.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\cert.css">
+      <DependentUpon>cert.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\cert.min.css">
+      <DependentUpon>cert.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\course.edit.css">
+      <DependentUpon>course.edit.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\course.edit.min.css">
+      <DependentUpon>course.edit.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\g2t.css">
+      <DependentUpon>g2t.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\g2t.min.css">
+      <DependentUpon>g2t.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\mixins.css">
+      <DependentUpon>mixins.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\mixins.min.css">
+      <DependentUpon>mixins.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\quiz.admin.css">
+      <DependentUpon>quiz.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\quiz.admin.min.css">
+      <DependentUpon>quiz.admin.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\quiz.css">
+      <DependentUpon>quiz.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\quiz.min.css">
+      <DependentUpon>quiz.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\variables.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\variables.min.css">
+      <DependentUpon>variables.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Content\styles\mailChimp.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\site.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\video.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\wizard.css" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\ws.css" />
+    <Content Include="Areas\AuthorAdmin\Scripts\bc\SelectHighestRendition.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\bc\SelectLowestRendition.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\bc\SelectOptimalRendition.js" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\mixins.less" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\variables.less" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\g2t.less" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\quiz.less" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\course.edit.less" />
+    <Content Include="Areas\AuthorAdmin\Content\styles\less\cert.less" />
+    <Content Include="App_Code\HtmlHelpers.cshtml" />
+    <Content Include=".ebextensions\iis.config" />
+    <Content Include=".ebextensions\gzip.config" />
+    <None Include="Areas\AuthorAdmin\Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\kendo.modernizr.custom.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\chapters.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.course.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.dash.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.form.helper.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.global.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.quiz.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.quiz.rep.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.video.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.wizard.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\lfe.ws.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\lfe\notif.manager.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\plugins\jquery-ui-1.10.3.custom.min.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\plugins\jquery-ui-1.10.4.custom.min.js" />
+    <Content Include="Areas\AuthorAdmin\Scripts\_references.js" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-authors.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-authors-row.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-bundles.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-chart.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-courses.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-csv.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-down-blue.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-learners.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-stores.png" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.nav.css">
+      <DependentUpon>admin.nav.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.nav.min.css">
+      <DependentUpon>admin.nav.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-box.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-camera.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-citrix.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-clock.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-count-clock.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-live-inside.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-live.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-more.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-sign.png" />
+    <Content Include="Areas\Widget\Content\assets\g2t\ico-success.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-clock-gray.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-clock.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-failed.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-quiz-title.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-quiz-tree.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-success.png" />
+    <Content Include="Areas\Widget\Content\assets\quiz\ico-timeout.png" />
+    <Content Include="Areas\Widget\Content\styles\less\cert.css">
+      <DependentUpon>cert.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\cert.min.css">
+      <DependentUpon>cert.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget - Copy.css">
+      <DependentUpon>widget.viewer.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.catalog.css">
+      <DependentUpon>widget.catalog.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.catalog.min.css">
+      <DependentUpon>widget.catalog.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.css">
+      <DependentUpon>widget.catalog.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.min - Copy.css">
+      <DependentUpon>widget - Copy.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.min.css">
+      <DependentUpon>widget.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\mixins.css">
+      <DependentUpon>mixins.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\mixins.min.css">
+      <DependentUpon>mixins.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\variables.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\variables.min.css">
+      <DependentUpon>variables.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.viewer.css">
+      <DependentUpon>widget.viewer.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Content\styles\less\widget.viewer.min.css">
+      <DependentUpon>widget.viewer.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.beame.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.quiz.helper.js" />
+    <Content Include="Content\assets\cert\ico-sign.png" />
+    <Content Include="Content\assets\cert\t1.png" />
+    <Content Include="Content\assets\cert\t2.png" />
+    <Content Include="Content\assets\cert\t3.png" />
+    <Content Include="Content\assets\video-thumb.png" />
+    <Content Include="Content\images\ico-equal.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-integrate.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-learners-row.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\ico-video.png" />
+    <Content Include="Areas\PortalAdmin\Content\images\logo.png" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.dash.css">
+      <DependentUpon>admin.dash.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.dash.min.css">
+      <DependentUpon>admin.dash.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\mixins.css">
+      <DependentUpon>mixins.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\mixins.min.css">
+      <DependentUpon>mixins.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\variables.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\less\variables.min.css">
+      <DependentUpon>variables.css</DependentUpon>
+    </Content>
+    <Content Include="Areas\PortalAdmin\Content\styles\site.css" />
+    <Content Include="Areas\PortalAdmin\Scripts\kendo.modernizr.custom.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\lfe\lfe.global.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\lfe\notif.manager.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\plugins\jquery.rateit.min.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\plugins\scrollIt.min.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\zero\ZeroClipboard.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\zero\ZeroClipboard.min.js" />
+    <Content Include="Areas\PortalAdmin\Scripts\zero\ZeroClipboard.swf" />
+    <Content Include="Areas\PortalAdmin\_CommonTemplate2.htm" />
+    <Content Include="Areas\PortalAdmin\_CommonTemplate.htm" />
+    <Content Include="Areas\UserPortal\Content\images\btn-bf-login.png" />
+    <Content Include="Areas\UserPortal\Content\images\default-avatar.gif" />
+    <Content Include="Areas\UserPortal\Content\images\delete.gif" />
+    <Content Include="Areas\UserPortal\Content\images\em\foot.png" />
+    <Content Include="Areas\UserPortal\Content\images\em\head.png" />
+    <Content Include="Areas\UserPortal\Content\images\em\qb.png" />
+    <Content Include="Areas\UserPortal\Content\images\em\qt.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-arrow-down.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-arrow-wh-up.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-cancel.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-doc.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-link.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-list-%24.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-list-add.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-list-cmnt.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-list-lrnr.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-next-off.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-next-on.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-prev-off.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-prev-on.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-refresh.png" />
+    <Content Include="Areas\UserPortal\Content\images\ico-save.png" />
+    <Content Include="Areas\UserPortal\Content\images\login-logo.png" />
+    <Content Include="Areas\UserPortal\Content\images\star.gif" />
+    <Content Include="Areas\UserPortal\Content\styles\course.css" />
+    <Content Include="Areas\UserPortal\Content\styles\jquery.mCustomScrollbar.css" />
+    <Content Include="Areas\UserPortal\Content\styles\rateit.css" />
+    <Content Include="Areas\UserPortal\Content\styles\site.css" />
+    <Content Include="Areas\UserPortal\Scripts\kendo.modernizr.custom.js" />
+    <Content Include="Areas\UserPortal\Scripts\lfe\lfe.bcl.player.js" />
+    <Content Include="Areas\UserPortal\Scripts\lfe\lfe.course.detail.js" />
+    <Content Include="Areas\UserPortal\Scripts\lfe\lfe.discuss.js" />
+    <Content Include="Areas\UserPortal\Scripts\lfe\lfe.global.js" />
+    <Content Include="Areas\UserPortal\Scripts\lfe\notif.manager.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\countdown.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\countdown.min.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.autosize.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.autosize.min.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.fieldselection.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.mCustomScrollbar.min.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.rateit.min.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.scrollTo.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\jquery.tagmate.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\scrollIt.min.js" />
+    <Content Include="Areas\UserPortal\Scripts\plugins\_jquery.tagmate.js" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\add_store.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\author.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\btnEn.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\create.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\lfe-logo-51-56.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\login.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\logo.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\popupWhite.css" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\qmark.png" />
+    <Content Include="Areas\WidgetEndPoint\Content\assets\support.png" />
+    <Content Include="Areas\WidgetEndPoint\Scripts\tiny_mce_popup.js" />
+    <Content Include="Areas\WidgetEndPoint\WidgetPopupWhite.html" />
+    <Content Include="Areas\Widget\Content\assets\grp_image.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-bund-box.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-bundle-box-90.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-cancel.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-clock.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-detail.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-doc.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-f.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-grp-big.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-grp-small.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-learner-black.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-learner.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-link.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-next-off.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-next-on.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-or.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-prev-off.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-prev-on.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-refresh.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-save.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-sc.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-star-dis.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-star.png" />
+    <Content Include="Areas\Widget\Content\assets\upper-bar-show-icon.png" />
+    <Content Include="Areas\Widget\Content\assets\upper-bar-sort-icon.png" />
+    <Content Include="Areas\Widget\Content\assets\widget-sprite.png" />
+    <Content Include="Areas\Widget\Content\images\default-avatar.gif" />
+    <Content Include="Areas\Widget\Content\images\delete.gif" />
+    <Content Include="Areas\Widget\Content\images\facebook-Small-icon.png" />
+    <Content Include="Areas\Widget\Content\images\ico-arrow-down.png" />
+    <Content Include="Areas\Widget\Content\images\ico-arrow-wh-up.png" />
+    <Content Include="Areas\Widget\Content\images\ico-bund-box.png" />
+    <Content Include="Areas\Widget\Content\images\ico-bund-cnt  .png" />
+    <Content Include="Areas\Widget\Content\images\ico-bund-cnt.png" />
+    <Content Include="Areas\Widget\Content\images\ico-bundle-box-90.png" />
+    <Content Include="Areas\Widget\Content\images\ico-bundle.png" />
+    <Content Include="Areas\Widget\Content\images\ico-cancel.png" />
+    <Content Include="Areas\Widget\Content\images\ico-chat.png" />
+    <Content Include="Areas\Widget\Content\images\ico-clock.png" />
+    <Content Include="Areas\Widget\Content\images\ico-ddl-caret.png" />
+    <Content Include="Areas\Widget\Content\images\ico-detail.png" />
+    <Content Include="Areas\Widget\Content\images\ico-doc.png" />
+    <Content Include="Areas\Widget\Content\images\ico-f.png" />
+    <Content Include="Areas\Widget\Content\assets\ico-grp.png" />
+    <Content Include="Areas\Widget\Content\images\ico-learner-black.png" />
+    <Content Include="Areas\Widget\Content\images\ico-learner.png" />
+    <Content Include="Areas\Widget\Content\images\ico-link.png" />
+    <Content Include="Areas\Widget\Content\images\ico-list-%24.png" />
+    <Content Include="Areas\Widget\Content\images\ico-list-add.png" />
+    <Content Include="Areas\Widget\Content\images\ico-list-cmnt.png" />
+    <Content Include="Areas\Widget\Content\images\ico-list-lrnr.png" />
+    <Content Include="Areas\Widget\Content\images\ico-minus.png" />
+    <Content Include="Areas\Widget\Content\images\ico-monitor.png" />
+    <Content Include="Areas\Widget\Content\images\ico-nav-option.png" />
+    <Content Include="Areas\Widget\Content\images\ico-nav-share.png" />
+    <Content Include="Areas\Widget\Content\images\ico-nav-sort.png" />
+    <Content Include="Areas\Widget\Content\images\ico-next-off.png" />
+    <Content Include="Areas\Widget\Content\images\ico-next-on.png" />
+    <Content Include="Areas\Widget\Content\images\ico-or.png" />
+    <Content Include="Areas\Widget\Content\images\ico-plus.png" />
+    <Content Include="Areas\Widget\Content\images\ico-prev-off.png" />
+    <Content Include="Areas\Widget\Content\images\ico-prev-on.png" />
+    <Content Include="Areas\Widget\Content\images\ico-purch-complete.png" />
+    <Content Include="Areas\Widget\Content\images\ico-save.png" />
+    <Content Include="Areas\Widget\Content\images\ico-sc.png" />
+    <Content Include="Areas\Widget\Content\images\ico-star-dis.png" />
+    <Content Include="Areas\Widget\Content\images\ico-star.png" />
+    <Content Include="Areas\Widget\Content\images\ico-study.png" />
+    <Content Include="Areas\Widget\Content\images\lfe_facebooklogo.png" />
+    <Content Include="Areas\Widget\Content\images\oops.jpg" />
+    <Content Include="Areas\Widget\Content\images\star.gif" />
+    <Content Include="Areas\Widget\Content\images\widget-sprite.png" />
+    <Content Include="Areas\Widget\Content\styles\b-main.css" />
+    <Content Include="Areas\Widget\Content\styles\buy.css" />
+    <Content Include="Areas\Widget\Content\styles\catalog.css" />
+    <Content Include="Areas\Widget\Content\styles\course.css" />
+    <Content Include="Areas\Widget\Content\styles\CourseIntro.css" />
+    <Content Include="Areas\Widget\Content\styles\facebook.css" />
+    <Content Include="Areas\Widget\Content\styles\facebookSettings.css" />
+    <Content Include="Areas\Widget\Content\styles\index.css" />
+    <Content Include="Areas\Widget\Content\styles\item-page.css" />
+    <Content Include="Areas\Widget\Content\styles\item-viewer.css" />
+    <Content Include="Areas\Widget\Content\styles\PlaceHolder.css" />
+    <Content Include="Areas\Widget\Content\styles\purchase.complete.css" />
+    <Content Include="Areas\Widget\Content\styles\purchase.css" />
+    <Content Include="Areas\Widget\Content\styles\rateit.css" />
+    <Content Include="Areas\Widget\Content\styles\Search.css" />
+    <Content Include="Areas\Widget\Content\styles\site.css" />
+    <Content Include="Areas\Widget\Content\styles\widget.css" />
+    <Content Include="Areas\Widget\Scripts\Html5PlaceHolder.js" />
+    <Content Include="Areas\Widget\Scripts\kendo.modernizr.custom.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.item.bc.player.template.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.item.bc.player.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\layout.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.bcl.player.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.course.detail.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.discuss.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.global.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.item.helper.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.item.viewer.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\lfe.sc.helper.js" />
+    <Content Include="Areas\Widget\Scripts\lfe\notif.manager.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\bootstrap.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\countdown.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\countdown.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\htmlEncode.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\iframeResizer.contentWindow.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\iframeResizer.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.autosize.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.fieldselection.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.mousewheel.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.scrollTo.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.tagmate.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.tagmate.js" />
+    <Content Include="Areas\Widget\Views\Checkout\PurchaseResult.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Content\main.css" />
+    <Content Include="Areas\WidgetEndPoint\Content\popup.css" />
+    <Content Include="Areas\WidgetEndPoint\Scripts\popup.js" />
+    <Content Include="Areas\WidgetEndPoint\WidgetPopup.html" />
+    <Content Include="Content\assets\ico-female.png" />
+    <Content Include="Content\assets\ico-looser.png" />
+    <Content Include="Content\assets\ico-victory.png" />
+    <Content Include="Content\assets\lfe-logo-108.png" />
+    <Content Include="Content\assets\lfe-logo-51-56.png" />
+    <Content Include="Content\assets\lfe-logo-bg.png" />
+    <Content Include="Content\assets\lfe-logo-tooltip-90.png" />
+    <Content Include="Content\assets\mail\ico-acc-red.png" />
+    <Content Include="Content\assets\mail\ico-acc.png" />
+    <Content Include="Content\assets\mail\ico-author.png" />
+    <Content Include="Content\assets\mail\ico-contact-red.png" />
+    <Content Include="Content\assets\mail\ico-contact.png" />
+    <Content Include="Content\assets\mail\ico-head-confirm.png" />
+    <Content Include="Content\assets\mail\ico-head-ms.png" />
+    <Content Include="Content\assets\mail\ico-head.png" />
+    <Content Include="Content\assets\mail\ico-learn-red.png" />
+    <Content Include="Content\assets\mail\ico-learn.png" />
+    <Content Include="Content\assets\mail\ico-v-red.png" />
+    <Content Include="Content\assets\mail\ico-v.png" />
+    <Content Include="Content\assets\mail\mail-logo-bg.png" />
+    <Content Include="Content\assets\site-sprite.png" />
+    <Content Include="Content\assets\Upper-bar-sharet-icon.png" />
+    <Content Include="Content\assets\upper-logo-active.png" />
+    <Content Include="Content\assets\upper-logo-inactive.png" />
+    <Content Include="Content\assets\user-dash-sprite.png" />
+    <Content Include="Content\images\ico-refresh.png" />
+    <Content Include="Content\images\main-loader.gif" />
+    <Content Include="Content\images\star-black32.png" />
+    <Content Include="Content\images\star-gold32.png" />
+    <Content Include="Content\images\star-red32.png" />
+    <Content Include="Content\images\star-white32.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\editor.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\imagebrowser.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\indeterminate.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\loading-image.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\loading.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\loading_2x.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\markers.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\markers_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\slider-h.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\slider-v.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\sprite.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\sprite_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\sprite_kpi.png" />
+    <Content Include="Content\kendo\2014.3.1119\Bootstrap\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\editor.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\imagebrowser.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\indeterminate.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\loading-image.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\loading.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\loading_2x.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\markers.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\markers_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\slider-h.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\slider-v.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Default\sprite.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\sprite_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\sprite_kpi.png" />
+    <Content Include="Content\kendo\2014.3.1119\Default\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\images\back.png" />
+    <Content Include="Content\kendo\2014.3.1119\images\kendoui.svg" />
+    <Content Include="Content\kendo\2014.3.1119\images\wp8_icons.png" />
+    <Content Include="Content\kendo\2014.3.1119\images\wp8_inverseicons.png" />
+    <Content Include="Content\kendo\2014.3.1119\kendo.bootstrap.min.css" />
+    <Content Include="Content\kendo\2014.3.1119\kendo.common.min.css" />
+    <Content Include="Content\kendo\2014.3.1119\kendo.default.min.css" />
+    <Content Include="Content\kendo\2014.3.1119\kendo.metro.min.css" />
+    <Content Include="Content\kendo\2014.3.1119\kendo.uniform.min.css" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\editor.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\imagebrowser.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\indeterminate.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\loading-image.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\loading.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\loading_2x.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\markers.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\markers_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\slider-h.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\slider-v.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\sprite.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\sprite_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\sprite_kpi.png" />
+    <Content Include="Content\kendo\2014.3.1119\Metro\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\brushed-metal.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots1.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots10.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots11.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots12.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots13.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots2.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots3.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots4.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots5.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots6.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots7.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots8.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\dots9.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\glass-lighter.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\glass.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\highlight.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\hsv-gradient.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\hue.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\leather1.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\leather2.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\noise.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe1.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe2.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe3.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe4.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe5.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\stripe6.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\transparency.png" />
+    <Content Include="Content\kendo\2014.3.1119\textures\transtexture.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\editor.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\imagebrowser.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\indeterminate.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\loading-image.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\loading.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\loading_2x.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\markers.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\markers_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\slider-h.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\slider-v.gif" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\sprite.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\sprite_2x.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\sprite_kpi.png" />
+    <Content Include="Content\kendo\2014.3.1119\Uniform\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\editor.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\imagebrowser.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\indeterminate.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\loading-image.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\loading.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\loading_2x.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\markers.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\markers_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\slider-h.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\slider-v.gif" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\sprite.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\sprite_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\sprite_kpi.png" />
+    <Content Include="Content\kendo\2016.1.112\Bootstrap\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\editor.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\imagebrowser.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\indeterminate.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\loading-image.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\loading.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\loading_2x.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\markers.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\markers_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\slider-h.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\slider-v.gif" />
+    <Content Include="Content\kendo\2016.1.112\Default\sprite.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\sprite_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\sprite_kpi.png" />
+    <Content Include="Content\kendo\2016.1.112\Default\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\images\back.png" />
+    <Content Include="Content\kendo\2016.1.112\images\kendoui.svg" />
+    <Content Include="Content\kendo\2016.1.112\images\wp8_icons.png" />
+    <Content Include="Content\kendo\2016.1.112\images\wp8_inverseicons.png" />
+    <Content Include="Content\kendo\2016.1.112\kendo.bootstrap.min.css" />
+    <Content Include="Content\kendo\2016.1.112\kendo.common.min.css" />
+    <Content Include="Content\kendo\2016.1.112\kendo.default.min.css" />
+    <Content Include="Content\kendo\2016.1.112\kendo.metro.min.css" />
+    <Content Include="Content\kendo\2016.1.112\kendo.uniform.min.css" />
+    <Content Include="Content\kendo\2016.1.112\Metro\editor.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\imagebrowser.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\indeterminate.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\loading-image.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\loading.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\loading_2x.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\markers.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\markers_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\slider-h.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\slider-v.gif" />
+    <Content Include="Content\kendo\2016.1.112\Metro\sprite.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\sprite_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\sprite_kpi.png" />
+    <Content Include="Content\kendo\2016.1.112\Metro\sprite_kpi_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\brushed-metal.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots1.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots10.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots11.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots12.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots13.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots2.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots3.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots4.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots5.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots6.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots7.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots8.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\dots9.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\glass-lighter.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\glass.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\highlight.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\hsv-gradient.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\hue.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\leather1.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\leather2.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\noise.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe1.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe2.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe3.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe4.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe5.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\stripe6.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\transparency.png" />
+    <Content Include="Content\kendo\2016.1.112\textures\transtexture.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\editor.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\imagebrowser.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\indeterminate.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\loading-image.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\loading.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\loading_2x.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\markers.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\markers_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\slider-h.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\slider-v.gif" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\sprite.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\sprite_2x.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\sprite_kpi.png" />
+    <Content Include="Content\kendo\2016.1.112\Uniform\sprite_kpi_2x.png" />
+    <Content Include="Content\styles\animate.css" />
+    <Content Include="Content\styles\animate.min.css" />
+    <Content Include="Content\styles\bigstars.css" />
+    <Content Include="Content\styles\bootstrap.custom.size.min.css" />
+    <Content Include="Content\styles\bootstrap.min.css" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_Header.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\_ItemViewer.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Bundle\_BundleCourseBox.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_ChaptersNavigation.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_NavTabs.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_ChapterContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_OtherLearners.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_OtherLearnerPersonal.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_OtherLearnerList.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_CourseReview.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\Viewer\_ChapterLinks.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_CourseDiscussion.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_HashFeed.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_HashFeedList.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_HashFeedTree.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_MessageInputForm.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_MessageView.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_RoomFeed.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_RoomFeedTree.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Discussion\_RoomMessagesList.cshtml" />
+    <Content Include="Areas\Widget\Views\Discussion\Feed.cshtml" />
+    <Content Include="Areas\Widget\Views\Discussion\IFrameFeed.cshtml" />
+    <Content Include="Areas\Widget\Views\Discussion\Message.cshtml" />
+    <Content Include="Areas\Widget\Views\Discussion\UserFeed.cshtml" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.tagmate.min.js.map">
+      <DependentUpon>jquery.tagmate.min.js</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Views\Shared\_PurchaseFormLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_PurchaseCompleteLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_PurchaseCompleteToolbar.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\_CustomRait.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WixBootstrapLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_LayoutLoginScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_LayoutWixScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_LayoutHeadCustomCssSettings.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_LayoutLfeTooltip.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_NavbarHeader.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_ProductPageScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_ProductPagePartial.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_FacebookSettings.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_FacebookFramesLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_FacebookSettingScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_FacebookRefreshAppScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_SettingsLogin.cshtml" />
+    <Content Include="Areas\Widget\Content\styles\fb.css" />
+    <Content Include="Areas\PortalAdmin\Views\Settings\CategoryManage.cshtml" />
+    <Content Include="Content\styles\bootstrap\less\glyphicons.css">
+      <DependentUpon>glyphicons.less</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\bootstrap\less\glyphicons.min.css">
+      <DependentUpon>glyphicons.css</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\styles\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\styles\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Areas\Widget\Views\Item\ItemNotPublished.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Settings\LfeStoreManage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\LfeMainStoreManage.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_Catalog.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Payout\_MonthlyPayoutCurrenciesReport.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\AdminPanel.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_AdminPanelConnectAccounts.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Home\Welcome.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Plugin\UserScript.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Plugin\SaveNewStore.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Shared\_LayoutLoginScripts.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_AdminPanelFbConnect.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_AdminPanelLfeLogin.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Home\PluginContent.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Mailchimp\Login.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Mailchimp\_LoginPartial.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Mailchimp\Index.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Mailchimp\_SegmentsListPartial.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\EventChartReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_EventReportFilters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_EventsChart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\EventOwnerChartReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_EventsOwnerChart.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WidgetBootstrapCheckoutLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\Login.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\Register.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\Index.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\Success.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\Failure.cshtml" />
+    <Content Include="Areas\Widget\Views\Checkout\ForgottenPassword.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Checkout\_PurchaseForm.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Checkout\_PurchaseFormParams.cshtml" />
+    <Content Include="Content\styles\google-gonts.css" />
+    <Content Include="Content\styles\less\triangle.css">
+      <DependentUpon>triangle.less</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\triangle.min.css">
+      <DependentUpon>triangle.css</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\login.css">
+      <DependentUpon>login.less</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\login.min.css">
+      <DependentUpon>login.css</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\mixins.css">
+      <DependentUpon>mixins.less</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\mixins.min.css">
+      <DependentUpon>mixins.css</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\variables.css">
+      <DependentUpon>variables.less</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\less\variables.min.css">
+      <DependentUpon>variables.css</DependentUpon>
+    </Content>
+    <Content Include="Content\styles\sidebar.min.css" />
+    <Content Include="Content\styles\sweet-alert.css" />
+    <Content Include="Content\styles\toolbar.old.css" />
+    <Content Include="HealthCheck.html" />
+    <Content Include="Scripts\jszip.min.js" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\beelden.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\bekle.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\five.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\glow.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\roundster.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\six.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\stormtrooper.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer-skins-premium\vapor.xml" />
+    <Content Include="Scripts\jwplayer\jwplayer.flash.swf" />
+    <Content Include="Scripts\jwplayer\jwplayer.html5.js" />
+    <Content Include="Scripts\jwplayer\jwplayer.js" />
+    <Content Include="Scripts\jwplayer\README.html" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.all.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.aspnetmvc.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.core.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.custom.widget.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.data.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.dataviz.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.fx.min.js" />
+    <Content Include="Scripts\kendo\2014.3.1119\kendo.web.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.all.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.aspnetmvc.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.core.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.custom.widget.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.data.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.dataviz.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.fx.min.js" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.web.min.js" />
+    <Content Include="Scripts\lfe\zendesk.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\plugins\brightcove.base.js" />
+    <Content Include="Scripts\plugins\sidebar.min.js" />
+    <Content Include="Scripts\plugins\sweet-alert.js" />
+    <Content Include="Scripts\plugins\sweet-alert.min.js" />
+    <Content Include="Scripts\plugins\wix-1.42.0.min.js" />
+    <Content Include="SystemInfo.html" />
+    <Content Include="Views\Shared\Account\_RefundProgram.cshtml" />
+    <Content Include="Views\Shared\Account\_GrpSubmitWindow.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\PluginInstallations.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_CTRL_UserAutoComplete.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_CTRL_EnumDropDown.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_AuthorAdminLayout.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\StoresReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbYourSales.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbNextPayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbAuthorStats.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbFilters.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbCharts.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Payout\PayoutExecutionReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_EventWindow.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbFooter.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Home\MonthlyStatement.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbSalesBox.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_SalesDetailWindow.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\SalesWindowContent\_AuthorSales.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\SalesWindowContent\_AffiliateSales.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\SalesWindowContent\_CouponsUsed.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\SalesWindowContent\_Subscriptions.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\SalesWindowContent\_Refunds.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbMainStats.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Home\AdminDashboard.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_AdminDashboardLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbHeaderScripts.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_dbFooterScripts.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Pricing\_ManageAffiliateCommission.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuizEditForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuestionEditForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_AuthorAdminCommonLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_CommonLayoutHeaderScripts.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuizQuestions.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_VideoBrowser.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_ImageUploader.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\QuizAnswerOptionDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_AnswerManageForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Quiz\Index.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuizReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuizManageForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuestionList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_QuizManage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_QuizListViewForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\CourseContentToken.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_QuizPublishForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_AuthorAdminNoHeaderLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\QuizDTO.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Certificate\_CertificateManage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Quiz\Report.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_ResponseToStudent.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Quiz\_StudentAttemptsWnd.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Certificate\Report.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Certificate\StudentCertificateEmail.cshtml" />
+    <Content Include="Content\kendo\2014.3.1119\images\kendoui.ttf" />
+    <Content Include="Content\kendo\2014.3.1119\images\kendoui.woff" />
+    <Content Include="Areas\PortalAdmin\Views\Report\HostEventsReport.cshtml" />
+    <Content Include="Content\styles\less\login.less" />
+    <Content Include="Content\styles\less\variables.less" />
+    <Content Include="Content\styles\bootstrap\less\alerts.less" />
+    <Content Include="Content\styles\bootstrap\less\badges.less" />
+    <Content Include="Content\styles\bootstrap\less\bootstrap.less" />
+    <Content Include="Content\styles\bootstrap\less\breadcrumbs.less" />
+    <Content Include="Content\styles\bootstrap\less\button-groups.less" />
+    <Content Include="Content\styles\bootstrap\less\buttons.less" />
+    <Content Include="Content\styles\bootstrap\less\carousel.less" />
+    <Content Include="Content\styles\bootstrap\less\close.less" />
+    <Content Include="Content\styles\bootstrap\less\code.less" />
+    <Content Include="Content\styles\bootstrap\less\component-animations.less" />
+    <Content Include="Content\styles\bootstrap\less\dropdowns.less" />
+    <Content Include="Content\styles\bootstrap\less\forms.less" />
+    <Content Include="Content\styles\bootstrap\less\glyphicons.less" />
+    <Content Include="Content\styles\bootstrap\less\grid.less" />
+    <Content Include="Content\styles\bootstrap\less\input-groups.less" />
+    <Content Include="Content\styles\bootstrap\less\jumbotron.less" />
+    <Content Include="Content\styles\bootstrap\less\labels.less" />
+    <Content Include="Content\styles\bootstrap\less\list-group.less" />
+    <Content Include="Content\styles\bootstrap\less\media.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\alerts.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\background-variant.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\border-radius.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\buttons.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\center-block.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\clearfix.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\forms.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\gradients.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\grid-framework.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\grid.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\hide-text.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\image.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\labels.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\list-group.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\nav-divider.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\nav-vertical-align.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\opacity.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\pagination.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\panels.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\progress-bar.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\reset-filter.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\resize.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\responsive-visibility.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\size.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\tab-focus.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\table-row.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\text-emphasis.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\text-overflow.less" />
+    <Content Include="Content\styles\bootstrap\less\mixins\vendor-prefixes.less" />
+    <Content Include="Content\styles\bootstrap\less\modals.less" />
+    <Content Include="Content\styles\bootstrap\less\navbar.less" />
+    <Content Include="Content\styles\bootstrap\less\navs.less" />
+    <Content Include="Content\styles\bootstrap\less\normalize.less" />
+    <Content Include="Content\styles\bootstrap\less\pager.less" />
+    <Content Include="Content\styles\bootstrap\less\pagination.less" />
+    <Content Include="Content\styles\bootstrap\less\panels.less" />
+    <Content Include="Content\styles\bootstrap\less\popovers.less" />
+    <Content Include="Content\styles\bootstrap\less\print.less" />
+    <Content Include="Content\styles\bootstrap\less\progress-bars.less" />
+    <Content Include="Content\styles\bootstrap\less\responsive-embed.less" />
+    <Content Include="Content\styles\bootstrap\less\responsive-utilities.less" />
+    <Content Include="Content\styles\bootstrap\less\scaffolding.less" />
+    <Content Include="Content\styles\bootstrap\less\tables.less" />
+    <Content Include="Content\styles\bootstrap\less\theme.less" />
+    <Content Include="Content\styles\bootstrap\less\thumbnails.less" />
+    <Content Include="Content\styles\bootstrap\less\tooltip.less" />
+    <Content Include="Content\styles\bootstrap\less\type.less" />
+    <Content Include="Content\styles\bootstrap\less\utilities.less" />
+    <Content Include="Content\styles\bootstrap\less\variables.less" />
+    <Content Include="Content\styles\bootstrap\less\wells.less" />
+    <Content Include="Content\styles\less\mixins.less" />
+    <Content Include="Content\styles\less\navbar.less" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_CustomTrxWindow.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_DashboardLayout.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Dashboard\Index.cshtml" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.dash.less" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\mixins.less" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\variables.less" />
+    <Content Include="Content\styles\less\triangle.less" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_LfePayout.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_Filters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_PlatformStats.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_PlatformStatsRow.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_PlatformStatsBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_MiniChart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_Totals.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_TotalBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_SalesTotals.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_SalesTotalBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_VideoStats.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_IntegrationStats.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_AuthorTotalStats.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_AuthorPeriodStatsRow.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_AuthorPeriodStatsBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_LearnerPeriodStatsRow.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_LearnerPeriodStatsBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_TopSellers.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_TopSellerBox.cshtml" />
+    <Content Include="Areas\PortalAdmin\Content\styles\less\admin.nav.less" />
+    <Content Include="Areas\Widget\Content\styles\less\widget.catalog.less" />
+    <Content Include="Areas\Widget\Content\styles\less\mixins.less" />
+    <Content Include="Areas\Widget\Content\styles\less\variables.less" />
+    <Content Include="Areas\Widget\Content\styles\less\widget.viewer.less" />
+    <Content Include="Areas\PortalAdmin\Views\Report\Index.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Dashboard\_AdminDashboard.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_QuizIntro.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_UserQuizRun.cshtml" />
+    <Content Include="Areas\Widget\Scripts\plugins\countdown.min.js.map">
+      <DependentUpon>countdown.min.js</DependentUpon>
+    </Content>
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_PropBox.cshtml" />
+    <Content Include="Content\styles\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_UserQuizQuestionContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_UserQuizComplete.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_Player.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_AttemptsCounter.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_UserActions.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_StartButton.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_ContactAuthor.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_StaticTimer.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_PostMessage.cshtml" />
+    <Content Include="Areas\Widget\Views\Quiz\StudentCertificateEmail.cshtml" />
+    <Content Include="Areas\Widget\Views\StudentCertificate.cshtml" />
+    <Content Include="Areas\Widget\Content\styles\less\cert.less" />
+    <Content Include="Areas\Widget\Views\Shared\Quiz\_ContactAuthorResult.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\QuizReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\HostAbandon.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Home\SystemActions.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Home\VideoState.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_ViewerPlayer.cshtml" />
+    <Content Include="Content\kendo\2016.1.112\images\kendoui.ttf" />
+    <Content Include="Content\kendo\2016.1.112\images\kendoui.woff" />
+    <Content Include="Content\kendo\2016.1.112\kendo.bootstrap.min.css.map" />
+    <Content Include="Content\kendo\2016.1.112\kendo.common.min.css.map" />
+    <Content Include="Content\kendo\2016.1.112\kendo.default.min.css.map" />
+    <Content Include="Content\kendo\2016.1.112\kendo.metro.min.css.map" />
+    <Content Include="Content\kendo\2016.1.112\kendo.uniform.min.css.map" />
+    <None Include="Properties\PublishProfiles\DELL DropBox.pubxml" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Content\styles\common-layout.css" />
+    <Content Include="Content\styles\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\styles\site.css" />
+    <Content Include="Content\styles\user-admin-endpoint.css" />
+    <Content Include="Content\styles\user-endpoint.css" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\jquery\jquery-1.9.1.js" />
+    <Content Include="Scripts\jquery\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery\jquery.unobtrusive-ajax.min.js" />
+    <None Include="Scripts\jquery\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery\jquery.validate.js" />
+    <Content Include="Scripts\jquery\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\lfe\lfe.login.js" />
+    <Content Include="Scripts\lfe\lfe.referrer.js" />
+    <Content Include="Scripts\modernizr-2.8.2.min.js" />
+    <Content Include="Scripts\plugins\htmlEncode.min.js" />
+    <Content Include="Scripts\plugins\jquery.rateit.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\jquery.resizecrop-1.0.3.min.js" />
+    <Content Include="Areas\Widget\Scripts\plugins\scrollIt.min.js" />
+    <Content Include="Areas\WixEndPoint\Content\images\help-popup-icon.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\ico-cancel.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\ico-save.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\LFE-App-Icon.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\refresh.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\tutorial.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\bg-gradient.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\buttongroup\button-grou-middle.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\buttongroup\button-group-left-shadow.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\buttongroup\button-group-right.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\buttongroup\button-group-top.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\checbox-sprite.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\color-picker-dropdown-frame.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\color-selector-sprite.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\expand-collapse-sprite.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\expand-collapse-sprite_.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\layouts.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\premium-features.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\radio-button-sprite.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\slider-bg-left.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\slider-bg-pixel.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\slider-bg-right.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\slider-knob.png" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\transparency.gif" />
+    <Content Include="Areas\WixEndPoint\Content\images\Wix\wix_icon.png" />
+    <Content Include="Areas\WixEndPoint\Content\styles\site.css" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\css\bootstrap.css" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\css\buttons.css" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\css\common.css" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\css\settings.css" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\css\ui-lib.min.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\bootstrap\bootstrap-popover.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\bootstrap\bootstrap-tooltip.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\accordion\accordion.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\css\dd.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\images\dropdown_arrow.png" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\images\dropdown_bg.png" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\images\drop_down_sprite.png" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\jquery.dd.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\advanced-dropdown\jquery.dd.min.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\checkbox\checkbox.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\color-picker-opacity.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\color-picker.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\color-picker2.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\color-pickers\advanced.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\color-pickers\simple.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\color-picker\css\color-picker.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\dropdown\dropdown.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\dropdown\dropdown.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\glued-position-min\glued.min.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\glued-position-min\glued.min.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\glued-position\css\glued-position.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\glued-position\glued-position.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\radio-button\radio-button.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\slider2\css\slider2.css" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\slider2\slider2.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\components\slider\slider.js" />
+    <Content Include="Areas\WixEndPoint\Scripts\wix\views\settings.js" />
+    <Content Include="Content\images\btn-bf-login.png" />
+    <Content Include="Content\images\btn-view-statement.png" />
+    <Content Include="Content\images\course.png" />
+    <Content Include="Content\images\delete.gif" />
+    <Content Include="Content\images\favicon.png" />
+    <Content Include="Content\images\ico-cancel.png" />
+    <Content Include="Content\images\ico-save.png" />
+    <Content Include="Content\images\icons\btn-bf-login.png" />
+    <Content Include="Content\images\em-logo.png" />
+    <Content Include="Content\images\icons\btn-fb-login.png" />
+    <Content Include="Content\images\icons\error-icon.png" />
+    <Content Include="Content\images\icons\ico-cancel.png" />
+    <Content Include="Content\images\icons\ico-error-42.png" />
+    <Content Include="Content\images\icons\ico-login.png" />
+    <Content Include="Content\images\icons\ico-ok-42.png" />
+    <Content Include="Content\images\icons\ico-save.png" />
+    <Content Include="Content\images\icons\icon-sprite.png" />
+    <Content Include="Content\images\icons\notification-icon.png" />
+    <Content Include="Content\images\icons\notification-sprite.png" />
+    <Content Include="Content\images\icons\success-icon.png" />
+    <Content Include="Content\images\invoice-bg.jpg" />
+    <Content Include="Content\images\invoice-footer.jpg" />
+    <Content Include="Content\images\invoice-logo.jpg" />
+    <Content Include="Content\images\lfe_sparkle_logo.png" />
+    <Content Include="Content\images\login-logo.png" />
+    <Content Include="Content\images\logo_138_130.png" />
+    <Content Include="Content\images\logo_paypal.png" />
+    <Content Include="Content\images\review-stars.png" />
+    <Content Include="Content\images\star.gif" />
+    <Content Include="Content\images\webstore\arrow-black-up.png" />
+    <Content Include="Content\images\webstore\arrow.png" />
+    <Content Include="Content\images\webstore\Arrow_black.png" />
+    <Content Include="Content\images\webstore\btn_buy_blue.png" />
+    <Content Include="Content\images\webstore\Buy-now-blue-btn.png" />
+    <Content Include="Content\images\webstore\Buy-now-btn.png" />
+    <Content Include="Content\images\webstore\Connect-with-FB-btn.png" />
+    <Content Include="Content\images\webstore\header_bg01.jpg" />
+    <Content Include="Content\images\webstore\header_bg01.png" />
+    <Content Include="Content\images\webstore\ico-cancel.png" />
+    <Content Include="Content\images\webstore\login-ajax-loader.gif" />
+    <Content Include="Content\images\webstore\logo.jpg" />
+    <Content Include="Content\images\webstore\next.jpg" />
+    <Content Include="Content\images\webstore\prev.jpg" />
+    <Content Include="Content\images\webstore\Video-placeholder-image-small.jpg" />
+    <Content Include="Content\images\webstore\Video-placeholder-image.jpg" />
+    <Content Include="Content\kendo.compatibility.css" />
+    <Content Include="Content\styles\acc.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap-theme.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap-theme.min.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap.custom.size.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap.custom.size.min.css" />
+    <Content Include="Content\styles\bootstrap\bootstrap.min.css" />
+    <Content Include="Content\styles\common.css" />
+    <Content Include="Content\styles\invoice.css" />
+    <Content Include="Content\styles\login.css" />
+    <Content Include="Content\styles\nanoscroller.css" />
+    <Content Include="Content\styles\rateit.css" />
+    <Content Include="Content\styles\reset.css" />
+    <Content Include="Content\styles\toolbar.css" />
+    <Content Include="error.html" />
+    <Content Include="favicon.ico" />
+    <Content Include="Global.asax" />
+    <Content Include="Areas\AuthorAdmin\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\AuthorVideos.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\Courses.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\Dashboard.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\Marketing.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\SalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\Settings.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\SubscribersReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Course\CourseWizard.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Course\EditCourse.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Course\WizardVideoManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Discussion\AuthorClassRooms.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Error\NonAuthorized.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_AdminWebStoreLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_Footer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_FromToFilter.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_Header.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_Navigation.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\_WizardLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_AuthorVideosScripts.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_AuthorViewDTOHidden.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_EditVideo.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_SubscribersReport.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserPurchases.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_VideosGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Author\_VideosList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_BundlesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_BundlesList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_CourseManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_CoursesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_CoursesList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_ReportManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseReport\_ReviewGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\_StepContainer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\_WizardContainer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\_WizardNavTree.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Forms\_AddChapter.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Forms\_EditLink.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Forms\_EditVideo.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_AboutYou.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_ChapterContents.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_CourseName.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_CourseVisuals.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_Introduction.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_Metadata.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_Pricing.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_Publish.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\CourseWizard\Steps\_VideoManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_SalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Discussion\_AuthorClassRoomsGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Discussion\_EditClassRoom.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Discussion\_RoomCoursesTooltipList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_BcPlayer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_Content.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CourseClassRooms.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CourseCoupons.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CourseDetails.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CoursePrice.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_EditChapter.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_EditCoupon.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_EditLink.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_EditVideo.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_Marketing.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_Pricing.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_Reviews.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Course\_SalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_VideoSelection.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\CouponType.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\CourseStatus.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\Currency.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\GridForeignKey.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\Integer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\Number.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\StoreStatus.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\WizardChapterListEditDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Error.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Video\_VideoManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_AddByAuthor.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_AddByLfeCategory.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_AddSingleItem.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_AdminUserWebStoreReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_ItemsList.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_EditCategory.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_EditSingleItem.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Dashboard\_OwnerStoresSalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_StoreContents.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_StoreDetails.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_StoreEmbed.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Store\_StoreSalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_StoresGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_WebStoreEditManager.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Web.config" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\AdminEditUserWebStore.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\AdminUserWebStoreManage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\EditStore.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\Report.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\WebStore\SalesReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Home\Index.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\EmailInterfaceLogs.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\EventLogsReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\FbPostInterfaceLogs.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\FileInterfaceLogs.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\SystemLogs.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Settings\EmailTemplates.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Settings\WizardStepTooltips.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_Footer.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_Header.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_Navigation.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\EditorTemplates\eUserStatuses.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Email\_EmailTemplate.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Email\_TemplateFieldSelection.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Fb\_FbMessageTester.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Fb\_FbStoryTester.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_EmailInterfaceLogsGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_EventLogsGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_FbPostInterfaceLogsGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_FileInterfaceLogsGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_ReportFilters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_SystemLogsGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_EditUserForm.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\User\Report.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Web.config" />
+    <Content Include="Areas\PortalAdmin\Views\WebStore\Index.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Course\CourseViewer.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Discussion\Feed.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Discussion\IFrameFeed.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Discussion\Message.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Discussion\UserFeed.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Error\NonAuthorized.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_FeedWindow.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_Footer.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_Header.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_IFrameLayout.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_NotificationMenu.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_UserCoursesCombo.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_UserNotificationLink.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\_UserNotifications.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_ChapterContent.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_ChapterLinks.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_ChaptersTree.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_CourseHeader.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_CourseNavigation.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_CourseReview.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_OtherLearnerList.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_OtherLearnerPersonal.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_OtherLearners.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_CourseDiscussion.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_HashFeed.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_HashFeedList.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_HashFeedTree.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_MessageInputForm.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_MessageView.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_RoomFeed.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_RoomFeedTree.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Discussion\_RoomMessagesList.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_DiscussionUserProfile.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserCoursesList.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserProfileCart.cshtml" />
+    <Content Include="Areas\UserPortal\Views\User\Profile.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Web.config" />
+    <Content Include="Areas\Widget\Views\Account\Activate.cshtml" />
+    <Content Include="Areas\Widget\Views\Course\Purchase.cshtml" />
+    <Content Include="Areas\Widget\Views\MainSite\MainSiteToolBar.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_Header.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_ToolBar.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WidgetItemBox.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WidgetLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WixLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_ForgotPassword.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_Login.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_LoginForm.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_LoginMainSite.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_Register.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_RegisterMainSite.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_RegistrationActivationNotification.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_UserLoginLinks.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_UserLoginLinksMainSite.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Account\_WidgetRegisterForm.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_BuyPlaceHolder.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_ChapterContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_ChapterLinks.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_ChaptersTree.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_Course.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseAuthor.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseHeader.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseNavigation.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseReviews.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_Player.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Error.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Error404.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Index\_CoursesList.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Index\_Paging.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Index\_Sort.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\ParentScript.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Styles\CourseIntroCss.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Styles\WidgetCss.cshtml" />
+    <Content Include="Areas\Widget\Views\Web.config" />
+    <Content Include="Areas\Widget\Views\Widget\Index.cshtml" />
+    <Content Include="Areas\Widget\Views\Wix\Frame.cshtml" />
+    <Content Include="Areas\Widget\Views\Wix\Index.cshtml" />
+    <Content Include="Areas\Widget\Views\Wix\PlaceHolder.cshtml" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\codekit-config.json" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\bootstrap.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\button-groups.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\buttons.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\forms.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\mixins.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\popover.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\reset.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\bootstrap\variables.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\codekit-config.json" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\common.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\components\accordion.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\components\buttons.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\components\color-picker.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\helpers\background.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\helpers\helpers.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\helpers\radius.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\main.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\views\settings.less" />
+    <Content Include="Areas\WixEndPoint\Content\styles\Wix\less\views\widget.less" />
+    <Content Include="Areas\WixEndPoint\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Home\AppSettingsNew.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Home\Error.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Home\Index.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_AuhtorAdminIFrame.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_ForgotPassword.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_Login.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_RegisterWixUser.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\_SettingsLayout.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Currency.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Email.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\EmailAddress.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\GridForeignKey.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Integer.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Number.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Shared\EditorTemplates\Url.cshtml" />
+    <Content Include="Areas\WixEndPoint\Views\Web.config" />
+    <Content Include="Scripts\angular-kendo.min.js" />
+    <Content Include="Scripts\angular-sanitize.min.js" />
+    <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\bootstrap\bootstrap.js" />
+    <Content Include="Scripts\bootstrap\bootstrap.min.js" />
+    <Content Include="Scripts\facebookApi.js" />
+    <Content Include="Scripts\fbApi.js" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Author\_SalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Author\_SubscriptionSalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Owner\_SubscriptionSalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Owner\_SalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\_SalesReportMVVM.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\_SalesReportMVVMFilters.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Store\_SubscriptionSalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Store\_SalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Course\_SalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Course\_SubscriptionSalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Bundle\_SalesGrid.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Bundle\_SalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Bundle\_SubscriptionSalesGrid.cshtml" />
+    <Content Include="Areas\Widget\Views\Account\SafariLoginSession.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\_SalesReportsScripts.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\SummaryReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_SummaryReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_SummaryReportGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserStatistics.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\User\StatisticsReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_FromToFilter.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserVideos.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_Player.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CourseContents.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_ChapterContents.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\ChapterEditDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\ChapterVideoEditDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\ChapterLinkEditDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\WebStoreCategoryEditDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_CategoryContents.cshtml" />
+    <Content Include="Areas\Widget\Views\Wix\PlaceHolderBundle.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_StoreItemSelection.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Payout\PayoutMonthlyStatement.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Payout\_PayoutReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Payout\_MonthlyPayoutCurrencyGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_SystemLogReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DashboardAdmin.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_FunnelChart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DashboardFilters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DashboardKpiChart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DashboardDailyStatsCharts.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DashboardDailyTotalsCharts.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DailyStatsUserData.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DailyStatsItemData.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DailyStatsStoreData.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DailyStatsPurchaseData.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\SettingsLogin.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\FileInterfaceLogs.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\CompletedPayments.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\_DailyStatsVideoData.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserEvents.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\VideosReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\MonthlyStatement.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\AppLandPage.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_MonthlyStatementTab.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\MonthlyStatement\_AuthorKpiChart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\MonthlyStatement\_Totals.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\MonthlyStatement\_Chart.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\MonthlyStatement\_Footer.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\MonthlyStatementEmail.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Report\MonthlyStatement\_ChartImage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\PaymentsReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\PriceLineDTO.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Pricing\_ManageItemPrices.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Pricing\_ManageCoursePriceMeta.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Web.config" />
+    <Content Include="Areas\WidgetEndPoint\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\WidgetEndPoint\Views\Home\Index.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WixLayoutScript.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_WidgetBootstrapLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_CatalogNavigation.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Pricing\_ItemPriceBox.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Pricing\_ItemPriceNameBox.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Pricing\_ItemPricesRow.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_WidgetItemBox.cshtml" />
+    <Content Include="Scripts\plugins\swfobject.js" />
+    <Content Include="Scripts\wix.1.33.0.js" />
+    <Content Include="Views\Shared\Common\_FacebookScript.cshtml" />
+    <Content Include="Areas\Widget\Views\Item\ProductPage.cshtml" />
+    <Content Include="Areas\Widget\Views\Item\ItemNotFound.cshtml" />
+    <Content Include="Areas\Widget\Views\Item\ItemViewer.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_ItemSubscribersLabel.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Author\_AuthorProfile.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_Paging.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_Player.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\_ChaptersTree.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Bundle\_BundleCoursesList.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\_CourseContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_ProductNavigation.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_CatalogSort.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_NavShareButton.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_NavViewOptions.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\_ItemIntro.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Bundle\_BundleContent.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Pricing\_ItemProductPagePrices.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_ItemProductPageHeader.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Layout\_ItemProductPageTabsNav.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\User\_AuhtorProfile.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Item\Course\_CourseReviews.cshtml" />
+    <None Include="Properties\PublishProfiles\Idan_04_03_2014.pubxml" />
+    <Content Include="Scripts\jquery\jquery-1.9.1.min.js" />
+    <Content Include="Scripts\jquery\jquery.migrate.1.2.1.min.js" />
+    <Content Include="Scripts\less-1.5.1.js" />
+    <Content Include="Scripts\less-1.5.1.min.js" />
+    <Content Include="Scripts\lfe\lfe.global.js" />
+    <Content Include="Scripts\modernizr-2.8.2.js" />
+    <Content Include="Scripts\plugins\css3-mediaqueries.js" />
+    <Content Include="Scripts\plugins\htmlEncode.js" />
+    <Content Include="Scripts\plugins\jquery.mousewheel.js" />
+    <Content Include="Scripts\plugins\jquery.nanoscroller.min.js" />
+    <Content Include="Scripts\plugins\jquery.placeholder.js" />
+    <Content Include="Scripts\plugins\jquery.placeholder.min.js" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Scripts\plugins\overthrow.min.js" />
+    <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\Account\RegisterConfirm.cshtml" />
+    <Content Include="Views\Account\RegisterSuccess.cshtml" />
+    <Content Include="Views\Shared\Account\_EditAccountScripts.cshtml" />
+    <Content Include="Views\Shared\Account\_EditAccountSettings.cshtml" />
+    <Content Include="Views\Shared\Account\_EditCommunicationSettings.cshtml" />
+    <Content Include="Views\Shared\Account\_ExternalLoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\_LfeLoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\_LoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\_RegisterForm.cshtml" />
+    <Content Include="Views\Shared\Account\_RequestForgottenPassword.cshtml" />
+    <Content Include="Views\Shared\Account\_SetPasswordPartial.cshtml" />
+    <Content Include="Views\Shared\Account\_SuccessRegistrationMessage.cshtml" />
+    <Content Include="Views\Shared\Account\_UserAccountSettings.cshtml" />
+    <Content Include="Views\Shared\Account\_WixExternalLoginPartial.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Currency.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Email.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\EmailAddress.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\GridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Integer.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Number.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Password.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Url.cshtml" />
+    <Content Include="Scripts\plugins\jquery.placeholder.min.js.map">
+      <DependentUpon>jquery.placeholder.js</DependentUpon>
+    </Content>
+    <Content Include="Views\Shared\_UserIndicator.cshtml" />
+    <Content Include="Views\Shared\Error404.cshtml" />
+    <Content Include="Views\Account\Settings.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Shared\_LoginLayout.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserProfile.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\_BillingLayout.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_CourseSelectionController.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\CreditCardDTO.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\eCreditCardType.cshtml" />
+    <Content Include="NLog.config" />
+    <Content Include="Areas\Widget\Views\Widget\Search.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Index\_SearchCoursesForm.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\_PurchaseLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Facebook\_FacebookLayout.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\FacebookSettings.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\FacebookFrames.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\facebookLayout.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\Author\_SalesReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\SalesReports\WebStore\Owner\_OwnerSalesReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\TransactionsReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_PaypalSubscriptionInfo.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_TrxReportFilters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_RefundOrderLinePayment.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\ScheduledSubscriptionPayments.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\FacebookPlaceholder.cshtml" />
+    <Content Include="Areas\Widget\Views\Facebook\ConnectApp.cshtml" />
+    <Content Include="Areas\UserPortal\Views\User\CourseInvoice.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserPurchaseGrid.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\User\_UserSubscriptionGrid.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Billing\SaleOrdersReport.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Course\EditBundle.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_BundleDetails.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_BundleContents.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_BundleCoupons.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_BundlePrice.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_Pricing.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditBundle\_EditCoupon.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Course\BundleViewer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Coupons\_EditCouponForm.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Coupons\_OwnerCouponReport.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Bundle\_BundleProductPage.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Bundle\_BundleHeader.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Bundle\_BundleNavigation.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Bundle\_BundleCoursesList.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Bundle\_BundleContent.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\Bundle\_BundleViewer.cshtml" />
+    <Content Include="Areas\Widget\Views\Shared\Course\_CourseProductPage.cshtml" />
+    <Content Include="Areas\UserPortal\Views\Shared\CourseViewer\_CourseViewer.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\Coupons.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Coupons\_AuthorCouponManage.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\Coupons\_EditAuthorCoupon.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditorTemplates\eCouponKinds.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\WebStore\_AddByCurrentUser.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Shared\EditCourse\_CourseStores.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserCourses.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserBundles.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserPurchase.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserSales.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserStores.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Report\CourseReport.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\Billing\_ReportFilters.cshtml" />
+    <Content Include="Areas\PortalAdmin\Views\Shared\User\_UserDetails.cshtml" />
+    <Content Include="Areas\Widget\Views\Widget\NotFound.cshtml" />
+    <Content Include="Areas\AuthorAdmin\Views\Author\AffiliateItems.cshtml" />
+    <Content Include="Areas\Widget\Views\Bundle\Bundle.cshtml" />
+    <None Include="Properties\PublishProfiles\01_02_2013.pubxml" />
+    <None Include="Properties\PublishProfiles\9_12_2013.pubxml" />
+    <None Include="Properties\PublishProfiles\DropboxDeploy.pubxml" />
+    <Content Include="Views\Shared\EditorTemplates\BillingAddressDTO.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\ePaymentMethods.cshtml" />
+    <Content Include="Views\Shared\Account\_EditSettingsCommandRow.cshtml" />
+    <Content Include="Views\Shared\Account\_EditPaymentMethods.cshtml" />
+    <Content Include="web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Properties\PublishProfiles\Local Deploy.pubxml" />
+    <Content Include="Views\Shared\Billing\_SalesReportsTemplates.cshtml" />
+    <Content Include="Views\Shared\Account\_PayoutSettings.cshtml" />
+    <Content Include="Views\Shared\_LoginWindowLayout.cshtml" />
+    <Content Include="Views\Account\LoginWindow.cshtml" />
+    <Content Include="Views\Shared\Account\Login\_WindowLoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\Login\_WindowLfeLoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\Login\_WindowRequestForgottenPassword.cshtml" />
+    <Content Include="Views\Shared\Account\Login\_WindowRegisterForm.cshtml" />
+    <Content Include="Views\Shared\Common\_LoaderTemplate.cshtml" />
+    <Content Include="Views\Shared\Common\_NotificationManagerScript.cshtml" />
+    <Content Include="Views\Shared\_CommonLayout.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_LfeLoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_LoginPartial.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_ExternalLogin.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_LoginForm.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_LoginBox.cshtml" />
+    <Content Include="Views\Shared\Common\_FooterScripts.cshtml" />
+    <Content Include="Views\Shared\_AccountSettingsLayout.cshtml" />
+    <Content Include="Views\Shared\Layout\_SiteHeader.cshtml" />
+    <Content Include="Views\Shared\Layout\_UserPurchasesToolbar.cshtml" />
+    <Content Include="Views\Shared\Layout\_HeaderScripts.cshtml" />
+    <Content Include="Views\Shared\MainSiteToolBarLayout.cshtml" />
+    <Content Include="Views\Home\MainSiteToolbar.cshtml" />
+    <Content Include="Views\Account\UserEndPoint.cshtml" />
+    <Content Include="Views\Shared\Common\_ZendeskScripts.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_RegisterForm.cshtml" />
+    <Content Include="Views\Shared\Account\MainLogin\_LfeRegisterForm.cshtml" />
+    <Content Include="Views\Shared\Account\Login\_RegistrationResult.cshtml" />
+    <Content Include="Views\Shared\Common\_HeaderCssLinks.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DashboardEventToken.cshtml" />
+    <Content Include="Views\Shared\Billing\MonthlyStatement\_AuthorKpiChart.cshtml" />
+    <Content Include="Views\Shared\Billing\MonthlyStatement\_Chart.cshtml" />
+    <Content Include="Views\Shared\Billing\MonthlyStatement\_ChartImage.cshtml" />
+    <Content Include="Views\Shared\Billing\MonthlyStatement\_Footer.cshtml" />
+    <Content Include="Views\Shared\Billing\MonthlyStatement\_Totals.cshtml" />
+    <Content Include="Views\Error\General.cshtml" />
+    <Content Include="Views\Error\HttpError404.cshtml" />
+    <Content Include="Views\Error\HttpError500.cshtml" />
+    <Content Include="Views\Shared\_ErrorLayout.cshtml" />
+    <Content Include="Secure\lfe.local.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Secure\lfe.prod.config" />
+    <Content Include="Views\Shared\EditorTemplates\eAdminStatuses.cshtml" />
+    <Content Include="Views\Account\HubRegistration.cshtml" />
+    <Content Include="Secure\lfe.local.conn.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Secure\lfe.prod.conn.config" />
+    <Content Include="Views\Shared\Certificate\_StudentCertificateEmail.cshtml" />
+    <Content Include="Views\Shared\Common\_ReferrerScripts.cshtml" />
+    <Content Include="Views\Shared\Layout\_WixSdkScript.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\RadioButtonListEnum.cshtml" />
+    <Content Include="Views\Shared\Common\_JWScripts.cshtml" />
+    <Content Include="Views\Upload\Upload.cshtml" />
+    <Content Include="Secure\cert\pk-cf.pem" />
+    <Content Include="Views\Shared\Common\_RedirectSSL.cshtml" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.all.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.aspnetmvc.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.core.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.data.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.dataviz.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.fx.min.js.map" />
+    <Content Include="Scripts\kendo\2016.1.112\kendo.web.min.js.map" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Areas\Widget\Scripts\wix\" />
+    <Folder Include="Areas\Widget\Views\Shared\Scripts\" />
+    <Folder Include="Views\Shared\Account\Hub\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LFE.Cach.Provider\LFE.Cach.Provider.csproj">
+      <Project>{A06ACD1D-605B-4B8F-9A8B-B4D975701AFC}</Project>
+      <Name>LFE.Cach.Provider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Core.Enums\LFE.Core.Enums.csproj">
+      <Project>{2C9FE912-3791-4658-AF46-C77D51DB86DD}</Project>
+      <Name>LFE.Core.Enums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Core.Extensions\LFE.Core.Extensions.csproj">
+      <Project>{7F4F29C2-9FDC-426F-A5BE-24C1A6B662E1}</Project>
+      <Name>LFE.Core.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Core.Utils\LFE.Core.Utils.csproj">
+      <Project>{D29FE10C-BBD6-4CA1-AEC9-C1B45C72881B}</Project>
+      <Name>LFE.Core.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.DataTokens\LFE.DataTokens.csproj">
+      <Project>{D547A46C-CF9C-425A-AE0E-D3408987B073}</Project>
+      <Name>LFE.DataTokens</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Domain.Context\LFE.Domain.Context.csproj">
+      <Project>{0F9534E3-6AC4-4AFF-A703-05A810E5CAE4}</Project>
+      <Name>LFE.Domain.Context</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Domain.Core.Data\LFE.Domain.Core.Data.csproj">
+      <Project>{C41F5EA1-33FE-4100-9CAB-8C1BCA6E0069}</Project>
+      <Name>LFE.Domain.Core.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Domain.Core\LFE.Domain.Core.csproj">
+      <Project>{00566009-2A6B-4D91-A8B9-417103751E7C}</Project>
+      <Name>LFE.Domain.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Domain.Model\LFE.Domain.Model.csproj">
+      <Project>{54B47488-8F36-407F-8C9B-2DE41DC10D5F}</Project>
+      <Name>LFE.Domain.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Dto.Mapper\LFE.Dto.Mapper.csproj">
+      <Project>{E36E90A0-005A-4AB9-9ED8-AE28AC2E6AC9}</Project>
+      <Name>LFE.Dto.Mapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Infrastructure\LFE.Infrastructure.NLogger.csproj">
+      <Project>{89A761E3-EA84-4F74-AFFD-7435DE0274B0}</Project>
+      <Name>LFE.Infrastructure.NLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Services\LFE.Application.Services.csproj">
+      <Project>{3790F9AE-C24F-4B2B-A2E0-06E2F71F1796}</Project>
+      <Name>LFE.Application.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_GlobalResources\GlobalResources.resx">
+      <Generator>GlobalResourceProxyGenerator</Generator>
+      <LastGenOutput>GlobalResources.Designer.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>19022</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://local.lfe.com</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <UserProperties UseCdnSupport="False" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.1.1\build\Microsoft.Net.Compilers.props'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

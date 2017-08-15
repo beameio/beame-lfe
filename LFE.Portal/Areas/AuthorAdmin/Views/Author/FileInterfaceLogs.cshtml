@@ -1,0 +1,31 @@
+﻿@using LFE.DataTokens
+
+@{
+    ViewBag.Title = "File Interface Logs";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="page-title">File interface logs report</h2>
+
+@(Html.Kendo().Grid<FileInterfaceLogDTO>()
+      .Name("FileLogReport")
+      .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.FileId);
+          columns.Bound(p => p.FilePath).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(FilePath)#' style='width:200px'>${FilePath}</div>");
+          columns.Bound(p => p.FileSize);
+          columns.Bound(p => p.BcIdentifier);
+          columns.Bound(p => p.ContentType);
+          columns.Bound(p => p.Status);
+          columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+          columns.Bound(p => p.UpdateOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+      })
+      .Sortable()
+      .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.FileId))
+                            .Read(read => read.Action("GetFileInterfaceLogs", "Author").Type(HttpVerbs.Get)).ServerOperation(false)
+                            .PageSize(20))
+)

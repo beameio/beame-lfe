@@ -1,0 +1,50 @@
+﻿@import "../../../../../Content/styles/less/mixins";
+@import "../../../../../Content/styles/less/variables";
+@import "variables";
+@import "mixins";
+
+.ul-first-level li.quiz .chap-row{background:#1F3A93;}
+ .ul-frm{    
+	 &.second-level{padding:0;margin:0;
+		& li:first-child{margin-top:0;}
+		& .box-short{.inline;width:40%;
+			label{width:40px;}
+			input[type="checkbox"]{width:40px;}
+
+		}
+		& .field-validation-error{display:block;padding:4px 0 0;font-size:11px;color:red;}
+	 }
+ }   
+
+ .ul-frm > li {min-height: 40px;height: auto;margin: 15px 0;font-size:13px;
+	.inner-box{
+		.float-left;width:480px;
+		&.bit{width:200px;}
+	}
+	label {width: 120px;color:#808080;font-size:16px;
+		.inline;.no-padding;.no-margin;padding-top:5px;
+	}
+	& .k-edit-field{float:none;.inline;width:200px;
+		&.chk-b{width:20px;.no-padding;padding-top:5px;}
+	}
+	& i{color:#808080;font-size:14px;.inline;padding:5px 0 0 5px;}
+
+	input { margin: 0;
+		&.l-edit-field{width:250px;min-height:24px;}
+	}
+}
+
+
+ .btn-action{.bg_color(@action_btn_bg_color);width:150px;height:@qest_list_form_btn_h;position:absolute;.action-btn-font;
+			bottom:0;right:0px;.bg_color(@action_btn_bg_color);
+			&.cancel-edit{.bg_color(@qest_list_form_cancel_btn_color);right:151px;}
+			& a,& input[type=submit]{.action-btn-font;.block;width:100%;height:@qest_list_form_btn_h;.pointer;color:#fff;.no-border;.no-box-shadow;.no-bg;padding:2px 0 0;}	        
+			& a{.block;}
+			& a:hover{text-decoration:none;}
+}
+
+
+ /**/
+ .k-list > .k-state-selected{background-color:#1F3A93 !important;color:#fff;
+							 &:hover{color:#fff;}
+ }

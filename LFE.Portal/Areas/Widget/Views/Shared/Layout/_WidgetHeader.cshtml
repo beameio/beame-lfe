@@ -1,0 +1,48 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+@{
+    var user = this.CurrentUser();
+    var returnUrl = Request.Url != null ? Request.Url.PathAndQuery : "";
+    if (!String.IsNullOrEmpty(returnUrl))
+    {
+        returnUrl = HttpUtility.UrlDecode(returnUrl);
+    }
+}
+
+<div class="navbar navbar-default navbar-static-top top" role="navigation">
+    <div class="container main-nav-container" >
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-acc" data-toggle="collapse" data-target="#nav-main" value="Account settings">
+                <span class="">Account settings</span>                
+            </button>
+            <a class="navbar-brand a-header-logo" href="@Utils.GetKeyValue("homeUrl")" target="_blank">powered by <span class="lfe">LFE</span></a>
+        </div>
+        <div class="navbar-collapse collapse @(User.Identity.IsAuthenticated ? "" : "user")" id="nav-main">
+            <ul class="nav navbar-nav navbar-right top">
+                @{
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        if (this.IsCurrentUserAdmin())
+                        {
+                            <li>
+                                @Html.ActionLink("Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { style = "text-decoration:none" })
+                            </li>
+                            <li class="sep"></li>
+                        }
+                        <li class=""><a href="@Url.Action("UserSettings","Account",new{area=""})">Settings</a></li>
+                        <li class="sep"></li>
+                        <li class=""><a href="@Url.Action("Index","Home",new {area="AuthorAdmin"} )" target="_blank">Dashboard</a></li>
+                        <li class="user"><span>@user.FullName</span></li>
+                        <li class="user logout">@Html.ActionLink("Logout", "SignOff", "Account", new { area = "", returnUrl }, null)</li>
+                    }
+                    else
+                    {
+                        <li class="user"><a href="#" id="a-register">Register</a></li>
+                        <li class="user login"><a href="#" id="a-login">Login</a></li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>

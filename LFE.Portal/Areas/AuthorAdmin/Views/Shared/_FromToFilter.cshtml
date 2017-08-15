@@ -1,0 +1,70 @@
+﻿
+<script>
+ 
+    
+    function startChange() {
+        var endPicker = $("#end").data("kendoDatePicker"),
+            startDate = this.value();
+
+        if (startDate) {
+            startDate = new Date(startDate);
+            startDate.setDate(startDate.getDate() + 1);
+            endPicker.min(startDate);
+        }
+
+        notifyDatesChange();
+    }
+
+    function endChange() {
+        var startPicker = $("#start").data("kendoDatePicker"),
+            endDate = this.value();
+
+        if (endDate) {
+            endDate = new Date(endDate);
+            endDate.setDate(endDate.getDate() - 1);
+            startPicker.max(endDate);
+        }
+
+        notifyDatesChange();
+    }
+    
+    function clearDateRepFilters() {
+        $("#start").data("kendoDatePicker").value(null);
+        $("#end").data("kendoDatePicker").value(null);
+        filterSalesRep();
+        window.getNotifManagerInstance().notify(notifEvents.report.clearFilter, null);
+    }
+    
+    function notifyDatesChange() {
+        var from = $("#start").data("kendoDatePicker").value();
+        var to = $("#end").data("kendoDatePicker").value();
+        window.getNotifManagerInstance().notify(notifEvents.report.dateFilterChanged, {
+            from: from
+            , to: to
+        });
+    }
+</script>
+
+<div  class="picker-row" >
+    <label class="inline" for="start">From date</label>
+    @(Html.Kendo().DatePicker()
+          .Name("start")
+          .Min("01/01/2012")
+          .Max(DateTime.Now.Date)
+          .HtmlAttributes(new{@class="inline dp"})
+          .Events(e => e.Change("startChange"))
+          )
+
+    <label class="inline" for="end" style="margin-left:3em">To date</label>
+    @(Html.Kendo().DatePicker()
+          .Name("end")     
+          .HtmlAttributes(new{@class="inline dp"})
+          .Events(e => e.Change("endChange"))
+          )
+    <span class="inline btn-clear" onclick="clearDateRepFilters()">Clear filters</span>
+</div>
+<script>
+    $(document).ready(function () {
+        clearDateRepFilters();
+    });
+</script>

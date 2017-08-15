@@ -1,0 +1,38 @@
+﻿@model string
+
+@{
+    ViewBag.Title = "LFE Registration Success";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+@section css
+{
+    <style type="text/css">
+        .reg-success-message {
+            color: #fff;
+            font-size: 16px;
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reg-success-title {
+            color: #fff;
+            font-size: 18px;
+            margin: 15px auto 25px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .back-link{display: block;color: #fff;margin: 15px 0 0;text-decoration: underline;font-size: 22px}
+        .back-link:hover{color: #fff}
+    </style>
+
+}
+
+
+<div class="reg-succes-container">
+    @Html.Partial("Account/_SuccessRegistrationMessage", Model)
+
+    @Html.ActionLink("Back to LFE Login Page","Login","Account",new{area=""},new{@class="back-link"})
+</div>

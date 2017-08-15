@@ -1,0 +1,171 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Extensions
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.WidgetItemListDTO
+
+@{
+    
+
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    var trackingId = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "";
+    var authorName = Model.AuthorName.OptimizedUrl();
+    var width = viewModel != null ? viewModel.Width : null;
+    var height = viewModel != null ? viewModel.Height : null;
+    var picUrl = Model.ImageURL;
+    var compId = this.GetWixCompId();
+
+
+    if (string.IsNullOrEmpty(picUrl))
+    {
+        picUrl = Url.Content("~/Content/images/course.png");
+    }
+    else
+    {
+        if (!picUrl.ToLower().StartsWith("http"))
+        {
+            picUrl = this.GetS3FileUrl(picUrl);
+        }
+    }
+
+    var itemTypeName = Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+
+    var wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+
+    string pageUrl = null;
+    string targetUrl = null;
+    string target = null;
+    var isItemValid = true;
+
+    switch (Model.ItemType)
+    {
+        case BillingEnums.ePurchaseItemTypes.COURSE:
+            pageUrl = this.GenerateItemPageUrl(authorName, Model.ItemUrlName, Model.ItemType, trackingId, null, width, height, compId);
+            break;
+        case BillingEnums.ePurchaseItemTypes.BUNDLE:
+            pageUrl = this.GenerateItemPageUrl(authorName, Model.ItemUrlName, Model.ItemType, trackingId, null, width, height, compId);
+            break;
+        default:
+            isItemValid = false;
+            break;
+    }
+
+    target = Model.IsItemOwner ? "_blank" : "_self";//string.IsNullOrEmpty(wixSectionUrl) ? "_self" : "_blank";
+
+    if (isItemValid)
+    {
+        targetUrl = pageUrl;
+    }
+
+    if (isItemValid)
+    {
+        <div class="item-container">
+            @{
+                if (Model.IsItemUnderRGP)
+                {
+                    <div class="iconGRP"></div>
+                }
+                
+            }
+            @*overlay*@
+            <div class="overlay @(Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE ? "bundle-over" : "")">
+                <div class="inner">
+                    <i class="ico-c @(Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE ? "ico-b" : "")">&nbsp;</i>
+                    <a href='@targetUrl' class="item-page-link" target="@target">
+                        <span class="container">
+                            @itemTypeName details
+                        </span>
+                    </a>
+                </div>
+            </div>
+            
+            @*bundle icon*@
+            
+            @{
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE)
+                {
+                    <div class="bundle-box">
+                        <div class="inner">
+                            <i class="bc nsc ico-f">
+                                <span class="cn">
+                                    <span>@Model.CoursesCnt</span>
+                                </span>
+                            </i>
+                            <i class="i-after bndl"></i>
+                        </div>
+                    </div>
+                }
+            }
+
+            @*header*@
+            <div class="wi-header">
+            @{
+                if (Model.NumSubscribers > 0)
+                {
+                    <div>                        
+                      @Html.Partial("~/Areas/Widget/Views/Shared/Item/_ItemSubscribersLabel.cshtml", Model.NumSubscribers)
+                    </div>
+                }
+
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+                {
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/_CustomRait.cshtml", Model.Rating)                   
+                }
+            }
+            </div>
+            
+            @*thumb*@
+            <div class="wi-img">
+                <a href='@targetUrl' class="go-2-page" target="@target">
+                    <img src="@picUrl" alt="" />
+                </a>
+            </div>
+            
+            @*author+description*@
+            <div class="wi-desc">
+                <a href='@targetUrl' class="go-2-page" target="@target">
+                    <h3>@Model.AuthorName</h3>
+                    <h4 class="ellipsis multiline">@Model.ItemName</h4>
+                </a>
+            </div>
+            
+            @*prices row*@
+            <div class="wi-foot @(Model.IsItemOwner ? "has-access" : "")">
+            @{
+                if (Model.IsItemOwner)
+                {
+                    <span>You have access to this @itemTypeName</span>
+                    <a href='@targetUrl' class="go-2-page" target="@target">Click here to learn</a>
+                }
+                else
+                {                    
+                    if (Model.IsFree)
+                    {
+                        <div class="has-access free-course">
+                            <label class="free">Free Course</label>
+                        </div>
+                    }
+                    else
+                    {
+                        if (Model.ItemPrices.Any())
+                        {
+                            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemPricesRow.cshtml", new ItemPricesPageToken { PriceLines = Model.ItemPrices, Mode = ePricesDisplayMode.SHORT, TrackingID = trackingId })
+                        }
+                        else
+                        {
+                            <label class="no-price">No price defined</label>
+                        }
+                    }
+                }
+            }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="ph">&nbsp;</div>
+    }
+}
+

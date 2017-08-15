@@ -1,0 +1,24 @@
+﻿@using LFE.Portal.Helpers
+@model bool
+<script>
+        $(document).ready(function () {            
+            $('.close_frame').click(function () {
+                $('.dark').fadeOut();
+                $('#buyFrameWrapper').slideToggle();
+                $('#buyIframe').attr('src', 'about:blank');
+            });
+
+            $('#buyIframe').load(function () {
+                $('#buy_image_loading').css('display', 'none');
+            });
+        });
+    </script>
+<div id="buyFrameWrapper" class="sub_tool_bar3@(Model ? " subPlaceHolder":"")">
+    <img id="buy_image_loading" alt="Loading..." src="@Url.Content("~/Content/kendo/"+ Url.ToKendoVersionUrl() + "/Uniform/loading-image.gif")"  />
+    <div class="close-wrapper">
+        <a class="close_frame">Close</a>
+    </div>
+    <iframe id="buyIframe" margin="auto" align="middle" style="border: 0px; text-align: center; width: 100%; height: 100%"
+        frameborder="0"
+        scrolling="no" width="100%" height="100%" scrolling="no"></iframe>
+</div>

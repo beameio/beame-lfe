@@ -1,0 +1,26 @@
+﻿@using LFE.Core.Enums
+@model LFE.Portal.Models.AccountSettingsCommandRowToken
+           
+<script>
+        $(document).ready(function () {
+            $('#btn-acc-sett-save').unbind('click').bind('click', function () {
+            submitForm('@Model.FormName');
+        });
+    });
+</script>
+<div class="form-cmd-row " id="d-asi" style="">
+    <div class="inner">
+        <div class="info-box" id="as-info">
+            <p class="alert"></p>
+        </div>
+        <div class="btn-container">
+            @*@{
+                if (Model.Role == CommonEnums.UserRoles.Author)
+                {
+                    <a href="@Url.Action("Index","Home",new{area=""})" class="btn-cancel" id="btn-as-close">cancel</a>
+                }
+            }*@
+            <span class="btn-submit" id="btn-acc-sett-save">save changes</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model PriceBoxToken
+           
+@{
+    string pricsCssClass = null;
+    switch (Model.type)
+    {
+        case BillingEnums.ePricingTypes.ONE_TIME:
+            pricsCssClass = "one";
+            break;
+        case BillingEnums.ePricingTypes.SUBSCRIPTION:
+            pricsCssClass = "subscr";
+            break;
+        case BillingEnums.ePricingTypes.RENTAL:
+            pricsCssClass = "rent";
+            break;
+    }
+
+    if (Model.type != BillingEnums.ePricingTypes.RENTAL || Model.Mode == ePricesDisplayMode.FULL)
+    {
+        foreach (var price in Model.prices)
+        {
+            var token = new PriceNameBoxToken
+            {
+                name       = String.Format("{0} {1}", price.Name, Model.type == BillingEnums.ePricingTypes.RENTAL ? "RENTAL" : "")
+                , id       = price.PriceLineID
+                , price    = price.Price
+                , iso      = price.Currency.ISO
+                , currency = price.Currency.Symbol
+                , cssCLass = String.Format("{0} {1} {2}", Model.ShowOrIcon ? "or" : "", pricsCssClass, Model.EvenOrOdd == 1 ? "even" : "odd")
+                , IsUnderGRP = price.IsItemUnderRGP
+            };
+
+            var actionLink = Url.ActionString(User.Identity.IsAuthenticated ? "Index" : "Login", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingID }, { "id", price.PriceLineID }, { "ref", Request.RawUrl } });
+
+            if (Model.Mode == ePricesDisplayMode.FULL && price.PriceLineID > 0)
+            {
+                <a class="buy-action-link" href="@actionLink">@Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemPriceNameBox.cshtml", token)</a>
+            }
+            else
+            {
+                @Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemPriceNameBox.cshtml", token)
+            }
+
+        }
+    }
+    else
+    {
+        <div class="price-container @pricsCssClass @( Model.EvenOrOdd == 1 ? "even" : "odd")">
+            <div class="price-name">RENTAL PLANS</div>            
+        </div>
+    }
+
+}

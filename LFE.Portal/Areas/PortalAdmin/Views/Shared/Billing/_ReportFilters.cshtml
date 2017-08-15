@@ -1,0 +1,229 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@{
+    var dates = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    ViewData["periodKinds"] = dates;
+
+    var statuses = Utils.EnumWithDescToList<BillingEnums.eOrderStatuses>();
+}
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            clearFilters(false);
+        }, 500);
+
+    });
+
+    function onFilterSelected() {
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function clearFilters(notify) {
+        var c1 = $('#periodSelectionKind').data("kendoDropDownList"); if (c1 != undefined) c1.value(null);
+        var c2 = $('#ddlSeller').data("kendoAutoComplete"); if (c2 != undefined) c2.value(null);
+        var c3 = $('#ddlBuyer').data("kendoAutoComplete"); if (c3 != undefined) c3.value(null);
+        var c4 = $('#ddlCourses').data("kendoAutoComplete"); if (c4 != undefined) c4.value(null);
+        var c5 = $('#ddlBundles').data("kendoAutoComplete"); if (c5 != undefined) c5.value(null);
+        var c6 = $('#ddlStores').data("kendoAutoComplete"); if (c6 != undefined) c6.value(null);
+        $('#chkOnlySub').prop('checked', false);
+        window.fltrSellerId = null;
+        window.fltrBuyerId = null;
+        window.fltrCourseId = null;
+        window.fltrBundleId = null;
+        window.fltrStoreId = null;
+        window.fltrStatus = null;
+
+        if (notify == null || notify) window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+    function onSellerAu() {
+        return {
+            name: $("#ddlSeller").val()
+            , email: null
+        };
+    }
+
+    function onSellerSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.UserId;
+        window.fltrSellerId = id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onBuyerSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.UserId;
+        window.fltrBuyerId = id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onBuyerAu() {
+        return {
+            name: $("#ddlBuyer").val()
+            , email: null
+        };
+    }
+
+    function onCourseAu() {
+        return {
+            name: $("#ddlCourses").val()
+        };
+    }
+
+    function onCourseSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.id;
+        window.fltrCourseId = id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onBundleAu() {
+        return {
+            name: $("#ddlBundles").val()
+        };
+    }
+
+    function onBundleSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.id;
+        window.fltrBundleId = id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onStoreAu() {
+        return {
+            name: $("#ddlStores").val()
+            , userId: window.fltrSellerId
+        };
+    }
+
+    function onStoreSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.id;
+        window.fltrStoreId = id;
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onSubChanged($this) {
+        window.fltrOnlySubscriptions = $($this).is(":checked");
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+
+    }
+</script>
+<div style="margin: 0 0 25px 0">
+    <div id="period-combo-container" class="inline">
+        @(Html.Kendo().DropDownList()
+              .Name("periodSelectionKind")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["periodKinds"])
+              .HtmlAttributes(new { @class = "combo-ps" })
+              .Events(e => e.Select("onFilterSelected"))
+              .HtmlAttributes(new { @style = "" })
+        )
+        <script>
+            $(document).ready(function () {
+                $('#periodSelectionKind').data("kendoDropDownList").value('@(((int)ReportEnums.ePeriodSelectionKinds.lastMonth).ToString())');
+            });
+        </script>
+    </div>
+
+    <div id="period-combo-container" class="inline">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlStatus")
+              .OptionLabel("All statuses")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo(statuses)
+              .HtmlAttributes(new { @class = "combo-ps" })
+              .Events(e => e.Select("onFilterSelected"))
+              .HtmlAttributes(new { @style = "" })
+        )
+        <script>
+            $(document).ready(function () {
+                $('#periodSelectionKind').data("kendoDropDownList").value('@(((int)ReportEnums.ePeriodSelectionKinds.lastMonth).ToString())');
+            });
+        </script>
+    </div>   <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlSeller")
+              .DataTextField("FullName")
+              .Placeholder(" find by seller")
+              .Filter("contains")
+              .MinLength(2)
+              .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                        "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+              .HtmlAttributes(new { style = "width:250px" })
+                              .Events(e => e.Select("onSellerSelected"))
+                      .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onSellerAu")).ServerFiltering(true))
+        )
+    </div>
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+                        .Name("ddlBuyer")
+                        .DataTextField("FullName")
+                        .Placeholder(" find by buyer")
+                        .Filter("contains")
+                        .MinLength(2)
+                        .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                               "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+                        .HtmlAttributes(new { style = "width:250px" })
+                                .Events(e => e.Select("onBuyerSelected"))
+                                .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onBuyerAu")).ServerFiltering(true))
+        )
+    </div>
+</div>
+
+<div>
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlStores")
+              .DataTextField("name")
+              .Placeholder(" find by store")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px" })
+              .Events(e => e.Select("onStoreSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindStores", "Report").Data("onStoreAu")).ServerFiltering(true))
+        )
+    </div>
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlCourses")
+              .DataTextField("name")
+              .Placeholder(" find by course")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px" })
+              .Events(e => e.Select("onCourseSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindCourses", "Report").Data("onCourseAu")).ServerFiltering(true))
+        )
+    </div>
+
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+              .Name("ddlBundles")
+              .DataTextField("name")
+              .Placeholder(" find by bundle")
+              .Filter("contains")
+              .MinLength(2)
+              .HtmlAttributes(new { style = "width:250px" })
+              .Events(e => e.Select("onBundleSelected"))
+              .DataSource(source => source.Read(read => read.Action("FindBundles", "Report").Data("onBundleAu")).ServerFiltering(true))
+        )
+    </div>
+</div>
+
+
+<div style="margin: 10px 0 ">
+    <div class="inline">
+        <label for="chkOnlySub">Only Subscriptions</label>
+        <input type="checkbox" id="chkOnlySub" onchange="onSubChanged(this)" />
+    </div>
+    <a href="#" onclick="clearFilters()" class="a-clear inline" style="margin-left: 50px;font-size: 14px;text-decoration: underline">clear filters</a>
+</div>

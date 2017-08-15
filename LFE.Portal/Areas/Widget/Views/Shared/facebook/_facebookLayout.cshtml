@@ -1,0 +1,101 @@
+﻿@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+}
+@{
+    string trackingID = "Place_Holder_Temp";
+    if (viewModel != null && viewModel.WebStore != null && !string.IsNullOrEmpty(viewModel.WebStore.TrackingID))
+    {
+        trackingID = viewModel.WebStore.TrackingID;
+    }
+}
+
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="@Url.Content("~/Content/styles/google-gonts.css")" rel="stylesheet" type='text/css' />
+    <meta name="viewport" content="width=device-width" />
+    <title>STORE NAME</title>
+    <link href="@Url.Action("WidgetCss", "Style", new { trackingID = trackingID, lastUpdate = (int)(viewModel.WebStore.LastUpdate - new DateTime(1970, 1, 1)).TotalSeconds })" rel="stylesheet" />
+
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    <link href="/Content/styles/toolbar.css" rel="stylesheet" />
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jquery/jquery")
+
+    @Scripts.Render("~/bundles/jquery/jqueryval")
+
+    @Scripts.Render("~/bundles/kendo")
+
+    @Styles.Render("~/Content/plugin/scroll")
+
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+    <script>
+        kendo.culture("en-US");
+    </script>
+
+    @Scripts.Render("~/bundles/lfe/common")
+
+    @RenderSection("CSS", false)
+
+    <link href="~/Areas/Widget/Content/styles/PlaceHolder.css" rel="stylesheet" />
+
+    <script>
+        var viewMode = '@viewModel.WixViewMode';
+      
+        //$(document).ready(function () {
+        //    if (viewMode == 'editor' || viewMode == 'preview') {
+        //        $('a').addClass('disabled');
+        //        $('a').click(function () {
+        //            if ($(this).hasClass('disabled'))
+        //                return false;
+        //        });
+        //    }
+        //});
+
+    </script>
+</head>
+<body>
+
+    @if (viewModel.Status == LFE.Core.Enums.WebStoreEnums.StoreStatus.Draft && viewModel.WixViewMode == "editor")
+    {
+        <div class="placeholder-header">
+            <div class="inner">
+                <div class="title">Your online course hasn't been configured yet </div>
+                <div class="subtitle">Use Settings above. @(viewModel.WebStore.WebStoreID > 0 ? "(" + viewModel.WebStore.WebStoreName + ")" : "")</div>
+            </div>
+        </div>
+    }
+
+    @if (!viewModel.IsSingleCourseStore)
+    {
+        @Html.Partial("_Header", viewModel)
+    }
+    else
+    {
+        <div style="height: 20px"></div>
+    }
+
+    <div class="page_content" id="main">
+        <div class="indent">
+            @RenderBody()
+        </div>
+    </div>
+
+    @Html.Partial("~/Areas/Widget/Views/Shared/_ToolBar.cshtml", viewModel)
+
+    @RenderSection("JS", required: false)
+
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+
+    @Html.Action("_FeedWindow", "Home", new { area = "UserPortal" })
+
+</body>
+</html>

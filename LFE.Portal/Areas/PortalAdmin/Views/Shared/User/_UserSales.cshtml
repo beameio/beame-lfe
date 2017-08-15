@@ -1,0 +1,24 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int
+
+
+@(Html.Kendo().Grid<OrderLineDTO>()
+	  .Name("AuthorTrxReport")
+	  .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.ItemName).Title("Item");
+		  columns.Bound(p => p.Buyer.FullName).Title("Learner");
+		  columns.Bound(p => p.OrderDate).Title("Date").Format("{0:d}");
+		  columns.Bound(p => p.TotalPrice).Title("Amount").Format("{0:c}").Width(100).ClientFooterTemplate("Total: #= kendo.toString(sum, 'c0') #"); 
+	  })
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true).Refresh(true))
+	  .Filterable(f => f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+								.Aggregates(aggregates => aggregates.Add(p => p.TotalPrice).Sum())
+							    .Model(model => model.Id(p => p.LineId))
+                                .Read(read => read.Action("GetUserSales", "User", new { area = "PortalAdmin", id = Model }).Type(HttpVerbs.Get))
+							    .PageSize(20))
+	)

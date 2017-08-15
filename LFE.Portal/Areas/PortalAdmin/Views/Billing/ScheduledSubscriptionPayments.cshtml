@@ -1,0 +1,154 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Extensions
+@using LFE.DataTokens
+@{
+    ViewBag.Title = "Scheduled Subscription Payments";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="font-size: 24px">Scheduled Subscription Payments</h2>
+<script>
+    function getReportFilters() {
+        return {
+            onlyCC: $("#chk-only-cc").is(":checked")
+        };
+    }
+
+    function onOnlyCcChanged() {
+        $('#ScheduledPaymentReport').data("kendoGrid").dataSource.read();
+    }
+
+    function onReportBound(e) {
+        window.boundGridUserDetails(e);
+        return;
+        var data = this._data;
+        for (var x = 0; x < data.length; x++) {
+            var dataItem = data[x];
+            var tr = $("#ScheduledPaymentReport").find("[data-uid='" + dataItem.uid + "']");
+
+            if (dataItem.AutoBill) {
+                tr.find('.k-grid-DoPayment').css('visibility', 'hidden');
+            } else {
+                tr.find('.k-grid-DoPayment').css('visibility', 'visible');
+            }
+
+        }
+    }
+
+    function doPayment(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        if (dataItem.AutoBill) {
+            alert('Manual payment not allowed');
+            return false;
+        }
+
+        var id = dataItem.PaymentId;
+        var url = '@Url.Action("DoPayment", "Billing")' + '/' + id;
+        window.showLoader();
+        $.ajax({
+            url: url,
+            cache: false,
+            type: "Post",
+            datatype: "json",
+            contentType: "application/json; charset=utf-8"
+			, success: function (response) {
+			    window.hideLoader();
+			    if (response.success) {
+			        $('#ScheduledPaymentReport').data("kendoGrid").dataSource.read();
+			        alert('payment completed');
+			    } else {
+			        alert(response.error);
+			    }
+			}
+			, error: function () {
+
+			}
+        });
+    }
+
+    $(document).ready(function() {
+        $('#btn-do-pay').unbind('click').click(function(e) {
+            e.preventDefault();
+            var url = '@Url.Action("ChargeScheduledPayments", "Billing")';
+            var v = $('#ScheduledDate').data("kendoDatePicker").value();
+            var data = { sd: v };
+            window.showLoader();
+            $.ajax({
+                url: url,
+                data: JSON.stringify(data),
+                cache: false,
+                type: "Post",
+                datatype: "json",
+                contentType: "application/json; charset=utf-8"
+                , success: function (response) {
+                    window.hideLoader();
+                    if (response.success) {
+                        $('#ScheduledPaymentReport').data("kendoGrid").dataSource.read();
+                        alert('payment completed');
+                    } else {
+                        alert(response.error);
+                    }
+                }
+                , error: function () {
+
+                }
+            });
+        });
+    });
+</script>
+
+<div style="margin: 10px 0">
+    <div class="inline">
+        <label for="chk-only-cc">Only Saved Credit Cards</label>  <input type="checkbox" id="chk-only-cc" onchange="onOnlyCcChanged()" />
+    </div>
+    <div class="inline" style="margin: 0 5px 0 20px">
+        @(Html.Kendo().DatePicker()
+                .Name("ScheduledDate")  
+              .Min("06/01/2014")
+            //  .Max(DateTime.Now.Date)
+              .HtmlAttributes(new{@style="width:200px;font-size:13px;",@placeholder="scheduled date before"})
+        )
+    </div>
+    <div class="inline">
+        <a href="#" id="btn-do-pay" class="k-button" style="height: 28px">Do payments</a>
+    </div>
+</div>
+
+@(Html.Kendo().Grid<ScheduledPaymentSummaryToken>()
+        .Name("ScheduledPaymentReport")
+        .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.OrderNumber).Width(80);
+            columns.Bound(p => p.ItemName).Width(300);
+            columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+            columns.Bound(p => p.ScheduledDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled Date");
+            columns.Bound(p => p.Seller.FullName).Width(100).ClientTemplate("<div data-val='${Seller.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Seller.FullName)#' style='width:100px'>${Seller.FullName}</div>");
+            columns.Bound(p => p.Buyer.FullName).Width(100).ClientTemplate("<div data-val='${Buyer.UserId}' class='list-cmd usr-btn ellipsis col-tooltip' title='#=Encoder.htmlEncode(Buyer.FullName)#' style='width:100px'>${Buyer.FullName}</div>");
+            columns.Bound(p => p.Amount).Width(80).Format("{0:c}").ClientFooterTemplate("Total: #=sum#");
+            columns.Bound(p => p.PaymentMethodName).Width(100).Title("Method");
+            columns.Bound(p => p.PaypalProfileID).Width(80).Title("ProfileID");
+            //columns.Command(c => c.Custom("Do Payment").Click("doPayment")).Width(80).Title(" ").Visible(this.GetCurrentUserId() == 422);
+        })
+        .Sortable()
+        .AutoBind(true)
+        .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+        .Filterable(f => f.Enabled(false))
+        .Events(e => e.DataBound("onReportBound"))
+        .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.PaymentId))
+                            .Aggregates(aggregates =>
+                            {
+                                aggregates.Add(p => p.Amount).Sum();
+                            })
+                            .Read(read => read.Action("GetScheduledPayments", "Billing").Data("getReportFilters").Type(HttpVerbs.Get)).ServerOperation(true)
+                            .PageSize(20))
+)
+
+@(Html.Kendo().Tooltip()
+     .For("#ScheduledPaymentReport")
+    .Filter(".col-tooltip")
+    .Position(TooltipPosition.Top)
+    .Width(300)
+)

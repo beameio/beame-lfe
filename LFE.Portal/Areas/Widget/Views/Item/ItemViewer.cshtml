@@ -1,0 +1,191 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.Widget.Helpers
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.ItemViewerPageToken
+
+@{
+    ViewBag.Title = Model.ItemName;
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapLayout.cshtml";
+
+    var hasQuizzes =Model.Contents != null &&  Model.Contents.Any(x => x.type == CourseEnums.eContentTreeViewItemType.quiz);
+}
+
+
+@Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+@section CSS{
+  
+    @Styles.Render("~/bundles/widget/viewer")
+    @Styles.Render("~/widget/viewer/less")
+   
+}
+
+@section JS{
+  
+    
+    @Scripts.Render("~/bundles/viewer")
+    
+   
+    <script>
+        
+    </script>
+
+    @{
+        
+        if (Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+        {
+
+            <script>
+                var notifyLastComplete  = '@Model.HasCertificateOnComplete.ToString().ToLower()' == 'true';
+                var onCourseCompleteUrl = '@Url.Action("OnCourseCompleted", "Quiz", new {area = "Widget",id = Model.ItemId})';
+                var fbPostVideoStoryUrl = '@Url.Action("PublishUserViewStory", "Item", new {area = "Widget"})';
+                var saveLearnerStateUrl = '@Url.Action("SaveLearnerCourseState", "Item", new {area = "Widget"})';
+                var reviewWndUrl        = '@Url.Action("GetCourseReviewPartial", "Item", new {area = "Widget", id = Model.ItemId})';
+                var HASHTAG_FEED_URL    = '@Url.Action("GetHashFeedTreePartial", "Discussion", new {area = "UserPortal"})';
+
+                var OPEN_FEED_WINDOW = true;
+                var CURRENT_COURSE_ID = '@Model.ItemId';
+
+                var bcLfePlayer;
+
+                $(document).ready(function() {
+                    window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoSelected, onVideoSelected, null);
+                    window.getNotifManagerInstance().subscribe(notifEvents.video.videoSelected, onVideoSelected, null);
+
+                    window.getNotifManagerInstance().unsubscribe(notifEvents.course.saveState, saveCoursState, null);
+                    window.getNotifManagerInstance().subscribe(notifEvents.course.saveState, saveCoursState, null);
+
+                    window.CURRENT_VIDEO_TOKEN = null;
+                    window.VIDEO_NAV_ARRAY = $.parseJSON('@(Html.ToJson(Model.VideosNavigation))');
+
+                    initTabEvents();
+
+                    onCoursePageLoad('@Model.LastVideoId');
+
+
+                    //write review logic
+                    window.getNotifManagerInstance().unsubscribe(notifEvents.course.ratingUpdated, updateRating, null);
+                    window.getNotifManagerInstance().subscribe(notifEvents.course.ratingUpdated, updateRating, null);
+
+                    $('#btn-write-review').unbind('click').bind('click', window.openReviewWnd);
+
+                    updateRating('@Model.Rating');
+                });
+
+                $('#modWriteReview').on('show', function() {
+                    $(this).find('.modal-body').css({
+                        width: 'auto', //probably not needed
+                        height: 'auto', //probably not needed 
+                        'max-height': '100%'
+                    });
+                });
+            </script>
+
+            if (Model.ItemState.ValidUntill != null)
+            {
+
+                var min2Left = Model.ItemState.MinutesRemind ?? 1;
+
+                var remainingTitle = Model.ItemState.IsRestOfCanceledSubscription ? "Subscription" : "Rental";
+
+                <script>
+
+                    var seconds = 60;
+                    var now = new Date();
+                    var end = addMinutes(now, parseInt('@min2Left'));
+                    // console.log('now ' + now);
+                    //  console.log('end ' + end);
+                    var rentalTimer = new Countdown({
+                        selector: '#countdown',
+                        msgPattern: "<span>Remaining @remainingTitle Period: </span> <span>{days} days</span> <span>{hours} hours</span> <span>{minutes} mins</span> <span>{seconds} sec</span>",
+                        msgAfter: "Your @remainingTitle period finished",
+                        leadingZeros: "0",
+                        dateStart: now,
+                        dateEnd: end,
+                        onEnd: onRentalEnd
+                    });
+
+
+                    function onRentalEnd() {
+                        ajaxAction('@Url.Action("OnRentalFinished", "Item", new {area = "Widget"})', { id: '@Model.ItemId' }, finishRentalCallback);
+                    }
+
+                    function finishRentalCallback(response) {
+                        if (response.success) {
+                            alert('You rental period finished');
+                            location.reload();
+                        } else {
+                            console.log(response.error);
+                            location.reload();
+                        }
+                    }
+
+                    function addMinutes(date, minutes) {
+                        return new Date(date.getTime() + minutes * 60000);
+                    }
+                </script>
+            }
+        }
+
+        if (hasQuizzes)
+        {
+               
+            @*<script src="~/Areas/Widget/Scripts/lfe/lfe.quiz.helper.js"></script>*@
+            <script>
+            var quizUrl = '@Url.Action("LoadUserQuiz", "Quiz", new { area = "Widget" })';
+            $(document).ready(function () {
+
+                window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.quizSuccess, onQuizSuccess, null);
+                window.getNotifManagerInstance().subscribe(notifEvents.quiz.quizSuccess, onQuizSuccess, null);
+            });
+
+            function onQuizSuccess() {
+                $('#frm-upd-content-tree').submit();
+            }
+            </script>                         
+        }
+        
+
+     
+        <script>
+            saveEventApi(USER_EVENTS.COURSE_VIEWER_ENTER, '@Model.TrackingID', '@(Model.ItemViewerToken2ItemId(BillingEnums.ePurchaseItemTypes.COURSE))', '@(Model.ItemViewerToken2ItemId(BillingEnums.ePurchaseItemTypes.BUNDLE))', null, null);
+        </script>
+    }
+}
+
+
+@section SecondNav
+{
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_ProductNavigation.cshtml")
+}
+
+
+@{
+    switch (Model.ItemType)
+    {
+        case BillingEnums.ePurchaseItemTypes.COURSE:
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/_ItemViewer.cshtml", Model)
+            <!-- Modal -->
+            <div class="modal fade" id="modWriteReview" tabindex="-1" role="dialog">
+                <div class="modal-dialog" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Review this course</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="inner">
+                                <div class="modal-body-wrapper"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            break;
+        case BillingEnums.ePurchaseItemTypes.BUNDLE:
+            <h3>@Model.Author.FullName</h3>
+            <h2 class="ellipsis multiline">@Model.ItemName</h2>
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Bundle/_BundleContent.cshtml", new BundleContentsPageToken { Item = Model.ViewerPageToken2ItemIntroToken(), courses = Model.BundleDetails.BundleCourses, mode = ePageMode.Viewer })
+            break;
+    }
+}

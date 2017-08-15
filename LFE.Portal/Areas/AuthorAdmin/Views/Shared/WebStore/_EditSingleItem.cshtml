@@ -1,0 +1,75 @@
+﻿@model LFE.DataTokens.WebStoreItemEditDTO
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmEditSingleItem';
+	var deleteUrl = '@Url.Action("DeleteItem","WebStore")';
+	
+	$(document).ready(function () {
+
+		var token = {
+			kind: StoreFormKinds.single
+			,title: '@Model.ItemName' + '  Details' 
+			,id: '@Model.WebStoreItemId'
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : deleteUrl
+		};
+
+		window.getNotifManagerInstance().notify(notifEvents.webstore.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onItemSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Item saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+		    $(EDIT_FORM_SELECTOR).find('#WebStoreItemId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.webstore.courseSaved, response.result);
+			window.getNotifManagerInstance().notify(notifEvents.webstore.storeStateChanged, null);
+		}
+	}	
+</script>
+<style scoped="scoped">
+.ul-edit-form.cn li label {width: 140px}
+.ul-edit-form.cn li div.input-container {width: 330px;}
+.ul-edit-form.cn li div.input-container .txt-inp {width: 330px;}
+.l-combo{width: 330px;}
+</style>
+@using (Ajax.BeginForm("SaveCategoryItemDetails", "WebStore", null, new AjaxOptions { OnSuccess = "onItemSaved", LoadingElementId = "site-loader" }, new { @id = "frmEditSingleItem", @style = "" }))
+{
+		@Html.HiddenFor(m => m.WebStoreItemId)
+		@Html.HiddenFor(m => m.WebStoreCategoryId)
+		@Html.HiddenFor(m=>m.ItemId)
+        @Html.HiddenFor(m=>m.ItemType)
+		@Html.HiddenFor(m=>m.OrderIndex)
+		<fieldset>
+		<legend></legend>
+			<ul class="ul-edit-form cn">				
+				<li>
+					@Html.LabelFor(m=>m.ItemName)
+					<div class="input-container">
+						@Html.TextBoxFor(m => m.ItemName, new { @class = "txt-inp", @readonly = "readonly" })
+						<span class="input-info">Maximum 250 symbols</span>
+					</div>
+					<div class="validator-container">
+						@Html.ValidationMessageFor(model => model.ItemName)
+					</div>
+				</li>
+				<li>
+					@Html.LabelFor(m=>m.Description)
+					<div class="input-container">
+						@Html.TextAreaFor(m=>m.Description,new{@class="txt-inp",@cols=20,@rows =10})					
+					</div>
+					<div class="validator-container"></div>
+				</li>
+			</ul>		
+		</fieldset>	
+}

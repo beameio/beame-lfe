@@ -1,0 +1,83 @@
+﻿@model LFE.DataTokens.PaypalCreditCardPaymentDTO
+@using Kendo.Mvc.UI
+
+@{
+	ViewBag.Title = "Direct CreditCard Payment";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    h2,h3{display: inline-block}
+    .field-validation-error, .validation-summary-errors {color:red;margin:5px 0 0 4px;vertical-align: top;display: inline-block}
+</style>
+<script>
+    var EDIT_FORM_SELECTOR = '#frmDirectCC';
+    $(document).ready(function () {
+
+        setTimeout(function() {
+            $('#course-name').val(null);
+
+            $('#amount').val(null);
+            $('#courseId').val(null);
+
+            var form = $(EDIT_FORM_SELECTOR);
+
+            initUnobstructiveFormValidation(form);
+        },500);
+
+        
+    });
+
+    function onCourseSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+
+        $('#amount').val(dataItem.Price);
+        $('#courseId').val(dataItem.CourseId);
+
+        $('#h2-name').html('Course name: ' + dataItem.Name);
+        $('#h3-price').html('Price: ' + dataItem.Price);
+
+        var a = $(EDIT_FORM_SELECTOR).valid();
+    }
+    
+    function onPaymentDone(response) {
+        hideFormLoader();
+        alert(response.success ? 'Payment done' : response.error);
+    }
+</script>
+
+@Html.ValidationSummary()
+
+<div id="dSlctCourse">
+	
+	
+    @(Html.Kendo().AutoComplete()
+                .Name("course-name")
+                .DataTextField("Name")
+                .HtmlAttributes(new{@style="width:400px"})
+                .Placeholder("-- select course --")                
+                .DataSource(ds=>ds.Read("GetAllCoursesList","Billing"))
+                .Events(e=>e.Select("onCourseSelected"))
+    )    
+	
+    <hr/>
+      @using (Ajax.BeginForm("DirectCcPayment", "Billing", null, new AjaxOptions {OnSuccess = "onPaymentDone", LoadingElementId = "site-loader" }, new { @id = "frmDirectCC", @style = "position:relative" }))
+      {
+        @Html.HiddenFor(m=>m.amount)
+        @Html.HiddenFor(m=>m.courseId)
+        
+        <h2 id="h2-name">Course name:</h2>  @Html.ValidationMessageFor(model => model.courseId)
+         <br/>
+          
+		<h3 id="h3-price">Price:</h3>  @Html.ValidationMessageFor(model => model.amount)
+				
+
+        @Html.EditorFor(m=>m.card)
+          
+		<input type="submit" style="padding: 7px;margin: 15px 0 0" class="k-button" title="Pay" value="Do Payment" /> 
+
+      }
+
+</div>
+
+

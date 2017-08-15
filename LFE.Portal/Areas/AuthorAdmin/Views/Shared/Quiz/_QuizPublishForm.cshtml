@@ -1,0 +1,102 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.QuizValidationToken
+           
+
+
+    @{
+        if (!Model.IsQuizValid)
+        {
+            <script>
+                $('.s-quiz_form').addClass('no-valid');
+            </script>
+            <div class="quiz-pub-container">
+                <div class="inner">
+                    <h3>Your quiz can not be published</h3>
+                    <ul>
+                        @{
+                            foreach (var t in Model.CheckList.Where(x => !x.Pass))
+                            {
+                                <li>@t.Message</li>
+                            }
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <script>
+                $('.s-quiz_form').removeClass('no-valid');
+            </script>
+        }
+
+        <script>
+            function onQuizStatusSaved(response) {
+                window.hideLoader();
+
+                if (response.success) {
+                    swal(
+                    {
+                        title: "Success",
+                        text: "Quiz saved",
+                        type: "success",
+                        timer:1000
+                    });
+                    $('#frm-quiz-pub').submit();
+
+                } else {
+                    sweetAlert("Oops...", response.error, "error");
+                }
+            }
+            function onQuizPublished(response) {
+                window.hideLoader();
+
+                if (response.success) {
+                    swal(
+                    {
+                        title: "Success",
+                        text: "Quiz saved",
+                        type: "success",
+                        timer: 1000
+                    },function() {
+                        window.parent.closeQuizEditWnd();
+                    });
+                    setTimeout(window.parent.closeQuizEditWnd, 1500);
+                } else {
+                    sweetAlert("Oops...", response.error, "error");
+                }
+            }
+        </script>
+        
+        switch (Model.Quiz.Status)
+        {
+            case QuizEnums.eQuizStatuses.DRAFT:
+
+                using (Ajax.BeginForm("SaveQuizStatus", "Quiz", new { area = "AuthorAdmin", Model.Quiz.QuizId, Status = QuizEnums.eQuizStatuses.PUBLISHED }, new AjaxOptions { OnSuccess = "onQuizPublished", OnBegin = "showLoader()", HttpMethod = "post" }, new { @id = "", @class = "" }))
+                {
+                    <div class="btn-action pub @(Model.IsQuizValid ? "" : "disabled no-pointer")">
+                        @{
+                            if (Model.IsQuizValid)
+                            {
+                                <input type="submit" value="Publish" />
+                            }
+                            else
+                            {
+                                <span style="padding: 15px 0 0">Publish</span>
+                            }
+                        }                        
+                    </div>
+                }
+                break;
+            case QuizEnums.eQuizStatuses.PUBLISHED:
+
+                using (Ajax.BeginForm("SaveQuizStatus", "Quiz", new { area = "AuthorAdmin", Model.Quiz.QuizId, Status = QuizEnums.eQuizStatuses.DRAFT }, new AjaxOptions { OnSuccess = "onQuizStatusSaved", OnBegin = "showLoader()", HttpMethod = "post" }, new { @id = "", @class = "" }))
+                {
+                    <div class="btn-action pub draft">
+                        <input type="submit" value="Disable" />
+                    </div>
+                }
+                break;
+        }
+}

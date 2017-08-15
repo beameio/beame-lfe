@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="~/Scripts/lfe/lfe.referrer.js"></script>
+
+    @Html.Partial("_CommonLayoutHeaderScripts")
+
+    @RenderSection("css", false)
+    @RenderSection("scripts", false)
+</head>
+<body>
+    @Html.Partial("~/Views/Shared/Layout/_SiteHeader.cshtml")
+
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">
+        <div class="nav-container" style="margin:20px auto;">
+            @Html.Partial("_Navigation")
+        </div>
+        <div class="d-body row">@RenderBody()</div>
+    </div>
+    @Html.Partial("Dashboard/_dbFooterScripts")
+    @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+    <script id="tp-template" type="text/x-kendo-template">
+        <p class="ptp">
+            #=target.data('title')#
+        </p>
+    </script>
+</body>
+
+</html>

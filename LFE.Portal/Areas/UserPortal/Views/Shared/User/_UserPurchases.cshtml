@@ -1,0 +1,110 @@
+﻿@using LFE.Portal.Areas.UserPortal.Models
+<style>
+	.k-footer-template td{border:none !important}
+	thead.k-grid-header, th.k-header {border-top:solid 1px #ccc !important}
+	#d-rep-manage{width:auto}
+	#d-rep-manage label.active{font-weight: bold}
+</style>
+
+<script>	
+	var gridId = 'UserPurchaseReport';	
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.report.dateFilterChanged, filterPurchaseGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.dateFilterChanged, filterPurchaseGrid, null);
+	});
+
+	function filterPurchaseGrid(dates) {
+	    filterGridByPeriod(gridId, "OrderDate", dates);
+	}  
+</script>
+
+<div >
+	<div class="inline picker-row" id="d-rep-manage">
+		<span class="inline" style="margin:  0;width: 120px;">
+			<input type="radio" id="PurchaseReportType" name="PurchaseReportType" value="@ePurchaseReportType.OneTime" data-bind="events: { click: onReportTypeChanged }" checked="checked"> <label class="inline" data-bind="text:oneTimeTitle, attr: { class: oneTimeLabelClass }"></label>
+		</span>
+		<span class="inline" style="margin: 0;width: 180px">
+			<input type="radio" id="PurchaseReportType" name="PurchaseReportType" value="@ePurchaseReportType.Subscription" data-bind="events: { click: onReportTypeChanged }"> <label class="inline" data-bind="text:subscriptionTitle, attr: { class: subscriptionLabelClass }"></label>
+		</span>
+
+	</div>
+	<div class="inline" style="margin: 0 0 0 50px">
+		@Html.Partial("~/Areas/AuthorAdmin/Views/Shared/_FromToFilter.cshtml")
+	</div>
+</div>
+
+<div style="margin: 20px 0 0">
+	<div id="d-onetime-c">
+		@Html.Partial("User/_UserPurchaseGrid")    
+	</div>
+	<div id="d-subscription-c" style="display: none">
+		@Html.Partial("User/_UserSubscriptionGrid")
+	</div>
+</div>
+
+
+<script>
+	var purchaseRepModel;
+	var ONE_TIME_TITLE = 'One-time';
+	var SUBSCRIPTION_TITLE = 'Monthly subscription';
+	var ONE_TIME_CONTAINER_SELECTOR = '#d-onetime-c';
+	var SUBSCRIPTION_CONTAINER_SELECTOR = '#d-subscription-c';
+
+	$(document).ready(function () {
+
+		window.getNotifManagerInstance().subscribe(notifEvents.report.oneTimeRepBound, setOneTimeTotal, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.subscriptionRepBound, setSubscriptionTotal, null);
+
+		purchaseRepModel = kendo.observable({
+			method: '@ePurchaseReportType.OneTime',
+			oneTimeTitle: ONE_TIME_TITLE,
+			oneTimeLabelClass:'active',
+			subscriptionTitle: SUBSCRIPTION_TITLE,
+			subscriptionLabelClass: '',
+
+			onReportTypeChanged: function () {
+				
+				this.set('method', $("input:radio[name=PurchaseReportType]:checked").val());
+
+				var method = this.get("method");
+				var otc = '';
+				var subc = '';
+				var c2hide,c2show;
+				switch (method) {
+					case '@ePurchaseReportType.OneTime':
+						otc = 'active';
+						c2show = ONE_TIME_CONTAINER_SELECTOR;
+						c2hide = SUBSCRIPTION_CONTAINER_SELECTOR;
+						break;
+					case '@ePurchaseReportType.Subscription':
+						subc = 'active';
+						c2hide = ONE_TIME_CONTAINER_SELECTOR;
+						c2show = SUBSCRIPTION_CONTAINER_SELECTOR;
+						break;
+					default:
+						return;
+				}
+
+				this.set('oneTimeLabelClass', otc);
+				this.set('subscriptionLabelClass', subc);
+
+				$(c2hide).slideToggle(300, function() {
+					$(c2show).slideToggle(300);
+				});
+
+			}
+			
+		});
+
+
+		kendo.bind($("#d-rep-manage"), purchaseRepModel);
+
+		function setOneTimeTotal(total) {
+			purchaseRepModel.set('oneTimeTitle', ONE_TIME_TITLE + '(' + total + ')');
+		}
+		function setSubscriptionTotal(total) {
+			purchaseRepModel.set('subscriptionTitle', SUBSCRIPTION_TITLE + '(' + total + ')');
+		}
+	});
+		   
+</script>

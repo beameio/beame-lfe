@@ -1,0 +1,29 @@
+﻿@model LFE.DataTokens.MessageViewDTO
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.disqus.messageClicked, go2Feed, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.disqus.messageClicked, go2Feed, null);
+	});
+
+
+	function go2Feed(data) {
+		window.location.href = '@Url.Action("Feed","Discussion")' + '?Id=' + data.Id + '&kind=' + data.kind;
+	}
+</script>
+ <div class="d-msg-container">
+	 <div class="inline img-container" >
+			<img alt="@Model.CreatorName" src="@Model.CreatorPhotoUrl"/>
+	 </div> 
+	<div class="inline row">   
+		<div class="auth">
+			<a href="@Url.Action("UserProfile","User",new{area="UserPortal",id=Model.CreatorId})" class="a-profile-link">
+				<span class="cr-name">@Model.CreatorName</span>
+			</a>
+			<span class="post-on">@Model.PostedOn</span>
+		</div>
+		<div class="room ellipsis">@Model.RoomName/@Model.CourseName</div>
+		<div class="txt ellipsis multiline">
+			@Html.Raw(Model.HTMLMessage)
+		</div>
+	</div>
+</div>

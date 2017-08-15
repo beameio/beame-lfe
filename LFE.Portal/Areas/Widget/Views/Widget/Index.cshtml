@@ -1,0 +1,150 @@
+﻿@model IndexModelViewToken
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+
+@{
+    var viewModel = (BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var isLfeStore = false;
+    var storeId = -1;
+    if (viewModel != null)
+    {
+        ViewBag.Title =  viewModel.WebStore != null ? viewModel.WebStore.WebStoreName : (viewModel.CategoryName == Constants.USER_COURSES_CATEGORY_NAME ?  "My Courses" : "LFE Catalog");
+        storeId = viewModel.WebStore != null ? viewModel.WebStore.WebStoreID : -1;
+        var trackingId = viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "";
+        isLfeStore = !String.IsNullOrEmpty(trackingId) && trackingId == Constants.LFE_MAIN_STORE_TRACKING_ID;
+    }
+    
+    
+    Layout = "~/Areas/widget/Views/Shared/_WidgetBootstrapLayout.cshtml";
+}
+
+@section CSS {
+    @Styles.Render("~/Areas/Widget/Content/styles/catalog")
+
+
+    @{
+        if (isLfeStore)
+        {
+            <style>
+                
+            ::-webkit-input-placeholder { font-size: 14px;letter-spacing: 0.1em}
+            :-moz-placeholder { /* Firefox 18- */ font-size: 14px;letter-spacing: 0.1em}
+            ::-moz-placeholder {  /* Firefox 19+ */ font-size: 14px;letter-spacing: 0.1em}
+            :-ms-input-placeholder { font-size: 14px;letter-spacing: 0.1em}
+            .k-dropdown-wrap, .k-dropdown-wrap .k-input {
+                border: medium none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;               
+            }
+             .k-dropdown-wrap {
+                background: none repeat scroll 0 0 #b9c1c3 !important;                
+            }
+            .l-k-input{width: 100%}
+            </style>
+        }
+    }
+   
+}
+@section JS
+{
+    @Scripts.Render("~/bundles/catalog")
+    <script>
+        $(document).ready(function() {
+            attachLoaderToItemUrls();
+        });
+        function attachLoaderToItemUrls() {
+            $('.item-page-link').on('click', showLoader);
+        }
+    </script>
+    @{
+        if (isLfeStore)
+        {
+            <script>
+                function clearResults() {
+                    clearFilters();
+                    showLoader();
+                    location.reload();
+                }
+                function clearFilters() {
+                    $('#combo-lfe-authors').data("kendoComboBox").value("");
+                    $('#au-lfe-item').data("kendoAutoComplete").value("");
+                }
+
+                $(document).ready(function () {
+                    var dsAuthors = new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                url: '@Url.Action("GetLfeAuthors", "Item", new{ area ="Widget" , id= storeId })',
+                                dataType: "json"
+                            }
+                        }
+                    });
+                    
+                    $('#combo-lfe-authors').kendoComboBox({
+                        placeholder: 'search by author name'
+                        , dataSource: dsAuthors
+                        , dataTextField: "fullName"
+                        , dataValueField: "userId"
+                        , filter: "contains"
+                        , suggest: true
+                        , highlightFirst: true
+                        , select: function (e) {
+                            var dataItem = this.dataItem(e.item.index());
+                            $('#frm-author-catalog').find('#id').val(dataItem.userId);
+                            showLoader();
+                            $('#frm-author-catalog').submit();
+                            //console.log(dataItem);
+                        }
+                    });
+                    
+                    var dsItems = new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                url: '@Url.Action("GetLfeItems", "Item", new{ area ="Widget" , id= storeId })',
+                                dataType: "json"
+                            }
+                        }
+                    });
+
+                    $('#au-lfe-item').kendoAutoComplete({
+                        placeholder: 'search by course name'
+                        , dataSource: dsItems
+                        , dataTextField: "ItemName"
+                        , dataValueField: "ItemId"
+                        , filter: "contains"
+                        , suggest: true
+                        , highlightFirst: true
+                        , minLength: 2
+                        ,select :function(e) {
+                            var dataItem = this.dataItem(e.item.index());
+                            showLoader();
+                            window.location.href = dataItem.ItemPageUrl;
+                        }
+                    });
+
+                    setTimeout(clearFilters, 400);
+                });
+
+                function onCatalogLoaded() {
+                    hideLoader();
+                    attachLoaderToItemUrls();
+                }
+            </script>
+
+            <form id="frm-author-catalog" method="post" data-ajax-update="#catalog-container" data-ajax-success="onCatalogLoaded" data-ajax-mode="replace" data-ajax="true" action="@Url.ActionString("_AuthorCatalog", "Item",new RouteValueDictionary{{"area","Widget"}})" novalidate="novalidate">
+                <input id="id" type="hidden" value="1655" name="id">
+            </form>
+        }
+}
+}
+
+
+@section SecondNav
+{
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_CatalogNavigation.cshtml", Model)
+}
+
+<div id="catalog-container">    
+   @Html.Partial("~/Areas/Widget/Views/Shared/Item/_Catalog.cshtml", Model)
+</div>

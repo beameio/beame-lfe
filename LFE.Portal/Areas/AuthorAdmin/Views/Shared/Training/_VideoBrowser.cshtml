@@ -1,0 +1,66 @@
+﻿@model LFE.DataTokens.TrainingViewToken
+<script type="text/x-kendo-template" id="kendo-video-thumb-template">
+    <div class="preview" id="thumb-${identifier}" style="background: url('${stillUrl}') no-repeat;">&nbsp;</div>
+
+    <div class="hint" style="display:none;" id="hint-${identifier}">
+        <span class="play" id="play-${identifier}">Play</span>
+    </div>
+    <div style="display:none;" class="list-player jwp" id="player-#=newGuid()#"></div>
+</script>
+<script>
+    var VIDEO_FIELD_NAME = '#BcIdentifier';
+    var BC_TH_PLAEYR_W = 290;
+    var BC_TH_PLAEYR_H = 198;
+    var uploadConsole, formValidator, formUserNotifManager;
+    var videoSelectionUrl = '@Url.Action("VideoSelection", "Course",new{area="AuthorAdmin"})';
+
+    $(document).ready(function() {
+
+        window.uploadConsole = $('#async-upload-console');
+
+    });
+</script>
+
+<div style="">
+    
+    <div style="padding-bottom: 15px;">
+        @Html.HiddenFor(m => m.BcIdentifier)
+        <a class="browse-video" href="javaScript:openVideoWnd()" style="">Browse video manager</a>
+    </div>
+
+    <div class="input-container" style="width:300px; height:200px; ">
+        <div class="thumb-box video-th" id="d-video-thumb">
+            @{
+                if (Model.PromoVideo != null)
+                {
+                    <script>
+                                var token = {
+                                    stillUrl: '@Model.PromoVideo.stillUrl'
+                                    , title: '@Model.PromoVideo.title'
+                                    , minutes: '@Model.PromoVideo.minutes'
+                                    , identifier: '@Model.BcIdentifier'
+                                    ,file:'@Model.PromoVideo.videoUrl'
+                                };
+                                buildThumbMediaPlayer(token, '#d-video-thumb');
+                    </script>
+                }
+            }
+        </div>
+    </div>
+</div>
+@(Html.Kendo().Window()
+        .Name("wndVideo")
+        .Title("Select Video")
+        .Draggable(false)
+        .HtmlAttributes(new { @style = "overflow:hidden;" })
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Height(600)
+        .Width(900)
+        .Modal(true)
+        .Animation(false)
+        .Events(e => e.Close("cleanWndContent"))
+        .Content("loading video library.....")
+)
+

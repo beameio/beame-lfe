@@ -1,0 +1,101 @@
+﻿@model LFE.Portal.Areas.AuthorAdmin.Models.WebStoreAddByAuthorToken
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmAddByAuthor';
+	
+	$(document).ready(function () {
+		setReportScroll("#d-course-list-container");
+		var token = {
+			kind: StoreFormKinds.author
+			,title: 'Add All Author Courses' 
+			,id: -1
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : null
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.webstore.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onAuthorCoursesSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Courses saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			$("#AuthorId").data("kendoDropDownList").value(null);
+			$("#d-course-list-content").html(null);
+			window.getNotifManagerInstance().notify(notifEvents.webstore.authorAdded, null);
+			window.getNotifManagerInstance().notify(notifEvents.webstore.storeStateChanged, null);
+		}
+	}
+	
+	function onAddByAuthorSubmit() {
+		var isAuthorValid = $(EDIT_FORM_SELECTOR).validate().element($('#AuthorId'));
+		if (!isAuthorValid) return false;		
+		return true;
+	}
+	
+	function onAuthorSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+		var authorId = dataItem.id;
+
+		var data = {
+			webCategoryId: '@Model.WebStoreCategoryId',
+		    authorId: authorId
+		};
+		
+		ajaxAction('@Url.Action("GetAuthorItemsListPartial","WebStore")', data, onCourseListBound, null);	    
+	}
+	
+	function onCourseListBound(view) {		
+		$("#d-course-list-content").html(view).fadeIn("slow");
+		setTimeout(function () {
+			setReportScroll("#d-course-list-container");
+		}, 50);
+		
+	}
+</script>
+<style scoped="scoped">
+.ul-edit-form.cn li label {width: 140px}
+.ul-edit-form.cn li div.input-container {width: 330px;}
+.ul-edit-form.cn li div.input-container .txt-inp {width: 330px;}
+.l-combo{width: 330px;}
+.k-listview {border:none}
+#d-course-list-container{width: 450px;height:500px}
+</style>
+@using (Ajax.BeginForm("AddAuthorCourses", "WebStore", null, new AjaxOptions { OnBegin = "onAddByAuthorSubmit", OnSuccess = "onAuthorCoursesSaved", LoadingElementId = "site-loader" }, new { @id = "frmAddByAuthor", @style = "" }))
+{
+		@Html.HiddenFor(m => m.WebStoreCategoryId)
+		<fieldset>
+		<legend></legend>
+			<ul class="ul-edit-form cn">
+				<li>
+					@Html.Label("Select Author")
+					<div class="input-container">
+						@(Html.Kendo().DropDownListFor(m => m.AuthorId)
+							  .HtmlAttributes(new { @class = "l-combo" })
+							  .OptionLabel("Select author...")
+							  .DataTextField("name")
+							  .DataValueField("id")
+							  .Events(e => e.Select("onAuthorSelected"))
+							  .DataSource(source => source.Read(read => read.Action("GetAuthorsLOV", "WebStore")))
+							  )
+					</div>
+					<div class="validator-container" style="height: 34px">
+						@Html.ValidationMessageFor(model => model.AuthorId)
+					</div>
+				</li>				
+			</ul>	
+			
+			<div id="d-course-list-container" class="nano" style="margin: 25px 0 0;">
+				<div class="content" id="d-course-list-content"></div>
+			</div>
+		</fieldset>		
+}

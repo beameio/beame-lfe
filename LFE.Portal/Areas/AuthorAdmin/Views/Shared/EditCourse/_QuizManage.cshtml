@@ -1,0 +1,81 @@
+﻿@using LFE.DataTokens
+@model BaseEntityDTO
+
+<script>var QUIZ_REP_SELECTOR = '#CourseQuizzesReport';</script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.js"></script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.rep.js"></script>
+<script>
+
+
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.courseQuizSaved, rebindQuizRep, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.quiz.courseQuizSaved, rebindQuizRep, null);
+    });
+
+    function openQuizWnd(id, title) {
+
+        var wnd = $(window.WND_QUIZ_MANAGE_SELECTOR).data("kendoWindow");
+        var url = window.quizEditWndUrl + '?id=' + id + '&cid=@Model.id';
+
+        var t = title == null ? "Add Quiz" : title;
+        wnd.title(t);
+        wnd.bind("close", onQuizEditWndClosed);
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+    function onQuizEditClicked(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        if (dataItem.IsAttached) {
+            showAttachWarning();
+            return;
+        }
+        window.openQuizWnd(dataItem.QuizId, dataItem.Title);
+    }
+</script>
+
+<div>
+    <span class="row-btn btn-add-first btn-add-quiz add" onclick="openQuizWnd(null,null)"><span class="ico inline"></span></span>
+</div>
+
+<div style="">
+
+    @(Html.Kendo().Grid<QuizListDTO>()
+      .Name("CourseQuizzesReport")
+      .HtmlAttributes(new { @style = "" })
+      .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+      .HtmlAttributes(new { @style = "" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#'style='width:200px;'>${Title}</div>").Title("Title").Width(250);
+          columns.Bound(p => p.AvailableAfter).Width(100);
+          columns.Bound(p => p.NumOfAttempts).Width(100);
+          columns.Bound(p => p.TimeLimitation).Width(100);
+          columns.Bound(p => p.Taken).Title("Taken").Width(100);
+          columns.Bound(p => p.IsMandatory).Title("Mandatory").ClientTemplate("<input type='checkbox' #=IsMandatory ? 'checked' : ''# disabled />").Width(80);
+          columns.Bound(p => p.AttachCertificate).Title("Certificate").ClientTemplate("<input type='checkbox' #=AttachCertificate ? 'checked' : ''# disabled />").Width(80);
+          columns.Bound(p => p.Status).Title("Status").Width(100);
+          //columns.Bound(p => p.Certificate).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Certificate)#'style='width:200px;'>${Certificate}</div>").Width(200);
+          columns.Command(c => c.Custom("Edit").Click("onQuizEditClicked")).Width(50);
+          columns.Command(c => c.Destroy().HtmlAttributes(new { @class = "list-cmd" })).Width(50);
+      })
+      .Events(e => e.DataBound("onCourseQuizzesBound").Remove("onQuizRemoved"))
+      .Sortable()
+      .Pageable(pager => pager.Refresh(true))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.QuizId))
+                            .Read(read => read.Action("GetCourseQuizzes", "Quiz", new { Model.id }).Type(HttpVerbs.Get))
+                            .Destroy(d => d.Action("DestroyCourseQuiz", "Quiz", new { area = "AuthorAdmin" }))
+                            .PageSize(6))
+    )
+
+</div>
+
+<script id="tp-template" type="text/x-kendo-template">
+    <p class="ptp">
+        #=target.data('title')#
+    </p>
+</script>

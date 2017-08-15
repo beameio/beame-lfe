@@ -1,0 +1,20 @@
+﻿@import "variables";
+
+.nav-container{margin:20px auto 10px;max-width:1220px;min-width:760px}
+nav { height: 30px;}
+nav ul{ height: 26px;display: block;width: auto;float: left}
+nav ul li{ display: inline;padding: 0 10px 0 0;border-right: 2px solid #999;margin: 0 0 0 10px;text-transform: uppercase}
+nav ul li.cb{padding-right: 30px}
+nav ul li:first-child{margin-left: 0}
+nav ul li:last-child{border-right: none}
+nav ul li a{ color: #999;text-decoration: none;font-size: 16px;font-weight: 600;}
+nav ul li span.a{ color: #666;font-size: 16px !important;font-weight: 600;cursor: pointer}
+nav ul li a:hover{color: #006699;}
+nav ul li a.current,nav ul li span.a.current{color: #006699}
+
+nav ul li.li-sub:hover .sub{display: block;} 
+nav ul li div.sub{position: absolute;top: -10px;left:-6px;width: 100%;background: #f6f6f6;display: none;text-align: left;padding-bottom: 10px;border: 1px solid #949494;z-index: 100001}
+nav ul li div.sub .inner{padding: 0 5px}
+nav ul li div.sub .menu-name{ color: #006699;font-size: 16px;font-weight: 600;text-transform: uppercase;margin: 5px auto 0;padding-bottom: 15px;border-bottom: 1px solid #949494;background: url('@{portal_images_root}/ico-down-blue.png') no-repeat;background-position: 95% 10px }
+nav ul li div.sub .sub-menu-link {min-height: 20px;border-bottom: 1px solid #949494;padding-bottom: 10px;margin-top: 10px;text-align: left}
+nav ul li div.sub .sub-menu-link a{ color: #000;font-size: 14px;text-decoration: none;text-transform: capitalize}

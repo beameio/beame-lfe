@@ -1,0 +1,10 @@
+﻿@model LFE.DataTokens.RegisterDTO
+
+<script>
+    
+</script>
+
+@using (Ajax.BeginForm("AjaxRegisterUser", "Account", new { area = "", ViewBag.ReturnUrl, RegistrationType = Model.RegistrationSource, Model.RequiredConfirmation, Model.IsPluginRegistration, Model.Uid, Model.TrackingID }, new AjaxOptions { HttpMethod = "Post", UpdateTargetId = "wnd-login-main" }, new { @id = "frmRegisterUser", @class = "reg-form rel" }))
+{
+    @Html.Partial("Account/MainLogin/_RegisterForm",Model)
+}

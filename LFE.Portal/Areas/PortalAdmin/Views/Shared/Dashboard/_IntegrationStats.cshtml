@@ -1,0 +1,12 @@
+﻿@model LFE.DataTokens.IntegrationStatsToken
+           
+<ul class="ul-vi">
+    <li>
+        <span class="title">mailchimp</span>
+        <span class="value">@Model.TotalMailchimp</span>
+    </li>
+    <li>
+        <span class="title">mbg</span>
+        <span class="value">@Model.MbgJoined/<span style="color: red;">@Model.MbgCanceled</span></span>
+    </li>
+</ul>

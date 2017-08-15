@@ -1,0 +1,35 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.DataTokens.AuthorPurchaseDTO
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+
+@{
+    var authorImageURL = string.Empty;
+    if (!string.IsNullOrEmpty(Model.AuthorPictureURL))
+    {  
+        authorImageURL = Model.AuthorPictureURL.ToLower().Contains("http") ? Model.AuthorPictureURL : this.GetS3FileUrl(Model.AuthorPictureURL);
+    }
+ }
+
+<div class="author">
+    <div class="left">
+        <h3>@Model.FullName</h3>
+        @{
+            if (!String.IsNullOrEmpty(authorImageURL))
+            {
+                <img src="@authorImageURL" alt="@Model.FullName" />       
+            }
+        }
+        <div class="htmlSlot">@Html.Raw(Model.BioHtml)</div>
+    </div>          
+</div>
+<div class="promo">
+    @if (Model.ItemsList.Any() && viewModel != null)
+    {
+        for (var i = 0; i < Model.ItemsList.Count(); i++)
+        {           
+            <div class="promo-item-wrapper">
+                @Html.Partial("_WidgetItemBox", Model.ItemsList[i])
+            </div>                 
+        }
+    }
+</div>

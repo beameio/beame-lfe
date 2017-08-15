@@ -1,0 +1,142 @@
+﻿
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@model AdminDashboardToken
+
+
+<div class="row po-container">
+    @Html.Partial("Dashboard/_LfePayout", Model.NextPayoutList)
+
+    @Html.Partial("Dashboard/_TopSellers", Model.TopSellers)
+</div>
+
+
+@Html.Partial("Dashboard/_Filters")
+
+<div id="d-time-report-container" class="row">
+    <script>
+        var lastFilter = null;
+
+        function isPeriodChanged(filter) {
+
+            return lastFilter == null ? true : lastFilter.period != filter.period;
+        }
+
+        function isCurrencyChanged(filter) {
+            return lastFilter == null ? true : lastFilter.currencyId != filter.currencyId;
+        }
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.dashboard.filtersChanged, onFilterChanged, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.dashboard.filtersChanged, onFilterChanged, null);
+
+        function onFilterChanged(filter) {
+            if (isPeriodChanged(filter)) {
+                //load platform stats
+                var platformStatsSelector = '#d-platform-stats-container';
+                actionFormResultWithContainer('@Url.Action("LoadPlatformStats", "Dashboard",new{area="PortalAdmin"})', filter, platformStatsSelector, platformStatsSelector);
+
+                //load total stats
+                var totalsSelector = '.totals-boxes-container > .common-totals';
+                actionFormResultWithContainer('@Url.Action("LoadTotals", "Dashboard",new{area="PortalAdmin"})', filter, totalsSelector, totalsSelector);
+
+                //load sales total stats
+                loadSalesStats(filter);
+
+                //load integration stats
+                var integrationSelector = '.integration-container';
+                actionFormResultWithContainer('@Url.Action("LoadIntegrationTotals", "Dashboard",new{area="PortalAdmin"})', filter, integrationSelector, integrationSelector);
+
+                //author period stats
+                var authorPeriodSelector = '.author-period-stats-container';
+                actionFormResultWithContainer('@Url.Action("LoadAuthorPeriodTotals", "Dashboard",new{area="PortalAdmin"})', filter, authorPeriodSelector, authorPeriodSelector);
+
+                //learner period stats
+                var learnerPeriodSelector = '.learner-period-stats-container';
+                actionFormResultWithContainer('@Url.Action("LoadLearnerPeriodTotals", "Dashboard",new{area="PortalAdmin"})', filter, learnerPeriodSelector, learnerPeriodSelector);
+
+                //load learner coupon stats
+                loadCouponStats(filter);
+
+                //keep last filter value
+                lastFilter = filter;
+            }
+
+            if (isCurrencyChanged(filter)) {
+                //load sales total stats
+                loadSalesStats(filter);
+
+                //load learner coupon stats
+                loadCouponStats(filter);
+
+                //keep last filter value
+                lastFilter = filter;
+            }
+        }
+
+        function loadSalesStats(filter) {
+            var salesTotalsSelector = '.sales-totals-container > .totals-boxes-container > .sales-totals';
+            actionFormResultWithContainer('@Url.Action("LoadSalesTotals", "Dashboard",new{area="PortalAdmin"})', filter, salesTotalsSelector, salesTotalsSelector);
+        }
+
+        function loadCouponStats(filter) {
+            var couponTotalsSelector = '.learner-period-coupon-stats-container';
+            actionFormResultWithContainer('@Url.Action("LoadLearnerPeriodCouponTotals", "Dashboard",new{area="PortalAdmin"})', filter, couponTotalsSelector, couponTotalsSelector);
+        }
+    </script>
+
+    <div id="d-platform-stats-container" class="col-lg-12 stats-container" style="min-height: 444px">
+        @Html.Action("LoadPlatformStats", "Dashboard", new AdminDashboardFiltersToken{currencyId = Constants.USD_CURRENCY_ID,period = ReportEnums.ePeriodSelectionKinds.lastMonth})
+    </div>
+
+    <div id="d-totals-container" class="col-lg-12 totals-container">
+        @*<div class="row">
+                <div class="totals-title"><h3>totals:</h3></div>
+            </div>*@
+        <div class="row totals-boxes-container">
+            <div class="common-totals"></div>
+        </div>
+    </div>
+
+    <div id="d-sales-totals-container" class="col-lg-12 totals-container sales-totals-container" style="margin-top: 15px;">
+        @*<div class="row">
+                <div class="totals-title"><h3>sales totals:</h3></div>
+            </div>*@
+        <div class="row totals-boxes-container">
+            <div class="sales-totals"></div>
+        </div>
+    </div>
+
+    <div id="d-video-integration-container" class="col-lg-12 video-integration-container">
+        <div class="row">
+            <div class="float-left video-stats-container">
+                @Html.Partial("Dashboard/_VideoStats", Model.VideoStats)
+            </div>
+            <div class="float-right integration-container">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="d-author-stats-container" class="col-lg-12 author-stats-container">
+        <div class="row">
+            <div class="row-inner">
+                <div class="float-left author-period-stats-container"></div>
+                <div class="float-right author-total-stats-container">
+                    @Html.Partial("Dashboard/_AuthorTotalStats", Model.AuthorTotalStats)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="d-learner-stats-container" class="col-lg-12 learner-stats-container">
+        <div class="row">
+            <div class="row-inner">
+                <div class="float-left learner-period-stats-container">
+
+                </div>
+                <div class="float-right learner-period-coupon-stats-container"></div>
+            </div>
+        </div>
+    </div>
+</div>

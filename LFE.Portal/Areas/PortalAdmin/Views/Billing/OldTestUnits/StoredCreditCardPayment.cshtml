@@ -1,0 +1,127 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.PayPalSavedCCPaymentDTO
+@{
+	ViewBag.Title = "Stored CreditCard Payment";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+	var ccFormDisplay = "block";
+}
+<style>
+	h2,h3{display: inline-block}
+	.field-validation-error, .validation-summary-errors {color:red;margin:5px 0 0 4px;vertical-align: top;display: inline-block}
+</style>
+
+<script>
+	var EDIT_FORM_SELECTOR = '#frmSavedCC';
+	$(document).ready(function () {
+
+		setTimeout(function () {
+			$('#course-name').val(null);
+
+			$('#amount').val(null);
+			$('#courseId').val(null);
+
+			var form = $(EDIT_FORM_SELECTOR);
+
+			initUnobstructiveFormValidation(form);
+		}, 500);
+
+
+	});
+
+	function onCourseSelected(e) {
+		var dataItem = this.dataItem(e.item.index());
+
+		$('#amount').val(dataItem.Price);
+		$('#courseId').val(dataItem.CourseId);
+
+		$('#h2-name').html('Course name: ' + dataItem.Name);
+		$('#h3-price').html('Price: ' + dataItem.Price);
+
+	  //  var a = $(EDIT_FORM_SELECTOR).valid();
+	}
+
+	function onChangeCardChanged($this) {
+		if ($($this).is(':checked')) {
+			$('#delectCurrent').val(true);
+			$.ajax({
+			    url: '@Url.Action("_CreditCardEditor","Billing")',
+			    cache: true,
+			    datatype: "json",
+			    contentType: "application/json; charset=utf-8"
+		        , success: function (view) {
+		            $('#d-cc-container').html(view);
+		            $('#d-cc-container').slideDown();
+		        }
+			});			
+		} else {
+		    $('#delectCurrent').val(false);
+			$('#d-cc-container').slideUp(300,function() {
+			    $('#d-cc-container').empty();
+			});
+		}
+	}
+
+	function onPaymentDone(response) {
+		hideLoader();
+		alert(response.success ? 'Payment done' : response.error);
+	}
+</script>
+
+@Html.ValidationSummary()
+
+
+<div id="dSlctCourse">
+	
+		<div>
+			<span class="inline">
+				@(Html.Kendo().AutoComplete()
+						.Name("course-name")
+						.DataTextField("Name")
+						.HtmlAttributes(new{@style="width:400px"})
+						.Placeholder("-- select course --")                
+						.DataSource(ds=>ds.Read("GetAllCoursesList","Billing"))
+						.Events(e=>e.Select("onCourseSelected"))
+				)    
+			</span>
+			<span class="inline">
+				@if (Model.IsCardExists)
+				{
+					ccFormDisplay = "none";
+					<span class="inline">
+						@Html.LabelFor(m=>m.ChangeCard,"Change card")
+						@Html.CheckBoxFor(m=>m.ChangeCard,new{onchange="onChangeCardChanged(this)"})
+					</span>
+				
+					<span class="inline">
+						@using (Html.BeginForm("DeleteCc","Billing",null,FormMethod.Post)){
+							<input type="submit" class="btn k-button" id="btn-rem-cc" value="Delete card" />
+						}                    
+					</span>
+				}  
+			</span>
+		</div>
+		<hr/>
+	  @using (Ajax.BeginForm("SaveCcPayment", "Billing", null, new AjaxOptions {OnSuccess = "onPaymentDone", LoadingElementId = "site-loader" }, new { @id = "frmSavedCC", @style = "position:relative" }))
+	  {
+		@Html.HiddenFor(m => m.amount)
+		@Html.HiddenFor(m => m.courseId)
+		@Html.HiddenFor(m=>m.IsCardExists)
+		@Html.Hidden("delectCurrent")
+		<h2 id="h2-name">Course name:</h2>  @Html.ValidationMessageFor(model => model.courseId)
+		 <br/>
+		  
+		<h3 id="h3-price">Price:</h3>  @Html.ValidationMessageFor(model => model.amount)
+
+		
+			
+		<div id="d-cc-container" style="display: @ccFormDisplay"></div>
+		  
+		  <p>
+			<input type="submit" style="padding: 7px;margin: 15px 0 0" class="k-button" title="Pay" value="Do Payment" />       
+		  </p>
+		
+
+	  }
+
+</div>

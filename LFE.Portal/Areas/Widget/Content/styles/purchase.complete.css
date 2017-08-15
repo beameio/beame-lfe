@@ -1,0 +1,65 @@
+﻿body{ color: #22313f;min-width: 280px}
+
+.pc-nav {height: 45px;background: none repeat scroll 0 0 #95a5a6;border: medium none !important;border-radius: 0;margin-bottom: 0 !important;position: relative;top: -1px;}
+.pc-nav > .container{margin-top: 15px}
+.pc-nav i.pc-logo { background: url('../../../../Areas/Widget/Content/images/ico-purch-complete.png') no-repeat;padding-left: 30px;color: #273031;font-size: 18px}
+
+.pc-container{ text-align: center;}
+.content{ max-width: 600px;margin: 50px auto 0}
+
+.d-head{text-align: left;}
+.d-head h3{ font-weight: 700;font-size: 24px;line-height: 1.4}
+.d-head h4{ font-weight: normal;font-size: 18px}
+
+
+.d-item{ margin: 40px 0 10px;display: table}
+
+.d-item  .image-wrap{height:110px;width: 200px;padding: 0 10px 0 0;display: table-cell}
+
+.d-item  .image-wrap img{ height: 100%;width: 100%}
+
+
+.d-item  .details{height: 100%;line-height: 1;display: table-cell;text-align: left;vertical-align: bottom}
+.d-item  .details h5{ font-size: 16px;font-weight: normal;padding-top: 35px;}
+.d-item  .details h6{font-size: 21px;font-weight: 600;padding-top: 10px}
+
+@media (max-width: 589px) {
+    .d-item{ display: block}
+
+    .d-item  .image-wrap{ display: block}
+
+    .d-item  .details{ display: block;}
+    .d-item  .details h5{padding-top: 15px}
+}
+
+.d-price{ width: 100%;height: 50px;background: #e87e04}
+.d-price .inner{ height: 100%;vertical-align: middle;text-align: center}
+.d-price .inner > span{ display: inline-block;vertical-align: middle}
+.d-price .inner .price{ color: #000;font-size: 34px}
+.d-price .inner .txt{ color: #fff;font-size: 16px}
+
+.d-mail-info{ height: auto;text-align: center;margin: 40px 15px;font-size: 14px}
+
+.whats-now{ color: #1e8bc3;font-size: 32px;text-transform: uppercase;text-align: left;}
+
+.d-foot{ background: #1e8bc3;color: #fff;}
+
+.d-foot > .container > .row{ max-width: 600px;margin: 0 auto;padding-bottom: 10px}
+.d-foot > .container > .row > .col{ padding: 30px 0 0;height: auto;text-align: center}
+.d-foot > .container > .row > .col > .ico{ background: #fff no-repeat center center;width: 120px;height: 120px;border-radius: 50%;display: block;margin: 0 auto }
+.d-foot > .container > .row > .col > .ico.ico-view{background-image: url('../../../../Areas/Widget/Content/images/ico-monitor.png')}
+.d-foot > .container > .row > .col > .ico.ico-chat{background-image: url('../../../../Areas/Widget/Content/images/ico-chat.png')}
+.d-foot > .container > .row > .col > .ico.ico-study{background-image: url('../../../../Areas/Widget/Content/images/ico-study.png')}
+.d-foot > .container > .row > .col > .title{ display: block;font-size: 16px;text-align: center;text-transform: uppercase;color: #000;padding:25px 0 10px }
+.d-foot > .container > .row > .col > a{ color: #fff;text-decoration: none;display: block;text-align: center;margin: 0 15px;}
+.d-foot > .container > .row > .col > a > span{ display: block;font-size: 13px;}
+.d-foot > .container > .row > .col > a > .a-title{ text-decoration: underline;padding-top: 15px;}
+.d-foot > .container > .row > .col > a > .a-title.ask{ padding-top: 50px;}
+.d-foot > .container > .row > .col > a > .a-title.view{ padding-top: 32px;}
+
+
+
+/*misc*/
+.reset-all{ padding: 0;margin: 0}
+.name{text-transform: capitalize}
+.rel{position: relative}

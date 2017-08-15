@@ -1,0 +1,71 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model TrainingFooterLinksToken
+
+<ul class="ul-links">
+    <li>
+        <a href="#">Register to a different session</a>
+    </li>
+
+    @{
+        if (Model.State == eUserG2TStates.ThankYou || Model.State == eUserG2TStates.Countdown)
+        {
+            <li>
+                <a href="#" id="a-btn-upd-notif">Update notification settings</a>
+                @using (Ajax.BeginForm("LoadNotificationSettingsForm", "Training", new { area = "Widget", id = Model.RegistrantId }, new AjaxOptions { UpdateTargetId = "g2t-user-inner", OnSuccess = "hideLoader", OnBegin = "showLoader()" }, new { @id = "frmLoadNotifSett", @class = "" })) { }
+                <script>
+                    var btn = document.getElementById("a-btn-upd-notif");
+                    btn.addEventListener("click", updateNotificationClickEvent, false);
+                    function updateNotificationClickEvent(e) {
+                        e.preventDefault();
+                        $('#frmLoadNotifSett').submit();
+                    }
+                </script>
+
+            </li>
+
+            <li>
+                @using (Ajax.BeginForm("CancelRegistration", "Training", new { area = "Widget", id = Model.RegistrantId }, new AjaxOptions { OnSuccess = "onCancelComplete" }, new { @id = "frmCancelRegistration", @class = "" })) { }
+                <a href="#" id="btn-cancel-g2t">Cancel registration</a>
+                <script>
+                    var el = document.getElementById("btn-cancel-g2t");
+                    el.addEventListener("click", cancelActionClickEvent, false);
+                    function cancelActionClickEvent(e) {
+                        e.preventDefault();
+                        swal(
+                            {
+                                title: "Are you sure?",
+                                text: "Your registration for live session will be canceled",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: "Yes",
+                                closeOnConfirm: false
+                            }, function () {
+                                showLoader();
+                                $('#frmCancelRegistration').submit();
+                            });
+                    }
+
+                    function onCancelComplete(response) {
+                        window.hideLoader();
+                        window.getNotifManagerInstance().notify(notifEvents.training.userRegistrationChanged, null);
+                        if (response.success) {
+                            swal(
+                                 {
+                                     title: "Canceled",
+                                     text: "Registration canceled",
+                                     type: "success"
+                                 },function() {
+                                     window.loadUserG2TForm();
+                            });
+                        } else {
+                            sweetAlert("Oops...", response.error, "error");
+                        }
+                    }
+                </script>
+            </li>
+        }
+    }    
+    <li>
+        <a href="mailto:@Model.AuthorEmail">Contact Author</a>
+    </li>
+</ul>

@@ -1,0 +1,37 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.SalesTotalsBoxToken
+@{
+    var isMoney = Model.Type != ReportEnums.eStatsTypes.Free && Model.Type != ReportEnums.eStatsTypes.MBG;
+}
+<div class="total-box">
+    <div class="box-inner">
+        <div class="title">@(Utils.GetEnumDescription(Model.Type))</div>
+        <div class="total">
+            @{
+                if (isMoney)
+                {
+                    @(Model.Currency != null ? Model.Currency.Symbol : "")@Model.TotalIncome.ToString("n0")
+                }
+                else
+                {
+                    <span class="">NEW @Model.New </span>
+                    <i title="@Model.Tendency.Tooltip" class="arrow @Html.TendencyDirection2CssClass(Model.Tendency.Direction," arrow-")"></i>
+                }
+            }
+            
+        </div>
+        <div class="new">
+            <div class="new-inner">
+                @{
+                    if (isMoney)
+                    {
+                        <span class="">NEW @Model.New </span>
+                        <i title="@Model.Tendency.Tooltip" class="arrow @Html.TendencyDirection2CssClass(Model.Tendency.Direction,"arrow-")"></i>
+                    }
+                }                
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Models
+@model LFE.DataTokens.AuhorRefundProgramDTO
+
+
+<script>
+function onAjaxPostCompleted() {
+    hideLoader();
+    var ckBoxes = $('#frmRefundSettings input:checkbox');
+    if (ckBoxes && ckBoxes.length > 0)
+        for (var i=0; i<ckBoxes.length; i++)
+            ckBoxes[i].checked = false;
+}
+</script>
+
+<style>
+.divGRPTerms { margin-bottom:20px; }
+.divGRPTerms h4 { color:#3B4DA7; font-weight:bold; margin:10px 0px; }
+.divGRPTerms h1 { font-weight:bold; color:#3D3C3C; margin:15px 10px 0; display:inline-block; position:relative; }
+#divSubmitGRP { position:relative;margin:30px 0;height:40px; }
+#btnSubmitGRP { position:absolute;top:0;right:0;background-color:#22B14C; padding:10px 35px;border:none;color:#FFFFFF;font-weight:bold; cursor:pointer; }
+</style>
+<div id="divResult">
+@{
+
+    if (ViewBag.ShowJoinedSuccess)
+    {
+        <div style="font-weight:bold;line-height:1.6em;margin:20px 0px 20px 27px;">
+            <h1 style="font-size:14pt;">SUCCESS!</h1>
+            You are now registered to the “30 day money back guarantee” program. We are confident this will serve to establish trust and confidence with your students, thus ensuring happier students and more sales.
+            <br />The program’s logo will now appear on all your courses that fall under the program:
+            <br /><img src="~/Areas/Widget/Content/assets/grp_image.png" />
+        </div>
+    }
+    else
+    {
+        <div class="divGRPTerms">
+            <img src="~/Areas/Widget/Content/assets/ico-grp.png" />
+            <h1 style="font-size:18pt;position:relative;bottom:15px;">The 30 Day Money Back Guarantee Program </h1>
+            <h4>What is this program?</h4>
+            This program was designed and implemented so as to enable your students to purchase your courses with confidence. Knowing you trust the strength and quality of your brand to the extent of offering a 30 day money back guarantee is an unmatched proposition.
+            <br />If you believe in the quality of your courses, if you stand behind your brand 100%, then this program is the one you want to advertise alongside each and every one of your courses.
+            <h4>How does it work?</h4>
+            The program applies only to courses with a one-time purchase price. Courses with a subscription or rental pricing plan will not be included in it. Once you sign up to this program, all your relevant courses will have the program’s logo, like this:
+            <br /><img src="~/Areas/Widget/Content/assets/grp_image.png" />
+            <br />Once a student purchases a course that is under this program, LFE will hold the purchase fee for the duration of the 30 days, and if no refund was requested by the student during these 30 days, the fee would be added (minus LFE and PayPal fees) to your upcoming monthly payout.
+            <br />If you decide to leave the program, LFE will hold the fee only for courses already bought under the program. Courses purchased after you opted out of the program will be included in the monthly payout as usual.
+            <br />LFE does not charge any extra fees from authors or students participating in this program!
+        </div>
+    }
+
+    if (!ViewBag.IsValid)
+    {
+        <div style="background-color:#FFCCCC;padding:10px;margin-bottom:15px;">@ViewBag.Error</div>
+    }
+
+
+    if (!Model.IsValid)
+    {
+        <div style="background-color:#FFCCCC;padding:10px;margin-bottom:15px;">@Model.Error</div>
+    }
+    else if (!ViewBag.ShowJoinedSuccess)
+    {
+        if (Model.JoinedToRefundProgram)
+        {
+            using (Ajax.BeginForm("RemoveFromRefundProgram", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "divResult", OnBegin = "showLoader()", OnComplete = "onAjaxPostCompleted()", OnSuccess = "", LoadingElementId = "site-loader" }, new { @id = "frmRefundSettings", @style = "margin:10px 0;" }))
+            {
+                @Html.CheckBoxFor(x => x.Checked, new { @id = "chkRemoveRefund" })
+                <label for="chkRemoveRefund" style="font-weight:bold;">Unregister me from the program</label>
+            }
+            <span>Please note, unregistering you will apply to new learners. Learners who bought your courses while you were registered to this program will still enjoy the 30 days guaranteed refund.</span>
+        }
+        else
+        {
+            using (Ajax.BeginForm("AddToRefundProgram", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "divResult", OnBegin = "showLoader()", OnComplete = "onAjaxPostCompleted()", OnSuccess = "", LoadingElementId = "site-loader" }, new { @id = "frmRefundSettings", @style = "margin:10px 0;" }))
+            {
+                @Html.CheckBoxFor(x => x.Checked, new { @id = "chkJoinRefund" })
+                <label for="chkJoinRefund" style="font-weight:bold;">I read and understood the terms</label>
+            }
+        }
+
+        var message = Model.JoinedToRefundProgram
+            ? "In order to Unregister from the 30 Day Money Back Guarantee program, you must check the Unregister me from the program check box first."
+            : "In order to sign up to the 30 Day Money Back Guarantee program, you must agree to the program's terms of service.";
+        <div id="divCheckMsg" style="background-color:#FFCCCC;padding:10px 15px;margin:5px 0px;display:none;">@message</div>
+    }
+
+    var btnText = Model.JoinedToRefundProgram ? "UNREGISTER ME" : "SIGN ME UP!";
+    if (!ViewBag.ShowJoinedSuccess)
+    {
+        <div id="divSubmitGRP">
+            <button id="btnSubmitGRP">@btnText</button>
+        </div>
+        <script>
+            $('#btnSubmitGRP').unbind('click').bind('click', function (e) {
+                var form = $('#divResult form'); 
+                if (!form) return;
+                var chkBox = $(form).find('input:checkbox');
+                if (chkBox[0].checked) {
+                    form.submit();
+                    return;
+                }
+                $('#divCheckMsg').show('swing');
+            });
+        </script>
+    }
+}
+
+</div>
+

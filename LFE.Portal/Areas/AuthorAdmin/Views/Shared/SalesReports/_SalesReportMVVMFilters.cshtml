@@ -1,0 +1,30 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.UserPortal.Models
+
+@{
+    var dates = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+}
+
+<div class="inline picker-row">
+    <span class="inline" style="margin:  4px 0 0;width: 120px;">
+        <input type="radio" id="PurchaseReportType" name="PurchaseReportType" value="@ePurchaseReportType.OneTime" data-bind="events: { click: onReportTypeChanged }" checked="checked"> <label class="inline" data-bind="text:oneTimeTitle, attr: { class: oneTimeLabelClass }"></label>
+    </span>
+    <span class="inline" style="margin:4px 0 0;width: 180px">
+        <input type="radio" id="PurchaseReportType" name="PurchaseReportType" value="@ePurchaseReportType.Subscription" data-bind="events: { click: onReportTypeChanged }"> <label class="inline" data-bind="text:subscriptionTitle, attr: { class: subscriptionLabelClass }"></label>
+    </span>
+
+</div>
+<div class="inline" style="margin: 0 0 0 25px">
+    @(Html.Kendo().DropDownList()
+                .Name("periodSelectionKind")
+                .DataTextField("Title")
+                .DataValueField("Value")
+                .BindTo(dates)
+                .HtmlAttributes(new { @class="c2",@style = "height:22px !important;font-size:12px  !important" })
+                .Events(e => e.Select("onFilterChanged"))
+                .Value((((int)ReportEnums.ePeriodSelectionKinds.all).ToString()))
+    )
+</div>

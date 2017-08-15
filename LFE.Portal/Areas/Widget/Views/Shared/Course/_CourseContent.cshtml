@@ -1,0 +1,12 @@
+﻿@model LFE.DataTokens.CoursePurchaseDTO   
+
+<div id="video-content" >
+    @Html.Partial("~/Areas/Widget/Views/Shared/Course/_Player.cshtml")
+    <div class="htmlSlot">
+        @Html.Raw(Model.IntroHtml)
+    </div>
+</div>
+
+<div class="inner">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Course/_ChaptersTree.cshtml", Model.Chapters)
+</div>

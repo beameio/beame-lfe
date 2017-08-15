@@ -1,0 +1,16 @@
+﻿@model List<LfeServices.DataEntities.WebStoreCategory>
+
+<h3>Browse by Category</h3>
+<ul>
+    @foreach (var category in Model)
+    {
+        if (ViewBag.CategoryName == category.CategoryName)
+        {
+            <li>@category.CategoryName</li>
+        }
+        else
+        {    
+            <li>@Html.ActionLink(@category.CategoryName, "Index", "Widget", new { categoryName = category.CategoryName }, null) </li>
+        }
+    }
+</ul>

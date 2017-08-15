@@ -1,0 +1,162 @@
+﻿@model LFE.DataTokens.WebStoreItemEditDTO
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmAddSingleCourse';
+	var deleteUrl = '@Url.Action("DeleteItem","WebStore")';
+	
+	$(document).ready(function () {
+
+		var token = {
+			kind: StoreFormKinds.single
+			,title: 'Add new item' 
+			,id: -1
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : null
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.webstore.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onItemSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Item saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+		    $(EDIT_FORM_SELECTOR).find('#WebStoreItemId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.webstore.courseSaved, response.result);
+			window.getNotifManagerInstance().notify(notifEvents.webstore.storeStateChanged, null);
+		}
+	}
+	
+	function filterCourses() {
+		return {
+		    id: $("#categories").val()
+            ,webCatId:'@Model.WebStoreCategoryId'
+		};
+	}
+	
+	function onAddSingleItemSubmit() {
+	    var isCourseValid = $(EDIT_FORM_SELECTOR).validate().element($('#ItemId'));
+		if (!isCourseValid) return false;
+		showContainerLoader('#main', null);
+		return true;
+	}
+	
+	function onLfeCategorySelected() {
+	    $('#ItemName').val(null);
+		$('#Description').val(null);
+	}
+
+	function onItemSelected(e) {
+	    var dataItem = this.dataItem(e.item.index());
+	   // console.log(dataItem);
+		var itemId = dataItem.id;
+	    var type = dataItem.type;
+		showLoader();
+
+		var data = { id: itemId,type:type };
+		
+		$.ajax({
+			url: '@Url.Action("GetItemDetails", "WebStore")',
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8"
+			, success: function (response) {
+				hideLoader();
+				if (response.success && response.result != null) {
+				    $('#ItemName').val(response.result.name);
+				    $('#Description').val(response.result.desc);
+				    $('#ItemType').val(response.result.type);
+				} else {
+				    alert(response.error);
+				}
+				
+			}
+		});
+	}
+
+    
+</script>
+<style scoped="scoped">
+.ul-edit-form.cn li label {width: 140px}
+.ul-edit-form.cn li div.input-container {width: 330px;}
+.ul-edit-form.cn li div.input-container .txt-inp {width: 330px;}
+.l-combo{width: 330px;}
+</style>
+@using (Ajax.BeginForm("SaveCategoryItemDetails", "WebStore", null, new AjaxOptions { OnBegin = "onAddSingleItemSubmit", OnSuccess = "onItemSaved", LoadingElementId = "site-loader" }, new { @id = "frmAddSingleCourse", @style = "" }))
+{
+		@Html.HiddenFor(m => m.WebStoreItemId)
+		@Html.HiddenFor(m => m.WebStoreCategoryId)
+		@Html.HiddenFor(m=>m.OrderIndex,-1)
+        @Html.HiddenFor(m=>m.ItemType)
+		<fieldset>
+		<legend></legend>
+			<ul class="ul-edit-form cn">
+				<li>
+					@Html.Label("Select LFE Category")
+					<div class="input-container">
+						@(Html.Kendo().DropDownList()
+							  .Name("categories")
+							  .HtmlAttributes(new { @class="l-combo"})
+							  .OptionLabel("Select category...")
+							  .DataTextField("name")
+							  .DataValueField("id")
+							  .Events(e=>e.Select("onLfeCategorySelected"))
+							  .DataSource(source => source.Read(read => read.Action("GetCategoriesLOV", "WebStore")))
+							  )
+					</div>
+					<div class="validator-container">&nbsp;</div>
+				</li>
+				<li>
+					@Html.Label("Select Item")
+					<div class="input-container">
+						@(Html.Kendo().DropDownListFor(m=>m.ItemId)
+							.HtmlAttributes(new { @class="l-combo" })
+							.OptionLabel("Select item...")
+							.DataTextField("name")
+							.DataValueField("id")
+							.Events(e=>e.Select("onItemSelected"))
+                            .Template("<span class=\"k-state-default #=status==1 ? 'draft' : ''#\">#:data.name#</span>")                      
+                            .DataSource(source => source.Read(read => read.Action("GetCategoryAvailableItemsLOV", "WebStore").Data("filterCourses")).ServerFiltering(true))
+							.Enable(false)
+							.AutoBind(false)
+							.CascadeFrom("categories")
+						)						
+					</div>
+					<div class="validator-container" style="height: 34px">
+						@Html.ValidationMessageFor(model => model.ItemId)
+					</div>
+				</li>
+				<li>
+					@Html.LabelFor(m=>m.ItemName)
+					<div class="input-container">
+						@Html.TextBoxFor(m=>m.ItemName,new{@class="txt-inp",@readonly="readonly"})
+						<span class="input-info">Maximum 250 symbols</span>
+					</div>
+					<div class="validator-container">
+						@Html.ValidationMessageFor(model => model.ItemName)
+					</div>
+				</li>
+				<li>
+					@Html.LabelFor(m=>m.Description)
+					<div class="input-container">
+						@Html.TextAreaFor(m=>m.Description,new{@class="txt-inp",@cols=20,@rows =10})					
+					</div>
+					<div class="validator-container"></div>
+				</li>
+			</ul>		
+		</fieldset>
+	
+	
+}

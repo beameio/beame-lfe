@@ -1,0 +1,113 @@
+﻿
+@model LFE.DataTokens.QuizQuestionDTO
+<script>
+    var uploadConsole;
+    $(document).ready(function() {
+        window.uploadConsole = $('#async-upload-console');
+        $("#a-fake-thumb-upload").click(function() {
+            $('#file').data("kendoUpload").wrapper.find("input[type='file']").click();
+        });
+    });
+
+    function onThumbUploadAction(e) {
+        // Array with information about the uploaded files
+        var files = e.files;
+
+        if (files.length > 1) {
+            alert(userMessages.UPLOAD.ONLY_ONE_FILE);
+            e.preventDefault();
+            return;
+        }
+
+        // Check the extension of each file and abort the upload if it is not .jpg
+        $.each(files, function() {
+            if ($.inArray(this.extension.toLowerCase(), IMAGE_EXTENSIONS) < 0) {
+                alert(userMessages.UPLOAD.ONLY_IMAGE);
+                e.preventDefault();
+                return;
+            } else {
+                $('#d-crs-thumb').empty();
+                showContainerLoader('#wndEditQuest', null);
+                //	adjustCmdPosition(110);
+            }
+        });
+    }
+
+    function onThumbUploadSuccess(e) {
+        var operation = e.operation;
+        var response = e.response;
+
+        hideLoader();
+
+        if (!response) return;
+
+        if (!response.success) {
+            alert(response.error);
+
+            return;
+        }
+        clearUploadConsole();
+        //	adjustCmdPosition();
+
+        var preview = $('#d-crs-thumb');
+        preview.empty();
+
+        switch (operation) {
+        case "remove":
+            break;
+        case "upload":
+            try {
+
+                preview.append($('<img />').attr({ src: response.result.url, 'alt': response.result.name, 'class': 'img-preview' }));
+
+                $('#a-fake-thumb-upload').html('Change image');
+
+                $('#ImageUrl').val(response.result.name);
+
+                window.getNotifManagerInstance().notify(notifEvents.file.fileUploaded, null);
+            } catch (e) {
+                if (window.console) console.log(e);
+            }
+            break;
+        }
+
+    }
+</script>
+
+
+
+<div class="thumb-container">
+    
+    <div class="thumb-box" id="d-crs-thumb">
+        @{
+            if (String.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <span class="prompt">
+                    Image Size
+                    <br />
+                    300 x 200px
+                </span>
+            }
+            else
+            {
+                <img src="@Model.ImageUrl" alt=""/>
+            }
+        }
+    </div>
+
+    <div id="async-upload-console" class="upl-consol"></div>
+
+    <div style="margin-top: 15px;">
+        @Html.HiddenFor(m => m.ImageUrl)
+        <a class="browse-video" href="#" id="a-fake-thumb-upload">Upload Image</a>
+    </div>
+
+
+    <span style="display: none">
+        @(Html.Kendo().Upload()
+            .Name("file")
+            .Events(e => e.Upload("onThumbUploadAction").Success("onThumbUploadSuccess").Progress("onUploadProgress"))
+            .Async(a => a.Save("SaveQuizQuestImage", "Upload", new { area = "AuthorAdmin", sid = Model.QuizSid }).AutoUpload(true))
+        )
+    </span>
+</div>

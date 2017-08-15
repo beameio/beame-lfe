@@ -1,0 +1,58 @@
+﻿<script>
+	
+	
+
+	var newNotif = 0;
+	
+	$(document).ready(function () {
+		var offset = $('#li-not').offset();
+		$('#notif-container').css({ left: (offset.left - 104) + 'px' });
+
+		window.getHeadNotifManagerInstance().unsubscribe(window.headNotifEvents.notif.notifyNewMsg, notifyNew, null);
+		window.getHeadNotifManagerInstance().subscribe(window.headNotifEvents.notif.notifyNewMsg, notifyNew, null);
+		
+		$(document).on('click', function (event) {
+		   // console.log($(event.target).parents().index($('.d-user-not-container')));
+			
+			if ($(event.target).parents().index($('.d-user-not-container')) == -1
+				&& $(event.target).attr('id') != 'btn-notif-menu'
+				&& $(event.target).attr('id') != 'a-view-all-not'
+				) {
+				if ($('#notif-container').is(':visible')) {
+						$('#notif-container').slideUp("slow");
+				}
+			}
+		});
+	});
+
+	function notifyNew(total) {
+		newNotif = total;
+		if (total == 0) {
+			$('.new-un').hide();
+		} else {
+			$('.new-un').html(total).show();
+		}
+	}
+
+	function showNotif() {
+		if ($('#notif-container').is(':hidden')) {
+			$('#notif-container').slideDown("slow");
+			if (newNotif > 0) {
+				notifyNew(0);
+				$.ajax({
+					url: '@Url.Action("UpdateUserNotificationStatus", "User", new { area = "UserPortal" })',
+					cache: false,
+					contentType: "application/json; charset=utf-8"
+				});
+			}
+		} else {
+			$('#notif-container').slideUp("slow");
+		}
+	}
+</script>
+<div id="li-not" style="position: relative">
+	<span class="btn" onclick="showNotif()" id="btn-notif-menu">Notifications</span>
+	<span class="new-un" style="display: none"></span>    
+</div>
+
+

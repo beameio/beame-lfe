@@ -1,0 +1,96 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+@{
+    
+    var viewModel     = ViewBag.MainLayoutViewModel == null ? null : (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+    var target        = string.IsNullOrEmpty(wixSectionUrl) ? "_self" : "_top";
+    var trackingId    = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "";
+    var isLfeStore    = !String.IsNullOrEmpty(trackingId) && trackingId == Constants.LFE_MAIN_STORE_TRACKING_ID;
+    var compId        = this.GetWixCompId(); 
+    
+    int? width = null;
+    int? height = null;
+
+    if (viewModel != null)
+    {
+        width = viewModel.Width;
+        height = viewModel.Height;
+    }
+
+    var selectedCategory = "View all";
+
+    if (viewModel != null)
+    {
+        if (viewModel.Category != null)
+        {
+            selectedCategory = viewModel.Category.CategoryName;
+        }
+        else
+        {
+            switch (viewModel.CategoryName)
+            {
+                case "_All":
+                    selectedCategory = "View all";
+                    break;
+                case Constants.USER_COURSES_CATEGORY_NAME:
+                    selectedCategory = "My purchases";
+                    break;
+            }
+        }
+    }
+    else
+    {
+        if (User.Identity.IsAuthenticated)
+        {
+            selectedCategory = "View my purchases";
+        }
+    }
+    
+    if (!String.IsNullOrEmpty(trackingId) || User.Identity.IsAuthenticated || (viewModel != null && viewModel.CategoriesList != null))
+    {
+        <div class="dropdown" id="view-option-ddl">
+            <a href="#" class="dropdown-toggle nav-ico nav-opt-ico" data-toggle="dropdown">@selectedCategory<b class="caret nav-ddl ddl-caret"></b></a>
+            <ul class="dropdown-menu">                            
+                @{
+                    if (!String.IsNullOrEmpty(trackingId))
+                    {
+                        <li>
+                            <a target="@target" href="@(wixSectionUrl + Url.Action("Index", "Widget", new { area = "Widget", trackingID = trackingId, categoryName = "_All", width, height, compId }))">View all</a>
+                        </li>
+                    }
+
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <a href="@Url.Action("MyCourses", "Widget", new { area = "Widget", trackingId, compId })">View my purchases</a>
+                        </li>
+                    }
+
+                    if (viewModel != null && viewModel.CategoriesList != null && viewModel.CategoriesList.Count > 0 && !isLfeStore)
+                    {
+                        <li class="category-sub-menu">
+                            <a data-target="#nav-cat-list" class="nav-inner-toggle" href="#">
+                                @(viewModel.Category != null ? viewModel.Category.CategoryName : "By category") <b class="caret nav-ddl ddl-caret"></b>
+                            </a>
+                            <ul id="nav-cat-list" class="nav-cat-list" style="display: none">
+                                @{
+
+                                    foreach (var category in viewModel.CategoriesList)
+                                    {
+                                        <li>
+                                            <a target="@target" href="@(wixSectionUrl + Url.Action("Index", "Widget", new { area = "Widget", trackingID = trackingId, categoryName = category.CategoryUrlName, width, height, compId }))">
+                                                <span>@category.CategoryName</span>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+}

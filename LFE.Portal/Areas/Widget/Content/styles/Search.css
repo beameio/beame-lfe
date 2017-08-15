@@ -1,0 +1,71 @@
+﻿.k-tb-reset,.k-tb-reset .k-dropdown-wrap,.k-tb-reset span.k-dropdown-wrap.k-state-default {background:#fff !important;-ms-border-radius:0 !important;border-radius: 0 !important;border-color: #000 !important}
+
+.ddl-price{ font-weight: bold;font-size: 11px;color:#000000}
+
+.promo-item{position:relative;background-repeat:no-repeat;background-position:center center;width:192px;height:119px;margin:0 10px 20px 0;float:left;overflow:hidden;float:none;margin:0;border:solid 1px;  background-size:192px 119px;}
+
+.promo-item-wrapper{width:16%;margin:2% 2% 0 2%;float:left}
+
+.promo-item-wrapper a{text-decoration:none}
+
+.promo-item-wrapper .headline{display:inline-block;position:relative;width:192px;height:46px;margin-left:2px}
+
+.promo-item-wrapper .headline .price{display:inline-block;float:left;font-size: 13px;height: 100%}
+.promo-item-wrapper .headline .box{ padding-right:0;}
+.promo-item-wrapper .headline .s-box{ padding-left:0; }
+.promo-item-wrapper .headline .sep{ width: 0;border-left: 1px solid #a4a4a4;padding: 0 7px 0 0;margin-left: 7px;height: 100%}
+.promo-item-wrapper .headline span{display: block}
+.promo-item-wrapper .headline .val{ font-weight: bold;padding: 0 0 4px 0}
+.promo-item-wrapper .headline .desc{ color: #666;font-size: 11px}
+
+.promo-item-wrapper .headline .po-title{ display: block;height: 13px;margin-bottom: 4px}
+
+.promo-item-wrapper .headline .suscribers{display:inline-block;float:right;font-size:13px;margin-right:4px}
+
+.promo-item-wrapper .thumb-container a .promo-item{position: relative}
+
+.promo-item-wrapper .thumb-container a .promo-item .info-row{position:absolute;height:20px;text-align:left;font-size:12px;color:#fff;width:99%;padding-left:1%;left:0;-ms-opacity:.7;opacity:.75}
+
+.promo-item-wrapper .thumb-container a .promo-item .owner{top: 0;background: #b5401f;}
+.promo-item-wrapper .thumb-container a .promo-item .bndl{ bottom: 0;background:url('../../Content/images/ico-bundle.png') no-repeat 4px center  #05194e;padding:4px 0 0 25px}
+
+#promo .promo-item-wrapper.last{margin-right:0}
+
+.promo{margin-top:44px;width:100%;overflow:hidden}
+
+
+@media only screen and (max-width : 1100px), only screen and (max-device-width : 1100px) {
+    .promo-item-wrapper {
+        width: 21%;
+    }
+}
+
+@media only screen and (max-width : 900px), only screen and (max-device-width : 950px) {
+    .promo-item-wrapper {
+        width: 29%;
+    }
+}
+
+@media only screen and (max-width : 700px), only screen and (max-device-width : 700px) {
+    .promo-item-wrapper {
+        width: 45%;
+    }
+}
+
+@media only screen and (max-width : 480px), only screen and (max-device-width : 480px) {
+    .promo-item-wrapper {
+        width: 96%;
+    }
+
+    .galleryItem img {
+        width: 96%;
+    }
+
+    .galleryItem h3 {
+        font-size: 18px;
+    }
+
+    .galleryItem p {
+        font-size: 18px;
+    }
+}

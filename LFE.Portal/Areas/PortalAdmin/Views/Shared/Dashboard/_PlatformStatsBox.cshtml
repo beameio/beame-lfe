@@ -1,0 +1,23 @@
+﻿
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.PlatformStatsBoxToken
+           
+<div class="stats-box ">
+    <div class="inner">
+        <div class="upper">
+            <div class="float-left lbl">@(Utils.GetEnumDescription(Model.Type))</div>
+            <div class="float-right">
+                <span class="float-left lbl">NEW</span>
+                <span class="float-left num new">@Model.New</span>
+                <i title="@Model.Tendency.Tooltip" class="float-left arrow @Html.TendencyDirection2CssClass(Model.Tendency.Direction,"arrow-")"></i>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="num total">@Model.Total.ToString("n0")</div>
+            <div class="chart">
+                @Html.Partial("Dashboard/_MiniChart",Model.Points)
+            </div>
+        </div>
+    </div>    
+</div>

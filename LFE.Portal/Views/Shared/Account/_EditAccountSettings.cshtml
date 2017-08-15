@@ -1,0 +1,203 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Models
+@model LFE.DataTokens.AccountSettingsDTO
+@{
+	var isLearner = User.IsInRole("Learner");
+	var isAuthor = User.IsInRole("Author");
+}
+
+<script>
+	var formUserNotifManager;
+	var PICTURE_PREVIEW_CONTAINER_SELECTOR = '#d-profile-pic';
+
+	var EDIT_FORM_SELECTOR = '#frmAccSettings';
+
+	$(document).ready(function () {
+		formUserNotifManager = new UserNotificationManager('#as-info', '.alert', false);
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+
+	function onSettingsSaved(response) {
+		hideFormLoader();
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? accountMessages.ACCOUNT.SETTINGS_UPDATED : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+	}
+	
+	
+	
+	function validateAccForm() {
+
+		if (hasValue($('#frmAccSettings #FirstName').val()) || hasValue($('#frmAccSettings #LastName').val())) {
+			showFormLoader('#frmAccSettings');
+			return true;
+		}
+
+		if (hasValue($('#frmAccSettings #Nickname').val())) {
+			showFormLoader('#frmAccSettings');
+			return true;
+		}
+		
+		window.formUserNotifManager.show({ message: accountMessages.ACCOUNT.NAME_REQUIRED, kind: NotificationKinds.Error });
+
+		return false;
+	}
+</script>
+
+@Html.Partial("Account/_EditAccountScripts")
+
+@using (Ajax.BeginForm("UpdateAccountSettings", "Account", new{area=""}, new AjaxOptions { OnBegin = "validateAccForm", OnSuccess = "onSettingsSaved", LoadingElementId = "site-loader" }, new { @id = "frmAccSettings", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.UserId)
+	<fieldset class="fs-as">
+		<legend></legend>
+		<ul class="inline ul-edit-form as wide">
+			<li>
+				@Html.LabelFor(m=>m.Email,new{@class="email-lbl"})
+				<div class="input-container">
+					<label class="email-lbl-val">
+						@Model.Email        
+					</label>
+					
+				</div>                
+			</li>
+			<li>
+				@Html.LabelFor(m=>m.FirstName)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.FirstName,new{@class="txt-inp"})
+				</div>
+			</li>
+		
+			<li>
+				@Html.LabelFor(m=>m.LastName)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.LastName,new{@class="txt-inp"})
+				</div>
+			</li>
+			
+			<li>
+				@Html.LabelFor(m=>m.Nickname)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.Nickname,new{@class="txt-inp"})
+				</div>
+			</li>
+			
+			@{
+				if (isAuthor)
+				{
+					<li>
+						@Html.LabelFor(m => m.AffiliateCommission)
+						<div class="input-container">
+							@(Html.Kendo().NumericTextBoxFor(m => m.AffiliateCommission)
+									.Spinners(false)
+									.Min(1)
+									.Max(100)
+									.Format("{0:F}")
+									.HtmlAttributes(new { @class = "k-tb-reset", @style = "width:270px" })
+							)
+						</div>
+					</li>
+				}
+			}
+
+            <li>
+                @Html.LabelFor(m => m.BioHtml)
+                <div class="input-container">
+                    @(Html.Kendo().EditorFor(m => m.BioHtml)
+                                      .HtmlAttributes(new { @style = "width:100%;height:200px;" })
+                                      .Encode(false)
+                                      .Tools(t => t.Clear()
+                                          .Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink()
+                                      )
+                    )
+                </div>
+            </li>		   
+
+			<li>
+				@Html.Label("Profile picture")
+				
+				@{
+					if (Model.FbUid == null)
+					{
+
+						<div class="" style="display: table-cell; padding-top: 10px">
+							@(Html.Kendo().Upload()
+								  .Name("ProfilePicture")
+								  .Multiple(false)
+								  .Messages(m => m.Select("Select profile picture"))
+								  .ShowFileList(true)
+								  .Events(e => e.Upload("onPictureUploadAction").Success("onPictureUploadSuccess").Remove("onPictureRemove"))
+								  .Async(a => a.AutoUpload(true)
+									.Save("SaveProfilePicture", "Upload",new{area="AuthorAdmin"})
+                                    .Remove("RemoveProfilePicture", "Upload", new { area = "AuthorAdmin" })
+								  ))
+							@Html.HiddenFor(m => m.PictureName)
+
+							<div id="d-profile-pic" class="thumb-container">
+								@{
+									if (!String.IsNullOrEmpty(Model.PictureURL))
+									{
+										<img alt="" src="@Model.PictureURL" class="img-preview"/>
+									}
+								}
+							</div>
+
+						</div>
+					}
+					else
+					{
+						<div class="thumb-container">
+							<img src="http://graph.facebook.com/@Model.FbUid/picture?type=normal" class="img-preview" alt=""/>
+						</div>
+					}
+				}
+				
+			</li>
+		</ul>
+		
+		@{
+			if (!Model.IsSocialLogin)
+			{
+				<div class="inline" style="width: 400px">
+					<h5 class="change-pwd-title">Change password:</h5>
+					<ul class="ul-edit-form as pwd">
+						<li>
+							@Html.LabelFor(m => m.Password)
+							<div class="input-container">
+								@Html.EditorFor(m => m.Password, new { @class = "txt-inp" })
+							</div>
+							<div class="validator-container">
+								@Html.ValidationMessageFor(model => model.Password)
+							</div>
+						</li>
+						
+						<li>
+							@Html.LabelFor(m => m.ReenterPassword)
+							<div class="input-container">
+								@Html.EditorFor(m => m.ReenterPassword, new { @class = "txt-inp" })
+							</div>
+							<div class="validator-container">
+								@Html.ValidationMessageFor(model => model.ReenterPassword)
+							</div>
+						</li>
+					</ul>    
+				</div>
+				
+			}
+		}
+			
+	</fieldset>
+}
+
+@Html.Partial("Account/_EditSettingsCommandRow",new AccountSettingsCommandRowToken
+{
+	Role     = Model.Role,
+	FormName = "frmAccSettings"
+})
+

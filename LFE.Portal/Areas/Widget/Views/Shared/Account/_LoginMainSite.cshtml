@@ -1,0 +1,117 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+@{
+    if (Model != null && string.IsNullOrEmpty(Model.Email) && Request.Cookies["lastEmail"] != null && !string.IsNullOrEmpty(Request.Cookies["lastEmail"].Value))
+    {
+        Model.Email = Request.Cookies["lastEmail"].Value;
+    }
+    ViewData["IsWidgetValue"] = "false";    
+}
+<script type="text/javascript">
+    @Html.Raw(ViewBag.StartupScript)
+
+    var loginSucceeded = '@(Model.IsLoggedIn)'.toLowerCase()=='true';
+    var socialLoginUrl = '@Url.Action("WidgetFbLogin", "Account", new { area = "Widget" } )';
+
+    $(document).ready(function() {
+        $('#btnLogin').click(function()
+        {
+            ToggleLogin();
+        });
+        $('.close_login').click(function () {
+            ToggleLogin();
+        });  
+        $('.forgotPassword').click(function () {  
+            $("#loginAjaxWrapper").fadeOut();
+            $("#loginAjaxWrapper").hide();
+            $("#forgetPasswordWrapper").fadeIn();            
+        }); 
+        
+        FitLoginScreen();
+    });
+    
+    function ToggleLogin(button) {
+        var div = $('.dark');
+        var parentDark = $('#dark', window.parent.document);
+        
+        $('.block-message').hide();
+        if ($('#registerWrapper').is(":hidden") && $('#loginWrapper').is(":visible"))
+        {
+            div.fadeOut();
+            parentDark.fadeOut();
+            window.resizeIframe("35");
+        }
+        else if (div.is(":hidden") && $('#loginWrapper').is(":hidden")) {
+            div.fadeIn();
+            parentDark.fadeIn();
+            window.resizeIframe("174");
+            parentDark.css("top", "174px");
+        }
+
+        if ($('#loginWrapper').is(":hidden") && ($('#registerWrapper').is(":visible"))) {
+            toggleButtonClass($('#btnRegister'));
+            $('#registerWrapper').slideToggle();
+        }
+
+        toggleButtonClass($('#btnLogin'));
+        $('#loginWrapper').slideToggle();
+
+       
+    }
+
+    function toggleButtonClass(button) {
+        if (button.attr("class") == 'toolbar-arrow') {
+            button.attr("class", "toolbar-arrow-open");
+        }
+        else {
+            button.attr("class", "toolbar-arrow");
+        }
+    }
+
+    function loginCompleted() {    
+        if (loginSucceeded) { 
+            $('#submitLogin').hide();
+            $(".login-loader").show();
+            top.location.reload();
+        } else {
+            $(".login-loader").hide();
+            $(".loginWrapper").show(); 
+            $("#submitLogin").show();      
+        }
+    }
+
+    function loginBegin() {
+         
+        $(".login-loader").show();
+        $('.loginError').hide();    
+        $('#submitLogin').hide();
+
+        return true;
+    }
+
+    function  FitLoginScreen(){
+        var width = $(window).width(); 
+        if(width <= 870){
+            $('#cssBlockWrapper').removeClass('block-wrapper').addClass('block-wrapper2');
+            $('#loginAjaxWrapper').css({margin: '10px'});
+            $('.sub_tool_bar').css({height: '300px'});
+          
+        }
+        else{
+            $('#cssBlockWrapper').removeClass('block-wrapper2').addClass('block-wrapper');
+            $('#loginAjaxWrapper').css({margin: '20px'});
+          //  $('.sub_tool_bar').css({height: '145px'});
+        }
+    }
+
+    $(window).resize(function(){       
+        FitLoginScreen();
+    })
+.resize();
+
+     
+</script>
+
+
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Account/_LoginForm.cshtml", Model)

@@ -1,0 +1,43 @@
+﻿@using LFE.Core.Utils
+@model LFE.Portal.Areas.WixEndPoint.Models.WixExternalLoginToken
+
+
+<script>
+    var callbackUrl = '@Url.Action("WixFbLogin", "Account", new { area = "WixEndPoint" , trackingId = Model.trackingId } )';
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=" + '@Utils.GetKeyValue("fbAppId")';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    $(document).ready(function () {
+        $('#a-fb-login').click(function (e) {
+            e.preventDefault();
+            if (typeof FB !== 'undefined' && typeof FB.login === 'function') {
+                FB.login(function (response) {
+                    if (response.authResponse && response.status === 'connected') {
+                        onWixFbLogin(response.authResponse);
+                    }
+                }, { scope: '@Constants.FB_SCOPE' });
+                }
+        });
+    });
+
+    function onWixFbLogin(response) {
+        $.post(callbackUrl, { provider: 'facebook', token: response.accessToken}, function (data) {
+            if (data.success) {
+                var url = '@Html.Raw(Model.returnUrl)';
+
+                window.location.href = url;
+            } else {
+                alert(data.error);
+            }
+            });
+    }
+</script>
+
+
+ <a id="a-fb-login" class="btn-fb-login" href="#">&nbsp;</a>

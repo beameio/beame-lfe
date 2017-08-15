@@ -1,0 +1,63 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+@model LFE.DataTokens.WebStoreEmbedToken
+
+<style scoped="scoped">
+    #d-embed-container div.row{height: 40px;margin-bottom: 10px}
+    #d-embed-container input{border: 1px solid #000000;min-height: 32px;}
+    #d-embed-container label{font-size: 14px;color: #333;width: 180px;padding: 14px 0 0}
+    #d-embed-container .inp-sh {width:240px;-ms-border-radius: 0 !important;border-radius: 0 !important}
+    #d-embed-container .inp-wd{width:540px;}    
+    #d-embed-container div.sep{height: 1px;width: 100%;background: #a0a0a0;margin: 30px 0}
+</style>
+
+<script>
+    var TRACKING_ID = '@Model.TrackingID';
+    $(document).ready(function () {
+        updateEmbed(TRACKING_ID, '@Utils.GetKeyValue("baseUrl")');
+        $('#d-embed-container').find('input').bind('keyup', function() {
+            updateEmbed(TRACKING_ID,'@Utils.GetKeyValue("baseUrl")');
+        });
+
+        $("#IsDisplayIframeBorder").change(function () {
+                updateEmbed(TRACKING_ID, '@Utils.GetKeyValue("baseUrl")');           
+        });
+    });
+</script>
+
+
+<div id="d-embed-container">
+    <div class="row">
+        <label class="inline">IFrame size</label>
+        @(Html.Kendo().NumericTextBoxFor(m=>m.Width)
+                      .Placeholder("Width")  
+                      .HtmlAttributes(new{@class="inp-sh"})
+                      .Spinners(false)
+                      .Format("{0:d}")
+        )                
+        <label class="inline" style="width:50px;text-align: center">by</label>
+          @(Html.Kendo().NumericTextBoxFor(m=>m.Height)
+                      .Placeholder("Height")  
+                      .HtmlAttributes(new{@class="inp-sh"})
+                      .Spinners(false)
+                      .Format("{0:d}")
+        )    
+        <span class="inline">@Html.Required()</span>
+    </div>
+    <div class="row">
+        @Html.LabelFor(m=>m.Url,new{@class="inline"})
+        @Html.TextBoxFor(m=>m.Url,new{@class="inp-wd",@placeholder="http://",@type="url",@pattern="https?://.+"})
+        <span class="inline">@Html.Required()</span>
+    </div>
+    <div class="row">
+        @Html.LabelFor(m=>m.IsDisplayIframeBorder,new{@class="inline"})
+        @Html.CheckBoxFor(m=>m.IsDisplayIframeBorder, new {@class="inp-chk"})
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+        <label class="inline">Store embed code:</label>
+        @Html.TextAreaFor(m=>m.EmbedCode,new{@class="inp-wd",@cols=50,@rows=8,@style="border: solid 1px #000"})
+    </div>
+</div>
+

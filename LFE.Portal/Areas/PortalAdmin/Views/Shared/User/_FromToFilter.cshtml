@@ -1,0 +1,25 @@
+﻿@using Kendo.Mvc.UI
+@model string
+           
+@{
+    var prefix = Model;
+}
+
+<div  class="picker-row inline" >
+    <label class="inline" >From date</label>
+    @(Html.Kendo().DatePicker()
+            .Name(prefix + "_start")
+            .Min("01/01/2012")
+            .Max(DateTime.Now.Date)
+            .HtmlAttributes(new{@class="inline dp" ,@style = "font-size:13px"})
+                    .Events(e => e.Change("rebindUserReport"))
+    )
+
+    <label class="inline"  style="margin-left:3em">To date</label>
+        @(Html.Kendo().DatePicker()
+            .Name(prefix + "_end")
+            .HtmlAttributes(new { @class = "inline dp", @style = "font-size:13px" })
+                    .Events(e => e.Change("rebindUserReport"))
+        )
+   
+</div>

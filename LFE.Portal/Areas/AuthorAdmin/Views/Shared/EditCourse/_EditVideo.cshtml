@@ -1,0 +1,118 @@
+﻿@model LFE.DataTokens.ChapterVideoEditDTO
+
+
+<script type="text/javascript">
+	var BC_TH_PLAEYR_W = 290;
+	var BC_TH_PLAEYR_H = 198;
+	var EDIT_FORM_SELECTOR = '#frmChapterVideo';
+	var VIDEO_FIELD_NAME = '#VideoIdentifier';
+	var deleteUrl = '@Url.Action("DeleteChapterVideo","Course")';
+	
+	$(document).ready(function () {
+
+		var id = Number('@Model.VideoId');
+		var name = Encoder.htmlDecode('@Model.Title');	    
+
+		var token = {
+			kind: ChapterFormKinds.video
+			,title: id < 0 ? 'Add new video' : 'Edit ' + name
+			,id: id
+			, form: EDIT_FORM_SELECTOR
+			,deleteUrl : deleteUrl + '/' + id
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.chapter.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.course.videoSelected, onVideoSelected, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.course.videoSelected, onVideoSelected, null);
+	});
+	
+	function onVideoSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Video saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			$(EDIT_FORM_SELECTOR).find('#VideoId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.chapter.videoSaved, response.result);
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+</script>
+
+
+@using (Ajax.BeginForm("SaveChapterVideo", "Course", null, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#main', null)", OnSuccess = "onVideoSaved", LoadingElementId = "site-loader" }, new { @id = "frmChapterVideo", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.VideoId)
+	@Html.HiddenFor(x=>x.ChapterId)
+	@Html.HiddenFor(x=>x.OrderIndex)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cn">
+			<li>
+				@Html.LabelFor(m=>m.Title)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.Title,new{@class="txt-inp",@onchange="onTxtBoxChanged(this)",@size=50,@maxlength=50})
+					<span class="input-info">Maximum 50 symbols</span>
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.Title,null,new{@class=String.IsNullOrEmpty(Model.Title) ? "" :"pass"})
+				</div>
+			</li>
+			<li >
+				@Html.LabelFor(m=>m.SummaryHTML)
+				<div class="input-container">
+					@(Html.Kendo().EditorFor(m=>m.SummaryHTML)
+						  .HtmlAttributes(new { @style = "width:338px;height:200px;" }) 
+						  .Encode(false)
+						  .Tools(t=>t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+					)
+				</div>
+			</li>
+			
+			<li style="position: relative">
+				@Html.LabelFor(m=>m.VideoIdentifier)
+				@Html.HiddenFor(m=>m.VideoIdentifier)                
+				<div class="input-container" style="width:340px;height:200px;text-align: right">
+					<div class="thumb-box video-th " id="d-video-thumb" style="position: relative;top: 0;left: 40px">
+						@{
+							if (Model.VideoToken != null)
+							{
+								<script>
+									var token = {
+									    stillUrl: fixSR('@Model.VideoToken.stillUrl')
+										 , title: '@Model.VideoToken.title'
+										 , minutes: '@Model.VideoToken.minutes'
+										 , identifier: '@Model.VideoToken.identifier'
+                                        , videoUrl: fixSR('@Model.VideoToken.videoUrl')
+									};
+									buildThumbMediaPlayer(token, '#d-video-thumb');
+								</script>
+							}
+						}
+					</div>
+					<a class="browse-video " style="width:auto;position: relative;top: 8px" href="javaScript:openVideoWnd()">Browse video manager</a>
+				</div>  
+				
+				<div class="validator-container" id="valid-video">
+					@Html.ValidationMessageFor(model => model.VideoIdentifier,null,new{@class="inline forthumb" + (Model.VideoIdentifier==null ? " " :" pass")})
+				</div>
+			</li>
+
+			<li style="display: none">
+				<div class="input-container" style="width:35px;padding: 15px 0 0">
+					@Html.EditorFor(m=>m.IsOpen)
+				</div>
+				@Html.LabelFor(m=>m.IsOpen,new{@Style="width:auto"})
+			</li>
+		</ul>		
+	</fieldset>
+}

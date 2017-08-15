@@ -1,0 +1,72 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model SalesDetailsWindowToken
+
+@{
+    Model.QueryParams = new { area = "AuthorAdmin", 
+                            saleBoxType = Model.Type,
+                            CurrencyId  = Model.Filter.CurrencyId, 
+                            StoreId     = Model.Filter.StoreId,
+                            from        = Model.Filter.DateRange.from,
+                            to          = Model.Filter.DateRange.to,
+                            userId      = Model.Filter.UserId
+    };
+}
+
+<style scoped="scoped">
+    .wnd-head .close{background:none repeat scroll 0 0 #17496e;color:#fff;font-size:40pt;font-weight:normal;height:52px;margin:0;opacity:1;padding:0;position:absolute;right:0;top:0;width:70px}
+</style>
+
+<div class="wnd-head">
+    <span style="text-transform: capitalize"></span>
+    
+    <button class="close" type="button" onclick="closeSalesDetailWindow()">×</button>
+</div>
+<div class="" style="padding: 10px;">
+@{
+    
+    switch (Model.Type)
+    {
+        case DashboardEnums.eSaleBoxType.ONE_TIME:
+        case DashboardEnums.eSaleBoxType.RENTAL:
+        case DashboardEnums.eSaleBoxType.SUBSCRIPTION:
+            @Html.Partial("Dashboard/SalesWindowContent/_AuthorSales", Model)
+            break;
+        case DashboardEnums.eSaleBoxType.SALES_BY_AFFILIATES:
+            @Html.Partial("Dashboard/SalesWindowContent/_AffiliateSales", Model)
+            break;
+        case DashboardEnums.eSaleBoxType.AFFILIATE_SALES:
+            @Html.Partial("Dashboard/SalesWindowContent/_AffiliateSales", Model)
+            break;
+        case DashboardEnums.eSaleBoxType.SUBSCRIPTION_CANCELLATION:
+            @Html.Partial("Dashboard/SalesWindowContent/_Subscriptions", new SubscriptionReportViewToken
+            {
+                QueryParams = Model.QueryParams
+                ,Action     = "GetSubscriptionCancellation"
+                ,ShowActive = false
+            })
+            break;
+        case DashboardEnums.eSaleBoxType.REFUNDS:
+            @Html.Partial("Dashboard/SalesWindowContent/_Refunds", Model)
+            break;
+        case DashboardEnums.eSaleBoxType.COUPONS_USED:
+            @Html.Partial("Dashboard/SalesWindowContent/_CouponsUsed", Model)
+            break;
+        case DashboardEnums.eSaleBoxType.ACTIVE_SUBSCRIBERS:
+            @Html.Partial("Dashboard/SalesWindowContent/_Subscriptions", new SubscriptionReportViewToken
+            {
+                QueryParams = Model.QueryParams
+                ,Action     = "GetActiveSubscriptions"
+                ,ShowActive = true
+            })
+            break;
+    }
+
+
+}
+</div>
+
+<script>
+    setSalesDetailWindowTitle('@Model.Title');
+</script>

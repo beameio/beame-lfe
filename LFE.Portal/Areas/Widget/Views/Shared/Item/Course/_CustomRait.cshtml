@@ -1,0 +1,15 @@
+﻿@model int
+           
+@{
+    if (Model > 0)
+    {
+        <div class="rait-container">
+            @{
+                for (var i = 1; i <= 5; i++)
+                {
+                    <i class="@(i <= Model ? "act": "dis")"></i>
+                }
+            }
+        </div>
+    }
+}

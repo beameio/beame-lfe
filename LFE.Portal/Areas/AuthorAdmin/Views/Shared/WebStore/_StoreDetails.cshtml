@@ -1,0 +1,145 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.DataTokens.WebStoreEditDTO
+
+
+
+<script type="text/javascript">
+	var FORM_HEIGHT = 340;
+	var EDIT_FORM_SELECTOR = '#frmStoreDetails';
+   
+	var uploadConsole, formValidator, formUserNotifManager;
+
+	$(document).ready(function () {
+
+		$(window).resize(function () {
+			adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+		$(document).scroll(function () {
+			adjustCmdPosition(EDIT_FORM_SELECTOR);
+		});
+
+		formUserNotifManager = new UserNotificationManager('#sd-info', '.alert', false);
+
+   
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+   
+	});
+
+</script>
+
+@using (Ajax.BeginForm("SaveStoreDetails", "WebStore", new { id = Model.StoreId }, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#main', null)", OnSuccess = "onStoreSaved", LoadingElementId = "site-loader" }, new { @id = "frmStoreDetails", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.OwnerUserId)
+	@Html.HiddenFor(x=>x.StoreId)
+	@Html.HiddenFor(x=>x.Uid)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cd">
+			<li>
+				@Html.LabelFor(m=>m.StoreName)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.StoreName,new{@class="txt-inp",@onchange="onTxtBoxChanged(this)"})
+				</div>
+				<div class="validator-container">                    
+					@Html.ValidationMessageFor(model => model.StoreName,null,new{@class=String.IsNullOrEmpty(Model.StoreName) ? "" :"pass"})
+				</div>
+			</li>
+		    <li>
+		        @Html.LabelFor(m=>m.TrackingID)
+		        <div class="input-container">
+		            @{
+		                if (Model.WixUid==null)
+		                {
+		                    @Html.TextBoxFor(m=>m.TrackingID,new{@class="txt-inp",@onchange="onTxtBoxChanged(this)"})        
+		                }
+		                else
+		                {
+		                    <label for="TrackingID">@Model.TrackingID</label> 
+		                    @Html.HiddenFor(m=>m.TrackingID)
+		                }
+		            }
+			        
+		            <span class="input-info" style="width: 480px;color:red;font-size: 12px">
+                        Enter a store tracking ID that will help you track it's performance better. You can use up to 50 alphanumeric characters, underscore or dashes.
+		            </span>
+		        </div>
+		        <div class="validator-container">                    
+		            @Html.ValidationMessageFor(model => model.TrackingID,null,new{@class=String.IsNullOrEmpty(Model.StoreName) ? "" :"pass"})
+		        </div>
+		    </li>
+            <li>
+                @Html.LabelFor(m => m.CurrencyId)
+                <div class="input-container" style="width: 250px;padding-left: 320px">
+                    @(Html.Kendo().DropDownListFor(m => m.CurrencyId)
+                      .BindTo(this.ActiveCurrencies())
+                      .TemplateId("kendo-currency-template")
+                      .ValueTemplateId("kendo-currency-template")
+                      .DataValueField("CurrencyId")
+                      .DataTextField("CurrencyName")
+                      .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:80px;font-size:13px;" })
+                    )
+                </div>
+            </li>
+
+		    <li style="border-bottom: 1px solid #a0a0a0;padding-bottom: 30px;">
+		        <div>
+		            @Html.LabelFor(m=>m.Status)
+		            <div class="input-container" style="width: 250px;padding-left: 320px">
+		                @Html.EditorFor(m=>m.Status)
+		            </div>
+		        </div>		        
+		            @{
+                        if (Model.StoreId >= 0 && !String.IsNullOrEmpty(Model.TrackingID))
+                        {
+                            <div style="padding: 7px 0">
+                		        <a href="@Url.Action("Index", "Widget", new { area = "Widget", trackingID = Model.TrackingID})" target="_blank" style="text-decoration: underline;color: blue;font-size: 14px">preview store page</a>
+                            </div>
+                        }
+                    }
+		    </li>		    
+			<li>
+				@Html.LabelFor(m=>m.Description)
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.Description,new{@rows=4,@columns=3,@class="txt-inp",@style="height:80px"})
+				</div>				
+			</li>
+			
+			<li>
+				@Html.LabelFor(m=>m.MetaTags)
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.MetaTags,new{@rows=2,@columns=3,@class="txt-inp"})
+					<span style="display: block;margin: 4px 0 0;font-size: 11px; color:#666">separate by comma</span>                   
+				</div>               
+			</li>						
+		</ul>
+		<div style="height: 1px;visibility: hidden;position: relative;bottom: 0" id="d-fd-bottom">&nbsp;</div>
+		<div class="form-cmd-row wrap" id="d-cr">
+			<div class="inner">
+				<div class="info-box" id="sd-info">
+					<p class="alert"></p>
+				</div>
+				<div class="btn-container">
+					@{
+                        if (Model.StoreId >= 0 && !String.IsNullOrEmpty(Model.TrackingID))
+                        {
+                            <a href="@Url.Action("Index", "Widget", new { area = "Widget", trackingID = Model.TrackingID})" target="_blank" class="btn-prev-prod">preview store page</a>
+                        }
+                    }
+					<a href="javaScript:submitForm('frmStoreDetails')" class="btn-submit">save changes</a>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+}
+
+
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		adjustCmdPosition(EDIT_FORM_SELECTOR);		
+	});		
+</script>

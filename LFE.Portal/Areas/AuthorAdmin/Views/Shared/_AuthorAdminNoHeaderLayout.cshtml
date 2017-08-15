@@ -1,0 +1,63 @@
+﻿@using LFE.Portal.Helpers
+<!DOCTYPE html>
+<html style="">
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    <title>Author Dashboard</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link href="~/Content/styles/bootstrap.min.css" rel="stylesheet"/>
+
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    <link href="~/Content/kendo/@Url.ToKendoVersionUrl()/kendo.bootstrap.min.css" rel="stylesheet"/>
+
+    <link href="~/Content/styles/animate.min.css" rel="stylesheet"/>
+
+    <link href="~/Content/styles/site.css" rel="stylesheet"/>
+
+    <link href="~/Areas/Widget/Content/styles/b-main.css" rel="stylesheet"/>
+
+    <link href="~/Areas/AuthorAdmin/Content/styles/site.css" rel="stylesheet"/>
+
+    <link href="~/Areas/AuthorAdmin/Content/styles/common.css" rel="stylesheet"/>
+
+
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml") <!-- SUPPORT LINK -->
+
+    <link href="~/Content/styles/sweet-alert.css" rel="stylesheet"/>
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script src="~/Scripts/plugins/htmlEncode.js"></script>
+
+    @Scripts.Render("~/bundles/kendoall")
+    <script src="~/Scripts/lfe/lfe.global.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.global.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/notif.manager.js"></script>
+
+    <script>
+        kendo.culture("en-US");
+    </script>
+
+    @*@Scripts.Render("~/bundles/lfe/common")*@
+
+    @RenderSection("css", false)
+    @RenderSection("scripts", false)
+    <script>
+        var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+    </script>
+
+</head>
+<body>
+    <div class="container rel" id="main-container">
+        <div class="d-body row">@RenderBody()</div>
+    </div>
+    @Html.Partial("Dashboard/_dbFooterScripts")
+</body>
+
+</html>

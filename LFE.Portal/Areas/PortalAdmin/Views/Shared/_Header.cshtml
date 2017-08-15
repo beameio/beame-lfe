@@ -1,0 +1,28 @@
+﻿@using LFE.Portal.Helpers
+
+
+<header>
+    @{
+        
+        var user = this.CurrentUser();        
+    }
+    <div class="top">
+        @{
+            if (user != null)
+            {
+                <ul>
+                    <li> Hi, @user.FullName </li>
+                    <li> Last login: @(user.LastLogin == null ? string.Empty : ((DateTime)user.LastLogin).ToShortDateString() ) </li>
+                    <li>@Html.ActionLink("Log Out", "SignOff", "Account", new{area="",returnUrl=@Url.Action("Index","Home",new{area="AuthorAdmin"})}, new { style = "" })</li>
+                </ul>       
+            }
+        }        
+    </div>
+    <div class="logo-row">
+        <h1 style="width: 140px;" class=""><a class="logo" title="LFE - Learning from Experience" href="/"> </a></h1>
+        <div class="nav-container">
+             @Html.Partial("_Navigation")
+        </div>
+    </div>
+
+</header>

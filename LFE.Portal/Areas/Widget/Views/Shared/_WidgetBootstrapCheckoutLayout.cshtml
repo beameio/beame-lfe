@@ -1,0 +1,133 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@{
+    var viewModel = (CheckoutLayoutToken)ViewBag.CheckoutLayoutViewToken;
+    string backUrl = null;
+    string signoutLink = null;
+    if (viewModel != null)
+    {
+        backUrl = String.IsNullOrEmpty(viewModel.Refferal) ? "#" : VirtualPathUtility.ToAbsolute(viewModel.Refferal);
+        signoutLink = Url.Action("SignOff", "Account", new { area = "", returnUrl = viewModel.Refferal });
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml")
+    <meta charset="utf-8"/>
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+
+    @Styles.Render("~/bundles/widget")
+
+    @Html.Partial("Layout/_LayoutHeadCustomCssSettings")
+    @Styles.Render("~/Areas/Widget/Content/styles/catalog")
+
+    @RenderSection("CSS", false)
+
+    @Html.Partial("~/Views/Shared/Layout/_HeaderScripts.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-35089799-1']);
+        _gaq.push(['_setDomainName', 'lfe.com']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+</head>
+<body>
+
+    @Html.Partial("~/Views/Shared/Layout/_SiteHeader.cshtml")
+
+    @Html.Partial("Layout/_ProductNavigation")
+    
+    <div class="container rel" id="item-info-container" style="margin-bottom: 50px">
+        <div class="pp-head">
+          @{
+              if (viewModel != null && viewModel.ItemInfo != null)
+              {
+                @Html.Partial("Layout/_ItemProductPageHeader", viewModel.ItemInfo)
+              }
+        }
+        </div>
+    </div>
+
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">
+        <div class="sc-header rel">
+            <a class="close" href="@backUrl" id="ch-back">×</a>               
+            <h4 class="">Checkout</h4>
+        </div>
+        <div class="sc-main">
+            @RenderBody()    
+        </div>        
+    </div>
+
+
+
+    <script>
+        var effect;
+        var reverse = false;
+        var flipSupported;
+
+        var initMode = 'Login';
+
+        var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+    </script>
+
+    @Scripts.Render("~/bundles/checkout")
+
+    @RenderSection("JS", required: false)
+
+    <script>
+
+        //_NavViewOptions
+        $(document).ready(function () {
+            $('.nav-inner-toggle').unbind('click').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).siblings($(this).attr('data-target')).toggle(300);
+            });
+        });
+    </script>
+
+
+    @{
+        if (!User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("Layout/_LayoutLoginScripts")
+        }
+  
+        if (!String.IsNullOrEmpty(signoutLink))
+        {
+            <script>
+                $(document).ready(function () {
+                    $('#a-logout').attr('href', '@signoutLink');
+                });
+            </script>
+        }
+    }
+
+    @Html.Partial("~/Views/Shared/Common/_FooterScripts.cshtml")
+
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+</body>
+
+
+
+</html>

@@ -1,0 +1,36 @@
+﻿#main-container{margin-top: 150px;color: #fff}
+h1.welcome{text-transform: uppercase;font-size: 18px;font-weight: 700;letter-spacing: 0.1em}
+h2.what{ font-size: 2.6em;}
+
+.dash-nav-container { margin: 100px auto 150px;display: inline-block;}
+.dash-nav-container:after { content: " ";display: block;clear: both;height: 0;visibility: hidden; }
+
+.dash-nav-container > .col {
+    border-right: solid 1px #FFF;  
+    text-align: center;
+    float: left;
+    padding: 15px 75px 0px;
+}
+.dash-nav-container > .col:last-of-type { border: none; }
+@media (max-width: 850px) {
+    h1.welcome{ margin-top: 60px; }
+}
+@media (max-width: 680px) {
+    .dash-nav-container { margin: 20px auto;}
+    .dash-nav-container > .col { border: none; padding-bottom: 20px;float: none;}
+}
+
+
+.dash-nav-container a{width: 122px;text-align: center;}
+.dash-nav-container a > span.a-title{padding-top: 30px;font-size:20px;color: #fff;display: block;width: 122px;}
+
+.dash-nav-container  .dash-ico{background: url('../../Content/assets/user-dash-sprite.png') no-repeat top left #fff;width: 122px;height: 122px;border-radius: 50%;display: block; margin: 0 auto}
+
+.dash-ico.dash-purchase{ background-position: -297px 28px; }
+.dash-ico.dash-portal{ background-position: -184px 34px; } 
+.dash-ico.dash-acc{ background-position:29px 36px; } 
+/*.dash-ico.dash-logout{ background-position: -74px 39px;  }*/ 
+
+.bottom-links > a {
+    color: #ffffff;text-decoration: underline;display: inline-block;padding: 0 5px;
+}

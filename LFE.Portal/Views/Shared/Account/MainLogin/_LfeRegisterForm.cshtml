@@ -1,0 +1,6 @@
+﻿@model LFE.DataTokens.RegisterDTO
+
+    @using (Html.BeginForm("RegisterUser", "Account", new { ViewBag.ReturnUrl,RegistrationType = Model.RegistrationSource, Model.RequiredConfirmation,Model.IsPluginRegistration, Model.Uid }, FormMethod.Post, new { @id = "frmRegisterUser", @class = "reg-form rel", @style = "" }))
+    {
+       @Html.Partial("Account/MainLogin/_RegisterForm")
+    }

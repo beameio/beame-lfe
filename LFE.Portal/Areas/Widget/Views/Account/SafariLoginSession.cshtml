@@ -1,0 +1,76 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width" />
+    <title>LFE | Start Safari Login Session</title>
+
+    <link href="~/Areas/Widget/Content/styles/widget.css" rel="stylesheet" />
+
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+    <script src="~/Areas/Widget/Scripts/modernizr-2.6.2.min.js"></script>
+    <script src="~/Areas/Widget/Scripts/jquery.1.9.1.min.js"></script>
+    <script src="~/Areas/Widget/Scripts/jquery.migrate.1.2.1.min.js"></script>
+    @Scripts.Render("~/bundles/kendo")
+
+    <script>
+        kendo.culture("en-US");
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            window.close();
+        });
+    </script>
+</head>
+<body>
+
+
+    <!-- page content -->
+    <div class="page_content" style="margin:20px; font-al:center ">
+        <div style="margin-top:40px;">
+            &nbsp;
+        </div>
+        <div style="padding-left: 3px; width: 800px; margin:0 auto;">
+
+            <div style="float:left; display:inline-block; width:40%; ">
+                <div style="font-weight:bold; padding-top:20px">This Window will be closed shortly....</div>
+                <div style="padding-top:40px"></div>
+            </div>
+            <div style="float: right; display: inline-block;  width:48% ">
+                @*<img src="~/Areas/Widget/Content/images/oops.jpg" alt="oops..." />*@
+            </div>
+
+        </div>
+    </div>
+    <!-- tools bar -->
+    <div class="tool_bar">
+        <div class="logo">
+            <img src="/content/images/webstore/logo.jpg" width="16" height="16" alt="logo" />
+        </div>
+
+        <div class="power"><a href="@(Utils.GetKeyValue("homeUrl"))" target="_blank">@(Constants.APP_OFFICIAL_NAME)</a></div>
+
+
+
+    </div>
+
+
+
+
+    <div class="dark" style="display: none"></div>
+
+    @{
+        string fbappid = Utils.GetKeyValue("fbAppId");
+    }
+    <script type="text/javascript">
+        var facebookAppId = '@fbappid';
+    </script>
+    <script src="~/Scripts/facebookApi.js" type="text/javascript"></script>
+
+</body>
+</html>

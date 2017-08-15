@@ -1,0 +1,85 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model CheckoutBaseToken
+
+@{
+    ViewBag.Title = "Register New LFE Account";
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapCheckoutLayout.cshtml";
+
+    var backLink = Url.ActionString("Login", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Model.Refferal } });
+    var purchaseLink = Model.ItemInfo.IsFreeItem ?    Url.ActionString("PurchaseFreeCourse", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "courseId", Model.ItemInfo.ItemId }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Request.AppRelativeCurrentExecutionFilePath } })
+                                                    : Url.ActionString("Index", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Model.Refferal } });
+
+    var registrationSource = CommonEnums.eRegistrationSources.Unknown;
+    if (Model.WidgetSotre != null && !String.IsNullOrEmpty(Model.WidgetSotre.WixInstanceID) && Model.WidgetSotre.WixInstanceID != Guid.Empty.ToString())
+    {
+        registrationSource = CommonEnums.eRegistrationSources.WIX;
+    }
+}
+
+
+@section CSS
+{
+   
+    <style>
+        .ul-login li input,.ul-reg li input{width:100%}
+        .ul-reg li input.inp-name-w{width:148px}
+        #p-reg-mandatory{display: none}
+       
+    </style>
+}
+
+<div class="sc-main-area rel">
+    <div class="inner sc-login">
+        <div class="sub-info">
+            <article>
+                This course by @Model.ItemInfo.Author.FullName is powered by @(Constants.APP_OFFICIAL_NAME)
+                To complete the checkout you’ll need an LFE account
+            </article>
+        </div>
+        <div style="display: table;width: 100%;padding-top: 25px">
+            <div class="tbl-row">
+                <div class="reg-title">
+                    Create a new LFE account
+                </div>
+                <div class="reg-mandatory">all fields are mandatory</div>
+            </div>
+            <div class="tbl-row">
+                <div class="reg-form">                    
+                    @using (Ajax.BeginForm("AjaxRegisterScUser", "Account", new { area = "", TrackingID = Model.TrackingId, RegistrationType = registrationSource, ReturnUrl = purchaseLink + "&mode=" + eScAuthenticationMode.reg }, new AjaxOptions { HttpMethod = "Post", OnSuccess = "onLoginEnd", OnBegin = "showLoader()" }, new { @id = "frm-sc-reg", @class = "reg-form rel" }))
+                    {
+                        @Html.Partial("Account/MainLogin/_RegisterForm", new RegisterDTO { RequiredConfirmation = false})
+                    }        
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="position: absolute;bottom: 0;right: 0;">
+        <a href="@backLink" class="sc-form-btn sc-btn-gray" id="sc-btn-back" style="width: 175px">Back</a>
+        <a href="#" class="sc-form-btn sc-btn-green" id="sc-btn-reg" style="width: 175px">Continue</a>
+    </div>
+
+</div>
+
+
+@section JS
+{
+    <script>
+        $(document).ready(function() {
+            $('#sc-btn-reg').unbind('click').click(function (e) {
+                e.preventDefault();
+                doLfeRegister('#frm-sc-reg', '.sc-main-area');
+            });
+        });
+    
+    
+        saveItemEvent(USER_EVENTS.CHECKOUT_REGISTER, '@Model.TrackingId', '@Model.ItemInfo.ItemId', '@((byte)Model.ItemInfo.ItemType)');
+    </script>
+    
+
+}

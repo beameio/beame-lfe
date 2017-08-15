@@ -1,0 +1,112 @@
+﻿@using System.Web.Mvc.Html;
+@{ var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel; }
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+       
+
+        $('#aCloseSearch').click(function () {
+            ToggleSearch();
+        });    
+
+        $('#submitSearch').click(function () {
+            SearchCourses();
+        });
+    });
+
+    function SearchCourses() {
+        var searchInput = $('#txtSearch').val();
+        $("#searchLoader").show();
+                
+        checkSearchStr();
+    }
+
+    function ToggleSearch() {
+        var div = $('.dark');
+        if (div.is(":hidden") && $('#serachWrapper').is(":hidden")) {
+            div.fadeIn();
+        }
+        
+        $('#searchWrapper').slideToggle();
+    }
+
+    function toggleButtonClass(button) {
+        if (button.attr("class") == 'toolbar-arrow') {
+            button.attr("class", "toolbar-arrow-open");
+        }
+        else {
+            button.attr("class", "toolbar-arrow");
+        }
+    }
+
+
+    function checkSearchStr() {
+        if ($("#keyword").val() == '' || $("#keyword").val() == 'Search') {
+            alert("Please insert a search phrase");
+            $("#keyword").val("");
+            $("#keyword").focus();
+            $("#searchLoader").hide();
+            return false;
+        }
+        if (CleanTheCharactersIndexOf()) {
+            var searchLink = '@Url.Action("Search", "Widget" ,  new {trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", keyword = "keywordPlaceHolder" })';
+            document.location = searchLink.replace('keywordPlaceHolder', escape($("#keyword").val()));
+        }
+        return false;
+    }
+
+    function CleanTheCharacters() {
+        var flag = "0";
+        var theWord;
+        var tempVal;
+        var i;
+        theWord = $("#keyword").val();
+        tempVal = $("#keyword").val().length;
+        for (i = 0; i < tempVal; i++) {
+            if ((theWord.charAt(i) == "<") || (theWord.charAt(i) == ">") || (theWord.charAt(i) == "%") || (theWord.charAt(i) == "@@") || (theWord.charAt(i) == "*") || (theWord.charAt(i) == "'") || (theWord.charAt(i) == "&") || (theWord.charAt(i) == "$") || (theWord.charAt(i) == "#") || (theWord.charAt(i) == "%")) {
+        $("#keyword").val("");
+        flag = "1";
+    }
+}
+    if (flag == "0") {
+        return true;
+    }
+    else {
+        alert("The text search contains invalid characters.");
+        $("#searchLoader").hide();
+        return false;
+    }
+}
+function CleanTheCharactersIndexOf() {
+    var flag = "0";
+    var theWord;
+    var tempVal;
+    var i;
+    theWord = document.getElementById('keyword').value.toLowerCase();
+    tempVal = document.getElementById('keyword').value.length;
+    if ((theWord.indexOf('http:/') != -1) || (theWord.indexOf('<sc') != -1)) {
+        alert("Invalid search input!");
+        $("#keyword").val("");
+        $("#keyword").focus();
+        $("#searchLoader").hide();
+        return false;
+    }
+    return true;
+}
+
+   </script>
+
+
+<div class="indent" id="searchWrapper">
+    <div id="cssBlockWrapper" class="block-wrapper">
+               
+        <input type="text" value="" placeholder="Search" name="keyword" id="keyword" data-val-required="Please insert a search phrase" data-val="true">
+        <div class="submit-wrapper">
+            <input type="submit" value="Search" id="submitSearch" />
+        </div>
+        <a class="close_search" id="aCloseSearch" >Close</a>
+        <img class="login-loader" src="~/Content/images/webstore/login-ajax-loader.gif" id="searchLoader" />
+    </div>   
+
+</div>

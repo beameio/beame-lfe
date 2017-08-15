@@ -1,0 +1,66 @@
+﻿@using LFE.Core.Utils
+@{
+    Layout = null;
+
+    var appId = Utils.GetKeyValue("Facebook:AppId");
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AppLandPage</title>
+    <link href="@Url.Content("~/Content/styles/google-gonts.css")" rel="stylesheet" type='text/css' />
+    <style>
+      .body{font-family: 'Open Sans',Arial;}
+.conn-btn {font-family: 'Open Sans',Arial;
+    background-color: #5472d2;
+    border-radius: 5px;
+    color: #ffffff !important;
+    display: table-cell;
+    font-size: 15px;
+    padding: 1.1em 2.5em;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.5s ease 0s;
+    vertical-align: middle;
+}
+    </style>
+    <script type="text/javascript">
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        window.fbAsyncInit = function () {
+            console.log('call status');
+            FB.init({ appId: 306294196144246, status: 1, xfbml: 1 });
+            FB.getLoginStatus(function (response) {
+                console.log(response);
+                if (response.status === 'connected') {
+                    var uid = response.authResponse.userID;
+                    var accessToken = response.authResponse.accessToken;
+                    FB.api('/me', function (response) {
+                        console.log(response);
+                    });
+                } else if (response.status === 'not_authorized') {
+                    console.log('Not authorized');
+                } else {
+                    console.log('Not logged in');
+                    FB.login();
+                }
+            });
+        }
+    </script>
+
+</head>
+    <body>
+        
+        <a title="" class="conn-btn" href="https://www.facebook.com/dialog/pagetab?app_id=306294196144246&amp;redirect_uri=@(Utils.GetKeyValue("homeUrl"))/facebook/ConnectApp" target="">
+            INSTALL THE ONLINE COURSE TAB ON YOUR FACEBOOK PAGE
+        </a>
+    </body>
+</html>

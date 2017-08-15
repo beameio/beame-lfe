@@ -1,0 +1,137 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Models
+@model HubRegistrationToken
+
+@{
+
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+
+    var error = Model.IsValid ? (ViewBag.LoginError == null || String.IsNullOrEmpty(ViewBag.LoginError.ToString()) ? null : ViewBag.LoginError) : Model.Message;
+
+    ViewBag.Title = "Hub User Registration"; //Model.Mode == eLoginWindowMode.Login ? "Login to LFE" : "Register to LFE";
+
+    var rq = Url.Action("Index", "Home", new { area = "HubAdmin" });
+
+    ViewBag.ReturnUrl = rq;
+
+    var loginFormDisplayStyle = Model.Mode == eLoginWindowMode.Login ? "block" : "none";
+    var registerFormDisplayStyle = Model.Mode == eLoginWindowMode.Login ? "none" : "block";
+}
+
+
+<script>
+    var LOGIN_FORM_MODE = 'MAIN';
+</script>
+@section css
+{
+    <style>
+        ::-webkit-input-placeholder {
+            color: #64769a;
+            background-color: #ccd7ed;
+        }
+        /* WebKit browsers */
+        :-moz-placeholder {
+            color: #64769a;
+            background-color: #ccd7ed;
+        }
+        /* Mozilla Firefox 4 to 18 */
+        ::-moz-placeholder {
+            color: #64769a;
+            background-color: #ccd7ed;
+        }
+        /* Mozilla Firefox 19+ */
+        :-ms-input-placeholder {
+            color: #64769a;
+            background-color: #ccd7ed;
+        }
+        /* Internet Explorer 10+ */
+    </style>
+
+}
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            initLoginBehavior('@Model.Mode.ToString()');
+        });
+    </script>
+    @{
+        if (error != null)
+        {
+            <script>
+                $(document).ready(function () {
+                    showLoginError('@error');
+                });
+            </script>
+        }
+    }
+}
+
+<div class="wnd-login" id="wnd-login-main" style="width: 320px;margin: 50px auto 20px">
+    <div class="login-head rel">
+        <h4 class="common-title">Login</h4>
+    </div>
+    @{
+        if (Model.IsValid)
+        {
+            <script>
+                var LOGIN_FORM_MODE = 'WINDOW';
+            </script>
+            <link href="~/Content/styles/login.css" rel="stylesheet" />
+
+
+            <ul class="ul-login simple-list" style="margin: 15px auto 0">
+                <li class="log-frm-inp-container">
+                    <input type="text" id="LicenseKey" placeholder="paste license key here" title="License Key" />
+                </li>
+            </ul>
+
+            <div class="login-main rel">
+                
+                <div class="flip" id="login-flip" style="display: @loginFormDisplayStyle">
+                    <div class="rel">
+                        <div class="flip" id="log-form">
+                            @Html.Partial("Account/Login/_WindowLoginPartial", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = CommonEnums.eRegistrationSources.HUB, LicenseRequired = true })
+                        </div>
+                        <div id="req-pwd-form-container" class="flip" style="display: none">
+                            @Html.Partial("Account/Login/_WindowRequestForgottenPassword")
+                        </div>
+                        <script>
+                            $('.login-main').addClass('login-main-360');
+                        </script>
+                    </div>
+                </div>
+
+                <div class="flip" id="reg-flip" style="display: @registerFormDisplayStyle">
+                    <div class="rel">
+                        <div style="height:57px;margin: 35px auto 0" class="login-inner-w">
+                            @Html.Partial("Account/MainLogin/_ExternalLogin", new LoginDTO { RedirectUrl = Model.ReturnUrl, RegistrationSource = CommonEnums.eRegistrationSources.HUB, LicenseRequired = true })
+                        </div>
+                        <label style="display: block;height: 16px;font-size: 16pt;font-weight: bold;margin: 20px 0" class="">or</label>
+                        <div id="reg-form">
+                            @Html.Partial("Account/Login/_WindowRegisterForm", new RegisterDTO { RequiredConfirmation = false, RegistrationSource = CommonEnums.eRegistrationSources.HUB, LicenseRequired = true })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="foot wnd-login-footer">
+                <div id="login-footer-link">
+                    <a class="link-button" id="btn-form-switch" href="#"></a>
+                </div>
+                <div id="lw-action-button">
+                    <span></span>
+                </div>
+            </div>
+
+            <script>
+                initLoginBehavior('@Model.Mode.ToString()');
+            </script>
+        }
+        else
+        {
+            <h1 style="font-size: 22px;color: #fff;margin: 25px auto 15px">@Model.Message</h1>
+        }
+    }
+</div>

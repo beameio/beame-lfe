@@ -1,0 +1,214 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Helpers
+
+@{
+    var kinds = Utils.EnumWithDescToList<CourseEnums.eCouponKinds>();
+    var types = Utils.EnumWithDescToList<CourseEnums.CouponType>();
+}
+
+<script type="text/javascript">
+    var COUPON_EDIT_FORM_CONTAINER = '#d-coupon-edit-container';
+    var COUPON_GRID_CONTAINER = '#d-coupon-grid-container';
+    $(document).ready(function () {
+
+        $('#btn-add-coupon').unbind('click').bind('click', function () {
+            if ($(COUPON_EDIT_FORM_CONTAINER).is(':visible')) {
+                return;
+            }
+            initCouponEditForm(-1);
+        });
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.coupon.switch2List, handleSaveCouponEvent, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.coupon.switch2List, handleSaveCouponEvent, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.coupon.couponInitEdit, initCouponEditForm, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.coupon.couponInitEdit, initCouponEditForm, null);
+
+       // $('#btn-add-coupon').trigger('click');
+    });
+
+    function initCouponEditForm(id) {
+
+        var data = {
+            id: id
+        };
+
+        ajaxAction('@Url.Action("EditAuthorCoupon", "Course")', data, loadCouponEditForm, '.coupon-container');
+    }
+
+    function loadCouponEditForm(view) {
+        $(COUPON_EDIT_FORM_CONTAINER).empty().html(view);
+        $(COUPON_GRID_CONTAINER).slideToggle(300, 'linear', function () {
+            $(COUPON_EDIT_FORM_CONTAINER).slideToggle(300, 'linear', function () {
+                setTimeout(function() {
+                    adjustCmdPosition(window.EDIT_FORM_SELECTOR);
+                    $('#d-cpn').show();
+                },50);
+            });
+        });
+    }
+
+    function cancelEditCoupon() {
+        $(COUPON_EDIT_FORM_CONTAINER).slideToggle(300, 'linear', function () {
+            $(COUPON_GRID_CONTAINER).slideToggle(300, 'linear', function () {
+                $(COUPON_EDIT_FORM_CONTAINER).empty();
+                exitEditMode();
+            });
+        });
+    }
+   
+    function handleSaveCouponEvent() {
+        setTimeout(function () {
+            cancelEditCoupon();
+        }, 2000);
+    }
+
+    var gridId = 'CouponsReport';
+
+    function filterCoupons(id,fieldName) {
+        var filter;
+        var grid = $("#" + gridId).data("kendoGrid");
+        var $filter = grid.dataSource.filter() == undefined ? [] : grid.dataSource.filter().filters;
+
+        if ($filter.length == 0) {
+            filter = {
+                logic: "and",
+                filters: []
+            };
+        } else {
+            filter = $filter[0];
+
+            for (var i = 0; i < filter.filters.length; i++) {
+                if (filter.filters[i].field == fieldName) {
+                    filter.filters.splice(i, 1);
+                }
+            }
+        }
+
+        if (hasValue(id)) {
+            var f = { field: fieldName, operator: "eq", value: id };
+            filter.filters.push(f);
+        }
+
+        if (filter.filters.length > 0) {
+            filterReport(filter, gridId, "kendoGrid");
+        }
+        else {
+            filterReport(null, gridId, "kendoGrid");
+        }
+    }
+
+
+    function onKindSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.Value;
+        filterCoupons(id, 'Kind');
+    }
+
+    function onCourseSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.CourseId;
+        filterCoupons(id, 'CourseId');
+    }
+
+    function onBundleSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.BundleId;
+        filterCoupons(id, 'BundleId');
+    }
+
+    function onTypeSelected(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var id = dataItem.Value;
+        filterCoupons(id, 'Type');
+    }
+
+    function clearCouponFilters(rebind) {
+        $.each($('#d-coupon-filter-container  input'), function() {
+            var combo = $(this).data("kendoDropDownList");
+            if (combo != null) combo.value(null);
+        });
+        if (rebind) filterReport(null, gridId, "kendoGrid");
+    }
+</script>
+
+<div class="coupon-container">
+    <div class="b-title">
+        <div style="float: left">Coupons</div>
+        <div style="float: right">
+            <span id="btn-add-coupon" class="button add-btn" title="add new coupon">add new coupon</span>
+        </div>
+    </div>
+
+    <div id="d-coupon-edit-container" style="display: none"></div>
+
+    <div id="d-coupon-grid-container">
+
+        <div style="height: 40px;width: 100%" id="d-coupon-filter-container">
+            <span class="inline" style="font-size: 14px;color: #666;margin: 6px 10px 0 0">
+                Filter by:
+            </span>
+            <span class="inline" style="margin: 0 20px 0 0">
+                @(Html.Kendo().DropDownList()
+                      .Name("KindsLOV")
+                      .OptionLabel("-- by kind --")
+                      .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                      .DataTextField("Title")
+                      .DataValueField("Value")
+                      .Events(e => e.Select("onKindSelected"))
+                      .BindTo(kinds)
+                )
+            </span>
+            <span class="inline" style="margin: 0 20px 0 0">
+                @(Html.Kendo().DropDownList()
+                      .Name("TypesLOV")
+                      .OptionLabel("-- by type --")
+                      .HtmlAttributes(new { @style = "height:22px;font-size:12px" })
+                      .DataTextField("Title")
+                      .DataValueField("Value")
+                      .Events(e => e.Select("onTypeSelected"))
+                      .BindTo(types)
+                )
+            </span>
+            <span class="inline" style="margin: 3px 20px 0;">
+                @(Html.Kendo().DropDownList()
+                      .Name("CourseFilterLOV")
+                      .DataTextField("Name")
+                      .DataValueField("CourseId")
+                      .OptionLabel(" by course")
+                      .Events(e => e.Select("onCourseSelected"))
+                      .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course"))))
+            </span>
+            <span class="inline" style="margin: 3px 20px 0;">
+                @(Html.Kendo().DropDownList()
+                      .Name("BundleFilterLOV")
+                      .DataTextField("Name")
+                      .DataValueField("BundleId")
+                      .OptionLabel(" by bundle")
+                      .Events(e => e.Select("onBundleSelected"))
+                      .DataSource(ds => ds.Read(r => r.Action("GetAuthorBundleLOV", "Course"))))
+            </span>
+            <span class="inline" style="font-size: 14px;color: #666;margin: 6px 10px 0 0;cursor: pointer" onclick="clearCouponFilters(true)">
+                clear filters
+            </span>
+        </div>
+
+        @Html.Partial("Coupons/_OwnerCouponReport", new CouponReportPageToken
+        {
+            Action = "GetAuthorCoupons"
+            ,Id = this.CurrentUser().UserId
+            ,ShowAuthorFields = true
+            ,PageSize = 20
+        })
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function() {
+            clearCouponFilters(false);
+        }, 500);
+    });
+</script>

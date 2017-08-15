@@ -1,0 +1,140 @@
+﻿@model string
+
+function getQuerystring(key, defaultValue) {
+		if (defaultValue == null) defaultValue = "";
+		key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+		var regex = new RegExp("[\\?&]" + key + "=([^&#]*)");
+		var qs = regex.exec(window.location.href);
+		if (qs == null)
+			return defaultValue;
+		else
+			return qs[1];
+	}
+
+    var lfeIframUrl = '';
+    var LfeWidgetPrefix = "http://" + '@HttpContext.Current.Request.Url.Host' + "/Widget/";
+    var lfeWidth = document.getElementById('lfe_widget_iframe').width;
+    var lfeHeight = document.getElementById('lfe_widget_iframe').height;
+    
+    var parentUrlQuery = '';
+    if (!lfeIsEmpty(lfeParentURL)){
+        parentUrlQuery = "&parentUrl=" + encodeURIComponent(lfeParentURL);
+    }   
+  
+	var lfeURL = decodeURIComponent(getQuerystring("lfe_app_url","http://@HttpContext.Current.Request.Url.Host/Widget/@Model" +"?width=" + lfeWidth + "&height=" + lfeHeight + parentUrlQuery));
+    if (lfeURL.indexOf("width=") < 0)
+    {
+        var questionMark = "";
+        if (lfeURL.indexOf("?") == -1){
+            questionMark = "?"
+        }
+        else
+        {
+            questionMark = "&";
+        }
+        lfeURL = lfeURL + "?width=" + lfeWidth + "&height=" + lfeHeight + parentUrlQuery;
+    } 
+    if (lfeURL.indexOf(LfeWidgetPrefix) < 0)
+    {
+        lfeURL = LfeWidgetPrefix + lfeURL;
+    }   
+
+
+    document.getElementById('lfe_widget_iframe').src = lfeURL ;
+    document.getElementById('lfe_widget_iframe').onload = function() {
+    lfeSetParentURL();     
+
+};
+
+
+function lfeIsEmpty(str) {
+    return (!str || 0 === str.length);
+}
+
+function lfeSetParentURL()
+{
+    try
+    {    
+    if (typeof history.pushState !== "undefined") {
+  
+        var pageURL = document.location.href;
+        //get parent url from embedded code
+        if (!lfeIsEmpty(lfeParentURL)){
+            pageURL = lfeParentURL;
+        }
+       
+        var urlPrefix = "";
+        if (pageURL.indexOf("#") != -1){
+            urlPrefix =   pageURL.substring( pageURL.indexOf("#") );
+        }
+        if (pageURL.indexOf("lfe_app_url") != -1)    {
+            pageURL = pageURL.substring(0, pageURL.indexOf("lfe_app_url") -2);
+        }
+        var questionMark = "";
+        if (pageURL.indexOf("?") == -1){
+            questionMark = "?"
+        }
+        else
+        {
+            questionMark = "&";
+        }
+        
+        var LfePrefixLength = LfeWidgetPrefix.length;
+        var newLfeIframeUrl = lfeIframUrl.substring(LfePrefixLength);
+        newLfeIframeUrl = newLfeIframeUrl.substring(0 , newLfeIframeUrl.indexOf("width=") - 1);
+
+        pageURL = pageURL +  questionMark +  "lfe_app_url=" +  newLfeIframeUrl.replace("&","%26");
+       
+        if (newLfeIframeUrl.length > 0)
+        {
+            window.history.pushState(null, null, pageURL);
+        }
+    }
+   }
+   catch (err)
+   {
+      //  alert(err);
+   }
+}
+
+
+
+window.addEventListener('message', receiveMessage, false);
+
+function receiveMessage(evt)
+{
+  if (evt.origin === 'http://@HttpContext.Current.Request.Url.Host')
+  {
+    //alert("got message: "+ evt.data);
+    lfeIframUrl = evt.data;
+  //  lfeSetParentURL();
+  }
+}
+
+function createCookie(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        var expires = "; expires=" + date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+
+	window.onresize = function(event){
+		lfeOnWindowResize();
+		}
+
+		function lfeOnWindowResize(){
+
+			var lfeWindowWidth = window.innerWidth;
+			var lfeIframeWidth = document.getElementById('lfe_widget_iframe').width;
+
+			if (window.console) console.log(lfeWindowWidth + '   ' + lfeIframeWidth);
+
+			if ( lfeIframeWidth > lfeWindowWidth ){
+				lfeWidth = lfeWindowWidth -20;
+				document.getElementById('lfe_widget_iframe').width = lfeWidth;
+			}
+		}		

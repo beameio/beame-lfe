@@ -1,0 +1,58 @@
+﻿@using LFE.Core.Extensions
+@model LFE.DataTokens.AdminDashboardToken
+
+@{
+    ViewBag.Title = "Portal Admin Dashboard";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<script>
+	$(document).ready(function () {
+
+	});
+</script>
+<style>
+    .sys-act li {
+        margin: 15px 0;
+    }
+</style>
+
+<ul class="sys-act">
+@*    <li>*@
+@*        @using (Html.BeginForm("ImportUserDataToProvision", "Home"))*@
+@*        {*@
+@*            <input id="userId" name="userId" type="number" placeholder="userId" />*@
+@*            <br />*@
+@*            <input type="submit" value="ImportUserDataToProvision" />*@
+@*        }*@
+@*    </li>*@
+@**@
+@*    <li>*@
+@*        @using (Html.BeginForm("ImportProductsToProvision", "Home"))*@
+@*        {*@
+@*            <input type="submit" value="ImportProductsToProvision" />}*@
+@*    </li>*@
+@**@
+@*    <li>*@
+@*        @using (Html.BeginForm("ImportUserProductsToProvision", "Home"))*@
+@*        {*@
+@*            <input id="userId" name="userId" type="number" placeholder="userId" />*@
+@*            <br />*@
+@*            <input id="courseId" name="courseId" type="number" placeholder="courseId" />*@
+@**@
+@*            <input type="submit" value="ImportUserProductsToProvision" />*@
+@*        }*@
+@*    </li>*@
+
+    <li>
+        @using (Html.BeginForm("FindMissingRenditions", "Home"))
+        {
+            <input type="submit" value="FindMissingRenditions" />}
+    </li>
+
+    <li>
+        @using (Html.BeginForm("GetTotalVideosDuration", "Home"))
+        {
+            <input type="submit" value="GetTotalVideosDuration" />}
+    </li>
+</ul>

@@ -1,0 +1,87 @@
+﻿/*main toolbar*/
+.navbar.top{background: #273031;height:33px !important;min-height: 33px !important;margin-bottom: 0 !important;border:none !important}
+
+.navbar.top > .container > .navbar-header{ height: 33px !important;position: relative}
+
+@media (max-width:599px) {  
+ .a-header-logo{ background-image: none;padding-left: 15px;width: 160px}
+ .a-header-logo:hover{background-image: none;}
+ .navbar.top > .container > .navbar-header{margin: 0}
+}
+
+.navbar .toggle-acc{ background: #26a65b !important;height:33px;padding:0 20px !important;margin:0 !important ;color: #fff;font-size: 13px;float: right;border: none !important;border-radius: 0 !important;  }
+.navbar .toggle-catalog-view{ float: left !important;border: none !important;border-radius: 0 !important;background: transparent !important }
+.navbar-default .navbar-toggle .icon-bar{background:#000!important}
+	
+.navbar.top > .container > .navbar-header > .navbar-brand{ height: 33px !important;position: absolute;left: 15px;}
+
+.navbar.top .navbar-collapse.user{background: #354243 !important}
+.navbar.top .container,.navbar.top .navbar-collapse.collapse {background-color:inherit}
+.navbar-collapse{ border-top: none !important;margin-top: 0 !important;box-shadow: none !important}
+
+
+.collapse.in,.navbar-collapse.collapse.in > .navbar-nav{ height: auto;border-top: none !important}
+.navbar-collapse.collapse.in > .navbar-nav > li.sep{display: none}
+/*.navbar-toggle{margin: 2px 15px 2px 0;padding:6px 8px;}*/
+
+.a-header-logo,.a-header-logo:visited{ display: block;background: url('../../Content/assets/site-sprite.png') no-repeat 0 -1002px;width: 259px; height: 33px;padding: 6px 0 0 60px !important;color: #fff !important;font-size: 12px;text-transform: uppercase;} /*upper-logo-inactive*/
+.a-header-logo:hover{background: url('../../Content/assets/site-sprite.png') no-repeat  0 -919px;} /*upper-logo-active*/
+.a-header-logo > span.lfe{ text-decoration: underline;}
+
+@media (max-width:599px) {  
+ .a-header-logo{ background-image: none;padding-left: 15px;width: 160px}
+ .a-header-logo:hover{background-image: none;}
+}
+@media (max-width:320px) {  
+ .a-header-logo{ padding-left: 0;} 
+}
+/*logo tooltip */
+.lfe-tooltip-content{ padding: 15px 15px 10px 100px;color: #000;font-size: 15px;text-align: left;margin-left: 30px !important} 
+.lfe-tooltip-content:before{background: url('../../Content/assets/site-sprite.png') no-repeat  0 -779px;position: absolute;content: "";top: 15px;left: 10px;width: 90px;height: 90px}/*lfe-logo-tooltip-90*/
+.lfe-tooltip-content > span.info{ font-size: 12px;margin-top:15px;display: block}
+
+.k-animation-container{min-width: 280px !important;max-width: 320px !important}
+.k-tooltip{ background: #e8efef !important;border-radius: 0;border:none !important;margin-left: 30px !important}
+.k-callout-n{ border-bottom-color: #e8efef !important;top:-12px !important}
+
+@media (max-width:319px) {
+  .k-tooltip{ margin-left: 0 !important}
+  .lfe-tooltip-content{width: 170px}
+}
+@media (min-width:320px) {
+  .k-tooltip{ margin-left: 0 !important}
+  .lfe-tooltip-content{width: 205px}
+}
+@media (max-width:599px) {
+  
+ .k-tooltip{ margin: 0 !important;padding: 0;}
+ .k-tooltip > .k-tooltip-content{padding: 0}
+}
+/*end logo tooltip*/
+
+.navbar-nav.top{height: 100%}
+.navbar-nav.navbar-right:last-child {margin-right: 0;} /*bootstrap override*/
+.main-nav-container,.main-nav-container a{color: #fff !important;font-size: 13px;}
+.navbar-nav > li.sep{ border-right: 1px solid #fff;width: 0;height:24px;margin: 4px 0 0}
+
+.navbar-nav > li > a,.navbar-nav > li > span{ padding: 6px 20px !important;display: block}
+
+
+.navbar-nav > li.user > a,.navbar-nav > li.user > span{ background: #354243 !important;}
+
+.navbar-nav > li.user > a:hover{color: #fff}
+
+.navbar-nav > li.user.login > a{ background: #26a65b !important;}
+.navbar-nav > li.user.logout > a{background: #96281b !important}
+@media (max-width: 880px) {
+	.main-nav-container{padding: 0}
+	.navbar-nav.navbar-right:last-child{margin-right:inherit}
+	.navbar-header{float:none}
+	.navbar-left,.navbar-right{float:none !important}
+	.navbar-toggle{display:block}
+	.navbar-collapse.collapse{display:none!important}
+	.navbar-nav{float:none!important}
+	.navbar-nav>li{float:none}
+	.navbar-nav>li>a{padding-top:10px;padding-bottom:10px}
+	.collapse.in{display:block !important}
+}

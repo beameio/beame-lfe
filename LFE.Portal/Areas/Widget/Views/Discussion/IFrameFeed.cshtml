@@ -1,0 +1,63 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.HashtagFeedToken
+@{
+	ViewBag.Title = "Feed";
+	Layout = "~/Areas/UserPortal/Views/Shared/_IFrameLayout.cshtml";
+}
+
+@section css
+{
+	<style>
+		 #main{top: 0}
+		.wrap{width: 600px;}
+		.d-feed-page{width: 100%;margin: 0 auto ;height: auto;overflow: hidden;position: relative} 
+		.fc-name{font-weight: bold}
+		.ul-cba-list > li.box{ width: 190px;}
+	/*.ul-msg-list li .row {width: 760px}       
+		.ul-msg-list li .replay-container .ul-child-msg li {width: 765px;}*/
+	</style>
+}
+
+@section scripts
+{
+	<script src="@Url.Content( "~/Areas/UserPortal/Scripts/lfe/lfe.discuss.js" )" type="text/javascript"></script>
+
+	<script>
+		var FEED_PAGE_SELECTOR = ".d-feed-page";
+		var FEED_TREE_SELECTOR = "#HashFeed";
+		var CONTENT_CONTAINER_SELECTOR = ".d-feed-page";
+		var USER_PROFILE_URL = '@Url.Action("_DiscussionUserProfile","User",new{area="UserPortal"})';
+		var HASHTAG_FEED_URL = '@Url.Action("GetHashFeedListPartial","Discussion",new {area="UserPortal"})';
+		
+		var OPEN_FEED_WINDOW = false;
+		
+		$(document).ready(function () {
+			adjuctFeedPageH();
+
+			$(window).resize(function () {
+				adjuctFeedPageH();
+			});
+		});
+
+		function adjuctFeedPageH() {
+			var h = $(window).height();
+			var newH = h - ( 15); //header=39+3 
+			$(FEED_PAGE_SELECTOR).height(newH);
+			window.getNotifManagerInstance().notify(notifEvents.window.windowResized, newH);
+		}
+		
+	
+	</script>
+}
+
+
+
+<div class="d-feed-page">
+	@Html.Partial("Discussion/_HashFeed",Model)
+</div>
+
+@*<script>
+	setTimeout(function () {
+		adjuctContentH();
+		setReportScroll(feedContainerSelector);
+	}, 100);
+</script>*@

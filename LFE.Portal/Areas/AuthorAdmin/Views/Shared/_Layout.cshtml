@@ -1,0 +1,100 @@
+﻿@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    <title>@ViewBag.Title</title>
+    <!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge"/><![endif]-->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml")
+    <script src="~/Scripts/lfe/lfe.referrer.js"></script>
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    <script src="~/Scripts/lfe/lfe.referrer.js"></script>
+    @Styles.Render("~/Areas/AuthorAdmin/Content/styles/css")
+    @Styles.Render("~/Content/styles/common")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Styles.Render("~/Content/plugin/scroll")
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+    @{
+        var controller = ViewContext.RouteData.GetRequiredString("controller");
+        var action = ViewContext.RouteData.Values["action"] as string ?? "Index";
+
+        if ((controller == "Author" && action == "Dashboard") || (controller == "Home" && action == "Index"))
+        {
+            <script src="http://cdn.kendostatic.com/@Url.ToKendoVersionUrl()/js/kendo.all.min.js"></script>
+            <script src="http://cdn.kendostatic.com/@Url.ToKendoVersionUrl()/js/kendo.aspnetmvc.min.js"></script>
+        }
+        else
+        {
+            @Scripts.Render("~/bundles/kendo")
+        }
+    }
+
+    <script>
+        kendo.culture("en-US");
+    </script>
+    @Scripts.Render("~/bundles/lfe/common")
+    <script src="~/Scripts/plugins/htmlEncode.js"></script>
+    @Scripts.Render("~/Areas/AuthorAdmin/bundles/lfe")
+
+
+    @{
+        if ((controller == "Course" && (action == "EditCourse" || action == "EditBundle")))
+        {
+            @Scripts.Render("~/Areas/AuthorAdmin/bundles/course")
+        }
+
+        if ((controller == "WebStore" && action == "EditStore"))
+        {
+            @Scripts.Render("~/Areas/AuthorAdmin/bundles/webstore")
+        }
+
+    }
+
+    @Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+
+    <script type="text/javascript">
+        var notificationManager;
+        var DEFAULT_CONTAINER_SELECTOR = '.wrap';
+
+        var LOADER_SELECTOR = '#site-loader';
+        var SITE_LOADER = null;
+        var FORM_LOADER_SELECTOR = '#d-form-loader';
+        var FORM_LOADER_ID = 'd-form-loader';
+        var FORM_LOADER = null;
+
+        function getNotifManagerInstance() {
+            if (notificationManager == undefined || notificationManager == null) {
+                notificationManager = new NotificationManager();
+            }
+            return notificationManager;
+        }
+    </script>
+    @RenderSection("css", false)
+    @RenderSection("scripts", false)
+
+</head>
+	<body>
+		<div class="wrap"  id="main">
+			@Html.Partial("_Header")
+		   
+			<section class="wrap clear" style="margin:10px 0 100px 0">
+				@RenderBody()
+			</section>        
+			@Html.Partial("_Footer")                      
+		</div>
+        @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+		
+	    <script type="text/x-kendo-template" id="kendo-currency-template">
+            <label class="currency-item">${ hasValue(Symbol) ? Symbol : ''} ${ISO}</label>
+        </script>
+        @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+	</body>
+
+</html>

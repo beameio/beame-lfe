@@ -1,0 +1,77 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.TrainingViewToken
+@{
+    var isEditable = Model.Status == TrainingEnums.eTrainingStatus.WAIT;
+}
+
+
+@using (Ajax.BeginForm("UpdateTraining", "Training", new { Model.TrainingId,Model.ItemType }, new AjaxOptions {OnBegin = "showLoader()", OnSuccess = "onTrainingUpdated" }, new { @id = "frmUpdateMsg", @class = "" }))
+{
+    <fieldset class="fs-g2t-form">
+        <legend></legend>
+        <ul class="ul-frm frm-view">
+            <li data-container-for="ItemId">
+                <label>Course</label>
+                <div class="k-edit-field">
+                    @(Html.Kendo().DropDownListFor(m => m.ItemId)
+                        .HtmlAttributes(new { style = "width: 200px" })
+                        .DataValueField("CourseId")
+                        .DataTextField("Name")
+                        .Enable(isEditable)
+                        .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course")))
+                    )
+                </div>
+            </li>
+
+            <li>
+                <label>Title</label>
+                <div class="k-edit-field">
+                    @(isEditable ? Html.TextBoxFor(m => m.Title, new { }) : Html.TextBoxFor(m => m.Title, new { @readonly = "readonly" }))
+                </div>
+            </li>
+
+            <li data-container-for="Description">
+                <label>Description</label>
+                <div class="k-edit-field">
+                    @(isEditable ? Html.TextAreaFor(model => model.Description, new { @cols = 20, @rows = 2 }) : Html.TextAreaFor(model => model.Description, new { @cols = 20, @rows = 2, @readonly = "readonly" }))
+                </div>
+            </li>
+
+            <li data-container-for="Start">
+                <label>From</label>
+                <div class="k-edit-field">
+                    @(Html.Kendo().DateTimePickerFor(model => model.Start)
+                        .Min(DateTime.Now).Enable(isEditable))
+                    <span data-for="start" class="k-invalid-msg"></span>
+                </div>
+            </li>
+
+            <li data-container-for="End">
+                <label>To</label>
+                <div class="k-edit-field">
+                    @(Html.Kendo().DateTimePickerFor(m => m.End).Enable(isEditable))
+                    <span data-for="end" class="k-invalid-msg"></span>
+                </div>
+            </li>
+        </ul>
+
+    </fieldset>
+
+    if (isEditable)
+    {
+        <input type="submit" class="btn-submit" value="Update session details" />
+    }
+
+}
+
+<script>
+    function onTrainingUpdated(response) {
+        window.hideLoader();
+
+        if (response.success) {
+            swal("Session Updated", "", "success");
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+</script>

@@ -1,0 +1,22 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+
+@(Html.Kendo().Grid <WebStoreGridDTO>()    
+	.Name("WsStoresReport")
+	.TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+	.Columns(columns =>
+	{
+	    columns.Bound(m => m.Name).Title("Store name"); //.ClientTemplate("<a href='" + Url.Action("EditStore", "WebStore") + "/#=Uid#' style='' title='click to edit store' class='list-cmd' >#=Name#</a>").Title("Name of Store");
+		columns.Bound(p => p.TrackingID).Title("TrackingID");
+		columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+        columns.Bound(p => p.CoursesCount).Title("Number of Courses").Width(150);
+        columns.Bound(m => m.WixSiteUrl).ClientTemplate(" # if (hasValue(WixSiteUrl)) { # <a href='#=WixSiteUrl#' title='view' target='_blank'>#=WixSiteUrl#</a> # } else{# <span>not exists</span> #}#").Title("Site Url");				
+	})          
+	.Sortable()
+	.Pageable(pager => pager.Enabled(false))
+	.Filterable(f=>f.Enabled(false))
+	.DataSource(dataSource => dataSource.Ajax()
+						.Model(model => model.Id(p => p.StoreId))
+                            .Read(read => read.Action("GetUserStores", "User", new { area = "PortalAdmin", id = Model }).Type(HttpVerbs.Get)).ServerOperation(false)
+						))

@@ -1,0 +1,204 @@
+﻿@using LFE.Portal.Helpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>OnDropBoxAuthorized</title>
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    @Styles.Render("~/Areas/AuthorAdmin/Content/styles/css")
+    <link href="@Url.Content("~/Areas/AuthorAdmin/Content/styles/dopbox.css")"  rel="stylesheet" />
+    @Styles.Render("~/Content/styles/common")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery/jquery")
+    @Scripts.Render("~/bundles/jquery/jqueryval")
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/lfe/common")
+    @Styles.Render("~/Content/plugin/scroll")
+    @Scripts.Render("~/bundles/plugin/scroll")
+    
+    <script>
+        var TREE_CONTAINER_SELECTOR = '#d-tree-container';
+
+        
+        function getToken()
+        {
+            return { access_token: getTokenFromHash() };
+        }
+
+        function getTokenFromHash() {
+            var h = window.location.hash;
+
+            if (h == undefined || !hasValue(h)) return '';
+
+            var h1 = h.substring(1);
+
+            var array = h1.split('&');
+
+            for (var i = 0; i < array.length; i++) {
+                var p = array[i].split('=');
+
+                if (p[0].indexOf('error') >= 0) {
+                    alert(p[1]);
+                    return '';
+                }
+
+                if (p[0] == 'access_token') {
+
+                    return p[1] ;
+                }
+
+            }
+            return '' ;
+        }
+
+        function setTreeSize() {
+            setReportScroll(TREE_CONTAINER_SELECTOR);
+        }
+
+        function simulate() {
+            var path = $('input[name=radiodrop]:checked').val();
+            
+            if (path == undefined) {
+                alert('Select folder');
+                return;
+            }
+
+            var name = $('input[name=radiodrop]:checked').siblings('span').html();
+
+
+            $('#frmSimulate #path').val(path);
+            $('#frmSimulate #name').val(name);
+            $('#frmSimulate #access_token').val(getTokenFromHash());
+            
+            $('#frmSimulate').submit();
+        }
+
+        function generate() {
+            var path = $('input[name=radiodrop]:checked').val();
+            
+            var data = {
+                path: path,
+                access_token: getTokenFromHash()
+            };
+            showLoader();
+            $.ajax({
+                url: '@Url.Action("CreateCourse", "Dropbox")',
+                cache: false,
+                type: "Post",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8"
+                , success: function (response) {
+                    hideLoader();
+
+                    var msg = response.success ? "Job submitted" : response.error;
+
+                    alert(msg);
+                }
+            });
+
+        }
+    </script>
+    <style>
+        ul.info-list li{list-style-type:circle }
+    </style>
+</head>
+    <body>
+        <div class="wrap" id="main">
+            <section class="wrap clear" style="margin:10px">
+                <div class="head">
+                    <div class="inner-content">
+                        <div class="h-title">Create your online course directly from your Dropbox!</div>
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <div class="i-title c-title">
+                        With the LFE Dropbox widget you can easily create your online courses and avoid re-uploading videos and other materials. 
+                    </div>
+                    <p>
+                        Here’s how it’s done:
+                        
+                        <ul class="info-list">
+                            <li>
+                                Only one course at a time can be created with this process        
+                            </li>
+                            <li>
+                                The name of the folder you will select for this process is also the name we will assign to your course
+                            </li>
+                            <li>
+                                The course description will be taken from a txt or doc files named readme (readme.txt, readme.doc) that you will add to the main course folder
+                            <li>
+                                To create chapters in your course, create sub folders and name them as you would like your chapters to be named
+                            </li>
+                            <li>
+                                Videos and documents saved to these sub-folders will be attached to the course chapters
+                            </li>
+                            <li>
+                                If you need further assistance contact us through our site at www.lfe.com
+                            </li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 7px">
+                    <span onclick="simulate()" class="inline drop-buttons simulate" title="Simulate course creation">Simulate</span>
+
+                    <span onclick="generate()" class="inline drop-buttons create" style="margin-left: 10px" title="generate course">generate course</span>
+                    @using (Ajax.BeginForm("SimulateCourseCreation", "Dropbox", null, new AjaxOptions { UpdateTargetId = "d-simulator", LoadingElementId = "site-loader", InsertionMode = InsertionMode.Replace }, new { @id = "frmSimulate" }))
+                    {
+                        @Html.Hidden("access_token")
+                        @Html.Hidden("path")
+                        @Html.Hidden("name")
+                    }
+                </div>
+
+                <div class="drop-zone">
+                    <div class="inline left">
+                        <div class="tri-title c-title">
+                            your dropbox folder:
+                        </div>
+                        <div id="d-tree-container" class="nano">
+                            <div class="content">
+                                @(Html.Kendo().TreeView()
+                                    .Name("treeview")
+                                    .HtmlAttributes(new { @class = "" })
+                                    .TemplateId("treeview-template")
+                                    .DataTextField("Name")
+                                    .Events(e => e.DataBound("setTreeSize").Expand("setTreeSize").Collapse("setTreeSize"))
+                                    .DataSource(dataSource => dataSource.Read(read => read.Action("GetMetaData", "Dropbox").Data("getToken")))
+                                )
+
+                                <script id="treeview-template" type="text/kendo-ui-template">
+                                    <input type="radio" value="#: item.id#" class="inline" name="radiodrop" />
+                                    <span title="#: item.Name #" style="width:380px;max-width:380px;" class="inline ellipsis">#: item.Name #</span>
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inline right">
+                        <div id="d-simulator"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+                    
+
+        <div id="site-loader" class="k-loading-mask">
+            <span class="k-loading-text">Loading...</span>
+            <div class="k-loading-image"></div>
+            <div class="k-loading-color"></div>
+        </div>
+        <script type="text/x-kendo-template" id="form-loader-template">
+            <span class="k-loading-text">Loading...</span>
+            <div class="k-loading-image"></div>
+            <div class="k-loading-color"></div>
+        </script>
+    </body>
+</html>

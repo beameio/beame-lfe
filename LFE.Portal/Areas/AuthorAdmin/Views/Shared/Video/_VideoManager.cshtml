@@ -1,0 +1,36 @@
+﻿@model LFE.Portal.Areas.AuthorAdmin.Models.AuthorVideosPageToken
+
+@Html.Partial("Author/_AuthorVideosScripts",Model)
+<style scoped>
+    .list-cntrl-container .list-type-button{padding:3px 0 0 40px;margin-left: 5px;}
+    .list-manage-row-bt .add-btn{float:left;font-size:18px;margin:10px 10px 0 0;padding:0 0 0 42px}
+</style>
+
+<div id="d-video-container">
+	<div class="list-manage-row-up" style="border-top: none;">
+		<div class="count-title" id="d-vd-total">0</div>		
+	</div>
+    <div class="list-manage-row-bt" style="height:45px">
+        <a href="javascript:editVideo(-1)" class="add-btn" style="float: left">upload new videos</a>      
+    </div>
+    <div class="list-manage-row-bt" style="height:45px;">
+        <div class="list-cntrl-container" id="d-type-btn" style="float: left; margin:5px 15px 0 0;">
+            <a class="inline list-type-button grid" onclick="changeRepType('grid',this)" id="btn-grid">
+                grid view
+            </a>
+
+            <a class="inline list-type-button list" onclick="changeRepType('list',this)" id="btn-list">
+                list view
+            </a>
+        </div>
+        <div class="search-container" style="margin-top: 5px;">
+            <label class="inline">search</label>
+            <input class="search-input" placeholder="search videos by name or tag"/>
+        </div>
+    </div>
+
+        <div id="video-rep-container">
+            @Html.Partial("Author/_VideosList", Model)
+        </div>
+
+    </div>

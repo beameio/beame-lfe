@@ -1,0 +1,54 @@
+﻿<script>
+
+    var SC_MODAL_SELECTOR = '#modSC';
+
+    $(document).ready(function () {
+        $('#ifrm-sc').attr('src', 'about:blank');
+    });
+
+    function onPriceClicked(lineId) {
+        if (!hasValue(lineId)) return;
+
+        if (Number(lineId) < 0) {
+            alert('LineId required');
+            return;
+        }
+
+        var frameSrc = '@Url.Action("LoadPurchaseForm", "Payment", new { Area = "Widget" })' + '?id=' + lineId + '&trackingId=' + window.trackingId;
+
+        var m = $(SC_MODAL_SELECTOR);
+        //showFormLoader(SC_MODAL_SELECTOR);
+
+        m.on('show.bs.modal', function () {
+            showFormLoader(SC_MODAL_SELECTOR);
+            $('#ifrm-sc').attr("src", frameSrc);
+
+        });
+
+        m.on('hide.bs.modal', function () {
+            $('#ifrm-sc').attr('src', 'about:blank');
+        });
+        m.modal({ show: true });
+
+    }
+
+    if (typeof (onWindowChanged) != undefined && typeof (onWindowChanged) == "function") {
+        $(window).resize(onWindowChanged);
+        $(window).on("orientationchange", onWindowChanged);
+    }
+                
+</script>
+
+<div class="modal fade" id="modSC" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header rel">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Checkout</h4>
+            </div>
+            <div class="modal-body no-pad rel">
+                <iframe id="ifrm-sc" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+</div>

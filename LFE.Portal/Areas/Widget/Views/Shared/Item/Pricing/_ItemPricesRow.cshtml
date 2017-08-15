@@ -1,0 +1,81 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+@model ItemPricesPageToken
+           
+@{
+    
+    string priceBoxClass;
+
+    var oneTime      = Model.PriceLines.Where(x => x.PriceType == BillingEnums.ePricingTypes.ONE_TIME && x.Price > 0).ToList();
+    var subscription = Model.PriceLines.Where(x => x.PriceType == BillingEnums.ePricingTypes.SUBSCRIPTION && x.Price > 0).ToList();
+    var rentals      = Model.PriceLines.Where(x => x.PriceType == BillingEnums.ePricingTypes.RENTAL && x.Price > 0).ToList();
+
+    var prices = new List<PriceBoxToken>();
+    
+    if (Model.Mode == ePricesDisplayMode.SHORT)
+    {
+        var oneTimeExists = oneTime.Any() ? 1 : 0;
+        var subscriptionExists = subscription.Any() ? 1 : 0;
+        var rentalExists = rentals.Any() ? 1 : 0;
+        var totalPriceKinds = oneTimeExists + subscriptionExists + rentalExists;
+
+        priceBoxClass = "short ";
+
+        switch (totalPriceKinds)
+        {
+            case 0:
+            case 1:
+                priceBoxClass += "col-xs-12";
+                break;
+            case 2:
+                priceBoxClass += "col-xs-6";
+                break;
+            case 3:
+                priceBoxClass += "col-xs-4";
+                break;
+        }
+
+        if (oneTime.Any())
+        {
+            prices.Add(new PriceBoxToken { prices = oneTime, type = BillingEnums.ePricingTypes.ONE_TIME, Mode = Model.Mode });
+        }
+        if (subscription.Any())
+        {
+            prices.Add(new PriceBoxToken { prices = subscription, type = BillingEnums.ePricingTypes.SUBSCRIPTION, Mode = Model.Mode });
+        }
+        if (rentals.Any())
+        {
+            prices.Add(new PriceBoxToken { prices = rentals, type = BillingEnums.ePricingTypes.RENTAL, Mode = Model.Mode });
+        }
+    }
+    else
+    {
+        priceBoxClass = "full ";
+        prices.AddRange(Model.PriceLines.Where(x=>x.Price > 0).Select(x=>new PriceBoxToken
+        {
+            prices = new List<PriceLineDTO> {x}
+            ,type  = x.PriceType
+            ,Mode  = Model.Mode
+        })); 
+    }   
+    
+
+    <div class="row">
+        @{
+            var cnt = 1;
+
+            foreach (var t in prices)
+            {
+                t.EvenOrOdd = (byte)(cnt % 2);
+                t.ShowOrIcon = cnt < prices.Count;
+                t.TrackingID = Model.TrackingID;                
+                <div class="col @priceBoxClass" style="height: 100%;">@Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemPriceBox.cshtml", t)</div>
+
+                cnt++;
+            }
+            
+            
+        }        
+    </div>
+}

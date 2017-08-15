@@ -1,0 +1,52 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.EmailTemplateDTO
+
+<script>
+    function onTemplateSaved(response) {
+        window.hideFormLoader();
+        alert(response.success ? 'Template saved' : response.error);
+        
+    }  
+</script>
+
+
+
+@using (Ajax.BeginForm("SaveEmailTemplate", "Settings", null, new AjaxOptions { OnBegin = "javaScript:showFormLoader('.inner', null)", OnSuccess = "onTemplateSaved" }, new { @id = "frmTemplateEdit", @style = "position: relative" }))
+{
+   @Html.HiddenFor(x=>x.Kind)
+   @Html.HiddenFor(x=>x.TemplateId)
+
+  
+    
+    @(Html.Kendo().EditorFor(m=>m.Snipet)
+            .Encode(false)  
+            .HtmlAttributes(new { style = "width: 740px;height:840px" })
+            .Tools(tools => tools
+                                //.Clear()
+                                //.ViewHtml()
+                                //.Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink()
+                                .Clear()
+                                .Snippets(snippets => snippets.AddFromFile("Blue template", "~/Areas/PortalAdmin/_CommonTemplate.htm").AddFromFile("White template", "~/Areas/PortalAdmin/_CommonTemplate2.htm"))
+                                .Bold().Italic().Underline().Strikethrough()
+                                .JustifyLeft().JustifyCenter().JustifyRight().JustifyFull()
+                                .InsertUnorderedList().InsertOrderedList()
+                                .Outdent().Indent()
+                                .CreateLink().Unlink()
+                                .InsertImage()
+                                .SubScript()
+                                .SuperScript()
+                                .TableEditing()
+                                .ViewHtml()                                        
+                                .Formatting()
+                                .FontName()
+                                .FontSize()
+                                .FontColor().BackColor()
+                                
+                )  
+            .Messages(m=>m.InsertHtml("Select template"))       
+    )
+    
+    <p>
+        <input type="submit" value="Save Template" class="k-button" />
+    </p>
+}

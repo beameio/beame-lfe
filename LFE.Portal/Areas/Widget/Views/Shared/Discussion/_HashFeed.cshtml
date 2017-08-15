@@ -1,0 +1,99 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.HashtagFeedToken
+
+<script>
+	var FLIP_CONTAINER_SELECTOR = '#d-feed-box';
+	var FLIP1_CONTAINER_SELECTOR = '#d-feed-list-container';
+	var FLIP2_CONTAINER_SELECTOR = '#d-user-profile-container';
+
+	var effect;
+	var reverse = false;
+	var flipSupported;
+	
+
+	$(document).ready(function() {
+
+		flipSupported = isFxSupported();
+
+		if (flipSupported) {
+			effect = kendo.fx(FLIP_CONTAINER_SELECTOR).flipHorizontal($(FLIP1_CONTAINER_SELECTOR), $(FLIP2_CONTAINER_SELECTOR)).duration(1000);
+		}
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.disqus.messageClicked, getFeedView, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.disqus.messageClicked, getFeedView, null);
+
+	//	window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setFeedBoxH, null);
+
+		var h = $('.d-feed-page').height();
+		setFeedBoxH(h);
+
+	    window.currentTag = '@Model.Hashtag';
+	});
+
+	function setFeedBoxH(h) {
+		if (h != null) {
+			$(FLIP_CONTAINER_SELECTOR).height(h);
+			$(FLIP1_CONTAINER_SELECTOR).height(h);
+			$(FLIP1_CONTAINER_SELECTOR).height(h);
+		}
+	}
+
+	function getFeedView(data) {
+
+		var url = null;
+		var token = null;
+		switch (data.kind) {
+		case "Hashtag":
+			
+			var t = $(window.FEED_TREE_SELECTOR + ' > li').find(".txt").find('.btn[data-kind=Hashtag][data-val=' + data.Id + ']');
+			if (t.length == 0) return;
+			var n = $(t[0]).text();
+			
+			if (n.replace(new RegExp("#", 'g'), "") == currentTag.replace(new RegExp("#", 'g'), "")) return;
+		    
+			if (window.OPEN_FEED_WINDOW) {
+				openFeedWnd(n);
+				return;
+			}
+
+		    window.loadFeedList(n);
+			return;
+
+		case "User":
+			url = window.USER_PROFILE_URL;
+			token = {
+				id: data.Id,
+				pageSize: '@Model.UserCoursesPageSize'
+				};
+				break;
+		}
+
+		if (url == null) return;
+
+		ajaxAction(url, token, reverse ? refreshFeed : showFeedByParam, null);
+	}
+	
+
+	function openFeedWnd(tagName) {
+	
+		var t = tagName.replace(new RegExp("#", 'g'), "");
+		var url = '@Url.Action("IFrameFeed","Discussion",new{area="UserPortal"})' + '?id=' + t;
+		
+		var wnd = $("#wndFeed").data("kendoWindow");
+		$('#wndFeed').parent().find('.k-window-titlebar').addClass('l-header');
+		wnd.setOptions({
+			height : $('#main').height() - 150		    
+		});
+		wnd.refresh(url);
+		wnd.title(tagName + " Discussion Feed");
+		wnd.center();
+	
+		wnd.open();
+	}    
+</script>
+
+<div id="d-feed-box" style="position: relative;width: 100%;text-align: center;">    
+	<div id="d-feed-list-container" class="flip" style="width: 600px;margin: 0 auto;position: relative;">
+		@Html.Partial("Discussion/_HashFeedList",Model)
+	</div>
+	<div id="d-user-profile-container" class="flip" style="display: none;text-align: left"></div>
+</div>

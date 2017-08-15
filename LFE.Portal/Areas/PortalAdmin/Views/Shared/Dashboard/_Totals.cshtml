@@ -1,0 +1,16 @@
+﻿@model List<LFE.DataTokens.TotalsBoxToken>
+             
+@{
+    if (Model != null)
+    {
+        foreach (var token in Model.OrderBy(x => x.Index).ToArray())
+        {
+            @Html.Partial("Dashboard/_TotalBox", token)
+        }
+    }
+    else
+    {
+        <h2>Unexpected error</h2>
+    }
+}
+           

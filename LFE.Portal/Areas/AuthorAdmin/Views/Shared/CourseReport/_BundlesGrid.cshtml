@@ -1,0 +1,46 @@
+﻿@using LFE.DataTokens
+
+
+<script>
+	function deleteRow(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+		//if (window.console) console.log(dataItem);
+		if (dataItem.LearnerCount > 0) {
+			alert("Bundle already purchased and can't be deleted");
+			return;
+		}
+		window.deleteBundle(dataItem.BundleId, dataItem.Name);        
+	}
+
+	function onBundleDeleted(response) {
+		if (response.success) {
+			$('#gridAuthorBundles').data("kendoGrid").dataSource.read();
+		} else {
+			alert(response.error);
+		}
+	}
+</script>
+
+@(Html.Kendo().Grid <BundleListDTO>()    
+		.Name("gridAuthorBundles")
+		.TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+		.Columns(columns => {
+			columns.Bound(m => m.Name).ClientTemplate("<a href='" + Url.Action("EditBundle", "Course") + "/#=Uid#' style='' title='click to edit bundle' class='list-cmd' >#=Name#</a>").Title("Name of Bundle");
+			columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+			columns.Bound(p => p.Price).Title("Price").Format("{0:c}").Width(120);
+			columns.Bound(p => p.MonthlySubscriptionPrice).Title("Subscription").Format("{0:c}").Width(120);
+			columns.Bound(p => p.Status).Title("Status").Width(100);
+			columns.Bound(p => p.LearnerCount).Title("Subscribers ").Width(80);
+			columns.Bound(p => p.ReviewCount).Title("Reviews").Width(120);
+			columns.Bound(m => m.BundleId).ClientTemplate("<a href='" + Url.Action("EditBundle", "Course") + "/#=Uid#' style='margin:3px 0 0' class='list-cmd' >Edit</a>").Title(" ").Width(50);
+			columns.Command(command => command.Custom("Delete").Click("deleteRow"));
+		})          
+		.Sortable()
+		.Pageable(pager => pager.Enabled(false))
+		.Filterable(f=>f.Enabled(false))
+		.Events(e => e.DataBound("onItemListBound"))
+		.DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.BundleId))
+							.Read(read => read.Action("GetAuthorBundleList", "Course").Type(HttpVerbs.Get)).ServerOperation(false))
+	)  

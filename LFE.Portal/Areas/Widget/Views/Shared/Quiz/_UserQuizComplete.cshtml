@@ -1,0 +1,131 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.StudentQuizAttemptDTO
+
+
+@{
+    if (Model.IsValid)
+    {
+        <div class="quiz-head">
+            <div class="inner row">
+                <div class="float-left">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_AttemptsCounter.cshtml", new AttemptCounterToken { Attempts = Model.Quiz.Attempts, UserAttempts = Model.UserAttempts, IsCompleteForm = true })
+                </div>
+
+                <div class="float-right">
+                    @{
+                        if (Model.Quiz.TimeLimit != null)
+                        {
+                            @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_StaticTimer.cshtml", Model.Quiz.TimeLimit)
+                        }
+                    }                    
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-content-container post">
+            @{
+                if (Model.FinishedOnTimeout)
+                {
+                    <div class="time-out-container">
+                        <div class="c-title">
+                            <h4>Oooooops....</h4>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12 col-md-4">
+                                <label class="detail-info">You have reached the time limit for this quiz</label>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    if (Model.IsSuccess)
+                    {
+                        <div class="cmpl-success-container">
+                            <div class="c-title">
+                                <h4 class="upper">congratulations</h4>
+
+                                <label class="detail-info">You have passed this quiz</label>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <label class="detail-info">Your score is:</label>
+
+                                    @{
+                                        if (Model.CertificateSent)
+                                        {
+                                            <label style="margin: 25px 0 0; font-weight: normal; color: #fff; font-size: 18px;">A certificate was sent to the email address associated with your LFE account</label>
+                                        }
+                                    }
+                                    
+                                </div>
+
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <label class="score-circle pass">
+                                        @Model.UserScore.FormatdDecimal(0)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="cmpl-fail-container">
+                            <div class="c-title">
+                                <h4>You have not passed this quiz.</h4>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6 col-sm-push-6 col-md-6 col-md-push-6">
+                                    <div class="score-circle fail">
+                                        <span class="sc-sub">Your score is:</span>
+                                        <span class="sc-val">@Model.UserScore.FormatdDecimal(0)</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-6 col-sm-pull-6 col-md-6 col-md-pull-6">
+                                    <label class="detail-info">Passing score:</label> <label class="sm-pass">@Model.Quiz.PassPercent</label>
+                                    @{
+                                        var isQuizAvailable = Model.AvailableAttempts == null || Model.AvailableAttempts > 0;
+                                        if (Model.Quiz.IsMandatory && !isQuizAvailable)
+                                        {
+                                            <label class="detail-info sm">
+                                                Since passing this quiz is mandatory for
+                                                completing the course, and you have
+                                                exceeded the number of attempts
+                                                allowed for this quiz, please contact
+                                                the course author for further instructions
+                                            </label>
+                                        }
+                                    }
+                                </div>
+
+
+                            </div>
+                        </div>
+                    }
+
+                }
+}
+
+            <div class="bottom-row">
+                <div class="inner row">
+                    @Html.Partial("Quiz/_UserActions", Model)
+                </div>
+            </div>
+        </div>
+
+        if (Model.IsSuccess && Model.NotifySuccess)
+        {
+            <script>
+                window.getNotifManagerInstance().notify(notifEvents.quiz.quizSuccess, null);
+            </script>
+        }
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}

@@ -1,0 +1,144 @@
+﻿
+@using LFE.Portal.Helpers
+@{    
+    var trackingID = string.Empty;
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    //var parentUrl = viewModel != null && viewModel.ParentURL != null ? viewModel.ParentURL : "";    
+    var isWixSite = viewModel != null && viewModel.WebStore != null && !String.IsNullOrEmpty(viewModel.WebStore.WixInstanceID) && viewModel.WebStore.WixInstanceID != Guid.Empty.ToString();
+    if (viewModel != null && viewModel.WebStore != null && !string.IsNullOrEmpty(viewModel.WebStore.TrackingID))
+    {
+        trackingID = viewModel.WebStore.TrackingID;
+    }
+
+    var isSecured = this.IsUnderSsl();      
+}
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml")
+    <meta charset="utf-8"/>
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+
+
+    @Styles.Render("~/bundles/widget")
+
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutHeadCustomCssSettings.cshtml")
+
+    @RenderSection("CSS", false)
+
+    @Html.Partial("~/Views/Shared/Layout/_HeaderScripts.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-35089799-1']);
+        _gaq.push(['_setDomainName', 'lfe.com']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+
+    @{
+        if (isWixSite)
+        {
+
+            @Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+        }
+    }
+    <script>
+        var isSecured = '@(isSecured.ToString().ToLower())' == 'true';
+    </script>
+</head>
+<body>
+
+    @Html.Partial("~/Views/Shared/Layout/_SiteHeader.cshtml")
+    
+    @RenderSection("SecondNav", false)
+
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">
+        @RenderBody()
+    </div>
+    
+    @RenderSection("JS", required: false)
+    @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutWixScripts.cshtml")
+    @{
+        if (!User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_LayoutLoginScripts.cshtml")
+        }
+    }
+    <script>
+        var effect;
+        var reverse = false;
+        var flipSupported;
+
+        var initMode = 'Login';
+
+        var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+    </script>
+    
+    <script>
+
+        $(document).ready(function() {
+            saveEventApi(USER_EVENTS.STORE_VIEW, '@trackingID', null, null, null, null);
+        });
+
+    </script>
+
+    <script>
+
+    //_NavViewOptions
+    $(document).ready(function () {
+        $('.nav-inner-toggle').unbind('click').click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).siblings($(this).attr('data-target')).toggle(300);
+        });
+    });
+    </script>
+  
+    @Html.Partial("~/Views/Shared/Common/_FooterScripts.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    <script type="text/x-kendo-template" id="kendo-sort-template">
+        <li>
+            <a data-val="${field}" data-dir="${dir}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+        </li>
+    </script>
+
+    @*@(Html.Kendo().Tooltip()
+        .For(".navbar-header")
+        .Filter("a")
+        .ContentTemplateId("lfe-template")
+        .Position(TooltipPosition.Bottom)
+        .Width(320)
+        .Height(180)
+        //.AutoHide(false)
+    )*@
+
+    <script id="lfe-template" type="text/x-kendo-template">
+        <div class="lfe-tooltip-content">
+            LFE stands for:
+            <br />
+            <b>Learning From Experience</b>
+            <span class="info">
+                That is our mission - to enable experts of all fields to distribute their knowledge without any need for technical skills.
+            </span>            
+        </div>
+    </script>
+    @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+</body>
+
+</html>

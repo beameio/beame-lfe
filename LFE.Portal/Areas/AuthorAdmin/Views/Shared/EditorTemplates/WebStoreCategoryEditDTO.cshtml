@@ -1,0 +1,26 @@
+﻿@model LFE.DataTokens.WebStoreCategoryEditDTO
+           
+<li data-val="${WebStoreCategoryId}">
+    <div class="chap-row">
+        @using (Ajax.BeginForm("SaveCategoryDetails", "WebStore", new { area = "AuthorAdmin" }, new AjaxOptions { OnSuccess = "onStoreCategorySaved" }, new { @id = "frmEditWsCategory", @style = "" }))
+        {
+            @Html.HiddenFor(m => m.WebStoreCategoryId)
+            @Html.HiddenFor(m => m.WebStoreId)
+            @Html.HiddenFor(m => m.OrderIndex)
+            @Html.HiddenFor(m => m.IsPublic)
+
+            <span class="float-left drag-box">&nbsp;</span>
+            <span class="float-left btn-collapse-first">&nbsp;</span>
+            <span class="float-left" style="padding-top: 4px">
+                @Html.TextBoxFor(m => m.CategoryName, new { @class = " ch-name", @style = "height:20px;width: 200px", @size = 256, @maxlength = 256 })
+            </span>
+
+            <span class="float-right" style="width:150px;">
+                <span class="k-update-button row-btn right btn-save inline" title="Save Category"><span class="ico"></span></span>
+
+                <span class="k-cancel-button row-btn btn-cancel inline pt9" title="Cancel"><span class="ico"></span></span>
+            </span>
+        }
+
+    </div>
+</li>

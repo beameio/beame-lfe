@@ -1,0 +1,110 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_HeaderCssLinks.cshtml")
+    <meta charset="utf-8"/>
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <meta name="viewport" content="width=device-width"/>
+    <title>@ViewBag.Title</title>
+
+    @Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+
+    @Styles.Render("~/bundles/widget")
+
+
+
+
+    @RenderSection("CSS", false)
+
+    @*@Scripts.Render("~/bundles/header")*@
+    @Html.Partial("~/Views/Shared/Layout/_HeaderScripts.cshtml")
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-35089799-1']);
+        _gaq.push(['_setDomainName', 'lfe.com']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+    @Scripts.Render("~/bundles/useracc")
+</head>
+<body>
+
+    @Html.Partial("Layout/_SiteHeader")
+
+   @Html.Partial("Layout/_UserPurchasesToolbar")
+
+    <div class="container rel" id="main-container" style="margin-bottom: 30px">
+        @RenderBody()
+    </div>
+    
+    <script>
+    var effect;
+    var reverse = false;
+    var flipSupported;
+
+    var initMode = 'Login';
+
+    var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+    </script>
+    
+    @RenderSection("JS", required: false)
+
+    <script>
+
+        //_NavViewOptions
+        $(document).ready(function () {
+            $('.nav-inner-toggle').unbind('click').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).siblings($(this).attr('data-target')).toggle(300);
+            });
+        });
+    </script>
+
+ 
+    <script>
+
+    $(document).ready(function () {});
+    
+    </script>
+    
+    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+    
+    @(Html.Kendo().Tooltip()
+        .For(".navbar-header")
+        .Filter("a")
+        .ContentTemplateId("lfe-template")
+        .Position(TooltipPosition.Bottom)
+        .Width(320)
+        .Height(180)
+    )
+
+    <script id="lfe-template" type="text/x-kendo-template">
+        <div class="lfe-tooltip-content">
+            LFE stands for:
+            <br />
+            <b>Learning From Experience</b>
+            <span class="info">
+                That is our mission - to enable experts of all fields to distribute their knowledge without any need for technical skills.
+            </span>            
+        </div>
+    </script>
+    @Html.Partial("~/Views/Shared/Common/_ZendeskScripts.cshtml")
+</body>
+
+</html>

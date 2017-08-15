@@ -1,0 +1,72 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+@section css{
+    <link href="~/Areas/PortalAdmin/Content/styles/hub.css" rel="stylesheet" />
+    <link href="~/Content/styles/sweet-alert.css" rel="stylesheet" />     
+}
+<h2>Hub report</h2>
+
+
+
+<div id="d-rep-container">
+
+    @(Html.Kendo().Grid<HubGridViewDTO>()
+          .Name("hubReport")
+          .ToolBar(toolbar => toolbar.Create().Text("Add new HUB"))
+          .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+          .Columns(columns =>
+          {
+              columns.Bound(b => b.LogoUrl).Filterable(false).Width(60).ClientTemplate("<img class='hub-thumb' alt='${Name}' src='${LogoUrl}' />").Title(" ");
+              columns.Bound(p => p.HubId).Width(60);
+              columns.Bound(p => p.Name);
+              columns.Bound(p => p.Currency.ISO).Title("Currency");
+              columns.Bound(b => b.Status);
+              columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy}");
+              columns.Bound(m => m.HubId).ClientTemplate("<a href='" + Url.Action("Details", "Hub") + "/#=HubId#' style='margin:3px 0 0' class='list-cmd' >View</a>").Title(" ").Width(50);
+              columns.Command(c => c.Destroy());
+          })
+          .AutoBind(true)
+          .Sortable()
+          .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+          .Filterable(f => f.Enabled(false))
+          .Editable(e => e.Mode(GridEditMode.PopUp).DisplayDeleteConfirmation("Are You sure?"))
+          .DataSource(dataSource => dataSource.Ajax()
+              .Events(e => e.Error("error_handler"))
+              .Model(model =>
+              {
+                  model.Id(p => p.HubId);
+                  model.Field(f => f.Status).DefaultValue(CommonEnums.eAdminStatuses.ACTIVE);
+                  model.Field(f => f.HubId).Editable(false).DefaultValue(-1);
+                  model.Field(f => f.Uid).Editable(false).DefaultValue(Guid.NewGuid());
+                  model.Field(f => f.AddOn).Editable(false).DefaultValue(DateTime.Now);                  
+                  model.Field(f => f.Currency).DefaultValue(Extensions.BASE_USD_DTO);
+                  model.Field(f => f.LogoUrl).Editable(false);
+              })
+              .Create(update => update.Action("HUB_Create", "Hub"))
+              .Destroy(update => update.Action("HUB_Destroy", "Hub"))
+              .Read(read => read.Action("HUB_Read", "Hub").Type(HttpVerbs.Get)).ServerOperation(true))
+    )
+</div>
+
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>

@@ -1,0 +1,42 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindFbLogGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindFbLogGrid, null);
+	});
+
+	function rebindFbLogGrid() {
+		$('#FbPostLogReport').data("kendoGrid").dataSource.read();
+	}
+	var amp = '#';
+</script>
+
+@(Html.Kendo().Grid<FbPostInterfaceLogDTO>()
+	  .Name("FbPostLogReport")
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.PostId);
+          columns.Bound(p => p.User.url).Width(30).ClientTemplate("<img class='user-thumb' alt='${User.name}' src='${User.url}' />").Title(" ");
+          columns.Bound(p => p.User.name).ClientTemplate("<span data-val='${User.id}' title='click to view user details' class='list-cmd usr-btn'>#=User.name#</a>");
+		  columns.Bound(p => p.Message).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Message)#' style='width:200px'>${Message}</div>");
+		  columns.Bound(p => p.Title).Width(150).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#' style='width:150px'>${Title}</div>");          
+		  columns.Bound(p => p.Caption).Width(150).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Caption)#' style='width:150px'>${Caption}</div>");
+		  columns.Bound(p => p.ImageUrl).Width(30).ClientTemplate("<img class='user-thumb' style='display:#=hasValue(ImageUrl) ? 'block' : 'none'#' alt='${Title}' src='#=hasValue(ImageUrl) ? ImageUrl : amp #' />").Title(" ");
+		  columns.Bound(p => p.Status);
+		  columns.Bound(p => p.Error).Width(150).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Error)#' style='width:150px'>${Error}</div>");
+		  columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+		  columns.Bound(p => p.FbPostId);
+		  columns.Bound(p => p.PostOn).Format("{0:MM/dd/yyyy HH:mm:ss}");          
+	  })
+	  .Events(e=>e.DataBound("onReportBound"))
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+	  .Filterable(f => f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.PostId))
+							.Read(read => read.Action("GetFbPostInterfaceLogs", "Report").Data("getLogsRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+	  )
+

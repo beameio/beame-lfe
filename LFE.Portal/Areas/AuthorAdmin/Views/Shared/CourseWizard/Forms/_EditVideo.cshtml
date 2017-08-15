@@ -1,0 +1,188 @@
+﻿@model LFE.DataTokens.ChapterVideoEditDTO
+
+<style>
+	table.k-editor,.k-editor .k-editable-area {height: 80px !important;}
+	.k-editor iframe.k-content {height: 80px !important;}
+	#valid-video .field-validation-error{height: 108px !important;margin-top: 0}
+</style>
+
+<script type="text/javascript">
+	var BC_TH_PLAEYR_W = 178;
+	var BC_TH_PLAEYR_H = 108;
+	var EDIT_FORM_SELECTOR = '#frmChapterVideo';
+	var VIDEO_FIELD_NAME = '#VideoIdentifier';
+	var deleteUrl = '@Url.Action("DeleteChapterVideo","Course")';
+	
+	$(document).ready(function () {
+
+		window.isFormInEditMode = parseInt('@Model.VideoId') < 0;
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		setFocusEvent($('.video-cn  #Title'));
+		
+		var btnSave = $('.btn-cn-save');
+		btnSave.unbind('click');
+		btnSave.bind('click', function (e) {
+			e.preventDefault();
+			$('#frmChapterVideo').submit();
+		}
+		);
+
+		var btnDelete = $('.d-form-title-row  .btn-delete');
+		btnDelete.unbind('click');
+		btnDelete.bind('click', function (e) {
+			e.preventDefault();
+			var videoId = $(EDIT_FORM_SELECTOR).find('#VideoId').val();
+		  
+			if (!hasValue(videoId)) {
+				window.formUserNotifManager.show({ message: userMessages.SAVE_YOUR_WORK, kind: NotificationKinds.Info });
+				return;
+			}
+			
+			if (!window.confirm(userMessages.CONFIRM_DELETE)) return;
+
+			var vid = parseInt(videoId);
+			
+			if (vid<0) {
+				alert(userMessages.SAVE_YOUR_WORK);
+				return;
+			}
+
+			var data = { id: vid };
+			
+			ajaxAction(deleteUrl, data, window.onVideoDeleted);
+		});
+		
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.course.videoSelected, onWizardVideoSelected, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.course.videoSelected, onWizardVideoSelected, null);
+	});
+	
+	function onVideoSaved(response) {
+		window.hideFormLoader();
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Video saved successfully" : response.error;
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+			window.isFormInEditMode = false;
+			$(EDIT_FORM_SELECTOR).find('#VideoId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+
+			//set timeout for notification alert
+			setTimeout(function () {
+				window.getNotifManagerInstance().notify(notifEvents.chapter.videoSaved, response.result);
+				window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+			}, 1000 *3);
+		}
+	}
+</script>
+
+<div class="d-form-title-row">
+	<h3 class="float-left ellipsis" title="@Model.Title">
+		@Model.Title
+	</h3>
+	<div class="float-right">
+		<a class="btn-cn-save inline" style="padding-right: 10px" href="#">save</a>
+		<a class="btn-delete inline" href="#">delete</a>
+	</div>
+</div>
+@*OnBegin = "javaScript:showFormLoader('#frmChapterVideo')",*@
+
+@using (Ajax.BeginForm("SaveChapterVideo", "Course", null, new AjaxOptions {  OnSuccess = "onVideoSaved", LoadingElementId = "site-loader" }, new { @id = "frmChapterVideo", @class = "fs-cn-form" })) 
+{
+	@Html.HiddenFor(x=>x.VideoId)
+	@Html.HiddenFor(x=>x.ChapterId)
+	@Html.HiddenFor(x=>x.OrderIndex)
+	<fieldset class="fs-cn">
+		<legend></legend>
+		<ul class="ul-edit-form cn video-cn">
+			<li>
+				@Html.LabelFor(m=>m.Title)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.Title,new{@class="txt-inp",@onkeydown="onTxtBoxInEdit(this)",@size=50,@maxlength=50})
+					<span class="input-info">Maximum 50 symbols</span>                    
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.Title,null,new{@class=String.IsNullOrEmpty(Model.Title) ? "" :"pass"})
+				</div>
+			</li>
+			<li >
+				@Html.LabelFor(m=>m.SummaryHTML)
+				<div class="input-container">
+					@(Html.Kendo().EditorFor(m=>m.SummaryHTML)
+						  .Events(e=>e.KeyDown("setEditMode"))
+						  .HtmlAttributes(new { @class = "video-summary" }) 
+						  .Encode(false)
+						  .Tools(t=>t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+						  )
+				</div>
+			</li>
+			
+			<li class="li-video-selector">
+				<div class="left">
+					@Html.LabelFor(m=>m.VideoIdentifier)                      
+				</div>
+				<div class="center" style="position: relative">
+					<div class="thumb-box video-th " id="d-video-thumb">
+						@{
+							if (Model.VideoToken != null)
+							{
+								<script>
+									var token = {
+									    stillUrl: fixSR('@Model.VideoToken.stillUrl')
+										, title: '@Model.VideoToken.title'
+										, minutes: '@Model.VideoToken.minutes'
+										, identifier: '@Model.VideoToken.identifier'
+                                        , videoUrl: fixSR('@Model.VideoToken.videoUrl')
+									};
+									buildThumbMediaPlayer(token, '#d-video-thumb');
+								</script>
+							}
+							else
+							{
+								<script>
+									$(document).ready(function () {
+										$('#d-video-thumb').attr({title:'click to open video manager'});
+										$('#d-video-thumb').click(openVideoWnd);
+									});							        
+								</script>
+							}
+						}
+					</div>		
+					<a class="browse-video " href="javaScript:openVideoWnd()">Browse video manager</a>			
+				</div>  
+				
+				<div class="validator-container right" id="valid-video">
+					@Html.ValidationMessageFor(model => model.VideoIdentifier,null,new{@class="inline forthumb" + (Model.VideoIdentifier==null ? " " :" pass")})
+				</div>
+				
+				@Html.HiddenFor(m=>m.VideoIdentifier)
+			</li>
+
+			<li>
+				<div class="input-container" style="width:35px;padding: 15px 0 0">
+					@Html.EditorFor(m=>m.IsOpen)
+				</div>
+				@Html.LabelFor(m=>m.IsOpen,new{@style="width:auto;display: table-cell;padding: 14px 0 0 !important"})
+			</li>
+		</ul>		        
+	</fieldset>
+}
+
+	
+	<div style="padding:5px 0 0; border-top:solid 1px #a4a4a4;width: 100%;">
+		<div class="inner">
+			<div class="inline info-box" id="wiz-video-info" style="width: calc(100% - 160px);height: 30px;margin: 0">
+				<p class="alert" id="info-lab" style="padding:0 0 2px 10px;width: auto"></p>
+			</div>
+			<div class="inline" style="width:140px;text-align: right;padding-top: 5px">
+				<a class="btn-cn-save inline" style="padding-right: 10px" href="#">save</a>
+				<a class="btn-delete inline" href="#">delete</a>
+			</div>
+		</div>    
+	</div>

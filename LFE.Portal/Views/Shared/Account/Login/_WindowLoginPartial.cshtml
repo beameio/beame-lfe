@@ -1,0 +1,15 @@
+﻿   @model LFE.DataTokens.LoginDTO
+   
+
+<div style="width: 100%">
+    <div style="height:57px;margin: 35px auto 0" class="login-inner-w">
+        @Html.Partial("Account/MainLogin/_ExternalLogin",Model)
+    </div>
+
+    
+    <label  style="display: block;height: 16px;font-size: 16pt;font-weight: bold;margin: 20px 0" class="">or</label>
+    
+    <div style="height: 180px;margin: 0 auto;" class="login-inner-w">
+        @Html.Partial("Account/Login/_WindowLfeLoginPartial", Model)
+    </div>
+</div>

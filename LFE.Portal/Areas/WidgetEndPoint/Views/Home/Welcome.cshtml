@@ -1,0 +1,34 @@
+﻿@using LFE.Core.Extensions
+@using LFE.Core.Utils
+@model LFE.Portal.Areas.WidgetEndPoint.Models.PluginIndexToken
+@{
+    ViewBag.Title = "Wordpress landing page";
+    Layout = "~/Areas/WidgetEndPoint/Views/Shared/_Layout.cshtml";
+
+    var user = this.GetCurrentUserName();
+}
+
+<div class="wep_topbox">
+    <h2>Learning From Experience</h2>
+    <h1>Sell Online Courses from your website</h1>
+    <span>Welcome to the world of @(Constants.APP_OFFICIAL_NAME). @(Constants.APP_OFFICIAL_NAME) mission is to enable experts in all fields to share their knowledge and earn money online through creating and selling online courses. Creating a course is easy - all it takes is a few clicks and great video content. Sign up or Login and let’s roll!</span>
+</div>
+<div class="wep_bottombox">
+    <div class="welcomeBox">
+        <span>Welcome @user</span>
+        <a href="@Url.Action("SignOff", "Account", new { area = "",returnUrl=Url.Action("Index","Home",new{area="WidgetEndPoint", id = Model.Uid})})">
+           Log out
+        </a>
+    </div>
+    <div class="cell">
+        <a href="@Url.Action("PluginContent", "Home", new { area = "WidgetEndPoint", id = Model.Uid })">
+            <h3>&nbsp;</h3><img src="~/Areas/WidgetEndPoint/Content/assets/author.png" alt="" /><br /><br /> Go to my<h4>AUTHOR<br />PORTAL</h4>
+        </a>
+        <div class="vert_separator"></div>
+    </div>
+    <div class="cell">
+        <a href="@(Utils.GetKeyValue("homeUrl"))wordpress-landing-page-001/">
+            <h3>&nbsp;</h3><img src="~/Areas/WidgetEndPoint/Content/assets/support.png" alt="" /><br /><br /><h4>LEARN MORE</h4>
+        </a>
+    </div>
+</div>

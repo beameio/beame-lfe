@@ -1,0 +1,87 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+<!DOCTYPE html>
+<html>
+<head>
+    @{
+        var meta_desc = Context.Items["meta_desc"] ?? $"{Constants.APP_OFFICIAL_NAME} is a multiplatform software solution that makes it easy for experts in any field to share their knowledge.";
+        var meta_keywords = Context.Items["meta_keywords"] ?? "LFE, Learning from experience, Experience, Courses, Teaching, Student, Knowledge";
+    }
+    <meta charset="utf-8" />
+    <meta name="description" content="@meta_desc" />
+    <meta name="keywords" content="@meta_keywords"/>
+    <link rel="shortcut icon" href="@Url.Content("~/Content/images/favicon.png")" />
+    <title>@(Constants.APP_OFFICIAL_NAME) @ViewBag.Title</title>
+    
+    @RenderSection("Meta", false)
+    @Styles.Render("~/Content/basecss")
+    @RenderSection("CSS", false)
+       
+  
+    <style>
+        .ul-loc-nav{width: 100%;margin: 10px 0 0 10px;float: none !important;text-align: right}
+         .ul-loc-nav li{display: inline-block;width: auto;margin: 0 10px;float: none !important}
+    </style>
+</head>
+<body>
+<div class="left-bg"></div>        
+<div id="page" class="table">
+<div class="row">
+@*  @{
+                Html.RenderAction("NormalNavigator", "Navigator", new { activePage = ViewBag.ActivePage });
+            } *@
+
+            <section id="content" class="cell">
+                <header>
+                    @{
+                        var isAdmin = this.IsCurrentUserAdmin(); ;
+
+                        var user = this.CurrentUser();
+                      
+                        var name = user != null ? user.FullName : string.Empty;
+                        
+                        if (WebSecurity.IsAuthenticated)
+                        {
+                           
+
+                            <ul class="ul-loc-nav" style="direction: ltr">
+                                <li>
+                                    @(String.IsNullOrEmpty(name) ? WebSecurity.CurrentUserName : name)
+                                </li>
+                                @{
+                                if (isAdmin)
+                                {
+                                    <li>
+                                        @Html.ActionLink("Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { style = "color:#555;text-decoration:underline" });    
+                                    </li>                                    
+                                }
+                                }
+                                <li>
+                                    @Html.ActionLink("My Account", "UserSettings", "Account", new { area = "" }, new { style = "color:#555;text-decoration:underline" })
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Start to Teach", "Index", "Home", new { Area = "AuthorAdmin" }, new { style = "color:#555;text-decoration:underline" })
+                                </li>
+                                <li>
+                                     @Html.ActionLink("Log Out", "SignOff", "Account", new{area=""}, new { style = "color:#555;text-decoration:underline" })  
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            @Html.ActionLink("go to login","Login","Account",new{area=""},null)
+                        }
+                    }                  
+                </header>
+                <div class="clear"></div>
+                <section id="main">
+                    @RenderBody()
+                </section>            
+            </section>        
+        </div>
+    </div>
+    
+    @RenderSection("JS", false)
+
+</body>
+</html>

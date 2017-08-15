@@ -1,0 +1,24 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int
+
+
+	@(Html.Kendo().Grid <CourseListDTO>()    
+	  .Name("gridAuthorCourses")
+	  .TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+	  .Columns(columns => {
+            columns.Bound(m => m.Name).ClientTemplate("<a href='#=CoursePageUrl#?mode=admin' style='' title='click to view course page' class='list-cmd'  target='_blank'>#=Name#</a>").Title("Name of Course");
+			columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+			columns.Bound(p => p.Price).Title("Price").Format("{0:c}").Width(120);
+			columns.Bound(p => p.MonthlySubscriptionPrice).Title("Subscription").Format("{0:c}").Width(120);
+			columns.Bound(p => p.LearnerCount).Title("Number of Subscribers ").Width(150);
+            columns.Bound(p => p.ReviewCount).Title("Reviews").Width(120);
+            columns.Bound(p => p.Status).Title("Status").Width(120);
+	  })          
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true).Refresh(true))
+	  .Filterable(f=>f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.CourseId))
+							.Read(read => read.Action("GetAuthorCoursesList", "User",new{area="PortalAdmin",id=Model}).Type(HttpVerbs.Get)).ServerOperation(false)
+	))	

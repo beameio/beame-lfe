@@ -1,0 +1,7 @@
+﻿@using LFE.Portal.Areas.Widget.Helpers
+@model LFE.DataTokens.ItemProductPageToken
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Item/_ItemIntro.cshtml", Model.ProductPageToken2ItemIntroToken())
+<div class="item-contents-container">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Item/Course/_ChaptersTree.cshtml", Model.Contents)    
+</div>

@@ -1,0 +1,245 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@model CourseWizardDto
+@{
+	var backAllowed = Model.CurrentWizardStep != CourseEnums.eWizardSteps.CourseName;
+}
+
+<script>
+	var formUserNotifManager;
+	
+	
+	$(document).ready(function () {
+
+		window.isFormInEditMode = false;
+		
+		formUserNotifManager = new WizardNotificationManager(); //old '#cn-info', '.alert', false
+
+		//update wizard form steps
+		updateManagerStep('@Model.LastCompletedStep', stepKinds.last);
+		updateManagerStep('@Model.NextWizardStep', stepKinds.next);
+		updateManagerStep('@Model.CurrentWizardStep', stepKinds.current);
+
+		//window.getNotifManagerInstance().notify(notifEvents.wizard.stepsUpdated);
+
+		var loadFromHash = '@Model.LoadFromHash'.toLowerCase() == 'true';
+		if (loadFromHash) {
+			var hash = window.location.hash ? window.location.hash.substring(1) : null;
+
+			if (hasValue(hash)) {
+				var current = getStepIndex(getManagerStep(stepKinds.current));
+				if (current == null) return;
+				var redirectByHash = handleHash(hash, current);
+				if (redirectByHash) return;
+			}
+			//set hash
+			var index = getStepIndex(getManagerStep(stepKinds.current));
+			if (index == null) return;
+			window.location.hash = index;
+		}
+
+		window.getNotifManagerInstance().notify(notifEvents.wizard.stepLoaded);
+		
+		//next button
+		var nextAllowed = '@(Model.IsNextAllowed)'.toLowerCase() == 'true';
+	//	console.log('next allowed =' + nextAllowed);
+		handleNextButtonState(nextAllowed);
+		
+		//next button
+		var backAllowed = '@backAllowed'.toLowerCase() == 'true';
+		handleBackButtonState(backAllowed);
+		
+	});
+	
+	function nextStepClick(e) {
+		
+		var isSaveAndNext = '@(Model.IsSaveAndNext)'.toLowerCase() == 'true';
+
+		if (isSaveAndNext) {
+			window.getNotifManagerInstance().notify(notifEvents.wizard.saveStep, null);
+
+			window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.stepSaved, changeStep, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.wizard.stepSaved, changeStep, null);
+		} else {
+			
+			if (!validateEditMode()) {
+				e.preventDefault();
+				return;
+			}
+
+			changeStep();
+		}
+	}
+
+	function handleNextButtonState(enabled) {
+		var next = $('.btn-next');
+		
+		next.unbind('click');
+		if (enabled) {
+			next.removeClass('disabled');
+			next.click(nextStepClick);
+		} else {
+			next.addClass('disabled');
+		}
+	}
+	
+	function handleBackButtonState(enabled) {
+		var back = $('.btn-back');
+		back.unbind('click');
+		
+		if (enabled) {
+			back.removeClass('disabled');
+			
+			back.bind('click', function (e) {
+				
+				if (!validateEditMode()) {
+					e.preventDefault();
+					return;
+				}
+				
+				updateManagerStep('@Model.BackWizardStep', stepKinds.next);
+				changeStep();
+			});
+		} else {
+			back.addClass('disabled');
+		}
+	}
+
+	function getCurrentChapterId() {
+		var combo = $('#ddlCourseChapters').data('kendoDropDownList');
+		return combo == undefined ? null : combo.value();
+	}
+
+	function onChaptersBound(e) {
+	    try {
+	        $('#s-curr-chapt-name').html(e.sender.text());
+	    } catch (ex) {
+	        //if (window.console) console.log(ex);
+	    }
+	}
+
+	function onChapterChanged(e) {
+		if (!validateEditMode()) {
+			e.preventDefault();
+			return;
+		}
+		var dataItem = this.dataItem(e.item.index());
+		
+		$('#s-curr-chapt-name').html(dataItem.name);
+		
+		window.getNotifManagerInstance().notify(notifEvents.wizard.chapterChanged, dataItem.id);
+	}
+	</script> 
+@{
+	if (Model.IsValid &&  Model.CheckVideoState)
+	{
+		<script>
+			var USER_VIDEO_REFRESH_INTERVAL;
+		 
+			$(document).ready(function () {
+				//console.log('video count logic');
+				clearInterval(USER_VIDEO_REFRESH_INTERVAL);
+				USER_VIDEO_REFRESH_INTERVAL = setInterval(checkUserVideos, 1000 * 60);
+			});
+
+			function checkUserVideos() {
+				$.ajax({
+					url: '@Url.Action("GetUserVideosCount", "Course")',
+					cache: false,
+					type: "Get",
+					datatype: "json",
+					contentType: "application/json; charset=utf-8"
+					, success: function (cnt) {
+						if (cnt == 0) return;
+						clearInterval(USER_VIDEO_REFRESH_INTERVAL);
+						window.getNotifManagerInstance().notify(notifEvents.video.videoSaved, null);
+						return;
+						//updateManagerStep(wizardStepsEnum.VideoManager, stepKinds.last);
+						
+						//window.getNotifManagerInstance().notify(notifEvents.wizard.rebindTree, null);
+						//handleNextButtonState(true);
+					}		           
+				});
+			}
+		</script>
+	}
+}
+
+
+@{
+	if (Model.IsValid)
+	{
+		<div class="step-title-row">
+			<div class="str-left">
+				@if (Model.CurrentWizardStep != CourseEnums.eWizardSteps.ChapterContents || Model.ChapersCount.Equals(0))
+				{ 		 
+					<h3 class="float-left">New LFE Course Wizard</h3>	
+				}
+				else
+				{
+					<h4 class="cn-ddl-title inline">Chapter contents: </h4>
+					
+					<h4 id="s-curr-chapt-name" class="cn-ddl-title inline" style="margin-left:10px"></h4>				    
+				}    
+			</div>
+			<div class="str-right">
+				<span id="step-tp" class="tp inline">&nbsp;</span> 
+				@(Html.Kendo().Tooltip()
+					  .For("#step-tp")
+					  .Content(Model.StepTooltip)
+					  .Position(TooltipPosition.Bottom)                      
+				)
+				<span class="step-counter inline">Step @((short)Model.CurrentWizardStep)/8</span>
+				<a href="#@((short)Model.NextWizardStep)" class="btn-nav btn-next inline" id="btn-next-top">@Model.NextButtonTitle</a>			
+			</div>                
+		</div>
+		
+		<div class="step-box">
+			<div class="box-inner inline">
+				<div style="padding: 10px">
+					@{
+						switch (Model.CurrentWizardStep)
+						{
+							case CourseEnums.eWizardSteps.CourseName:
+									@Html.Partial("CourseWizard/Steps/_CourseName", Model.CurrentStep as WizardCourseNameDTO)
+								break;
+							case CourseEnums.eWizardSteps.VideoManager:                    
+									@Html.Partial("CourseWizard/Steps/_VideoManager", Model.CurrentStep as WizardVideoManageDTO)
+								break;
+							@*case CourseEnums.eWizardSteps.ChapterManage:				      
+									@Html.Partial("CourseWizard/Steps/_ChapterList", Model.CurrentStep as WizardChapterManageDTO)
+								break;*@
+							case CourseEnums.eWizardSteps.ChapterContents:
+									@Html.Partial("CourseWizard/Steps/_ChapterContents", Model.CurrentStep as WizardChapterContentManageDTO)
+								break;
+							case CourseEnums.eWizardSteps.CourseVisuals:
+									@Html.Partial("CourseWizard/Steps/_CourseVisuals", Model.CurrentStep as WizardCourseVisualsDTO)
+								break;
+							case CourseEnums.eWizardSteps.CourseMeta:
+									@Html.Partial("CourseWizard/Steps/_Metadata", Model.CurrentStep as WizardCourseMetaDTO)
+								break;
+							case CourseEnums.eWizardSteps.AboutAuthor:
+									@Html.Partial("CourseWizard/Steps/_AboutYou", Model.CurrentStep as WizardAboutAuthorDTO)
+								break;
+							case CourseEnums.eWizardSteps.CoursePrice:
+									@Html.Partial("CourseWizard/Steps/_Pricing", Model.CurrentStep as WizardCoursePricingDTO)
+								break;
+							case CourseEnums.eWizardSteps.Publish:
+									@Html.Partial("CourseWizard/Steps/_Publish", Model.CurrentStep as WizardCoursePublishDTO)
+								break;
+						}
+					}
+				</div>
+			</div>
+		</div>
+	
+		<a href="#@(Model.BackWizardStep!=null ? (short)Model.BackWizardStep : 1)" class="btn-nav btn-back btn-bottom" id="btn-back-bottom">< back</a>    
+	
+		<a href="#@((short)Model.NextWizardStep)" class="btn-nav btn-next btn-bottom" id="btn-next-bottom">@Model.NextButtonTitle</a>
+	}
+	else
+	{
+		<h3>@Model.ErrorMessage</h3>
+	}
+}
+

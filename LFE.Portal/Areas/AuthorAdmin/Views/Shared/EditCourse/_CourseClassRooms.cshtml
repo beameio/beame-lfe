@@ -1,0 +1,66 @@
+﻿@model LFE.DataTokens.ChapterEditDTO
+
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmChapterDetails';
+	
+	var deleteUrl = '@Url.Action("DeleteChapter","Course")';
+	$(document).ready(function () {
+
+		var id = Number('@Model.ChapterId');
+		var name = Encoder.htmlDecode('@Model.Name');	    
+
+		var token = {
+			kind: ChapterFormKinds.chapter
+			,title: id < 0 ? 'Add new chapter' : 'Edit ' + name
+			,id: id
+			, form: EDIT_FORM_SELECTOR
+			,deleteUrl : deleteUrl + '/' + id
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.chapter.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onChapterSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Chapter saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			$(EDIT_FORM_SELECTOR).find('#ChapterId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.chapter.chapterSaved, response.result);
+		}
+	}
+</script>
+
+
+@using (Ajax.BeginForm("SaveChapterDetails", "Course", null, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#main', null)", OnSuccess = "onChapterSaved", LoadingElementId = "site-loader" }, new { @id = "frmChapterDetails", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.ChapterId)
+	@Html.HiddenFor(x=>x.OrderIndex)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cn">
+			<li>
+				@Html.LabelFor(m=>m.Name)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.Name,new{@class="txt-inp",@onchange="onTxtBoxChanged(this)",@size=50,@maxlength=50})
+					<span class="input-info">Maximum 50 symbols</span>
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.Name,null,new{@class=String.IsNullOrEmpty(Model.Name) ? "" :"pass"})
+				</div>
+			</li>
+		
+		</ul>		
+	</fieldset>
+}

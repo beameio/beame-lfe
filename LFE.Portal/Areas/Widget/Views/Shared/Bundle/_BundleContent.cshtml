@@ -1,0 +1,13 @@
+﻿@model LFE.DataTokens.BundlePurchaseDTO   
+
+<div id="video-content" >
+    @Html.Partial("Course/_Player")
+    <div class="bundle-desc">
+        @Html.Raw(Model.IntroHtml)
+    </div>
+</div>
+
+<div class="bndl-sub-title">Courses included in this bundle</div>
+<div class="inner">
+    @Html.Partial("Bundle/_BundleCoursesList",Model.BundleCourses)
+</div>

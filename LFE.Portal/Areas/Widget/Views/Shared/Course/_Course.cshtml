@@ -1,0 +1,14 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.CoursePurchaseDTO
+
+
+@Html.Partial("Payment/_PaymentWindowScripts",new PaymentWindowScriptsToken
+{
+  // PurchaseActionUrl = Url.Action("Buy", "Payment", new { Area = "Widget", courseName = Model.CourseUrlName, authorName=Model.User.fullName })
+    PurchaseActionUrl = Url.Action("Buy", "Payment", new { Area = "Widget"})
+})
+
+
+@Html.Partial("Course/_CourseProductPage",Model)
+
+

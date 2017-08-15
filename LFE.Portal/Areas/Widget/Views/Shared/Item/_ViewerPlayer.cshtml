@@ -1,0 +1,66 @@
+﻿@model LFE.DataTokens.VideoInfoToken
+@{
+
+    var wrapperId = "video-wrapper-" + Model.BcIdentifier;
+
+
+
+    <div class="video-wrapper-container">
+        <div class="video-wrapper" id="@wrapperId">
+            Loading the player...
+        </div>
+    </div>
+
+
+        <script>
+            var playerInstance = jwplayer("@wrapperId");
+
+            var sources = [];
+
+            var playList = fixSR('@Model.PlayListUrl');
+
+//            if (playList.length > 0) {
+//                sources.push({ file: playList,default:true });
+//            }
+
+
+            var rend = @Html.Raw(Json.Encode(Model.Renditions));
+
+
+            for (var i = 0; i < rend.length; i++) {
+
+                var json = {
+                    file:fixSR(rend[i].CloudFrontPath),
+                    label:rend[i].FrameWidth +'x'  +rend[i].FrameHeight,
+                    image:fixSR('@Model.ThumbUrl')
+                }
+
+                //if(sources.length===0)
+                    sources.push(json);
+            }
+
+            var settings = {
+                sources:sources,
+                image:fixSR('@Model.StillUrl'),
+                autostart:true,
+                width: "100%",
+                aspectratio: "16:9" ,
+                skin: '/Scripts/jwplayer/jwplayer-skins-premium/vapor.xml',
+                primary: "html",
+                events:{
+                    onComplete: function() {
+                        window.getBcPlayerInstance().onMediaComplete();
+                    }
+                }
+            }
+
+            console.log('playe settings',settings);
+
+            playerInstance.setup(settings);
+
+        </script>
+}
+
+
+
+

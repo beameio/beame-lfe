@@ -1,0 +1,98 @@
+﻿@model LFE.DataTokens.BaseModelViewToken
+
+@{
+    var viewModel = ViewBag.MainLayoutViewModel == null ? null : (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#ul-course-tabs').find('a').click(function () {
+            $('#ul-course-tabs').find('a').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#btnSearch').click(function () {
+            window.ToggleSearch();
+        });
+    });
+</script>
+
+<header class="page_head">
+
+    <div class="indent">
+        @if (viewModel != null && viewModel.WebStore != null && (viewModel.WebStore.IsShowTitleBar == null || viewModel.WebStore.IsShowTitleBar))
+        {
+            <a href="/Widget/@viewModel.WebStore.TrackingID?width=@viewModel.Width&height=@viewModel.Height" class="title">
+                <strong>@viewModel.WebStore.WebStoreName</strong>
+            </a>
+        }
+    </div>
+
+    <div class="subtitle">
+        <nav>
+            <ul>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="@(Model.CategoryName.ToLower() == "mycourses"  ? "bold" : "")">
+                        @Html.ActionLink("MY COURSES", "Index", "Widget", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", categoryName = "MyCourses", width = viewModel != null ? viewModel.Width : null, height = viewModel != null ? viewModel.Height : null }, null)
+                    </li>
+                }
+                <li class="@(viewModel != null && viewModel.Category == null && Model.CategoryName.ToLower() != "mycourses" ? "bold" : "")">
+                    <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action("Index", "Widget", new {trackingID = viewModel.WebStore.TrackingID, categoryName = "_All", width =  viewModel.Width, height =  viewModel.Height }))">VIEW ALL COURSES</a>
+                </li>
+                <li style="position:relative" class="li-sub cb">
+                    @if (viewModel != null && viewModel.Category != null)
+                    {
+                        <span class="bold">@viewModel.Category.CategoryName</span>
+                    }
+                    else
+                    {
+                        <span>BROWSE BY CATEGORY</span>
+                    }
+                    <div class="sub">
+                        <div class="inner">
+                            <div class="menu-name">BROWSE BY CATEGORY</div>
+                            @{
+                                if (viewModel != null && viewModel.CategoriesList != null)
+                                {
+                                    foreach (var category in viewModel.CategoriesList)
+                                    {
+                                        <div class="sub-menu-link">
+                                            <a target="@(!string.IsNullOrEmpty(wixSectionUrl) ? "_top" : "_self"   )" href="@(wixSectionUrl + Url.Action("Index", "Widget", new {trackingID = viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", categoryName = category.CategoryUrlName, width =  viewModel.Width, height =  viewModel.Height }))">@category.CategoryName</a>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </li>
+                @*<li>
+                        <a id="btnSearch">Search</a>
+                    </li>*@
+            </ul>
+
+
+        </nav>
+        <div class="share">
+            @* <div class="fb-share-button" data-href="@viewModel.ParentURL" data-type="link"></div>*@
+
+            <a href="#" id="a-share">Share this page</a>
+            <script>
+                $(document).ready(function() {
+                    $('#a-share').unbind('click').click(openShareWnd);
+                });
+                function openShareWnd() {
+                    window.open(
+                        'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('@(viewModel != null && viewModel.ParentURL != null ? viewModel.ParentURL : "")'),
+                        'facebook-share-dialog',
+                        'width=626,height=436');
+                    return false;
+                }
+            </script>
+
+        </div>
+    </div>
+</header>

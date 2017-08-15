@@ -1,0 +1,67 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+
+
+@{
+	ViewBag.Title = "Subscribers Report";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	<style type="text/css">
+		.k-grid-footer{display: none !important}	
+			
+	</style>    
+}
+
+@section scripts
+{
+	<script type="text/javascript">
+		function getSelectedCourse() {
+			var id = null;
+			var combo = $('#CourseLOV').data("kendoDropDownList");
+
+			if (combo != undefined && hasValue(combo.value())) {
+				id = combo.value();
+			}
+
+			return {
+				courseId: id
+			};
+		}
+
+		function onStoreSelected() {
+			window.getNotifManagerInstance().notify(notifEvents.report.courseChanged,null);
+		}
+	</script>
+}
+
+<div class="page-title">
+	<div class="float-left">Subscribers Report</div>
+</div>
+
+<div style="margin: 0 20px 0 0;height: 30px">
+	@(Html.Kendo().DropDownList()
+					.Name("CourseLOV")
+					.OptionLabel("-- select course --")
+					.HtmlAttributes(new{@style="height:22px;font-size:12px;width:300px;"})
+					.DataTextField("name")
+					.DataValueField("id")                    
+					.Events(e=>e.Select("onStoreSelected"))
+					.DataSource(ds=>ds.Read(r=>r.Action("GetAuthorCourses","Author")))
+	) 		
+</div>	
+
+
+@Html.Partial("Author/_SubscribersReport",new SalesReportConfigToken
+{
+	pageSize   = 10
+	,showPageSizes = true
+})
+
+<script type="text/x-kendo-template" id="kendo-crs-template">
+	<div>
+		<div class="thumb" style="background-image: url('#=url#');">&nbsp;</div>
+		<div class="name ellipsis multiline">${name}</div>
+	</div>	
+</script>

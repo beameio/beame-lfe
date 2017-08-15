@@ -1,0 +1,54 @@
+﻿@using LFE.Core.Enums
+@model LFE.Portal.Areas.AuthorAdmin.Models.DashboardSaleBoxPageToken
+           
+@{
+    const string bg_white   = "bg-white";
+    const string bg_blue    = "bg-blue";
+    const string text_white = "text-white";
+    const string text_red   = "text-red";
+    const string text_green = "text-green";
+
+
+    var bgClass = bg_blue;
+    var txtClass = text_white;
+
+    switch (Model.StatsToken.Type)
+    {
+        case DashboardEnums.eSaleBoxType.SUBSCRIPTION_CANCELLATION:
+            bgClass  = bg_white;
+            txtClass = text_red;
+            break;
+        case DashboardEnums.eSaleBoxType.REFUNDS:
+            bgClass  = bg_white;
+            txtClass = text_red;
+            break;
+        case DashboardEnums.eSaleBoxType.COUPONS_USED:
+            bgClass  = bg_white;
+            txtClass = text_green;
+            break;
+    }
+}
+
+
+<div class="ys-box" title="click to view details" style="cursor: pointer;@Model.BoxWidth" data-cnt="@Model.StatsToken.Quantity" data-type="@Model.StatsToken.Type" data-compare="@Model.IsCompareBox.ToString().ToLower()">
+    <div class="inner @bgClass @txtClass">
+        @{
+            if (Model.ShowTitle)
+            {
+                <h4>@Model.StatsToken.Title</h4>
+            }
+        }
+        <div class="amount">@string.Format("{0}{1}", Model.Currency.Symbol, Model.StatsToken.Total)</div>
+        @{
+            <div class="quantity">@Model.StatsToken.Quantity</div>
+            if (Model.StatsToken.IsUp)
+            {
+                <div class="arr-up"></div>
+            }
+            else
+            {
+                <div class="arr-down"></div>
+            }
+        }
+    </div>
+</div>

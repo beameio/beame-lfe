@@ -1,0 +1,80 @@
+﻿@model LFE.DataTokens.BaseEntityDTO
+
+<script type="text/javascript">
+    var COUPON_EDIT_FORM_CONTAINER = '#d-coupon-edit-container';
+    var COUPON_GRID_CONTAINER = '#d-coupon-grid-container';
+    $(document).ready(function () {
+        
+        $('#btn-add-coupon').unbind('click').bind('click', function () {
+            if ($(COUPON_EDIT_FORM_CONTAINER).is(':visible')) {
+                return;
+            }
+            initCouponEditForm(-1);
+        });
+        
+        window.getNotifManagerInstance().unsubscribe(notifEvents.coupon.switch2List, handleSaveCouponEvent, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.coupon.switch2List, handleSaveCouponEvent, null);
+        
+        window.getNotifManagerInstance().unsubscribe(notifEvents.coupon.couponInitEdit, initCouponEditForm, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.coupon.couponInitEdit, initCouponEditForm, null);
+    });
+    
+    function initCouponEditForm(id) {
+      
+        var data = {
+            id: id
+           , bundleId: '@Model.id'
+         };
+
+        ajaxAction('@Url.Action("EditBundleCoupon","Course")', data, loadCouponEditForm, '.coupon-container');
+    }
+
+    function loadCouponEditForm(view) {       
+        $(COUPON_EDIT_FORM_CONTAINER).empty().html(view);
+        $(COUPON_GRID_CONTAINER).slideToggle(300, 'linear', function () {
+            $(COUPON_EDIT_FORM_CONTAINER).slideToggle(300, 'linear', function () {
+                setTimeout(function() {
+                    adjustCmdPosition(window.EDIT_FORM_SELECTOR);
+                    $('#d-cpn').show();
+                },50);
+            });
+        });
+    }
+    
+    function cancelEditCoupon() {
+        $(COUPON_EDIT_FORM_CONTAINER).slideToggle(300, 'linear', function () {
+            $(COUPON_GRID_CONTAINER).slideToggle(300, 'linear', function () {
+                $(COUPON_EDIT_FORM_CONTAINER).empty();
+                exitEditMode();
+            });
+        });
+    }
+    
+    function handleSaveCouponEvent() {
+        setTimeout(function () {
+            cancelEditCoupon();
+        }, 2000);
+    }
+</script>
+
+<div class="price-row">
+    <div class="b-title">Pricing</div>
+    
+    @Html.Action("BundlePrice","Course",new {Model.id})
+</div>
+
+
+<div class="coupon-container">
+    <div class="b-title">
+        <div style="float: left">Coupons</div>
+        <div style="float: right">
+            <span id="btn-add-coupon" class="button add-btn" title="add new coupon">add new coupon</span>
+        </div>
+    </div>
+    
+    <div id="d-coupon-edit-container" style="display: none"></div>
+
+    <div id="d-coupon-grid-container">
+        @Html.Partial("EditBundle/_BundleCoupons",Model)
+    </div>
+</div>

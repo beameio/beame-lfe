@@ -1,0 +1,103 @@
+﻿@model string
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Widget Settings &bull; Wix</title>
+    
+    <!-- Wix SDK -->    
+    @Html.Partial("~/Views/Shared/Layout/_WixSdkScript.cshtml")
+   
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery/jquery")
+    @Scripts.Render("~/bundles/jquery/jqueryval")
+      
+   
+    <link href="~/Areas/WixEndPoint/Scripts/wix/components/dropdown/dropdown.css" rel="stylesheet" />
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/common.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/buttons.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/settings.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/css/color-picker.css" rel="stylesheet" />
+    <link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/glued-position-min/glued.min.css" rel="stylesheet" />
+
+   
+    
+</head>
+<body>
+    <header class="intro box">
+        <div class="title">
+            <!-- App Logo with native CSS3 gloss -->
+            <div class="icon">
+                <div class="logo">
+                    <span class="gloss"></span>
+                </div>
+            </div>
+
+            <!-- This divider is a must according to the Wix design requirements -->
+            <div class="divider"></div>
+        </div>
+
+        <!-- Connect account area -->
+        <div class="login">
+            <div class="guest">
+                <div class="description">
+                     <div>LFE - Learning From Experience</div>
+                    <p>
+                        Creating and selling online video courses               
+                    </p>
+                </div>
+
+            
+            </div>
+
+          
+        </div>
+    </header>
+
+    <!-- Settings box -->
+ <div class="box">
+                 <h3 class="input-col-w">Error:</h3>
+                 <div class="feature">
+                     <div style="font-weight:bold; text-align:center; margin:2px" >
+                          <p>
+        We are having some minor technical problems, which prevented us from completing the task you were doing.
+        <br />
+        Our technical team was notified of the problem, please try again what you were doing in a few minutes.
+        <br /><br />
+        We are sorry for the inconvenience.  
+    </p>
+                     </div>
+                 </div>
+			</div>
+
+
+  
+    <!-- Twitter Bootstrap components;
+     include this to utilize the Color Pickers, based on Tooltip and Popover -->
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/bootstrap/bootstrap-tooltip.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/bootstrap/bootstrap-popover.js"></script>
+
+    <!-- Wix UI Components -->
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/accordion/accordion.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/checkbox/checkbox.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/radio-button/radio-button.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/slider/slider.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/color-pickers/simple.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/color-pickers/advanced.js"></script>
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/color-picker.js"></script>
+
+    <!-- Settings Glued Logic -->
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/components/glued-position-min/glued.min.js"></script>
+
+    <!-- Settings View Logic -->
+    <script type="text/javascript" src="~/Areas/WixEndPoint/Scripts/Wix/views/settings.js"></script>
+
+
+    
+    
+</body>
+</html>

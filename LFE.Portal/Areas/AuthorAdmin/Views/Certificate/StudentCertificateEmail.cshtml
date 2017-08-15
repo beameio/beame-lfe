@@ -1,0 +1,22 @@
+﻿@model LFE.DataTokens.StudentCertificateDTO
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Student Certificate</title>
+    
+
+</head>
+<body>
+    <div class="wrapper">
+        <div class="inner">
+            @Html.Partial("~/Views/Shared/Certificate/_StudentCertificateEmail.cshtml", Model)
+        </div>
+    </div>
+</body>
+</html>

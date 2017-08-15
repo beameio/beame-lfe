@@ -1,0 +1,46 @@
+﻿@model LFE.Portal.Models.UdemyLoginToken
+           
+@using (Html.BeginForm("Login", "Udemy", new { area = "AuthorAdmin" }, FormMethod.Post, new { @id = "frm-udemy-login" }))
+{
+    <div class="mc-inpBox">
+        <div id="hlpForm" class="help"></div>
+        <h2>Start by connecting your existing Udemy account</h2>
+        <div>
+            <label for="inpKey">Enter your Udemey user name</label>
+            @Html.TextBoxFor(model => model.Email, new { placeholder = "Email", title = "Email" })
+            <span style="position: relative;top:-5px;">
+                @Html.ValidationMessageFor(m => m.Email)
+            </span>
+        </div>
+        <div>
+            <label for="inpListId">Enter your Udemey password</label>
+            @Html.PasswordFor(model => model.Password, new { placeholder = "Password", title = "Password" })
+            <span style="position: relative;top:-5px;">
+                @Html.ValidationMessageFor(m => m.Password)
+            </span>
+        </div>
+        <input type="submit" value="Begin Import" />
+    </div>
+
+
+}
+
+<!--------------- Tooltips ----------------------->
+<!------------------------------------------------>
+<script id="helpTmpl_1" type="text/x-kendo-template">
+    <h1>this is some help text UDEMY...</h1>
+</script>
+
+<script>
+    $(document).ready(function() {
+        var form = $('#frm-udemy-login');
+        initUnobstructiveFormValidation(form);
+
+        $("#hlpForm").kendoTooltip({
+            content: kendo.template($("#helpTmpl_1").html()),
+            width: 200,
+            height: 50,
+            position: "bottom"
+        });
+    });
+</script>

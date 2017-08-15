@@ -1,0 +1,94 @@
+﻿@using LFE.DataTokens
+@model QuizQuestionDTO
+
+@{
+    var answerUrl = Url.Action("_AnswerManageForm", "Quiz", new {area = "AuthorAdmin", id = Model.QuestionId});
+}
+
+<div class="col-lg-12 quest-head">
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="quest-nav-tabs">
+            <li class="tab">
+                <a id="a-quest-edit-tab" href="#paneQuestEdit" data-action="EDIT_QUEST" data-toggle="tab" role="tab">Edit Question Details</a>
+            </li>
+            <li class="tab @(Model.QuestionId < 0 ? "disabled" : "")">
+                <a id="a-answer-manage-tab" href="#paneAnswerManage" data-action="QUEST_ANSWERS" data-toggle="tab" data-url="@answerUrl" role="tab">Add/Edit Answer</a>
+            </li>
+        </ul>
+    </div>  
+</div>
+
+
+<section class="col-lg-12 s-quest-form" id="s-qst-content">
+    <div class="row">
+        <div class="tab-content col col-xs-12" id="d-tab-content">
+            <div role="tabpanel" class="tab-pane fade" id="paneQuestEdit">
+                @Html.Partial("Quiz/_QustionEditForm", Model)
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="paneAnswerManage"></div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        $('#a-btn-back').on('click', function (e) {
+            e.preventDefault();
+            window.getNotifManagerInstance().notify(notifEvents.quiz.loadQuizContent, { action: window.QuizActions.MANAGE_QUIZZES, data: { id: null } });
+        });
+        $('#a-quest-edit-tab').tab('show');
+        var request = window.parseQuizHash();
+
+        //onQuizTabActions(request);
+
+        initQuestTabEvents();
+    });
+
+    function onQuizTabActions(request) {
+
+        // console.log('qmf');
+        // console.log(request);
+
+        switch (request.action) {
+            case window.QuizActions.EDIT_QUIZ:
+                setTimeout(function () {
+                    $('#a-quest-edit-tab').tab('show');
+                }, 100);
+                break;
+            case window.QuizActions.QUIZ_QUESTIONS:
+                setTimeout(function () {
+                    $('#a-answer-manage-tab').tab('show');
+                }, 10);
+                break;
+        }
+    }
+
+    function initQuestTabEvents() {
+
+        $('#quest-nav-tabs > li > a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+            var action = $(this).attr("data-action");
+            window.location.hash = action + window.hashSeparator + '@Model.QuizId' + window.hashSeparator + '@Model.QuestionId';
+
+            var url = $(this).attr("data-url");
+
+            var target = $(e.target).attr("href");
+
+            if ($(target).is(':empty')) {
+                var pane = $(this);
+                $(target).load(url, function () {
+                    pane.tab('show');
+                    onQuestManageLoaded();
+                });
+            } else {
+                onQuestManageLoaded();
+            }
+        });
+
+
+    }
+
+    function onQuestManageLoaded() {
+        $("html, body").animate({ scrollTop: 0 }, 650);
+    }
+</script>

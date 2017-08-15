@@ -1,0 +1,46 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model LFE.DataTokens.UserViewDto
+
+@{
+	ViewBag.Title = "My Videos";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_WizardLayout.cshtml";
+
+	var token = new AuthorVideosPageToken
+	{
+		user = Model,
+		ListPageSize = 6
+	};
+}
+
+@section css
+{
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/video.css" )" rel="stylesheet" type="text/css"  />
+	
+	<style>
+		.ul-video{margin:0 0 10px 10px;width: auto;background-color: transparent;text-align: left;}
+		.ul-video li {width: 250px;height: 200px;margin: 0 10px 15px 0}
+		.ul-video li .preview {width: 250px;height:150px;}
+		.ul-video li .hint {width: 250px;height: 150px;}
+		.ul-video li .play {font-size: 18pt;padding: 60px 0 0;}
+		.ul-video li .list-player {width: 250px;height: 150px;}
+		.ul-video li .video-info {width: 200px;height: 50px;top: 155px;} 
+		.d-video-list-container{height: 480px;}
+		 #AuthorVideos_pager{position: absolute;bottom: 5px;  width: 100%;background-color:transparent !important;background-image:none!important;border:medium none!important;font-size:12px!important;color:#333}
+	</style>      
+}
+
+@section scripts
+{
+	
+}
+
+<script>
+	var BC_PLAEYR_W = 250;
+	var BC_PLAEYR_H = 150;
+</script>
+
+<div style="padding: 15px 30px">
+	@Html.Partial("Video/_VideoManager",token)    
+</div>
+

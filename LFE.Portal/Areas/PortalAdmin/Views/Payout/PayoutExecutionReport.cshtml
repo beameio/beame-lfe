@@ -1,0 +1,183 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int?
+@{
+	ViewBag.Title = "Payout Execution Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+	var selectedExecId = Model ?? -1;
+}
+
+
+@section css{
+	<style>
+		.k-button.btn-payout,.k-button.btn-payout:hover,.k-button.btn-payout:focus,.k-button.btn-payout:active{display: table-cell;vertical-align: middle;text-align: center;height: 30px;width: auto;padding: 0 15px;cursor: pointer;color: #fff !important;font-size: 16px !important;background: green !important;text-decoration: none !important}
+	</style>
+}
+<h3 class="" style="margin: 50px 0 15px;font-size: 22px">Payout Execution Report</h3>
+
+<script>
+	var selectedExecId = Number('@selectedExecId');
+  
+	function onPayoutBound(e) {
+		var grid = e.sender;
+
+		if (selectedExecId < 0) {
+			grid.expandRow(".k-master-row:first");			
+		}
+
+		var data = grid.dataSource.data();
+		$.each(data, function (i, row) {
+			if (row.ExecutionId == selectedExecId) {                
+				grid.expandRow('tr[data-uid="' + row.uid + '"]');              
+			}
+
+			if (row.Status == 1 || row.Status == 4) // wait/completed
+			{
+			    $('tr[data-uid="' + row.uid + '"] ').find(".k-grid-ExecuteBatch").hide();
+			} else {
+			    $('tr[data-uid="' + row.uid + '"] ').find(".k-grid-ExecuteBatch").addClass('btn-payout');
+			}
+		});
+	}
+
+	function onStatementBound(e) {
+		var grid = e.sender;
+	   
+		var data = grid.dataSource.data();
+
+		$.each(data, function (i, row) {
+	   
+			if (row.Status == 1 || row.Status == 4) // wait/completed
+			{
+				$('tr[data-uid="' + row.uid + '"] ').find(".k-grid-ExecutePayment").hide();
+			} else {
+			    $('tr[data-uid="' + row.uid + '"] ').find(".k-grid-ExecutePayment").addClass('btn-payout');
+			}
+		});
+	}
+
+	function runBatchAgain(e) {
+	   
+		if (!window.confirm('Are You sure ?')) return;
+
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		//console.log(dataItem);
+		if (dataItem.Status == 1) {
+			alert('payout already waiting for process');
+			return;
+		}
+		if (dataItem.Status == 4) {
+			alert('payout already completed');
+			return;
+		}
+		var data = {
+			id: dataItem.ExecutionId
+		};
+
+		window.showLoader();
+		$.ajax({
+			url: '@Url.Action("RunBatchAgain","Payout",new{area="PortalAdmin"})',
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+				window.hideLoader();
+				if (response.success) {
+					$('#PayoutReport').data("kendoGrid").dataSource.read();
+				} else {
+					alert(response.error);
+				}
+			}
+		});
+	}
+
+    function runSingleStatementAgain(e) {
+       
+		if (!window.confirm('Are You sure ?')) return;
+
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		//console.log(dataItem);
+		if (dataItem.Status == 1) {
+			alert('payout already waiting for process');
+			return;
+		}
+		if (dataItem.Status == 4) {
+			alert('payout already completed');
+			return;
+		}
+		var data = {
+			id: dataItem.PayoutId
+		};
+
+		window.showLoader();
+		$.ajax({
+			url: '@Url.Action("RunSinglePaymentAgain", "Payout", new { area = "PortalAdmin" })',
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+				window.hideLoader();
+				if (response.success) {
+					$('#PayoutReport').data("kendoGrid").dataSource.read();
+				} else {
+					alert(response.error);
+				}
+			}
+		});
+	}
+</script>
+
+@(Html.Kendo().Grid<PayoutExecutionDTO>()
+	  .Name("PayoutReport")
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.ExecutionId);
+		  columns.Bound(p => p.Year);
+		  columns.Bound(p => p.Month);
+		  columns.Bound(p => p.TotalRows).Title("Total");
+		  columns.Bound(p => p.TotCompletedalRows).Title("Completed");
+		  columns.Bound(p => p.Status);
+		  columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy HH:mm}");
+		  columns.Bound(p => p.ExecutedBy.FullName).Title("Created by");
+		  columns.Command(c => c.Custom("Execute Batch").Click("runBatchAgain")).Title(" ");
+	  })
+	  .ClientDetailTemplateId("template-payments-detail")
+	  .Events(e => e.DataBound("onPayoutBound"))
+	  .Sortable(s => s.Enabled(true))
+	  .Pageable(pager => pager.Enabled(true).Refresh(true).Numeric(true))
+	  .Filterable(f => f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax().ServerOperation(false).Read(read => read.Action("GetPayoutExecutions", "Payout").Type(HttpVerbs.Get))))
+
+<script id="template-payments-detail" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<PayoutStatmentDTO>()
+				.Name("statments_#=ExecutionId#")
+				.TableHtmlAttributes(new { @style = "background-image: none !important;" })
+				.Columns(columns =>
+				{
+					columns.Bound(p => p.PayoutId).Width(60);
+					columns.Bound(p => p.Beneficiary.FullName).Title("Beneficiary");
+					columns.Bound(p => p.Amount).ClientTemplate("\\#=kendo.toString(Amount, 'n2')\\# \\#=Currency.Symbol\\#" );
+					columns.Bound(p => p.Status);
+					columns.Bound(p => p.PaypalEmail);
+					columns.Bound(p => p.PayKey);
+					columns.Bound(p => p.Error);
+                    columns.Command(c => c.Custom("Execute Payment").Click("runSingleStatementAgain")).Title(" ");
+				})
+				.Events(e => e.DataBound("onStatementBound"))
+				.Sortable(s => s.Enabled(true))
+				.Pageable(pager => pager.Enabled(true).Refresh(true).Numeric(true))
+				.Filterable(f => f.Enabled(false))
+				.DataSource(dataSource => dataSource.Ajax().ServerOperation(false).PageSize(20)
+				.Model(model => model.Id(p => p.PayoutId))
+				.Read(read => read.Action("GetPayoutStatements", "Payout", new { execId = "#=ExecutionId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+
+</script>

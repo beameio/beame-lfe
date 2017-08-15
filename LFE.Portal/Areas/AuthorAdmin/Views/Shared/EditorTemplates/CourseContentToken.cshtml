@@ -1,0 +1,18 @@
+﻿
+@model LFE.DataTokens.CourseContentToken
+
+<li data-val="${Uid}" data-id="${ContentId}" data-kind="${Kind}" class="li-chap #= Kind==2 ? 'quiz': ''#">
+        #if(Kind==1){#
+            @Html.EditorFor(m => m.Chapter)
+        #} else{#
+            # if(ContentId < 0){# 
+                @Html.EditorFor(m => m.Quiz)
+            #} else{#
+                <div class="chap-row">
+                        <span class="float-left drag-box drag" title="drag to reorder">&nbsp;</span>
+                        <span class="float-left btn-collapse-first">&nbsp;</span>
+                        <span title="#=Encoder.htmlEncode(Name)#" class="float-left ch-name pt9 ellipsis">${Name}</span>
+                </div>
+            #}#
+        #}#    
+</li>

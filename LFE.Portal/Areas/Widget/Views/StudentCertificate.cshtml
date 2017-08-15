@@ -1,0 +1,52 @@
+﻿@model LFE.DataTokens.StudentCertificateDTO
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Student Certificate</title>
+    <style>
+        .wrapper {width: 100%;text-align: center;}
+        .wrapper > .inner {width: 2021px;height:1428px;margin: 0 auto;}
+    </style>
+    @Styles.Render("~/widget/cert/less")
+</head>
+<body>
+    <div class="wrapper">
+        <div class="inner">
+            @{
+                if (Model.IsValid)
+                {
+
+
+                    <div class="cert-v @(String.Format("t{0}",Model.TemplateId))" style="background-image: url('@Model.BgFullUrl');">
+                            <span class="cert-c-name">@Model.CourseName</span>
+                            <span class="cert-title">@Model.Title</span>
+                            <span class="cert-stud-name">@Model.StudentInfo.FullName</span>
+                            <span class="cert-desc"><label>@Model.Description</label></span>
+                            <span class="cert-date">
+                                <label>Presented on</label>
+                                <label class="d">@(Model.AddOn.ToString("d"))</label>
+                            </span>
+                            <span class="cert-sign">
+                                <img src="@Model.SignatureImageUrl" class="img-sign" alt="" style="overflow: hidden" />
+                                <label class=""><span>Presented by</span> <span class="n">@Model.PresentedBy</span></label>
+                            </span>
+                    </div>
+
+
+
+                }
+                else
+                {
+                    <h1>@Model.Message</h1>
+                }
+            }
+        </div>
+    </div>
+</body>
+</html>

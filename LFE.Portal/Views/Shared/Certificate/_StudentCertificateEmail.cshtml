@@ -1,0 +1,292 @@
+﻿@model LFE.DataTokens.StudentCertificateDTO
+
+<style>
+    .wrapper {
+        width: 100%;
+        text-align: center;
+        font-family: Calibri;
+    }
+
+    .wrapper > .inner {
+        width: 2014px;
+        height: 1412px;
+        margin: 0 auto;
+    }
+      .cert-v {
+        width: 2014px;
+        height: 1412px;
+        display: table-cell;
+        position: relative;
+        text-align: center;
+        background-repeat: no-repeat !important;
+        background-size: 100% 100% !important;
+    }
+    .relative {
+        position: relative;
+    }
+
+    .absolute {
+        position: absolute;
+    }
+
+    .no-bg {
+        background: none;
+    }
+
+    .no-repeat {
+        background-repeat: no-repeat;
+    }
+
+    .no-padding {
+        padding: 0;
+    }
+
+    .no-margin {
+        margin: 0;
+    }
+
+    .semi-bold {
+        font-weight: 600;
+    }
+
+    .inline {
+        display: inline-block !important;
+        vertical-align: top;
+    }
+
+    .block {
+        display: block;
+    }
+
+    .ellips-base {
+        overflow: hidden;
+        -moz-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    }
+
+    .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        -moz-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    }
+
+    .ellipsis-multiline {
+        white-space: normal;
+        overflow: hidden;
+        -moz-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+    }
+
+    .upper {
+        text-transform: uppercase;
+    }
+
+  
+
+    .cert-v span {
+        display: block;
+        position: absolute;
+    }
+
+    .cert-v span.cert-c-name {
+        top: 130px;
+        color: #000;
+        width: 100%;
+        font-size: 26pt;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .cert-v span.cert-title {
+        top: 215px;
+        color: #000;
+        width: 100%;
+        font-size: 32pt;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .cert-v span.cert-stud-name {
+        top: 400px;
+        color: #000;
+        width: 100%;
+        font-size: 50pt;
+        font-weight: 800;
+        text-transform: capitalize;
+    }
+
+    .cert-v span.cert-desc {
+        top: 235px;
+        color: #000;
+        width: 100%;
+        font-size: 28pt;
+    }
+
+    .cert-v span.cert-desc > label {
+        width: 60%;
+        margin: 0 auto;
+        -ms-word-break: normal;
+        word-break: normal;
+    }
+
+    .cert-v span.cert-date {
+        bottom: 155px;
+        left: 10%;
+        color: #000;
+        text-align: center;
+    }
+
+    .cert-v span.cert-date > label {
+        font-weight: 600;
+        font-size: 26pt;
+    }
+
+    .cert-v span.cert-date > label.d {
+        font-size: 40pt;
+    }
+
+    .cert-v span.cert-sign {
+        bottom: 155px;
+        right: 10%;
+        color: #000;
+    }
+
+    .cert-v span.cert-sign > img {
+        width: 400px;
+        height: 150px;
+    }
+
+    .cert-v span.cert-sign > label {
+        font-weight: 600;
+        font-size: 26pt;
+    }
+
+    .cert-v span.cert-sign > label > span {
+        display: inline-block !important;
+        vertical-align: top;
+        position: relative;
+    }
+
+    .cert-v span.cert-sign > label > span.n {
+        text-transform: capitalize;
+        font-size: 26pt;
+    }
+
+    .cert-v span > label {
+        display: block;
+        overflow: hidden;
+    }
+
+    .cert-v.t1 span.cert-title {
+        color: #fff;
+        top: 300px;
+    }
+
+    .cert-v.t1 span.cert-stud-name {
+        top: 440px;
+    }
+
+    .cert-v.t1 span.cert-desc {
+        top: 835px;
+    }
+
+    .cert-v.t2{font-family:'Times New Roman';font-style:italic;font-weight: normal !important;}
+
+    .cert-v.t2 span.cert-c-name{text-transform:capitalize;font-size:30pt;top:150px;}
+    
+    .cert-v.t2 span.cert-title{text-transform:uppercase;font-size:38pt;top:300px;}
+
+    .cert-v.t2 span.cert-stud-name {
+        top: 595px;font-size: 65pt;
+    }
+
+    .cert-v.t2 span.cert-desc {
+        top: 830px;font-size: 34pt;
+    }
+
+    .cert-v.t2 span.cert-sign {
+        bottom: 155px !important;
+        right: 265px;
+    }
+
+    .cert-v.t2 span.cert-date {
+        bottom: 155px !important;
+        left: 18%;
+    }
+
+
+    .cert-v.t3{font-family:'Times New Roman';font-style:italic;}
+
+    .cert-v.t3 span.cert-c-name,
+    .cert-v.t3 span.cert-title{text-transform: uppercase;text-transform: capitalize;}
+    .cert-v.t3 span.cert-c-name,
+    .cert-v.t3 span.cert-title,
+    .cert-v.t3 span.cert-desc {
+        color: #257a82;
+    }
+
+    .cert-v.t3 span.cert-c-name {
+        top: 135px;
+        font-size: 32pt;
+    }
+
+    .cert-v.t3 span.cert-title {
+        top: 350px;
+        font-size: 45pt;       
+    }
+
+    .cert-v.t3 span.cert-stud-name {
+        top: 500px;
+        font-size: 80pt;
+    }
+
+    .cert-v.t3 span.cert-desc {
+        top:725px;
+        font-size: 40pt;
+    }
+
+    .cert-v.t3 span.cert-sign {
+        bottom: 155px !important;
+    }
+
+    .cert-v.t3 span.cert-date {
+        bottom: 155px !important;
+        left: 15%;
+    }
+</style>
+
+@{
+    if (Model.IsValid)
+    {
+
+
+        <div class="cert-v @(String.Format("t{0}",Model.TemplateId))" style="background-image: url('@Model.BgFullUrl');">
+            <span class="cert-c-name">@Model.CourseName</span>
+            <span class="cert-title">@Model.Title</span>
+            <span class="cert-stud-name">@Model.StudentInfo.FullName</span>
+            <span class="cert-desc"><label>@Model.Description</label></span>
+            <span class="cert-date">
+                <label>Presented on</label>
+                <label class="d">@(Model.AddOn.ToString("d"))</label>
+            </span>
+            <span class="cert-sign">
+                <img src="@Model.SignatureImageUrl" class="img-sign" alt="" style="overflow: hidden" />
+                <label class=""><span>Presented by</span> <span class="n">@Model.PresentedBy</span></label>
+            </span>
+        </div>
+
+
+
+    }
+    else
+    {
+        <h1>@Model.Message</h1>
+    }
+}

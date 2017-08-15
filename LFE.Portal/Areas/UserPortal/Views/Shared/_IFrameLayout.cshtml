@@ -1,0 +1,91 @@
+﻿@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>@ViewBag.Title</title>
+		<!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge" /><![endif]-->
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		@Styles.Render("~/Content/kendo/"+ Url.ToKendoVersionUrl() + "/css")
+		   
+		@Styles.Render("~/Areas/UserPortal/Content/styles/css")
+		
+		@Styles.Render("~/Content/styles/common")
+
+		@Scripts.Render("~/bundles/modernizr")
+		   
+		@Scripts.Render("~/bundles/jquery/jquery")
+		
+		@Styles.Render("~/Content/plugin/scroll")
+		
+		@Scripts.Render("~/bundles/plugin/scroll") 
+
+		@Scripts.Render("~/bundles/kendo")
+		
+		<script>
+			kendo.culture("en-US");
+		</script> 
+		  
+		@Scripts.Render("~/bundles/lfe/common")
+
+		@Scripts.Render("~/Areas/UserPortal/bundles/lfe") 
+		 
+		<script type="text/javascript">
+			var notificationManager;
+		 
+
+			function getNotifManagerInstance() {
+				if (notificationManager == undefined || notificationManager == null) {
+					notificationManager = new NotificationManager();
+				}
+				return notificationManager;
+			}
+		</script>
+		@RenderSection("css", false)	
+		@RenderSection("scripts", false)
+	</head>
+	<body>
+	  
+		<div class="wrap" id="main">
+			@RenderBody()
+		</div>
+		
+		<div id="site-loader" class="k-loading-mask" style="width: 100%; height: 100%; top: 0; left: 0;display: none; -ms-opacity: 0.5; opacity: 0.5;background-color: #cfcfcf">
+			<span class="k-loading-text">Loading...</span>
+			<div class="k-loading-image"></div>
+			<div class="k-loading-color"></div>
+		</div>
+	   
+		<script type="text/x-kendo-template" id="feed-list-template">
+			<li >
+				<div class="inline img-container" >
+					<img alt="" src="${CreatorPhotoUrl}"/>
+				</div> 
+				<div class="inline row">   
+					<div class="auth">
+						<a href="#='@Url.Action("UserProfile","User",new{area="UserPortal"})' + '?id=' + CreatorId#" class="a-profile-link">
+							<span class="cr-name">${CreatorName}</span>
+						</a>
+						 
+						<span class="post-on">${PostedOn}</span>
+					</div>
+					<div class="room">${RoomName}/${CourseName}</div>
+					<div class="txt">
+						#=Encoder.htmlDecode(HTMLMessage)#
+					</div>            
+				</div>
+			</li>
+		</script>
+		<script type="text/x-kendo-template" id="form-loader-template">
+				<span class="k-loading-text">Loading...</span>
+				<div class="k-loading-image"></div>
+				<div class="k-loading-color"></div>		    
+		</script>
+		<script type="text/x-kendo-template" id="kendo-sort-template">
+			<li>
+				<a data-val="${field}" data-dir="${dir}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+			</li>
+		</script>
+	</body>
+</html>

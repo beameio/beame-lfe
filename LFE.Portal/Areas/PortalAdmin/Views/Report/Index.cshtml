@@ -1,0 +1,28 @@
+﻿@using LFE.Core.Extensions
+@{
+	ViewBag.Title = "Portal Admin Dashboard";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+	$(document).ready(function () {
+	  
+	});
+</script>
+
+
+@Html.Action("_DashboardAdmin", "Report")
+
+
+
+
+@{
+    if (this.GetCurrentUserId() == 422)
+    {
+        using (Html.BeginForm("ImportBcVideos", "Home"))
+        {
+            <input type="submit" value="ImportBcVideos" />
+        }
+    }
+}
+

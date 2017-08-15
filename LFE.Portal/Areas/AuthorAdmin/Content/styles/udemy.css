@@ -1,0 +1,170 @@
+﻿* {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.mc-header {
+    position: relative;
+    border-bottom: solid 3px #A0A0A0;
+    border-top: solid 1px #A0A0A0;
+    padding: 20px 10px;
+}
+.mc-header h1 {
+    font-size: 2em;
+    font-weight: normal;
+}
+.mc-content {
+    position: relative;
+    margin: 20px 0px 0px 0px;
+    padding: 0px 10px;
+}
+.mc-content h2 {
+    margin-bottom: 10px;
+}
+.mc-inpBox {
+    background-color: #ebeeef;
+    border: solid 1px #dadfe1;
+    padding: 10px 10px 40px 10px;
+    width: 90%;
+    /*margin: 0 auto;*/
+    margin-bottom: 150px;
+    position: relative;
+}
+.mc-inpBox h2 {
+    margin: 20px 0px 20px 20px;
+}
+.mc-inpBox h3 {
+    margin: 30px 20px 0px 20px;
+    padding: 0px 0px 10px 0px;
+    border-bottom: solid 1px #cccccc;
+}
+.mc-inpBox > div {
+    position: relative;
+    margin: 40px 0px 0px 20px;
+}
+.mc-inpBox div.udemyItem {
+    position: relative;
+    margin: 10px 20px 0px 20px;
+    background-position: 30px 1px;
+    background-repeat: no-repeat;
+    background-size: 25px;
+}
+.mc-inpBox div.udemyItem > label{
+    position: relative;
+    top: -5px;left: 30px;
+}
+.mc-inpBox input {
+    border: solid 1px #dadfe1;
+    font-size: 1.2em;
+    height: 33px;
+    width: 350px;
+    font-weight: normal;
+}
+.mc-inpBox input[type="checkbox"] {
+    border: none;
+    height: 20px;
+    width: 20px;
+}
+.mc-inpBox label {
+    display: inline-block;
+    width: 220px;
+}
+
+.mc-inpBox .help {
+    background-image: url("../../../../Areas/AuthorAdmin/Content/images/mc_icoHelp.png");
+    position: absolute;
+    width: 24px;height: 24px;
+    top: 10px;right: 10px;
+    margin: 0px;
+}
+input[type=submit] {
+    border: solid 1px #dadfe1;
+    background-color: #4183d7;
+    color: #FFFFFF;
+    font-size: 1.2em;
+    font-weight: normal;
+    padding: 0px 40px;
+    position: absolute;
+    margin: 0;
+    height: 45px;
+    bottom: -70px;right: -2px;
+    cursor: pointer;
+}
+input[type=submit]:disabled {
+    border: solid 1px #4183d7;
+    background-color: #4183d7;
+    color:#71b3ff;
+    cursor:default;
+}
+.mc-errorBox {
+    border: solid 1px #ebccd1;
+    margin: 20px 0px;
+}
+.mc-errorBox .header {
+    color: #a94442;
+    border-bottom: solid 1px #ebccd1;
+    background-color: #f2dede;
+    background-image: url("../../../../Areas/AuthorAdmin/Content/images/mc_icoError.png");
+    background-repeat: no-repeat;
+    background-position: 12px 10px;
+    padding: 10px 10px 10px 40px;
+}
+.mc-errorBox .content {
+    padding: 10px 10px 10px 40px;
+}
+.mc-content .udemy-succes {
+    border-bottom: solid 1px #cccccc;
+    padding-bottom: 40px;
+    margin-bottom: 20px;
+}
+.mc-content .udemy-succes h2 { font-size: 2.0em;font-weight: normal;margin-bottom: 20px; }
+.mc-content .udemy-succes h3 { font-size: 1.5em;font-weight: normal; }
+.mc-content .blueBtn {
+    border: solid 1px #dadfe1;
+    font-size: 1.2em;
+    font-weight: normal;
+    padding: 0px 40px;
+    background-color: #4183d7;
+    color: #FFFFFF;
+    height: 45px;
+    cursor: pointer;
+    float: right;
+}
+.mc-content a.blueBtn {
+    border: solid 1px #dadfe1;
+    font-size: 1.2em;line-height: 2.1em;
+    font-weight: normal;
+    padding: 0px 40px;
+    background-color: #4183d7;
+    color: #FFFFFF;
+    cursor: pointer;
+    float: right;
+    margin-left: 10px;
+}
+.mc-content .mc-gridBox {
+    background-color: #ebeeef;
+    border: solid 1px #dadfe1;
+    padding-bottom: 10px;
+    width: 95%;
+    margin-bottom: 150px;
+    position: relative;
+}
+.mc-content .mc-gridBox h1 {
+    font-size: 1.6em;line-height: 0.8em; font-weight: normal;
+    margin: 10px 20px 10px 20px;
+}
+/*.mc-content .mc-gridBox .grid-col-header { }
+.mc-content .mc-gridBox .grid-col-header .grid-col-header-border {
+    margin: 0px 20px 10px 20px;height: 1px;
+    border-bottom: solid 1px #BBBBBB;
+}
+.mc-content .mc-gridBox .grid-col-header h2 {
+    font-size: 1em;font-weight: normal;color: #666666;text-align: left;
+    margin: 10px 0px;
+    border: solid 0px red;
+    float: left;
+}
+.mc-content .mc-gridBox .grid-col-header h2:nth-child(1) { padding-left: 20px;width: 60%; }
+.mc-content .mc-gridBox .grid-col-header h2:nth-child(2) { width: 20%; }*/
+
+

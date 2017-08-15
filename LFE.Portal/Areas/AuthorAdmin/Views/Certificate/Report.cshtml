@@ -1,0 +1,86 @@
+﻿@using LFE.DataTokens
+@{
+    ViewBag.Title = "Student Certificates Report";
+
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminCommonLayout.cshtml";
+}
+<style>
+    .k-tooltip {
+        color: #333 !important;
+    }
+    .k-filter-row > th{border: none !important;vertical-align: top;padding-left: 0;}
+</style>
+<link href="~/Content/styles/common.css" rel="stylesheet" />
+<script>
+    function onCertReportBound(e) {
+        $(".col-tooltip").kendoTooltip({
+            position: "top",
+            content: kendo.template($("#tp-template").html()),
+            width: 250
+        }).data("kendoTooltip");
+    }
+
+    function onResendClicked(e) {
+        e.preventDefault();
+
+        var grid = $(e.delegateTarget).data("kendoGrid");
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        var data = { id: dataItem.StudentCertificateId };
+
+        showLoader();
+
+        $.ajax({
+            url: '@Url.Action("ResendStudentCertificate", "Certificate", new { area = "AuthorAdmin" })',
+            cache: false,
+            type: "Post",
+            data: JSON.stringify(data),
+            datatype: "json",
+            contentType: "application/json; charset=utf-8"
+			, success: function (response) {
+			    hideLoader();
+			    if (response.success) {
+			        alert('Certificate sent');
+			    } else {
+			        alert(response.error);
+			    }
+			}
+			, error: function () {
+			    hideLoader();
+			    alert('Unexpected error');
+			}
+        });
+    }
+</script>
+<h2 style="margin-bottom: 10px; font-size: 20pt;color: #333">Student Certificates Report</h2>
+
+<div>
+    @(Html.Kendo().Grid<StudentCertificateDTO>()
+          .Name("StudentCertificateReport")
+          .HtmlAttributes(new { @style = "" })
+          .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+          .HtmlAttributes(new { @style = "" })
+          .Columns(columns =>
+          {             
+              columns.Bound(p => p.CourseName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(CourseName)#'style='width:150px;'>${CourseName}</div>").Title("Course").Width(150);
+              columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#'style='width:150px;'>${Title}</div>").Title("Certificate Name").Width(150);
+              columns.Bound(p => p.StudentInfo.FullName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(StudentInfo.FullName)#'style='width:150px;'>${StudentInfo.FullName}</div>").Title("Student Name").Width(150);
+              columns.Bound(p => p.SendOn).Title("Send").Format("{0:d}").Width(150);
+              columns.Command(c => c.Custom("Resend").Click("onResendClicked")).Width(50).Title(" ");
+          })
+          .Events(e => e.DataBound("onCertReportBound"))
+          .Sortable()
+          .Pageable(pager => pager.Refresh(true))
+                  .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Row).Extra(false)
+                 .Operators(operators => operators
+                    .ForString(str => str.Clear()
+                        .StartsWith("Starts with")
+                        .Contains("Contains")
+                    )))
+          .DataSource(dataSource => dataSource.Ajax()
+              .Model(model => model.Id(p => p.StudentCertificateId))
+              .Read(read => read.Action("GetCertReport", "Certificate", new { area = "AuthorAdmin" }).Type(HttpVerbs.Get))
+              .PageSize(20))
+    )
+</div>

@@ -1,0 +1,63 @@
+﻿@using LFE.DataTokens
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.discussion.roomSaved, rebindRooms, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.discussion.roomSaved, rebindRooms, null);
+	});
+
+	function rebindRooms() {
+		$('#CourseClassRooms').data("kendoGrid").dataSource.read();
+	}
+	
+	function onRoomsGridBound(e) {
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.discussion.roomsLoaded, total);
+	}
+	
+	function onRoomDeleting(e) {
+		if (e.model.CourseCount > 0) {
+			alert(userMessages.DISCUSSION.ROOM_PREVENT_DELETE);
+			e.sender.cancelChanges();
+			e.preventDefault();
+		}
+	}
+</script>
+
+
+@(Html.Kendo().Grid <AuthorRoomListDTO>()    
+	  .Name("CourseClassRooms")
+	  .TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+	  .Columns(columns => {
+			columns.Bound(m => m.Name).ClientTemplate("<a href='#=emptyHref#' onclick='editRoom(#=RoomId#,\"#=Encoder.htmlEncode(Name)#\")' style='margin:-5px 0 0' class='list-cmd' >${Name}</a>").Title("ClassRoom Name");
+			columns.Bound(m => m.CourseCount).ClientTemplate("<span class='btn' style='text-decoration:underline' data-id='${RoomId}'>${CourseCount}</span>");
+			columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+			columns.Bound(m => m.RoomId).ClientTemplate("<a href='#=emptyHref#' onclick='editRoom(#=RoomId#,\"#=Encoder.htmlEncode(Name)#\")' style='margin:-5px 0 0' class='list-cmd' >Edit</a>").Title(" ").Width(50);
+			columns.Command(c => c.Destroy().HtmlAttributes(new{@class="list-cmd"})).Title(" ").Width(50);
+	  })          
+	  .Sortable()
+	  .Pageable(pager => pager.Enabled(false))
+	  .Filterable(f=>f.Enabled(false))
+	  .Events(e=>e.DataBound("onRoomsGridBound").Remove("onRoomDeleting"))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.RoomId))
+							.Read(read => read.Action("GetAuthorClassRooms", "Discussion").Type(HttpVerbs.Get)).ServerOperation(false)
+							.Destroy(d=>d.Action("DestroyRoom","Discussion")))
+	  )  
+	  
+	  
+	  @(Html.Kendo().Tooltip()
+	.For("#CourseClassRooms")
+	.Filter("span")
+	.LoadContentFrom("RoomCoursesTooltip", "Discussion")
+	.Position(TooltipPosition.Top)
+	.Width(300)
+	//.Height(280)
+	.Events(events => events.RequestStart("requestStart"))
+)
+<script type="text/javascript">
+	function requestStart(e) {
+		e.options.data = {
+			id: e.target.data("id")
+		};
+	}
+</script>

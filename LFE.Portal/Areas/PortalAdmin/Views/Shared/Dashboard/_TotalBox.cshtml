@@ -1,0 +1,16 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.TotalsBoxToken
+           
+<div class="total-box">
+    <div class="box-inner">
+        <div class="title @Model.Type.ToString().ToLower()">@(Utils.GetEnumDescription(Model.Type))</div>
+        <div class="total">@Model.Total.ToString("n0")</div>
+        <div class="new">
+            <div class="new-inner">
+                <span class="">NEW @Model.New </span>
+                <i title="@Model.Tendency.Tooltip" class="arrow @Html.TendencyDirection2CssClass(Model.Tendency.Direction,"arrow-")"></i>    
+            </div>
+        </div>
+    </div>
+</div>

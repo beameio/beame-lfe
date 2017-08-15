@@ -1,0 +1,113 @@
+﻿@model LFE.DataTokens.QuizBaseDTO
+
+@{
+    ViewBag.Title = "Manage Quizzes";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminNoHeaderLayout.cshtml";
+
+    var quizManageUrl = Url.Action("_QuizManageForm", "Quiz", new { area = "AuthorAdmin", cid = Model.CourseId });  
+}
+
+@section css
+{
+    @Styles.Render("~/admin/quiz/less")
+    @Styles.Render("~/Content/plugin/scroll")
+}
+
+@section scripts{
+
+    <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/plugins/jquery-ui-1.10.4.custom.min.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.form.helper.js"></script>
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+
+
+    <script>
+        var QUIZ_CONTENT_AREA_SELECTOR = "#s-qz-content";
+        var hashSeparator = "$";
+        var QuizActions = {
+            EDIT_QUIZ: 'EDIT_QUIZ',
+            QUIZ_QUESTIONS: 'QUIZ_QUESTIONS',
+            EDIT_QUEST: 'EDIT_QUEST',
+            QUEST_ANSWERS: 'QUEST_ANSWERS'
+        };
+      
+        function parseQuizHash() {
+            var token = {
+                action: window.QuizActions.EDIT_QUIZ,
+                data: {
+                    id: null
+                }
+            }
+
+            var hash = window.location.hash ? window.location.hash.substring(1) : null;
+            if (hash == null) return token;
+
+            var paramArray = hash.split(hashSeparator);
+
+            var action = paramArray[0];
+            switch (action) {               
+                case window.QuizActions.EDIT_QUIZ:
+                    token.action = window.QuizActions.EDIT_QUIZ;
+                    token.data.id = paramArray[1];
+                    break;
+                case window.QuizActions.QUIZ_QUESTIONS:
+                    token.action = window.QuizActions.QUIZ_QUESTIONS;
+                    token.data.id = paramArray[1];
+                    break;
+            }
+
+            return token;
+        }
+        $(document).ready(function () {
+            window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.loadQuizContent, loadQuizContent, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.quiz.loadQuizContent, loadQuizContent, null);
+        });
+
+        function loadQuizContent(request) {
+
+            //console.log(cnt);
+            //console.log(request);
+           // cnt++;
+
+            var url, pane, hash, tab;
+
+            switch (request.action) {
+                case window.QuizActions.EDIT_QUIZ:
+                    url = '@quizManageUrl' + '?id=' + request.data.id;
+                    hash = window.QuizActions.EDIT_QUIZ + hashSeparator + request.data.id;
+                    pane = $('#paneQuiz');
+                    tab = $('#a-quiz-tab');
+                    break;
+                case window.QuizActions.QUIZ_QUESTIONS:
+                    url = '@quizManageUrl' + '?id=' + request.data.id;
+                    hash = window.QuizActions.QUIZ_QUESTIONS + hashSeparator + request.data.id;
+                    pane = $('#paneQuiz');
+                    tab = $('#a-quiz-tab');
+                    break;
+                default:
+                    return;
+            }
+
+            window.location.hash = hash;
+
+
+            showLoader();
+
+            pane.load(url, function () {
+                hideFormLoader();
+                tab.tab('show');
+                onQuizContentLoaded();
+            });
+        }
+
+        function onQuizContentLoaded() {
+            $("html, body").animate({ scrollTop: 0 }, 300);
+        }
+
+    </script>
+}
+<div style="margin-top: 15px;background: #fff">
+@Html.Partial("Quiz/_QuizManageForm", Model)    
+</div>

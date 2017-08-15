@@ -1,0 +1,209 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+
+@model LFE.DataTokens.AuthorCouponDTO
+
+@{
+    var types = Utils.EnumWithDescToList<CourseEnums.eCouponKinds>().OrderBy(x => x.Value).ToArray();
+  
+}
+
+<script type="text/javascript">
+    var EDIT_FORM_SELECTOR = '#frmAuthorCoupon';
+    var formCouponUserNotifManager;
+    var FORM_HEIGHT = COUPON_FORM_HEIGHT;
+    $(document).ready(function () {
+
+        $(window).resize(function () {
+            adjustCmdPosition(EDIT_FORM_SELECTOR,140);
+        });
+        $(document).scroll(function () {
+            adjustCmdPosition(EDIT_FORM_SELECTOR,140);
+        });
+
+        formCouponUserNotifManager = new UserNotificationManager('#cpn-info', '.alert', false);
+
+        var form = $(EDIT_FORM_SELECTOR);
+
+        initUnobstructiveFormValidation(form);
+
+        setTimeout(adjustValidatorsH, 50);
+
+
+    });
+
+    function onCouponSaved(response) {
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? "Coupon saved successfully" : response.error;
+
+        formCouponUserNotifManager.show({ message: msg, kind: kind });
+
+        if (!response.success) return;
+
+        window.getNotifManagerInstance().notify(notifEvents.coupon.couponSaved, null);
+        window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+        window.getNotifManagerInstance().notify(notifEvents.coupon.switch2List, null);
+    }
+
+    function onKindChanged(e) {
+        var token = this.dataItem(e.item.index());
+        var v = String(token.Value);
+
+        var c = $('#frmAuthorCoupon #CourseId').data('kendoDropDownList');
+        var b = $('#frmAuthorCoupon #BundleId').data('kendoDropDownList');
+
+        var cc = $('#d-course-selection');
+        var bc = $('#d-bundle-selection');
+
+        switch (v) {
+            case '@((int)CourseEnums.eCouponKinds.Author)':
+                c.value(null);
+                c.enable(false);
+                b.value(null);
+                b.enable(false);
+                cc.hide();
+                bc.hide();
+                break;
+            case '@((int)CourseEnums.eCouponKinds.Course)':
+                c.enable(true);
+                b.value(null);
+                b.enable(false);
+                cc.show();
+                bc.hide();
+                break;
+            case '@((int)CourseEnums.eCouponKinds.Bundle)':
+                c.value(null);
+                c.enable(false);
+                b.enable(true);
+                cc.hide();
+                bc.show();
+                break;
+        }
+    }
+
+    function onCouponSaving() {
+        var kind = $("#frmAuthorCoupon input:radio[name=Kind]:checked").val();
+        var c = $('#frmAuthorCoupon #CourseId').data('kendoDropDownList');
+        var b = $('#frmAuthorCoupon #BundleId').data('kendoDropDownList');
+        var isValid = true;
+        var msg = '';
+        switch (kind) {
+            case '@CourseEnums.eCouponKinds.Author':
+                break;
+            case '@CourseEnums.eCouponKinds.Course':
+                if (!hasValue(c.value())) {
+                    isValid = false;
+                    msg = 'select course';
+                }
+                break;
+            case '@CourseEnums.eCouponKinds.Bundle':
+                if (!hasValue(b.value())) {
+                    isValid = false;
+                    msg = 'select bundle';
+                }
+                break;
+        }
+
+        if (isValid) {
+            showContainerLoader('#f-cpn', null);
+            return true;
+        }
+
+        formCouponUserNotifManager.show({ message: msg, kind: NotificationKinds.Error });
+        return false;
+    }
+</script>
+<style>
+    #cp-info {
+        height: 20px;
+        margin-left: 130px;
+    }
+</style>
+
+@using (Ajax.BeginForm("SaveAuthorCoupon", "Course", new { }, new AjaxOptions { OnBegin = "javascript:return onCouponSaving()", OnSuccess = "onCouponSaved", LoadingElementId = "site-loader" }, new { @id = "frmAuthorCoupon", @style = "" }))
+{
+
+    <div style="height: auto;margin-bottom: 40px">
+        <div style="height: 30px;margin: 20px 0 0 ;padding-bottom: 20px;border-bottom: 1px solid #e1e1e1">
+            <div class="inline" style="width: 147px;font-size: 14px;color: #333">
+                <label for="Type">Coupon for</label>
+            </div>
+            <div class="inline">
+                @(Html.Kendo().DropDownListFor(m => m.Kind)
+                        .DataTextField("Title")
+                        .DataValueField("Value")
+                        .BindTo(types)
+                        .HtmlAttributes(new {@class="c2", @style = "height:22px;font-size:12px" })
+                        .Events(e => e.Select("onKindChanged"))
+                        .Value(((byte)Model.Kind).ToString())
+                        .Enable(Model.CouponId < 0)
+                      )
+            </div>
+            <div class="inline">
+                <div class="" style="margin:0 20px 0;display: @(Model.CouponId < 0 ? "none" : (Model.Kind==CourseEnums.eCouponKinds.Course ? "block" : "none"))" id="d-course-selection">
+                    @(Html.Kendo().DropDownListFor(m => m.CourseId)
+                        .DataTextField("Name")
+                        .DataValueField("CourseId")
+                        .OptionLabel(" select course")
+                        .HtmlAttributes(new { @class = "c2", @style = "width:400px;height:22px;font-size:12px" })
+                        .Enable(Model.Kind == CourseEnums.eCouponKinds.Course && Model.CouponId < 0)
+                        .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course"))))
+                </div>
+                <div class="" style="margin: 0 20px 0;display: @(Model.CouponId < 0 ? "none" : (Model.Kind==CourseEnums.eCouponKinds.Bundle ? "block" : "none"))" id="d-bundle-selection">
+                    @(Html.Kendo().DropDownListFor(m => m.BundleId)
+                        .DataTextField("Name")
+                        .DataValueField("BundleId")
+                        .OptionLabel(" select bundle")
+                        .HtmlAttributes(new { @class = "c2", @style = "width:400px;height:22px;font-size:12px" })
+                        .Enable(Model.Kind == CourseEnums.eCouponKinds.Bundle && Model.CouponId < 0)
+                        .DataSource(ds => ds.Read(r => r.Action("GetAuthorBundleLOV", "Course"))))
+                </div>
+            </div>            
+        </div>     
+    </div>
+    
+    @*<div style="width: 840px;height: 35px;margin-bottom: 30px">
+        <div class="inline" style="margin: 7px 0 0;">
+            <input type="radio" id="Kind_Author" name="Kind" onchange="onKindChanged(this)" value="@CourseEnums.eCouponKinds.Author.ToString()" @Html.ToCouponKindChecked(CourseEnums.eCouponKinds.Author, Model.Kind) @Html.ToCouponKindReadonly(Model.CouponId)> <label class="inline">All my courses</label>
+        </div>
+        <div class="inline" style="margin: 7px 20px 0;">
+            <input type="radio" id="Kind_Course" name="Kind" onchange="onKindChanged(this)" value="@CourseEnums.eCouponKinds.Course.ToString()" @Html.ToCouponKindChecked(CourseEnums.eCouponKinds.Course, Model.Kind) @Html.ToCouponKindReadonly(Model.CouponId)> <label class="inline">Course</label>
+        </div>
+        <div class="inline" style="margin: 3px 20px 0;">
+            @(Html.Kendo().DropDownListFor(m=>m.CourseId)
+                    .DataTextField("Name")
+                    .DataValueField("CourseId")
+                    .OptionLabel(" select course")
+                    .Enable(Model.Kind==CourseEnums.eCouponKinds.Course && Model.CouponId<0)
+                    .DataSource(ds=>ds.Read(r=>r.Action("GetAuthorCoursesLOV","Course"))))
+        </div>
+        <div class="inline" style="margin: 7px 20px 0;">
+            <input type="radio" id="Kind_Bundle" name="Kind" onchange="onKindChanged(this)"  value="@CourseEnums.eCouponKinds.Bundle.ToString()" @Html.ToCouponKindChecked(CourseEnums.eCouponKinds.Bundle, Model.Kind) @Html.ToCouponKindReadonly(Model.CouponId)> <label class="inline">Bundle</label>
+        </div>
+        <div class="inline" style="margin: 3px 20px 0;">
+            @(Html.Kendo().DropDownListFor(m => m.BundleId)
+                    .DataTextField("Name")
+                    .DataValueField("BundleId")
+                    .OptionLabel(" select bundle")
+                    .Enable(Model.Kind == CourseEnums.eCouponKinds.Bundle && Model.CouponId < 0)
+                    .DataSource(ds => ds.Read(r => r.Action("GetAuthorBundleLOV", "Course"))))
+        </div>
+    </div>*@
+
+    @Html.Partial("Coupons/_EditCouponForm", Model)
+
+    <div class="form-cmd-row wrap" id="d-cpn" style="display: none;height: 40px;margin-top: 20px;">
+        <div class="inner">
+            <div id="cpn-info" class="info-box float-left">
+                <p class="alert"></p>
+            </div>
+            <div class="btn-container float-left">
+                <a href="javaScript:cancelEditCoupon()" class="btn-cancel inline" title="cancel coupon editing">cancel</a>
+                <a href="javaScript:submitForm('frmAuthorCoupon')" class="btn-submit inline" title="save coupon">save changes</a>
+            </div>
+        </div>
+    </div>
+}
+
+
+

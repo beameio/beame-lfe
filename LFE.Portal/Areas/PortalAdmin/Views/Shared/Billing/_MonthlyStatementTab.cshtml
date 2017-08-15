@@ -1,0 +1,40 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.MonthlyStatementDTO
+
+@{
+    if (Model.IsValid)
+    {
+        @Html.Action("MonthlyStatement", "Billing", new { area = "PortalAdmin", userId = Model.User.UserId, year = Model.Year, month = Model.Month,currencyId = Model.Currency.CurrencyId })
+
+        <div style="height: 40px;margin: 15px 0">
+            @Html.Hidden("hidChart_" + Model.User.UserId)
+            @(Html.Kendo().Button()
+                            .Name("Send_" + Model.User.UserId)
+                            .Content("Send Statement to Author")
+                            .HtmlAttributes(new { @style = "height:30px;padding:7px" })
+            )
+            <script>
+                $(document).ready(function () {
+                    $("#Send_" + '@Model.User.UserId').unbind('click').bind('click',function () {
+                        var data = {
+                            userId: '@Model.User.UserId'
+                            , year: '@Model.Year'
+                            , month: '@Model.Month'
+                            , img: $("#hidChart_" + '@Model.User.UserId').val()
+                            ,currencyId:'@Model.Currency.CurrencyId'
+                        };
+                        console.log(data);
+                        var url = '@Url.Action("SendMonthlyStatement","Billing")';
+
+                        ajaxAction(url, data, window.onStatementSend, null);
+                    });
+                });
+            </script>
+        </div>
+    }
+    else
+    {
+        <h3>@Model.Message</h3>
+    }
+}
+

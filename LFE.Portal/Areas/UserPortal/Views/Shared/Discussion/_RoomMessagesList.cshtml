@@ -1,0 +1,147 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model CourseDiscussionToken 
+
+@{
+	var kinds = new List<DataSourceSortToken>
+		{
+			new DataSourceSortToken
+				{
+					name    = "newest"
+					,field  = "AddOn"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "oldest"
+					,field  = "AddOn"
+					,dir    = "asc"
+				},
+				new DataSourceSortToken
+				{
+					name   = "name of poster"
+					,field = "CreatorName"
+					,dir   = ""
+				}
+		};
+}
+
+<script>
+	var replayActive = false;
+	var findUrl = '@Url.Action("FindUsers","Discussion")';
+	var userSelected = false;
+	
+	$(document).ready(function () {
+		window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setRoomFeedH, null);
+	});
+
+	function setRoomFeedH(h) {
+		if (h != null) {
+			$('#d-room-msg-container').height(h - 185);
+		}
+		$('#d-room-msg-container').nanoScroller();
+	}
+	
+	function replayTo(parentId) {
+		
+		if (hasValue($('#input-replay-container-' + parentId).html())) {
+			$('#input-replay-container-' + parentId).slideDown("slow", function() {
+				$("#d-room-msg-container").nanoScroller();
+			});
+		} else {
+			var data = {
+				roomId: '@Model.RoomId'
+				,courseId: '@Model.CourseId'
+				,parentId: parentId
+			};
+			var url = '@Url.Action("MessageInputPartial","Discussion")';
+			
+			$.ajax({
+				url: url,
+				cache: false,
+				type: "Post",
+				data: JSON.stringify(data),
+				datatype: "json",
+				contentType: "application/json; charset=utf-8"
+				, success: function (view) {
+					$('#input-replay-container-' + parentId).empty().html(view);
+					$('#input-replay-container-' + parentId).slideDown("slow", function () {
+						$("#d-room-msg-container").nanoScroller();
+					});
+				}
+			});
+		}
+		
+	}
+
+	function cancelReplay(parentId) {
+		$('#input-replay-container-' + parentId).slideUp("slow", function () {
+			$("#d-room-msg-container").nanoScroller();
+		});
+	}
+	
+	function refreshRoomDiscuss() {
+		var currentSortEl = $('#lvFeedSort').find('li > a[class=active]');
+		var field = currentSortEl.attr('data-val');
+		var dir = currentSortEl.attr('data-dir');
+
+		var data = {
+			roomId: '@Model.RoomId'
+			, courseId: '@Model.CourseId'
+			, field: field
+			, dir : dir
+		};
+
+		var url = '@Url.Action("GetRoomFeedTreePartial","Discussion",new{area="UserPortal"})';
+
+		window.showFormLoader('#d-room-feed-container');
+		
+		$.ajax({
+			url: url,
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8"
+			, success: function (view) {
+				$('#d-room-feed-container').fadeOut("slow",function() {
+					$('#d-room-feed-container').html(view).fadeIn("slow");
+					window.hideFormLoader();
+				});
+				
+			}
+		});
+	}
+</script>
+
+<div id="d-RoomMessages-cmd-row" style="height: 40px;">
+	<div class="d-sort-row discus float-left">
+		<label>Sort by:</label>
+		@(Html.Kendo().ListView<DataSourceSortToken>()
+			  .Name( "lvFeedSort" )
+			  .TagName( "ul" )
+			  .ClientTemplateId( "kendo-sort-template" )
+			  .BindTo( kinds )			  
+			  .Events( e => e.DataBound( "onFeedSortFiltersBound" ))
+			  )
+	</div>
+	<div class="float-right">
+		<span onclick="refreshRoomDiscuss()" class="btn-room-feed-refresh">Refresh</span>
+	</div>
+</div>
+
+<div id="d-room-msg-container" class="nano" style="">
+	<div class="content" id="d-room-feed-container">
+		@Html.Partial("Discussion/_RoomFeedTree",Model)
+	</div>
+</div>
+	  
+<script>
+	setTimeout(function () {
+		var h = $('#d-room-msg-container').parent().height();        
+		$('#d-room-msg-container').height(h - 185); //185 = 130 input + 15px margin + 40px sort row
+		setReportScroll("#d-room-msg-container");
+	}, 100);
+</script>

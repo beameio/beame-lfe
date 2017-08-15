@@ -1,0 +1,68 @@
+﻿html {background-color: #fff;margin: 0;padding: 0;}
+ul, ol { list-style: none; padding: 0; margin: 0; }
+
+body{background-color: #fff;color: #333;font-family: Calibri;margin: 0;padding: 0;}
+
+
+.wrap{margin:0 auto;-moz-min-width:1260px;-ms-min-width:1260px;-o-min-width:1260px;-webkit-min-width:1260px;min-width:1260px;width:auto;max-width:1260px;padding:0 1px}
+#main{overflow: hidden;top: 10px;position: relative;min-height: 100%;height: auto;margin-bottom: 20px}
+.main-nav-container{font-family: "Open Sans",​Arial}
+a {color: #666;outline: none;text-decoration: none}
+a:link, a:visited,a:active, a:hover {color: #666;}
+fieldset{ border: none;padding: 0;margin: 0}
+fieldset legend{ display: none;}
+p{ margin: 0;border: 0;padding: 0}
+/*header*/
+header, footer, hgroup,nav, section {display: block;}
+header .top{ height: 25px;width: 100%;font-size: 12px;}
+header .top a{text-decoration: underline}
+header .top ul { padding: 7px;float: right}
+header .top ul li{ float: left;margin: 0 7px 0 0}
+header .logo-row{ height: 110px;text-align: left;margin: 0 0 15px}
+header .logo{ background: url('../../../../Content/assets/lfe-logo-108.png') no-repeat;display: block;width: 180px;height: 110px}
+header .nav-container{margin:-70px 0 0 200px;max-width:1220px;-moz-min-width:760px;-ms-min-width:760px;-o-min-width:760px;-webkit-min-width:760px;min-width:760px}
+
+/*navigation*/
+nav { height: 30px;font-family: Calibri;}
+nav ul{ height: 26px;display: block;width: auto;float: left}
+nav ul li{ display: inline;padding: 0 10px 0 0;border-right: 2px solid #999;margin: 0 0 0 10px;text-transform: uppercase;font-family: Calibri !important}
+nav ul li.cb{padding-right: 30px}
+nav ul li:first-child{margin-left: 0}
+nav ul li:last-child{border-right: none}
+nav ul li a{ color: #999;text-decoration: none;font-size: 20px;font-weight: bold;font-family:  Calibri !important}
+nav ul li span.a{ color: #666;font-size: 20px;font-weight: bold;cursor: pointer;font-family:  Calibri !important}
+nav ul li a:hover{color: #006699}
+nav ul li a.current,nav ul li span.a.current{color: #006699}
+
+nav ul li.li-sub:hover .sub{display: block;} 
+nav ul li div.sub{position: absolute;top: -10px;left:-6px;width: 100%;background: #f6f6f6;display: none;text-align: left;padding-bottom: 10px;border: 1px solid #949494;z-index: 100001}
+nav ul li div.sub .inner{padding: 0 5px}
+nav ul li div.sub .menu-name{ color: #006699;font-size: 20px;font-weight: bold;text-transform: uppercase;margin: 5px auto 0;padding-bottom: 15px;border-bottom: 1px solid #949494;background: url('../../Content/images/ico-down-blue.png') no-repeat;background-position: 95% 10px }
+nav ul li div.sub .sub-menu-link {min-height: 20px;border-bottom: 1px solid #949494;padding-bottom: 10px;margin-top: 10px;text-align: left}
+nav ul li div.sub .sub-menu-link a{ color: #000;font-size: 14px;text-decoration: none;text-transform: capitalize}
+
+nav .sett-link{ display: block;float: right;background: url('../images/ico-sett.png') no-repeat;padding: 3px 0 0 30px;color: #000;height: 30px;margin: 8px 5px 0 0;font-weight: bold;font-size: 14px; }
+
+/*footer*/
+footer { font-size: 11px;}
+footer p{float: right}
+footer ul{list-style:none;margin:1em 0 0;float:left;padding:0}
+footer li{margin:0;border-left:1px solid #999;padding:0 4px 0 8px;display:inline}
+footer li:first-child{padding-left:0;border-left:none}
+footer li a{color:#464646;text-decoration:none;}
+footer li a:hover,footer li a:active{text-decoration:underline}
+
+.float-left{float:left}
+.float-right{float:right}
+
+h1, h2, h3,
+h4, h5, h6 {margin: 0;padding: 0;}
+
+h1{font-size:2em}h2{font-size:1.75em}h3{font-size:1.2em}h4{font-size:1.1em}h5,h6{font-size:1em}h5 a:link,h5 a:visited,h5 a:active{padding:0;text-decoration:none}
+
+.page-title{color: #333;height: 32px; margin-bottom: 20px;font-size: 32px;border-bottom: 3px solid #a0a0a0;padding-bottom: 22px}
+/*misc*/
+.required{ color: red;width: 5px;}
+.required.pass{color: red !important}
+
+

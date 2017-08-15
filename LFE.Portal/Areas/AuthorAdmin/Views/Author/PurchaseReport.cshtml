@@ -1,0 +1,22 @@
+﻿
+@{
+	ViewBag.Title = "Purchase Report";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	<style type="text/css">
+		.k-grid-footer{display: none !important}	
+		/*.k-grid tbody tr.k-alt{background: #fff}*/	
+	</style>    
+}
+
+<div class="page-title">
+	<div class="float-left">My Purchases</div>    
+	@*<div id="total-title" class="float-right">Total: 0 $</div>*@
+</div>
+
+
+
+@Html.Action("_UserPurchases", "User",new{area="UserPortal"})

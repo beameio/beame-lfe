@@ -1,0 +1,518 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+
+@model LFE.DataTokens.ItemPurchaseDataToken
+@{
+    ViewBag.Title = "Purchase " + Model.ItemName;
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+
+}
+@section css
+{
+    <style>
+    </style>
+}
+
+@{
+    if (!Model.IsValid)
+    {
+        <script>
+            $(document).ready(function () {
+                hideLoader();
+            });
+        </script>
+        <h2>
+            @Model.Message
+        </h2>
+    }
+    else
+    {
+        var smallItemTypeName = Model.Type == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+
+        if (Model.IsPurchased)
+        {
+            <h2>
+                You have already purchased this @smallItemTypeName
+            </h2>
+        }
+        else
+        {
+            <div class="row">
+                <div class="pay-container">
+                <div class="pay-course-head">
+                    <div class="first">
+                        @{
+                            switch (Model.PriceToken.PriceType)
+                            {
+                                case BillingEnums.ePricingTypes.ONE_TIME:
+                                    <span class="lbl-title inline">purchase @smallItemTypeName  - @Model.PriceToken.Currency.Symbol</span>
+                                    break;
+                                case BillingEnums.ePricingTypes.SUBSCRIPTION:
+                                    <span class="lbl-title inline">purchase monthly subscription for @smallItemTypeName  - @Model.PriceToken.Currency.Symbol</span>
+                                    break;
+                                case BillingEnums.ePricingTypes.RENTAL:
+                                    <span class="lbl-title inline">rent for @smallItemTypeName  - @Model.PriceToken.Currency.Symbol</span>
+                                    break;
+                            }
+                            
+                            @*if (!Model.BuySubscription)
+                            {
+                                <span class="lbl-title inline">purchase @smallItemTypeName  - $</span>
+                            }
+                            else
+                            {
+                                <span class="lbl-title inline">purchase monthly subscription for @smallItemTypeName  - $</span>
+                            }*@
+                        }
+                        <span class="lbl-title inline" data-bind="text: Price"></span>
+                    </div>
+                    <div class="sec">
+                        <span class="lbl-sub-title inline">@Model.Author.fullName - @Model.ItemName</span>
+                    </div>
+                </div>
+
+                <div style="height: 20px;">
+                    <span id="msg-container" style="display: none;" data-bind="text: infoMessage, attr: { class: getMessageClass }"></span>
+                </div>
+
+                <hr />
+
+                <div class="coupon-container row">
+                    @using (Ajax.BeginForm("GetItemPriceWithCoupon", "Payment",
+                                            new { area = "Widget", lineId = Model.PriceToken.PriceLineID, itemType = Model.Type,ownerId=Model.Author.userId },
+                                            new AjaxOptions { OnSuccess = "onCouponChecked" },
+                                            new { @id = "frmCheckCoupon", @class = "form-inline" }))
+                    {
+                        @Html.Hidden("itemId", Model.ItemId)
+
+                        <div class="col-sm-7 col-xs-8 col-md-5 col-lg-4" style="max-width:400px ">
+                            <label class="inline">If you have a coupon-code, please insert it here:</label>
+                        </div>
+                        <div class="col-sm-5 col-xs-4 col-md-4 col-lg-3" style="max-width: 375px">
+                            <input id="couponCode" name="couponCode" type="text" style="width: 100%;height: 25px; border: 1px solid #a4a4a4;" />
+                        </div>
+                        <div class="col-sm-12 col-xs-12 col-md-3 col-lg-5">
+                            <input type="submit" value="Apply Coupon" class="blue" id="btn-submit-coupon" data-bind="events: { click: onCheckCouponClicked }" />
+                        </div>
+                    }
+                </div>
+
+                <hr />
+
+
+                @using (Html.BeginForm("ExecuteItemPurchase", "Payment", new { area = "Widget", Model.ItemId, Model.ItemName, Model.TrackingID, Model.BuySubscription }, FormMethod.Post, new { @id = "frmBuyCourse", @class = "reg-form", target = "_self" }))
+                {
+                    @Html.HiddenFor(m=>m.PriceToken.PriceLineID)
+                    @Html.HiddenFor(m=>m.PriceToken.Currency.ISO)
+                    @Html.HiddenFor(m => m.Type)
+                    @Html.HiddenFor(m => m.IsFree)
+                    @Html.HiddenFor(m => m.Price, new { @data_bind = "value:Price" })
+                    @Html.HiddenFor(m => m.CouponCode, new { @data_bind = "value:CouponCode" })
+                    @Html.HiddenFor(m => m.Author.fullName)
+                    @Html.HiddenFor(m => m.Author.userId)
+                    @Html.HiddenFor(m => m.PaymentInstrumentId, new { @data_bind = "value:PaymentInstrumentId" })
+
+                    <input type="submit" class="green" id="btn-submit-free" style="width: 150px; display: none; position: absolute; top: 10px; right: 10px;" value="Complete" onclick="javascript: showLoader();" />
+
+                    <div id="po-container">
+
+                        <div class="pay-method-container row">
+                            <label class="inline" style="margin: 7px 7px 0 0">Payment Method:</label>
+
+                            <div style="margin: 7px 0 0 0;font-size: 14px" class="inline pm-opt-row">
+                                <div class="inline" style="">
+                                    <label class="">
+                                        <input type="radio" id="PaymentMethod_PaymentMethod_Credit_Card" name="PaymentMethod" value="@BillingEnums.ePaymentMethods.Credit_Card.ToString()" data-bind="events: { click: onPaymentMethodChanged }" checked="checked">
+                                        Credit Card
+                                    </label>
+                                </div>
+                                <div class="inline" style="">                                    
+                                    <label class="paypal">
+                                        <input type="radio" id="PaymentMethod_PaymentMethod_Paypal" name="PaymentMethod" value="@BillingEnums.ePaymentMethods.Paypal.ToString()" data-bind="events: { click: onPaymentMethodChanged }">     
+                                    </label>
+                                </div>
+
+                                @{
+                                    if (Model.UserSavedCards.Any())
+                                    {
+                                        <div class="inline" style="">                            
+                                            <label class="inline" style="margin: 0 10px 0 0">
+                                                <input type="radio" id="PaymentMethod_PaymentMethod_Saved_Instrument" name="PaymentMethod" data-bind="events: { click: onPaymentMethodChanged }" @(Model.UserSavedCards.Any() ? "" : "disabled") value="@BillingEnums.ePaymentMethods.Saved_Instrument.ToString()">
+                                                Saved credit cards                                                                                               
+                                            </label>
+                                            <span class="inline" style="margin: 3px 0 0">
+                                                @(Html.Kendo().DropDownListFor(m => m.UserSavedCards)
+                                                                                                    .DataValueField("InstrumentId")
+                                                                                                    .DataTextField("DisplayName")
+                                                                                                    .OptionLabel("-- select saved credit card --")
+                                                                                                    .BindTo(Model.UserSavedCards)
+                                                                                                    .Enable(Model.PaymentMethod == BillingEnums.ePaymentMethods.Saved_Instrument && Model.UserSavedCards.Any())
+                                                                                                    .Events(e => e.Select("onSavedCardSelected"))
+                                                )
+                                            </span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="pay-instrument-container">
+                            <div class="inline" style="width: 360px;">
+                                <h3 data-bind="text:instrumentTitle"></h3>
+                                <div id="d-cc-container">
+                                    @Html.EditorFor(m => m.CreditCard)
+                                </div>
+                                <div id="d-pp-container" style="display: none">
+                                    <label class="inline" style="width: 200px; margin: 25px 0 0 25px" data-bind="text: instrumentInfoMessage"></label>
+                                </div>
+                            </div>
+
+                            <div class="inline" style="width: 360px;">
+                                <div id="d-ba-box">
+                                    <div>
+                                        <h3 class="inline" style="margin: 4px 25px 0 0">Billing Address</h3>
+
+                                        <div class="inline" data-bind="style:{visibility:isAddressComboVisible}">
+                                            @(Html.Kendo().DropDownList()
+                                              .Name("ddlUserAdresses")
+                                              .DataTextField("DisplayName")
+                                              .DataValueField("AddressId")
+                                              .BindTo(Model.BillingAddresses)
+                                              .Enable(Model.BillingAddresses.Count > 0)
+                                              .OptionLabel("-- select saved address")
+                                              .HtmlAttributes(new { @style = "width:200px;" })
+                                              .Events(e => e.Select("onAddressSelected"))
+                                            )
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 10px 0" data-bind="style:{visibility:isAddressComboVisible}">
+                                        <label style="margin: 0 10px 0 0; font-size: 12px;" for="chkUseNewAddress" class="inline">Use new</label> <input type="checkbox" id="chkUseNewAddress" style="margin: 4px 0 0 0" class="inline" data-bind="events: { click: onNewAddressClicked },checked: isNewAddrChecked, disabled: isNewAddrDisabled" />
+                                    </div>
+                                </div>
+                                <div id="d-ba-container">
+                                    @Html.Partial("EditorTemplates/BillingAddressDTO", Model.BillingAddress)
+                                </div>
+
+                            </div>
+
+                            <div class="inline" style="width: 160px; vertical-align: bottom; padding-bottom: 15px">
+                                <div style="margin: 0 0 10px 0" data-bind="style:{display:isSaveCreditCardVisible}">
+                                    @Html.CheckBoxFor(m => m.SavePaymentInstrument, new { @class = "inline", @data_bind = "checked:isSaveInstrumentChecked,disabled:isSaveInstrumentDisabled" })
+
+                                    <div data-bind="text: saveInstrMessage" class="inline" style="font-size: 11px; width: 120px"></div>
+                                </div>
+                                <input type="submit" data-bind="value: buyButtonText" class="green" id="btn-submit-buy" style="width: 150px" onclick="javascript: onSubmitClicked();" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @using (Ajax.BeginForm("GetBillingAddressEditForm", "Account", new { area = "" }, new AjaxOptions { UpdateTargetId = "d-ba-container", InsertionMode = InsertionMode.Replace }, new { @id = "frmLoadAddress" }))
+                {
+                    @Html.Hidden("addressId")
+                }
+            </div>
+            </div>
+            @section scripts
+            {
+                <script>
+                    var SAVE_PAYPAL_MESSAGE = 'Sign a billing agreement to streaming future purchase with paypal';
+                    var SAVE_CC_MESSAGE = 'Save credit card details on PayPal for future use';
+                    var BUY_CC_BTN_TEXT = 'Buy';
+                    var BUY_PAYPAL_BTN_TEXT = 'Continue';
+                    var BUY_CC_TITLE = 'Payment with Credit Card';
+                    var BUY_SAVED_CC_TITLE = 'Payment with Saved Credit Card';
+                    var BUY_PAYPAL_TITLE = 'Payment with Paypal';
+                    var SAVED_CC_INFO_MESSAGE = 'The payment will be processing with saved credit card ';
+                    var PAYPAL_INFO_MESSAGE = 'You will be redirected to the Paypal website for completion of the payment process';
+                    var basePrice = '@Model.PriceToken.Price';
+                    var messageKind = {
+                        error: 'error',
+                        info: 'info'
+                    };
+                    var purchaseModel;
+
+                    function onSubmitClicked() {
+                        var isValid = $('#frmBuyCourse').validate().form();
+
+                        if (!isValid) return false;
+
+                        showLoader();
+
+                        return true;
+                    }
+
+                    $(document).ready(function () {
+                        $('#frmBuyCourse').validate().settings.ignore = [];
+                        initUnobstructiveFormValidation($('#frmBuyCourse'));
+
+                        var msg = '@Model.Message';
+
+                        if (hasValue(msg)) showMessage(msg, messageKind.error);
+
+                        purchaseModel = kendo.observable({
+                            Price: basePrice,
+                            CouponCode: '',
+                            CouponApplied: false,
+                            PaymentInstrumentId: null,
+                            //selected payment method
+                            method: '@BillingEnums.ePaymentMethods.Credit_Card',
+
+                            //notification properties
+                            msgClass: '',
+                            infoMessage: '',
+
+                            //checkbox and submit button
+                            saveInstrMessage: SAVE_CC_MESSAGE,
+                            buyButtonText: BUY_CC_BTN_TEXT,
+
+                            //info block instead cc
+                            instrumentTitle: BUY_CC_TITLE,
+                            instrumentInfoMessage: '',
+
+                            //new address checkbox behavior
+                            isNewAddrDisabled: false,
+                            isNewAddrChecked: true,
+                            savedAddressCount: '@Model.BillingAddresses.Count',
+
+                            getMessageClass: function () {
+                                return this.get('msgClass');
+                            },
+
+                            isSaveCreditCardVisible: function () {
+                                return this.get('method') == '@BillingEnums.ePaymentMethods.Credit_Card' ? 'block' : 'none';
+                            },
+
+                            isAddressComboVisible: function () {
+                               // console.log(this.get('savedAddressCount'));
+                                return this.get('savedAddressCount') > 0 ? 'visible' : 'hidden';
+                            },
+
+                            isSaveInstrumentChecked: function () {
+                                return this.get('method') == '@BillingEnums.ePaymentMethods.Credit_Card';
+                            },
+                            isSaveInstrumentDisabled: function () {
+                                return '@(Model.PriceToken.PriceType==BillingEnums.ePricingTypes.SUBSCRIPTION)'.toLowerCase() == 'true' || !(this.get('method') == '@BillingEnums.ePaymentMethods.Credit_Card');
+                            },
+
+                            onNewAddressClicked: function () {
+                                var checked = $('#chkUseNewAddress').prop('checked');
+                                if (checked) {
+                                    $('#ddlUserAdresses').data("kendoDropDownList").value(null);
+                                    $('#frmLoadAddress #addressId').val(-1); //get new
+                                    $('#frmLoadAddress').submit();
+                                } else {
+                                    loadDefaultContact();
+                                }
+                            },
+
+                            onPaymentMethodChanged: function () {
+                                purchaseModel.set('method', $("input:radio[name=PaymentMethod]:checked").val());
+
+                                var method = this.get("method");
+
+                                switch (method) {
+                                    case '@BillingEnums.ePaymentMethods.Credit_Card':
+                                        purchaseModel.set('saveInstrMessage', SAVE_CC_MESSAGE);
+                                        purchaseModel.set('buyButtonText', BUY_CC_BTN_TEXT);
+                                        purchaseModel.set('instrumentTitle', BUY_CC_TITLE);
+                                        $('#d-pp-container').slideUp(300, function () {
+                                            //enable client validation on CC
+                                            $('#d-cc-container input').removeAttr('disabled');
+                                            //disable saved card combo
+                                            resetCardCombo();
+
+                                            $('#d-cc-container').slideDown();
+
+                                            if (!$('#d-ba-box').is(':visible')) {
+                                                $('#d-ba-box').slideDown(300, function () {
+                                                    $('#frmLoadAddress').submit();
+                                                    $('#d-ba-container').slideDown(300, function () {
+
+                                                    });
+                                                });
+                                            }
+
+                                            $('#frmBuyCourse').attr('target', '_self');
+                                        });
+                                        break;
+                                    case '@BillingEnums.ePaymentMethods.Paypal':
+                                    case '@BillingEnums.ePaymentMethods.Saved_Instrument':
+                                        var toHideSelector, buttonText, infoTitle, infoMessage;
+
+                                        if (method == '@BillingEnums.ePaymentMethods.Paypal') {
+                                            buttonText = BUY_PAYPAL_BTN_TEXT;
+                                            infoTitle = BUY_PAYPAL_TITLE;
+                                            infoMessage = PAYPAL_INFO_MESSAGE;
+                                            //disable saved card combo
+                                            resetCardCombo();
+                                            $('#frmBuyCourse').attr('target', '_blank');
+                                        } else {
+                                            buttonText = BUY_CC_BTN_TEXT;
+                                            infoTitle = BUY_SAVED_CC_TITLE;
+                                            infoMessage = SAVED_CC_INFO_MESSAGE;
+                                            //enable saved card combo
+                                            var cardCombo = $('#UserSavedCards').data("kendoDropDownList");
+                                            if (cardCombo != undefined) {
+                                                cardCombo.enable(true);
+                                                setTimeout(loadDefaultCard, 400);
+                                            }
+                                            $('#frmBuyCourse').attr('target', '_self');
+                                        }
+
+                                        if ($('#d-cc-container').is(':visible')) {
+                                            toHideSelector = '#d-cc-container';
+                                        } else {
+                                            toHideSelector = '#d-pp-container';
+                                            $(toHideSelector).fadeToggle();
+                                        }
+                                        if ($('#d-ba-box').is(':visible')) {
+                                            $('#d-ba-box').slideToggle(300, function () {
+                                                $('#d-ba-container').slideToggle().empty();
+                                            });
+                                        }
+                                        $(toHideSelector).slideUp(300, function () {
+                                            purchaseModel.set('saveInstrMessage', '');
+                                            purchaseModel.set('buyButtonText', buttonText);
+                                            purchaseModel.set('instrumentTitle', infoTitle);
+                                            purchaseModel.set('instrumentInfoMessage', infoMessage);
+                                            //disable client validation on CC
+                                            $('#d-cc-container input').attr('disabled', 'disabled');
+                                            $('#d-pp-container').slideDown();
+                                        });
+                                        break;
+
+                                    default:
+                                        return;
+                                }
+                            },
+
+                            onCheckCouponClicked: function (e) {
+                                var couponApplied = purchaseModel.get('CouponApplied');
+                                if (couponApplied) {
+                                    e.preventDefault();
+                                    return false;
+                                }
+
+                                if (!hasValue($('#couponCode').val())) {
+                                    e.preventDefault();
+                                    showMessage("insert coupon code", messageKind.error);
+                                    return false;
+                                }
+                                showLoader();
+                                return true;
+                            }
+                        });
+
+
+                        kendo.bind($(".pay-container"), purchaseModel);
+
+                        loadDefaultContact();
+                    });
+
+                    function resetCardCombo() {
+                        var cardCombo = $('#UserSavedCards').data("kendoDropDownList");
+                        if (cardCombo == undefined) return;
+                        cardCombo.value(null);
+                        cardCombo.enable(false);
+                        purchaseModel.set('PaymentInstrumentId', null);
+                    }
+
+                    function onCouponChecked(response) {
+                        window.hideLoader();
+                        var kind;
+
+                        if (response.IsValid) {
+                            kind = messageKind.info;
+                            purchaseModel.set('Price', response.FinalPrice.toFixed(2));
+                            purchaseModel.set('CouponCode', $('#couponCode').val());
+                            purchaseModel.set('CouponApplied', true);
+                            $('#couponCode').attr({ disabled: 'disabled' });
+                            $('#btn-submit-coupon').addClass('disabled');
+                            showMessage(response.Message, kind);
+
+                            if (response.IsFree) {
+                                $('#po-container').slideToggle(300, function () {
+                                    $('#po-container').empty();
+                                    $('#btn-submit-free').fadeIn();
+                                    $('#IsFree').val(true);
+                                    $('#frmBuyCourse').attr('target', '_self');
+                                });
+                            }
+                        } else {
+                            purchaseModel.set('Price', basePrice);
+                            kind = messageKind.error;
+                            showMessage(response.Message, kind);
+                        }
+                    }
+
+                    function showMessage(msg, kind) {
+                        var messageContainer = $('#msg-container');
+                        //reset
+                        purchaseModel.set('msgClass', '');
+                        purchaseModel.set('infoMessage', '');
+                        messageContainer.hide();
+                        purchaseModel.set('msgClass', kind);
+                        purchaseModel.set('infoMessage', msg);
+                        messageContainer.fadeIn(300);
+                    }
+
+                    function reloadCoursePage() {
+                        self.parent.showLoader();
+                        self.parent.location.reload(true);
+                    }
+
+                    function onSavedCardSelected(e) {
+                        var dataItem = this.dataItem(e.item.index());
+                        var id = dataItem.InstrumentId;
+                        var msg = SAVED_CC_INFO_MESSAGE;
+                        if (hasValue(id)) {
+                            msg += dataItem.DisplayName;
+                        } else {
+                            id = null;
+                        }
+
+                        purchaseModel.set('instrumentInfoMessage', msg);
+                        purchaseModel.set('PaymentInstrumentId', id);
+                    }
+
+                    function onAddressSelected(e) {
+                        var dataItem = this.dataItem(e.item.index());
+                        $('#frmLoadAddress #addressId').val(dataItem.AddressId);
+                        var isAddr = hasValue(dataItem.AddressId);
+                        purchaseModel.set('isNewAddrChecked', !isAddr);
+
+                        $('#frmLoadAddress').submit();
+                    }
+
+                    function loadDefaultContact() {
+                        var combo = $('#ddlUserAdresses').data("kendoDropDownList");
+                        if (combo == undefined) return;
+                        if (combo.dataSource._data.length == 0) {
+                            purchaseModel.set('isNewAddrChecked', true);
+                            purchaseModel.set('isNewAddrDisabled', true);
+                            return;
+                        }
+                        combo.select(1);
+                        combo.trigger("select", { item: $("#ddlUserAdresses_listbox li.k-state-selected") });
+                    }
+
+                    function loadDefaultCard() {
+                        var combo = $('#UserSavedCards').data("kendoDropDownList");
+                        if (combo == undefined) return;
+                        if (combo.dataSource._data.length == 0) {
+                            return;
+                        }
+                        combo.select(1);
+                        combo.trigger("select", { item: $("#UserSavedCards_listbox li.k-state-selected") });
+                    }
+
+                </script>
+            }
+
+        }
+    }
+}

@@ -1,0 +1,93 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Utils
+@{
+    var months = new NameValue[12];
+    for (var i = 1; i <= 12; i++)
+    {
+        months[i-1] = new NameValue{Name = i.ToString(),Value = i.ToString()};
+    }
+
+    var l = 1 + DateTime.Now.Year - 2012;
+    
+    var years = new NameValue[l];
+    var j = 0;
+    for (var i = 2012; i <= DateTime.Now.Year; i++)
+    {
+        years[j] = new NameValue { Name = i.ToString(), Value = i.ToString() };
+        j++;
+    }
+}
+
+<h2>Summary Report</h2>
+
+<div style="margin: 10px 0"> 
+  
+    <div class="inline">
+        @(Html.Kendo().DropDownList()
+                .Name("comboMonths")
+                .DataTextField("Name")
+                .DataValueField("Value")
+                .BindTo(months)
+                .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                .Events(e => e.Select("setRepParams"))
+        )
+    </div>
+    
+    <div class="inline">
+        @(Html.Kendo().DropDownList()
+                .Name("comboYears")
+                .DataTextField("Name")
+                .DataValueField("Value")
+                .BindTo(years)                
+                .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+                .Events(e => e.Select("setRepParams"))
+        )
+    </div>
+
+    <div class="inline" style="margin-left: 25px;">
+        @using (Ajax.BeginForm("GetMonthlyPayoutReport", "Payout", new { area = "PortalAdmin" }, new AjaxOptions { OnBegin = "window.showLoader()", OnSuccess = "window.hideLoader()", UpdateTargetId = "d-rep-container", LoadingElementId = "site-loader" }, new { @id = "frmSubmitRep" }))
+        {
+       
+            @Html.Hidden("year")
+            @Html.Hidden("month")
+            
+            <span class="" style="text-decoration: underline;cursor: pointer;color: #000;font-size: 16px;" id="btn-submit-rep">Generate Report</span>
+        }
+    </div>
+    
+    <div class="inline" style="margin-left: 25px">
+        <a class="btn-export-csv" href="#"><span>Export to CSV</span></a>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#comboYears').data('kendoDropDownList').value('@DateTime.Now.Year.ToString()');
+        $('#comboMonths').data('kendoDropDownList').value('@DateTime.Now.Month.ToString()');
+
+        $('#btn-submit-rep').unbind('click').click(submitReport);
+
+        setTimeout(submitReport, 300);
+
+        $('.btn-export-csv').unbind('click').bind('click', function () {
+
+            setRepParams();
+            var url = '@Url.Action("ExportPayoutReport", "Payout",new{area="PortalAdmin"})' + '?year=' + $('#frmSubmitRep #year').val() + '&month='+ $('#frmSubmitRep #month').val();
+            $('.btn-export-csv').attr({ 'href': url });
+
+        });
+    });
+
+    function submitReport() {
+        setRepParams();
+        $('#frmSubmitRep').submit();
+    }
+
+    function setRepParams() {
+        $('#frmSubmitRep #year').val($('#comboYears').data('kendoDropDownList').value());
+        $('#frmSubmitRep #month').val($('#comboMonths').data('kendoDropDownList').value());
+    }
+</script>
+
+<div id="d-rep-container"></div>

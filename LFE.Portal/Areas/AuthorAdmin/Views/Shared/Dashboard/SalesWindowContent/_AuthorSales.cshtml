@@ -1,0 +1,44 @@
+﻿@model LFE.Portal.Areas.AuthorAdmin.Models.SalesDetailsWindowToken
+@using LFE.DataTokens
+
+<script>
+function onItemListBound(e) {
+}
+</script>
+
+
+@(Html.Kendo().Grid<BaseOrderLineDTO>()
+        .Name("grid")
+        .TableHtmlAttributes(new { @style = "background-color: #fff !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.OrderNumber).Title("Order No").Width(70);
+            columns.Bound(p => p.ItemName).Title("Course");
+            columns.Bound(p => p.OrderDate).Title("Order Date").Format("{0:d}").Width(120);
+            columns.Bound(p => p.Price).Format("{0:c}").Width(120);
+            columns.Bound(p => p.Discount).Format("{0:c}").Width(120);
+            columns.Bound(p => p.TotalPrice).Format("{0:c}").Width(120);
+            columns.Bound(p => p.TotalAmount).Title("Amount").Format("{0:c}").Width(120);
+            columns.Bound(p => p.Buyer.FullName).Title("Buyer").Width(120);
+        })
+        .AutoBind(true) 
+        .Sortable()
+        .Pageable(pager => pager.Enabled(true))
+        .Filterable(f => f.Enabled(false))
+        .Events(e => e.DataBound("onItemListBound"))
+        .Editable(e => e.DisplayDeleteConfirmation(false))
+        .DataSource(dataSource => dataSource.Ajax()
+                    .Model(model => model.Id(p => p.LineId))
+                    .PageSize(10)
+                    .Read(read => read.Action("GetAuthorSales", "Home", Model.QueryParams).Type(HttpVerbs.Get)).ServerOperation(false))
+)
+
+
+
+
+
+
+
+
+
+

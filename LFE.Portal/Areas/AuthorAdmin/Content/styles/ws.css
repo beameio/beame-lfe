@@ -1,0 +1,65 @@
+﻿.list-manage-row{border-top: 1px solid #a0a0a0}
+.list-manage-row  > #d-ws-total.count-title:after{content: "stores";}
+
+.c-tabs-content{margin: 40px 0 0}
+
+/*store details*/
+.ul-edit-form.cd li label{ width: 180px;} 
+.ul-edit-form.cd li div.input-container{width:570px}
+.ul-edit-form.cd li div.input-container .txt-inp{ width: 570px;}
+.ul-edit-form.cd li div.input-container textarea{width: 570px !important}
+.ul-edit-form.cd li .validator-container{ display: table-cell;width: 190px}
+
+/*contents*/
+
+#d-category-container{ width: 430px;}
+.ul-first-level{ width: 100%;}
+.ul-first-level li .first-contents{margin: 0 }  
+
+.ul-first-level li.k-state-selected .chap-row{background: #02437b}
+
+.ul-second-level li.k-state-selected .content-head-row{background: #a6d3f2}
+.ul-second-level li .content-head-row{ margin-bottom: 1px;}
+.li-st-item .ch-name{width:405px !important }
+.ul-cat-items li{min-height: 40px}
+.ul-cat-items li .content-head-row{height: 40px}
+
+.li-st-item .cn-details{padding: 7px 7px 7px 22px}
+.cn-details .inner{padding: 7px 24px 7px 22px}
+.cn-details .price-row{ height: 18px;padding: 7px;border-top: dotted 1px #a4a44a;border-bottom: dotted 1px #a4a44a;margin-bottom: 5px}
+.no-drag .drag{display: none}
+.ul-first-level .right {padding: 9px 12px 11px 0;}
+.content-head-row .ch-name{ width: 260px;padding-left: 10px }
+.content-head-row .ch-name .au-name{ width: 100%;font-size: 12px;text-transform: capitalize;margin-top: 2px;}
+.content-head-row .ch-name .it-name{ width: 100%;font-size: 13px;font-weight: bold}
+
+/**/
+.cn-info{width: calc(100% - 555px) !important}
+.cn-container{width:calc(100% - 555px);background: #cecece}
+.cn-container .inner{padding: 7px}
+.cn-filters{ font-weight: bold;font-size: 14px;margin:7px 0 15px;}
+.cn-filters label{ margin-right: 10px;padding-top: 5px}
+
+.cn-sort{width: 100%;height: 20px;padding: 10px 0 ;border-bottom: dotted 1px #000;border-top: dotted 1px #000;font-size: 14px}
+.cn-sort label{ margin-right:25px;}
+.cn-sort a{ font-size: 13px;text-decoration: underline;color: #000;margin-right: 15px}
+
+.item-list-header{float:right;height:14px;margin:7px 10px 7px 0;width:210px}
+.item-list-header .title{ width: 70px;text-align: center;font-size: 12px;float: left}
+
+.si-w{ width: 55px;text-align: center;padding: 9px 0 8px}
+.ci-w{ width: 120px;}
+.transfer-area { width: 100px;padding-left: 17px; }
+
+.transfer-btn{ border-color: #666;color: #000;text-transform: uppercase;font-size: 13px;background: url('../../../../Areas/AuthorAdmin/Content/images/ico-arrow-left.png') no-repeat 100% 15px;margin:150px 10px 0 5px;padding: 10px 0 0;cursor: pointer}
+
+.a-preview-item{ display: block;margin: 0 0 7px 0;font-size: 13px;font-weight: bold;text-decoration: underline !important;color: #000 !important}
+.i-hidden{visibility: hidden}
+
+#ddlAuthors-list.k-list-container{width: 250px !important}
+a.btn-prev-prod {
+    background-image: url("../../../../Areas/AuthorAdmin/Content/images/ico-preview-page.png");
+    background-position: 0 2px;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}

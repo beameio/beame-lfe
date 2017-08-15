@@ -1,0 +1,43 @@
+﻿@using LFE.DataTokens
+@model QuizDTO
+
+<div class="quest-container">
+    <div class="command-row">
+        <div class="add-new">
+            <a href="#" id="btn-add-quest"><span class="i"></span><span>Add Question</span></a>
+        </div>
+        <div class="expnd-clps">
+            <a href="#" id="btn-expand-all">Expand All</a>
+        </div>
+        <div class="expnd-clps">
+            <a href="#" id="btn-collapse-all">Collapse All</a>
+        </div>
+    </div>
+    
+
+    <div class="q-list-card">
+        @Html.Partial("Quiz/_QuestionList", Model)
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#btn-add-quest').die('click').live('click', function (e) {
+            e.preventDefault();
+            window.addNewQuest();
+            //window.getNotifManagerInstance().notify(notifEvents.quiz.questionAddNew, null);
+        });
+
+        $('#btn-collapse-all').on('click', function (e) {
+            e.preventDefault();
+            collapseQuestions();
+        });
+        $('#btn-expand-all').on('click', function (e) {
+            e.preventDefault();
+            expandQuestions();
+        });
+        
+        
+    });    
+</script>

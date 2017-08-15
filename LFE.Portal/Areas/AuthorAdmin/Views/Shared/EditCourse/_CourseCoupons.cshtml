@@ -1,0 +1,9 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model BaseEntityDTO
+
+@Html.Partial("Coupons/_OwnerCouponReport", new CouponReportPageToken
+{
+    Action = "GetCourseCoupons"
+    ,Id = Model.id
+})

@@ -1,0 +1,129 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.RoomManagePageToken
+
+<style scoped="scoped">
+.ul-edit-form > li{ display:block;margin: 0 0 15px;height: auto}
+.ul-edit-form li label { display: table-cell;vertical-align: top;font-size: 14px;color: #333}
+.ul-edit-form li div.input-container{ display: table-cell;vertical-align: top;color: #000}
+.ul-edit-form li div.input-container .txt-inp{border: 1px solid #000;min-height: 32px}
+
+.ul-edit-form.vd{padding: 0}
+.ul-edit-form.vd li label{ width: 180px;} 
+.ul-edit-form.vd li div.input-container{width:300px}
+.ul-edit-form.vd li div.input-container .txt-inp{ width: 300px;}
+.ul-edit-form.vd li .validator-container{ display: table-cell;width: 100px}
+.form-cmd-row{border-top:1px solid #9f9f9f;height:38px;left:0;bottom:10px;padding:1px 0;position:absolute;width:100%}
+.form-cmd-row .inner{height:40px;position:relative;text-align:left;width:auto}
+.info-box{float:left;height:100%;width:335px}
+.info-box .alert{color:#000;font-size:14px;font-weight:bold;height:26px;margin:0;padding:10px 20px 2px 10px;width:100%}
+.form-cmd-row .btn-container{float:left;margin-top:7px;width: 220px;text-align: right;margin-left: 5px}
+.form-cmd-row a{background-position:0 2px;background-repeat:no-repeat;color:#333;display:inline-block;font-size:16px;padding-left:20px;text-transform:uppercase;vertical-align:top}
+
+a.btn-submit{background-position:0 2px;background-repeat:no-repeat;color:#333;font-size:16px;margin-left:15px;padding-left:20px;text-transform:uppercase}
+
+.ul-room-courses{border: none}
+.ul-room-courses li{height: 25px;margin: 5px 0}
+.ul-room-courses li a{text-decoration: underline}
+</style>
+<script>
+	var EDIT_FORM_SELECTOR = '#frmEdiRoom';
+	var formUserNotifManager;
+	var videosSaved = 0;
+	
+	$(document).ready(function () {
+		
+		formUserNotifManager = new UserNotificationManager('#vd-info', '.alert', false);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+
+	
+	function closeRoomEditWnd() {
+		$("#wndEditClassRoom").data("kendoWindow").close();
+	}
+
+	function onRoomSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? userMessages.DISCUSSION.ROOM_SAVED : response.error;
+
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			setTimeout(function () {
+				window.getNotifManagerInstance().notify(notifEvents.discussion.roomSaved, response.result);
+				closeRoomEditWnd();
+			}, 2000);
+			
+		}
+	}
+	
+	function onRoomCoursesBound() {
+		setReportScroll("#d-room-courses-container");
+	}
+</script>
+
+@using (Ajax.BeginForm("SaveClassRoom", "Discussion", null, new AjaxOptions { OnSuccess = "onRoomSaved", LoadingElementId = "site-loader" }, new { @id = "frmEdiRoom", @style = "height: 100%;" }))
+{
+	@Html.HiddenFor(x=>x.RoomDto.RoomId)
+	<fieldset style="height:345px;position: relative;padding:0">
+		<legend style="display: none;"></legend>
+			 <ul class="ul-edit-form vd">
+				<li>
+					@Html.LabelFor(m=>m.RoomDto.Name)
+					<div class="input-container">
+						@Html.TextBoxFor(m=>m.RoomDto.Name,new{@class="txt-inp"})
+					</div>
+					<div class="validator-container">                    
+						@Html.ValidationMessageFor(model => model.RoomDto.Name)
+					</div>
+				</li>
+				<li>
+					@Html.LabelFor(m=>m.RoomDto.IsActive)
+					<div class="input-container">
+						@Html.CheckBoxFor(m=>m.RoomDto.IsActive)
+					</div>
+					<div class="validator-container"></div>
+				</li>
+			</ul>
+			
+			@{
+				if (Model.RoomDto.RoomId >= 0)
+				{
+					<div id="d-room-courses-container" class="nano" style="height: 200px;margin: 10px 0 0 180px;width: 300px">
+						<div class="content">
+							@(Html.Kendo().ListView<BaseListDTO>()
+								  .Name( "lvRoomCourses" )
+								  .TagName( "ul" )
+								  .HtmlAttributes(new{@class="ul-room-courses"})
+								  .ClientTemplateId( "kendo-room-courses-template" )
+								  .BindTo( Model.Courses )			                      
+								  .Events(e=>e.DataBound("onRoomCoursesBound"))
+							)
+						</div>
+					</div>        
+				}
+			}
+
+			<div class="form-cmd-row " id="d-vd" style="padding: 0 10px;width: 585px;">
+				<div class="inner">
+					<div class="info-box" id="vd-info">
+						<p class="alert"></p>
+					</div>
+					<div class="btn-container">
+						<a href="javaScript:closeRoomEditWnd()" class="btn-cancel" id="btn-video-close">close</a>     
+						<a href="javaScript:submitForm('frmEdiRoom')" class="btn-submit">save changes</a>
+					</div>
+				</div>
+			</div>		
+	</fieldset>
+}
+
+<script type="text/x-kendo-template" id="kendo-room-courses-template">
+	<li>
+		<a href='@Url.Action("EditCourse", "Course")/${uid}' class='ellipsis'>${name}</a>
+	</li>
+</script>

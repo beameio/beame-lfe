@@ -1,0 +1,81 @@
+﻿@using LFE.Core.Utils
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class=" js no-flexbox flexbox-legacy canvas canvastext webgl no-touch geolocation postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="~/Content/images/favicon.png">
+    <title>@(Constants.APP_OFFICIAL_NAME) 404 Not Found</title>
+    <style>
+        .thank-wrapper
+        {
+            margin-top: 70px;
+            border-top: 1px solid #9fa1a3;
+            border-bottom: 1px solid #9fa1a3;
+            padding: 56px 0 56px 34px;
+        }
+        
+        .thank-wrapper .thank-image
+        {
+            width: 545px;
+            height: 257px;
+            background: transparent url(@(Request.ApplicationPath + "Content/images/logo-thank.png")) no-repeat center center;
+        }
+    </style>
+    <link href="~/Content/reset.css" rel="stylesheet">
+    <link href="~/Content/base.css" rel="stylesheet">
+</head>
+<body>
+    <div class="left-bg">
+    </div>
+    <div id="page" class="table">
+        <div class="row">
+            <nav class="cell">
+    <div id="inner">
+            
+        <div id="logowrapper">
+            <a href="@(Utils.GetKeyValue("homeUrl"))" id="logo-small"></a>
+        </div>                
+        <ul class="menu">
+           
+       
+        </ul>                                           
+        <ul class="menu-bottom">
+        </ul>
+    </div>
+</nav>
+            <section id="content" class="cell">
+                <header>         
+                </header>
+                <div class="clear"></div>
+                <section id="main">
+                    
+
+
+<h1 style="font-size:22px;font-weight:bold;margin-top:20px;">Not Found</h1>
+<div style="padding-left:3px;margin-top:20px;">
+    
+    <p style="font-size:14px">
+      We're sorry! This page is not available.
+      <br /><br /> Please visit the <a style="color:Blue" href="@(Utils.GetKeyValue("homeUrl"))">@(Constants.APP_OFFICIAL_NAME) Homepage</a> or try a different address.
+    </p>
+    <div>
+      </div>
+    <div class="thank-wrapper">
+        <div class="thank-image"></div>
+    </div>
+</div>
+                </section>            
+            </section>
+        </div>
+    </div>
+    <div class="right-bg">
+    </div>
+   
+</body>
+</html>

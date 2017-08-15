@@ -1,0 +1,171 @@
+﻿@{
+    var quizRepUrl = Url.Action("_QuizReport","Quiz",new{area="AuthorAdmin"});
+    var quizManageUrl = Url.Action("_QuizManageForm", "Quiz", new { area = "AuthorAdmin" });    
+    var certRepUrl = Url.Action("_CertReport","Quiz",new{area="AuthorAdmin"});
+}
+
+<script>
+    var quizRepUrl = '@quizRepUrl';
+    var certRepUrl = '@certRepUrl';
+    var hashSeparator = "$";
+    
+    function parseQuizHash() {
+        var token = {
+            action: window.QuizActions.MANAGE_QUIZZES,
+            data: {
+                 id: null
+            }
+        }
+
+        var hash = window.location.hash ? window.location.hash.substring(1) : null;
+        if (hash == null) return token;
+
+        var paramArray = hash.split(hashSeparator);
+
+        var action = paramArray[0];
+        switch (action) {
+            case window.QuizActions.MANAGE_QUIZZES:
+                break;
+            case window.QuizActions.MANAGE_CERT:
+                token.action = window.QuizActions.MANAGE_CERT;
+                break;
+            case window.QuizActions.EDIT_QUIZ:
+                token.action = window.QuizActions.EDIT_QUIZ;
+                token.data.id = paramArray[1];
+                break;
+            case window.QuizActions.QUIZ_QUESTIONS:
+                token.action = window.QuizActions.QUIZ_QUESTIONS;
+                token.data.id = paramArray[1];
+                break;
+        }
+
+        return token;
+    }
+
+    $(document).ready(function() {
+        initTabEvents();
+        initAddNewBtnEvents();
+        
+        var request = parseQuizHash();
+        //console.log(request);
+
+        loadQuizContent(request);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.loadQuizContent, loadQuizContent, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.quiz.loadQuizContent, loadQuizContent, null);
+    });
+    var cnt = 0;
+
+    function loadQuizContent(request) {
+
+        //console.log(cnt);
+        //console.log(request);
+        cnt++;
+
+        var url,pane,hash,tab;
+
+        switch (request.action) {
+            case window.QuizActions.MANAGE_QUIZZES:
+                url = '@quizRepUrl';
+                hash = window.QuizActions.MANAGE_QUIZZES;                
+                pane = $('#paneQuiz');
+                tab = $('#a-quiz-tab');
+                break;        
+            case window.QuizActions.EDIT_QUIZ:
+                url = '@quizManageUrl' + '/' + request.data.id;
+                hash = window.QuizActions.EDIT_QUIZ + hashSeparator + request.data.id;
+                pane = $('#paneQuiz');
+                tab = $('#a-quiz-tab');
+                break;
+            case window.QuizActions.QUIZ_QUESTIONS:
+                url = '@quizManageUrl' + '/' + request.data.id;
+                hash = window.QuizActions.QUIZ_QUESTIONS + hashSeparator + request.data.id;
+                pane = $('#paneQuiz');
+                tab = $('#a-quiz-tab');
+                break;
+            default:
+                return;
+        }
+
+        window.location.hash = hash;
+
+
+        showLoader();
+
+        pane.load(url, function () {
+            hideFormLoader();
+            tab.tab('show');
+            onQuizContentLoaded();
+        });
+    }
+
+    function initTabEvents() {
+
+        $('#qc-nav-tabs > li > a[data-toggle="tab"]').on('click', function (e) {
+            e.preventDefault();
+            var action = $(this).attr("data-action");
+            var token = {
+                action:action,
+                data: {
+                    id: null
+                }
+            }
+            loadQuizContent(token);
+           
+        });
+
+        //$('#qc-nav-tabs > li > a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+           
+        //    var token = parseQuizHash();
+          
+        //    var action = $(this).attr("data-action");
+
+        //    var target = $(e.target).attr("href");
+
+        //    console.log(3);
+        //    console.log(token);
+        //    console.log(action);
+
+        //    if ( $(target).is(':empty')) { //action !== token.action ||
+        //        var request = {
+        //            action: action
+        //        }
+        //        loadQuizContent(request);
+        //    } else {
+        //        onQuizContentLoaded();
+        //    }
+        //});
+
+    }
+
+    function onQuizContentLoaded() {
+        $("html, body").animate({ scrollTop: 0 }, 300);       
+    }
+
+    function initAddNewBtnEvents() {
+        $('#btn-add-quiz').on('click', function (e) {
+            e.preventDefault();
+            window.getNotifManagerInstance().notify(notifEvents.quiz.loadQuizContent, { action: window.QuizActions.EDIT_QUIZ, data: { id: @Guid.Empty } });
+        });
+    }
+</script>
+
+
+<div class="col-lg-12 index-head">
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="qc-nav-tabs">
+            <li class="tab tq">
+                <a id="a-quiz-tab" href="#paneQuiz" data-action="MANAGE_QUIZZES" data-toggle="tab" role="tab" data-url="@quizRepUrl">My Quizzes</a>
+            </li>
+            <li class="tab tc">
+                <a id="a-cert-tab" href="#paneCert" data-action="MANAGE_CERT"   data-toggle="tab" role="tab" data-url="@certRepUrl">My Certificates</a>
+            </li>
+        </ul>
+        @*<div class="tab tq">My Quizzes</div>
+            <div class="tab tc"></div>*@
+    </div>
+    <div class="new-btn-container">
+        <a href="#" class="btn" id="btn-add-cert">Add Certificate</a>
+        <a href="#" class="btn" id="btn-add-quiz">Add Quiz</a>
+    </div>
+</div>

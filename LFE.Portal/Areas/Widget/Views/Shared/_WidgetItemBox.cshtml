@@ -1,0 +1,163 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.WidgetItemListDTO
+
+
+@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+    var picUrl = Model.ImageURL;
+    
+    if (string.IsNullOrEmpty(picUrl))
+    {
+        picUrl = Url.Content("~/Content/images/course.png");
+    }
+    else
+    {
+        if (!picUrl.ToLower().StartsWith("http"))
+        {
+            picUrl = this.GetS3FileUrl(picUrl);
+        }
+    }
+
+    var itemTypeName = Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE ? "course" : "bundle";
+
+    var wixSectionUrl = (!string.IsNullOrEmpty(Request.QueryString["section-url"]) ? Request.QueryString["section-url"] : "").TrimEnd('/');
+
+    string pageUrl        = null;
+    string productPageUrl = null;
+    string targetUrl      = null;
+    string target         = null;
+    var isItemValid       = true;
+
+    switch (Model.ItemType)
+    {
+        case BillingEnums.ePurchaseItemTypes.COURSE:
+            pageUrl = Url.GenerateCoursePageUrl(Model.AuthorName, Model.ItemUrlName, null, viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "");
+            productPageUrl = Url.Action("Index", "Course", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", categoryName = viewModel != null && viewModel.CategoryName != null ? viewModel.CategoryName : "", authorName = Model.AuthorName.OptimizedUrl(), courseName = Model.ItemUrlName, width = viewModel != null ? viewModel.Width : null, height = viewModel != null ? viewModel.Height : null });
+            target = "_blank";
+            break;
+        case BillingEnums.ePurchaseItemTypes.BUNDLE:
+            pageUrl = Url.GenerateBundlePageUrl(Model.AuthorName, Model.ItemUrlName, null, viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "");
+            productPageUrl = Url.Action("Index", "Bundle", new { trackingID = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "", categoryName = viewModel != null && viewModel.CategoryName != null ? viewModel.CategoryName : "", authorName = Model.AuthorName.OptimizedUrl(), bundleName = Model.ItemUrlName, width = viewModel != null ? viewModel.Width : null, height = viewModel != null ? viewModel.Height : null });
+            target = string.IsNullOrEmpty(wixSectionUrl) ? "_self" : "_top";
+            break;
+        default:
+            isItemValid = false;
+            break;
+    }
+
+    if (isItemValid)
+    {
+        targetUrl = Model.IsItemOwner ? pageUrl : productPageUrl;
+    }
+
+    if (isItemValid)
+    {
+        <div class="item-container">
+            @*overlay*@
+            <div class="overlay">
+                <div class="inner">
+                    <a href='@targetUrl' class="" target="@target">
+                        <span class="container">
+                            @itemTypeName details
+                        </span>
+                    </a>
+                </div>
+            </div>
+            
+            @*bundle icon*@
+            
+            @{
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE)
+                {
+                    <div class="bundle-box">&nbsp;</div>
+                }
+            }
+
+            @*header*@
+            <div class="wi-header">
+            @{
+                if (Model.NumSubscribers > 0)
+                {
+                    <div>
+                        <i class="ns nsc ico-f">
+                            <span class="cn">
+                                <span>@Model.NumSubscribers</span>
+                            </span>
+                        </i>
+                        <i class="i-after lrnr">
+                            <span>Learner@(Model.NumSubscribers > 1 ? "s" : "")</span>
+                        </i>
+                    </div>
+                }
+
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE)
+                {
+                    <div>
+                        <i class="bc nsc ico-f">
+                            <span class="cn">
+                                <span>@Model.CoursesCnt</span>
+                            </span>
+                        </i>
+                        <i class="i-after bndl"></i>
+                    </div>
+                }
+            }
+            </div>
+            
+            @*thumb*@
+            <div class="wi-img">
+                <a href='@targetUrl' class="go-2-page" target="@target">
+                    <img src="@picUrl" alt="" />
+                </a>
+            </div>
+            
+            @*author+description*@
+            <div class="wi-desc">
+                <a href='@targetUrl' class="go-2-page" target="@target">
+                    <h3>@Model.AuthorName</h3>
+                    <h4 class="ellipsis multiline">@Model.ItemName</h4>
+                </a>
+            </div>
+            
+            @*prices row*@
+            <div class="wi-foot @(Model.IsItemOwner ? "has-access" : "")">
+            @{
+                if (Model.IsItemOwner)
+                {
+                    <span>You have access to this @itemTypeName</span>
+                    <a href='@targetUrl' class="go-2-page" target="@target">Click here to learn</a>
+                }
+                else
+                {                    
+                    if (Model.IsFree)
+                    {
+                        <div class="has-access">
+                            <label class="free">Free Course</label>
+                        </div>
+                    }
+                    else
+                    {
+                        if (Model.ItemPrices.Any())
+                        {
+
+                            @Html.Partial("Item/Pricing/_ItemPricesRow/_ItemPricesRow", Model.ItemPrices)
+                        }
+                        else
+                        {
+                            <label class="no-price">No price defined</label>
+                        }
+                    }
+                }
+            }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="ph">&nbsp;</div>
+    }
+}
+

@@ -1,0 +1,124 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Helpers
+
+@model AuthorVideosPageToken
+@Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+<script>
+
+    function transcodeVideo(id, name) {
+        if (name[name.length - 1] === ".")
+            name = name.slice(0, -1);
+
+        var url = '@this.UploaderOrigin()' + '/upload-backend/upload-completed/@this.CurrentUser().UserId/' + id + '/' + encodeURIComponent(name);
+
+        $.get(url).done(function (result) {
+            console.log('retranscode request sent for:' + id + ' to url: ' + url + ' with result:');
+            console.log(result);
+            var data= {
+                id: id,
+                status:result.status,
+                err:result.status === "OK" ? "" : result.msg
+            }
+
+            $.ajax({
+                url: "@Url.Action("SaveS3TranscodeJob","Upload",new{area=""})",
+                cache: false,
+                type: "Post",
+                data: JSON.stringify(data),
+                datatype: "json",
+                contentType: "application/json; charset=utf-8"
+		        , success: function (response) {
+
+		        }
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.videosLoaded, onVideosLoaded, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.videosLoaded, onVideosLoaded, null);
+
+        //load grid
+        //changeRepType('grid', $('#btn-grid'));
+        $('#btn-grid').addClass('active');
+
+        //bind search ENTER event
+        $('.search-input').keypress(function (event) {
+            if (window.console) console.log($('.search-input').val());
+            if (event.which == 13) {
+                var txt2Search = $('.search-input').val();
+
+                var filter = {
+                    logic: "or",
+                    filters: []
+                };
+
+                if (!hasValue(txt2Search)) {
+                    window.getNotifManagerInstance().notify(notifEvents.video.searchVideos, filter);
+                };
+
+
+                var f1 = { field: "title", operator: "contains", value: txt2Search };
+                filter.filters.push(f1);
+                f1 = { field: "tagsStr", operator: "contains", value: txt2Search };
+                filter.filters.push(f1);
+
+                window.getNotifManagerInstance().notify(notifEvents.video.searchVideos, filter);
+            }
+        });
+    });
+
+    function onVideosLoaded(total) {
+        $('#d-vd-total').html(total);
+    }
+
+    function changeRepType(type, $this) {
+        $('#d-type-btn > a').removeClass('active');
+        $($this).addClass('active');
+
+        switch (type) {
+        case 'grid':
+            $('#formVideoGrid').submit();
+            break;
+        case 'list':
+            $('#formVideoList').submit();
+            break;
+        }
+    }
+
+    function editVideo(identifier, fileId, title) {
+
+        var wnd = $("#wndEditVideo").data("kendoWindow");
+        var url = '@Url.Action("EditVideoPartial","Author")' + '/' + identifier + (fileId != null ? '?fileId=' + fileId : '');
+        wnd.title(identifier < 0 && (fileId == null || fileId < 0) ? 'Upload new videos' : 'Edit ' + (title == null ? ' new video' : title));
+        $('#wndEditVideo').parent().find('.k-window-titlebar').addClass('l-header');
+        wnd.refresh(url);
+        wnd.center();
+        wnd.open();
+    }
+
+    function onUploadWndClosed(e) {
+        // window.getNotifManagerInstance().notify(notifEvents.video.videoSaved, null);
+        window.handleWndClosed(e);
+    }
+</script>
+
+@using (Ajax.BeginForm("GetVideoReport", "Author", new { type = eReportTypes.Grid }, new AjaxOptions { UpdateTargetId = "video-rep-container", LoadingElementId = "site-loader" }, new { @id = "formVideoGrid" })){@Html.Partial("Author/_AuthorViewDTOHidden",Model.user)}
+@using (Ajax.BeginForm("GetVideoReport", "Author", new { type = eReportTypes.List, pageSize = Model.ListPageSize }, new AjaxOptions { UpdateTargetId = "video-rep-container", LoadingElementId = "site-loader" }, new { @id = "formVideoList" })){@Html.Partial("Author/_AuthorViewDTOHidden", Model.user)}
+
+@(Html.Kendo().Window()
+		.Name("wndEditVideo")
+		//.Title(false)
+		.Draggable(false)
+		.HtmlAttributes(new{@style="padding:40px 10px 0 10px;overflow:hidden"})
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(550)
+		.Width(625)
+		.Modal(true)  
+        .Draggable(true)
+		.Animation(false)     
+		.Events(e=>e.Close("onUploadWndClosed"))
+		.Content("loading video data.....")	  
+)

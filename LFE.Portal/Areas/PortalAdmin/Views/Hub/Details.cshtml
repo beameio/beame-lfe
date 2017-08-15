@@ -1,0 +1,54 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.HubDetailDTO
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+   
+<link href="~/Areas/PortalAdmin/Content/styles/hub.css" rel="stylesheet" />
+<link href="~/Content/styles/sweet-alert.css" rel="stylesheet" /> 
+}
+@section scripts
+{
+    
+<script src="~/Scripts/plugins/sweet-alert.min.js"></script>
+}
+<h2 style="font-size: 22px;margin-bottom: 15px">Hub Details</h2>
+
+
+
+<div id="d-hub-container">
+    @{
+        if (Model.IsValid)
+        {
+            <div class="">
+                @(Html.Kendo().TabStrip()
+              .Name("tabstrip")
+              .Items(tabstrip =>
+              {
+                  tabstrip.Add().Text("Details")
+                      .Selected(true)
+                      .Content(@<text>
+                                    @Html.EditorForModel()
+                                </text>);
+
+                  tabstrip.Add().Text("Users")
+                      .LoadContentFrom("_HubUsersManagePartial", "Hub",new{area="PortalAdmin",id=Model.HubId});
+
+                  tabstrip.Add().Text("Channels")
+                      .LoadContentFrom(Url.Content("~/Content/web/tabstrip/ajax/ajaxContent3.html"));
+              })
+                )
+            </div>
+        }
+        else
+        {
+            <h3>@Model.Message</h3>
+        }
+    }
+</div>
+

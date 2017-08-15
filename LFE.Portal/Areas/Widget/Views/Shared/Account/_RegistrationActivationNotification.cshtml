@@ -1,0 +1,20 @@
+﻿@model string
+
+<script>
+    $(document).ready(function () {
+     
+        $('.close_register').click(function () {
+            window.ToggleRegister();
+        });
+    });
+</script>
+
+<div id="register-confirmation" class="register-confirmation">
+    @*<div class="title" >@LfeServices.Services.Slots.getSlotValue("register", "post registration header message").Replace("[username]", Model)</div>
+    
+    <div class="message" >@Html.Raw(LfeServices.Services.Slots.getSlotValue("register", "post registration email notice message").Replace("[username]", Model))</div>*@
+    
+    @Html.Partial("Account/_SuccessRegistrationMessage",Model)
+
+    <div class="message" ><a class="close_register">Close</a></div>
+</div>

@@ -1,0 +1,45 @@
+﻿@using LFE.DataTokens
+<script id="template-payment" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<LinePaymentDTO>()
+        .Name("payments_#=LineId#")
+        .ToolBar(t => t.Template("Payments"))
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+            columns.Bound(p => p.TypeName).Width(60).Title("Type");
+            columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+            columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(100);
+            columns.Bound(p => p.Status).Width(100).Title("Status");
+            columns.Bound(p => p.ScheduledDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+            columns.Bound(p => p.CompletedDate).Width(80).Format("{0:MM/dd/yy}").Title("Completed");
+        })
+        .ClientDetailTemplateId("template-payment-refunds")
+        .Sortable(s => s.Enabled(false))
+        .Events(e => e.DataBound("onPaymentsBound"))
+        .Pageable(pager => pager.Refresh(true).Enabled(false))
+        .Filterable(f => f.Enabled(false))
+        .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => model.Id(p => p.PaymentId))
+            .Read(read => read.Action("GetOrderLinePayments", "User", new { area = "UserPortal", LineId = "#=LineId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+</script>
+
+
+<script id="template-payment-refunds" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<PaymentRefundDTO>()
+           .Name("refund_#=PaymentId#")
+           .ToolBar(t => t.Template("Refunds"))
+           .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+           .Columns(columns =>
+           {
+               //columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+               columns.Bound(p => p.Amount).Width(80);
+               columns.Bound(p => p.TypeName).Width(60).Title("Type");
+               columns.Bound(p => p.RefundDate).Width(80).Format("{0:MM/dd/yy}").Title("Refund date");
+           })
+            .Sortable(s => s.Enabled(false))
+            .Pageable(pager => pager.Enabled(false))
+            .Filterable(f => f.Enabled(false))
+                    .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.RefundId)).Read(read => read.Action("GetPaymentRefunds", "User", new { area = "UserPortal", PaymentId = "#=PaymentId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+    )
+</script>

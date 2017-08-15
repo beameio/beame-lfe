@@ -1,0 +1,156 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model LFE.Portal.Areas.UserPortal.Models.HashtagFeedToken
+@{
+	var kinds = new List<DataSourceSortToken>
+		{
+			new DataSourceSortToken
+				{
+					name    = "newest"
+					,field  = "AddOn"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "oldest"
+					,field  = "AddOn"
+					,dir    = "asc"
+				},
+				new DataSourceSortToken
+				{
+					name   = "name of poster"
+					,field = "CreatorName"
+					,dir   = ""
+				}
+				,
+				new DataSourceSortToken
+				{
+					name   = "course name"
+					,field = "CourseName"
+					,dir   = ""
+				}
+		};
+}
+
+<script>
+	var feedContainerSelector = "#d-feed-container";
+	var currentTag;
+	var feedHFactor;
+	var feedUrl = '@Url.Action("GetHashFeedTreePartial","Discussion",new{area="UserPortal"})';
+	
+	$(document).ready(function () {
+		var showTitle = '@Model.ShowTitle.ToString().ToLower()' == 'true';
+		feedHFactor = showTitle ? 156 : 86; //title= 20+25*2, command= 40 +11px = 70+46+40(sort) = 156px
+		//window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setHashFeedH, null);
+		currentTag = '@Model.Hashtag';
+	});
+
+	function setHashFeedH(h) {
+		if (h != null) {
+			$(feedContainerSelector).height(h - feedHFactor);
+		}
+		$(feedContainerSelector).nanoScroller();
+	}
+
+
+	function loadFeedList(q) {		
+	    loadFeedPartial(q, feedUrl, '#d-feed-content');
+	}
+
+	function refreshHashFeed() {		
+	    loadFeedPartial(currentTag, feedUrl, '#d-feed-content');
+	}
+
+	function loadFeedPartial(q,url,targetSelector) {
+		var currentSortEl = $('#lvFeedSort').find('li > a[class=active]');
+		var field = currentSortEl.attr('data-val');
+		var dir = currentSortEl.attr('data-dir');
+
+		var data = {
+			  q: q
+			, field: field
+			, dir: dir
+			, pageSize: '@Model.UserCoursesPageSize'
+			, showTitle: '@Model.ShowTitle'
+			, showCloseBtn: '@Model.ShowCloseBtn'
+			  ,uid:'@Model.Uid'
+		};
+
+		window.showFormLoader(feedContainerSelector);
+
+		$.ajax({
+			url: url,
+			cache: false,
+			type: "Post",
+			data: JSON.stringify(data),
+			datatype: "json",
+			contentType: "application/json; charset=utf-8"
+			, success: function (view) {
+				currentTag = q;
+				$(targetSelector).fadeOut("slow", function () {
+
+					if (window.parent.$("#wndFeed").data("kendoWindow") != undefined) {
+						window.parent.$("#wndFeed").data("kendoWindow").title(q + " Discussion Feed");
+					}
+					
+					$(targetSelector).html(view).fadeIn("slow");
+					window.hideFormLoader();
+				});
+
+			}
+		});
+	}
+
+	
+	function closeFeedWnd() {
+		window.parent.$("#wndFeed").data("kendoWindow").close();
+	}
+</script>
+
+		@{
+			if (Model.ShowTitle)
+			{
+				<div class="title-row" style="margin: 25px 0">
+					<h4 class="float-left">@Model.Title</h4>
+				</div>        
+			}
+		}
+	<div id="d-HashFeed-cmd-row" style="height: 40px;">
+		<div class="d-sort-row discus float-left">
+			<label>Sort by:</label>
+			@(Html.Kendo().ListView<DataSourceSortToken>()
+				  .Name( "lvFeedSort" )
+				  .TagName( "ul" )
+				  .ClientTemplateId( "kendo-sort-template" )
+				  .BindTo( kinds )			  
+				  .Events( e => e.DataBound( "onFeedSortFiltersBound" ))
+				  )
+		</div>   
+	</div>
+
+	<div id="d-feed-container" class="nano" style="">
+		<div class="content" id="d-feed-content">
+			@Html.Partial("Discussion/_HashFeedTree", Model)
+		</div>
+	</div>
+	
+	<div class="feed-cmd-row">
+		<div class="float-right">
+			<span id="btn-refresh-feed" class="btn-refresh cmd-btn inline" onclick="refreshHashFeed()">Refresh</span> 
+			@{
+				if (Model.ShowCloseBtn)
+				{
+					<span id="btn-close-feed-wnd" class="btn-cancel cmd-btn inline" onclick="closeFeedWnd()" style="margin-left: 25px">Close</span> 
+				}
+			}   
+		</div>        
+	</div>
+
+<script>
+	setTimeout(function () {
+		var h = $(feedContainerSelector).parent().height();
+		$(feedContainerSelector).height(h - feedHFactor);    
+		setReportScroll(feedContainerSelector);
+	}, 100);
+</script>

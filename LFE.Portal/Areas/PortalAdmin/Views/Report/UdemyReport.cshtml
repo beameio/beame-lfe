@@ -1,0 +1,144 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Models
+@using LFE.Core.Enums
+@{
+    ViewBag.Title = "Udemy imports report";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+    var dates = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    var userAC = new CTRL_UserAutoComplete { SelectedCallback = "onUserSelected" };
+    var periodDDL = new CTRL_EnumDropDown { SelectedCallback = "onPeriodSelected", NameValueList = dates.ToList(), Style = "margin-left:10px;position:relative;bottom:3px;" };
+    var defaultPeriod = (int)ReportEnums.ePeriodSelectionKinds.lastMonth;
+}
+<h2 class="page-title">Udemy imports report</h2>
+
+<style>
+.controls { position:relative;margin-bottom:10px; }
+.controls a#a_clear { position:absolute;top:5px;right:10px; color:#333333; }
+.controls a#a_clear:hover { text-decoration:underline; }
+</style>
+<div class="controls">
+    @Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_UserAutoComplete.cshtml", userAC)
+    @Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_EnumDropDown.cshtml", periodDDL)
+    <a href="#" id="a_clear">clear filters</a>
+</div>
+
+<script>
+    $(function(){
+        $('#a_clear').click(function(e){
+            e.preventDefault();
+            @userAC.Clear();
+            @periodDDL.Clear();
+            rebindGrid();
+        });
+    })
+
+    function getPeriod() { 
+        var callback = @periodDDL.GetValueCallback;
+        var period = callback();
+        return period ? period.Value : '@defaultPeriod';
+    }
+    function getUser() {
+        var callback = @userAC.GetValueCallback;
+        var user = callback();
+        return user ? user.UserId : null;
+    }
+    function getFilters() {
+        return {
+            periodSelectionKind: getPeriod(),
+            userId: getUser()
+        };
+    }
+
+    function onPeriodSelected(data) {
+        rebindGrid();
+    }
+    function onUserSelected(data) {
+        console.log(data);
+        rebindGrid();
+    }
+
+	function rebindGrid() {
+	    $('#UdemyReport').data("kendoGrid").dataSource.read();
+	}
+    function onJobsGridBound(e) {
+        var grid = this;
+        var currentRecords = grid.dataSource.view();
+        for (var i = 0; i < currentRecords.length; i++) {
+                grid.tbody.find("tr[data-uid='" + currentRecords[i].uid + "']").addClass(getRowCssClass(currentRecords[i].Status));
+        }
+    }
+    function getRowCssClass(status) {
+        switch (status) {
+            case 0:     return 'job-row-green';     //created
+            case 1:     return 'job-row-yellow';    //in progress
+            case 2:     return 'job-row';           //success
+            case 4:     return 'job-row-blue';      //partial_success
+            case 8:     return 'job-row-red';       //failed
+            case 16:    return 'job-row-green';     //cancelled
+            default:    return 'job-row';
+        }
+    }
+</script>
+<style>
+#UdemyReport { margin: 0 5px; }
+.job-row        { background-color: transparent; outline: solid 1px #DDDDDD; }
+.job-row-yellow { background-color: #faf5df; outline: solid 1px #eecf75; }
+.job-row-blue   { background-color: #def0f2; outline: solid 1px #88cac8; }
+.job-row-red    { background-color: #f2dedf; outline: solid 1px #f2cad3; }
+.job-row-green  { background-color: #def2e0; outline: solid 1px #bed8c0; }
+.c-name{font-weight: bold;font-size:1em;}
+</style>
+
+
+@(Html.Kendo().Grid<UdemyJobReportToken>()
+        .Name("UdemyReport")
+        .TableHtmlAttributes(new { @style = "border-collapse: separate;border-spacing:0 4px; background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.CourseName).ClientTemplate("<span class='c-name'>#: CourseName#</span>").Title("Course name");
+            columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy}").Title("Import date");
+            columns.Bound(p => p.Status).Title("Import status");
+        })
+        .AutoBind(true)
+        .Sortable()
+        .Filterable(f => f.Enabled(false))
+        .Pageable(p => p.Enabled(false))
+        .Events(e => e.DataBound("onJobsGridBound"))
+        .ClientDetailTemplateId("template-udemy-files")
+        .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.JobId))
+                            .Read(read => read.Action("GetUdemyJobLogs", "Report").Data("getFilters").Type(HttpVerbs.Get)).ServerOperation(true)
+                            .PageSize(20))
+)
+
+<script id="template-udemy-files" type="text/kendo-tmpl">
+    @(Html.Kendo().Grid<UdemyJobFileDTO>()
+        .Name("files_#=JobId#")
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.FileName);
+            columns.Bound(p => p.Type).Width(80).Title("Type");
+            columns.Bound(p => p.Status).Width(80).Title("Status");
+            columns.Bound(p => p.BcIdentifier).Width(80);
+            columns.Bound(p => p.AddOn).Width(80).Format("{0:MM/dd/yy}").Title("Add");
+            columns.Bound(p => p.DownloadOn).Width(80).Format("{0:MM/dd/yy}").Title("Download");
+            columns.Bound(p => p.UploadOn).Width(80).Format("{0:MM/dd/yy}").Title("Upload");
+        })
+        .Sortable(s => s.Enabled(true))
+        .Pageable(pager => pager.Refresh(true))
+        .Filterable(f => f.Enabled(false))
+        .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.FileId)).Read(read => read.Action("GetUdemyJobFiles", "Report", new { id = "#=JobId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+    )
+</script>
+
+
+
+
+

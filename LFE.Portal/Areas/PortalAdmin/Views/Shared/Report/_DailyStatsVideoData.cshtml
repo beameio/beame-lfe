@@ -1,0 +1,53 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<VideoDTO>
+
+<script>
+    var gridId = 'UserVideos';
+    $(document).ready(function() {
+	 
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+    });
+
+    function filterVideosGrid(filter) {
+
+        var filterExists = filter.filters.length > 0;
+
+        if (filterExists) {
+            checkFilter(filter, gridId, "kendoGrid");
+            filterReport(filter, gridId, "kendoGrid");
+        } else {
+            filterReport(null, gridId, "kendoGrid");
+        }
+    }
+
+    function rebindVideoGrid() {
+        $('#VideoStats').data("kendoGrid").dataSource.read();
+    }
+    function notify2Player(id, name) {
+        var token = { id: id, name: name };
+        window.getNotifManagerInstance().notify(notifEvents.video.openPlayer,token);
+    }
+</script>
+
+
+
+@(Html.Kendo().Grid <VideoDTO>()
+		.Name("VideoStats")
+		.TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.user.FullName).Title("Author").ClientTemplate("<span data-val='${user.UserId}' title='click to view user details' class='list-cmd usr-btn'>#=user.FullName#</a>");
+            columns.Bound(p => p.name).Title("Title").ClientTemplate("<a href='javascript:notify2Player(#=identifier#,\"#=Encoder.htmlEncode(name)#\")' style='margin:3px 0 0' class='list-cmd' >${name}</a>");
+			columns.Bound(p => p.addon).Title("Date Added").Format("{0:d}").Width(120);			
+			columns.Bound(p => p.duration).Title("Duration").Width(120);
+		})
+        .BindTo(Model)
+		.Sortable()
+		.Pageable(pager => pager.Enabled(true))
+		.Filterable(f=>f.Enabled(false))
+		.DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+							.PageSize(10)
+							.Model(model => model.Id(p => p.identifier))
+				))

@@ -1,0 +1,40 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindReport, rebindBcLogGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindReport, rebindBcLogGrid, null);
+	});
+
+	function rebindBcLogGrid() {
+		$('#FileLogReport').data("kendoGrid").dataSource.read();
+	}
+	
+</script>
+
+@(Html.Kendo().Grid<FileInterfaceLogDTO>()
+	  .Name("FileLogReport")
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.FileId);
+          columns.Bound(p => p.User.url).Width(30).ClientTemplate("<img class='user-thumb' alt='${User.name}' src='${User.url}' />").Title(" ");
+          columns.Bound(p => p.User.name).ClientTemplate("<span data-val='${User.id}' title='click to view user details' class='list-cmd usr-btn'>#=User.name#</a>");		  
+		  columns.Bound(p => p.FilePath).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(FilePath)#' style='width:200px'>${FilePath}</div>");
+		  columns.Bound(p => p.FileSize);
+		  columns.Bound(p => p.BcIdentifier);
+		  columns.Bound(p => p.ContentType);
+		  columns.Bound(p => p.Status);
+		  columns.Bound(p => p.AddOn).Format("{0:MM/dd/yyyy HH:mm:ss}");
+		  columns.Bound(p => p.UpdateOn).Format("{0:MM/dd/yyyy HH:mm:ss}");          
+	  })
+	  .Events(e=>e.DataBound("onReportBound"))
+	  .Sortable()
+	  .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+	  .Filterable(f => f.Enabled(false))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.FileId))
+							.Read(read => read.Action("GetFileInterfaceLogs", "Report").Data("getLogsRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(20))
+)
+

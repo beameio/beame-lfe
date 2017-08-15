@@ -1,0 +1,41 @@
+﻿
+<script>
+    var angularApp = angular.module('paypal_app', ['kendo.directives']);
+    angularApp.controller('CourseSelectCntrl', function ($scope) {
+        $scope.au = null;
+
+        $scope.CourseId = -1;
+        $scope.Price = 0;
+       // $scope.frmDirectPay.$setDirty();
+        
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: '@Url.Action("GetAllCoursesList","Billing")',
+                    dataType: "json"
+                }
+            }
+        });
+
+        $scope.options =  {
+                            dataSource: dataSource,
+                            dataTextField: "Name",
+                            serverFiltering:true
+                        };
+
+        $scope.courseSelected = function (e) {
+            var dataItem = e.sender.dataItem(e.item.index());
+
+            $scope.Name = dataItem.Name;
+            $scope.Price = dataItem.Price;
+            $scope.CourseId =  dataItem.CourseId;
+
+        };
+
+        setTimeout(function () {
+            $scope.au = $('#course-name').data("kendoAutoComplete");
+            $scope.au.value(null);
+        }, 500);
+
+    });
+</script>

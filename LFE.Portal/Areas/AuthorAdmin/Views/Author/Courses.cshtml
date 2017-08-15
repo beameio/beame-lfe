@@ -1,0 +1,228 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model LFE.DataTokens.UserViewDto
+
+@{
+	ViewBag.Title = Model.fullName + " Courses";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/course.css" )" rel="stylesheet" type="text/css"  />    
+}
+
+@section scripts
+{
+	<script type="text/javascript">
+		var editCourseUrl = '@Url.Action("EditCourse","Course")';
+		$(document).ready(function () {
+			window.getNotifManagerInstance().unsubscribe(notifEvents.report.reviewBound, setReviewTotals, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.report.reviewBound, setReviewTotals, null);
+			window.getNotifManagerInstance().unsubscribe(notifEvents.report.courseBound, setCourseTotals, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.report.courseBound, setCourseTotals, null);
+			window.getNotifManagerInstance().unsubscribe(notifEvents.report.bundleBound, setBundleTotals, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.report.bundleBound, setBundleTotals, null);
+			
+			//load grid
+			$('#btn-grid').addClass('active');
+		});
+
+		function setCourseTotals(total) {
+			$('#cnt-course').html(total);
+			$('#d-mr-total').html(total);
+		}
+		function setBundleTotals(total) {
+			$('#cnt-bundle').html(total);
+			$('#d-bn-total').html(total);
+		}
+		function setReviewTotals(total) {
+			$('#cnt-review').html(total);
+			$('#d-rv-total').html(total);
+		}
+
+
+		function changeRepType(type,$this) {
+			$('#li-type-btn > a').removeClass('active');
+			$($this).addClass('active');
+			switch (type) {
+			case 'grid':			        
+				$('#formCourseGrid').submit();
+				$('#formBundleGrid').submit();
+				break;
+			case 'list':
+				$('#formCourseList').submit();
+				$('#formBundleList').submit();
+				break;
+			}
+		}
+
+		function onSortFiltersBound(e) {
+			var listView = e.sender;
+			var target = listView.wrapper.attr('data-role');
+
+			if (!hasValue(target)) return;
+			var notifyEvent;
+			switch (target) {
+			case 'course':
+				notifyEvent = notifEvents.report.sortCourse;
+				break;
+			case 'bundle':
+				notifyEvent = notifEvents.report.sortBundle;
+				break;
+			default:
+				return;
+			}
+
+			$.each(listView.element.children().find('a'), function (i) {
+				var token = listView.dataSource._data[i];
+				var link = $(this);
+				link.unbind('click');
+				link.bind('click', function () {
+					listView.element.children().find('a').removeClass('active');
+					$(this).addClass('active');
+					var filter = { field: token.field, dir: token.dir };
+					window.getNotifManagerInstance().notify(notifyEvent, filter);
+				});
+				if (i == 0) link.addClass('active');
+			});
+		}
+		
+		function deleteCourse(id, name) {
+		    if (!window.confirm('Delete  ' + name + '?')) return;
+		    var data = { id: id };
+		    var url = '@Url.Action("DeleteCourse","Course")';
+		    ajaxAction(url, data, window.onCourseDeleted);
+		}
+
+        function deleteBundle(id, name) {
+            if (!window.confirm('Delete  ' + name + '?')) return;
+            var data = { id: id };
+            var url = '@Url.Action("DeleteBundle","Course")';
+            ajaxAction(url, data, window.onBundleDeleted);
+        }
+	</script>
+}
+<div class="stat-container upper-gray-box">
+	<ul class="ul-stats">
+		<li class="course stat">
+			<a href="#d-course-container">
+				<div class="count" id="cnt-course">0</div>    
+			</a>	        
+		</li>
+		<li>
+			<a href="#d-course-container">
+				<label class="course-label">courses</label>
+			</a>
+		</li>
+		<li class="bundle stat">
+			<a href="#d-bundle-container">
+				<div class="count" id="cnt-bundle">0</div>
+			</a>
+		</li>
+		<li>
+			<a href="#d-bundle-container">
+				<label class="course-label">bundles</label>    
+			</a> 
+		</li>
+		<li class="review stat">
+			<a href="#d-review-container">
+				<div class="count" id="cnt-review">0</div>
+			</a>	        
+		</li>
+		<li>
+			<a href="#d-review-container">
+				<label class="course-label">new reviews</label>
+			</a>
+		</li>
+		<li style="float: right;margin: 0" id="li-type-btn">
+			<a class="inline list-type-button grid" onclick="changeRepType('grid',this)" id="btn-grid">
+				grid view
+			</a>
+			
+			<a class="inline list-type-button list" onclick="changeRepType('list',this)" id="btn-list">
+				list view
+			</a>
+		</li>
+	</ul>
+</div>
+@using (Ajax.BeginForm("GetCourseReport", "Course", new {type = eReportTypes.Grid}, new AjaxOptions {UpdateTargetId = "course-rep-container", LoadingElementId = "site-loader"}, new {@id = "formCourseGrid"})){}
+@using (Ajax.BeginForm("GetCourseReport", "Course", new { type = eReportTypes.List}, new AjaxOptions { UpdateTargetId = "course-rep-container", LoadingElementId = "site-loader" }, new { @id = "formCourseList" })){}
+@using (Ajax.BeginForm("GetBundleReport", "Course", new {type = eReportTypes.Grid}, new AjaxOptions {UpdateTargetId = "bundle-rep-container", LoadingElementId = "d-master-loader"}, new {@id = "formBundleGrid"})){}
+@using (Ajax.BeginForm("GetBundleReport", "Course", new { type = eReportTypes.List }, new AjaxOptions { UpdateTargetId = "bundle-rep-container", LoadingElementId = "d-master-loader" }, new { @id = "formBundleList" })){}
+
+<script>
+	function openWizardWindow(courseGuid){
+			var w = 870;
+			var h = 780;
+			var left = (screen.width/2)-(w/2);
+			var top = (screen.height/2)-(h/2);
+			var str = '@Url.Action("CourseWizard", "Course", new { area = "AuthorAdmin", id = "tempGuid" })';
+			var url = str.replace("tempGuid", courseGuid);
+			return window.open(url, '', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left);
+
+	}
+
+	$(document).ready(function() {
+		$('#a-add-new-wiz').bind("click", function(e) {
+			e.preventDefault();
+			openWizardWindow('@Guid.Empty');
+		});
+	});
+
+    function onItemListBound(e) {
+
+        //console.log(e);
+        var grid = e.sender;
+        var data = grid.dataSource.data();
+        $.each(data, function (i, item) {
+            if (item.Status == 1) {
+                $('tr[data-uid="' + item.uid + '"] ').addClass('tr-draft');
+            }
+
+            if (item.LearnerCount > 0) {
+                $('tr[data-uid="' + item.uid + '"] ').find('.k-grid-Delete').hide();
+            }
+        });
+      
+    }
+
+</script>
+
+<div id="d-course-container">
+	<div class="list-manage-row">
+		<div class="count-title" id="d-mr-total">0</div>
+		<a href="@Url.Action("EditBundle","Course")/@Guid.NewGuid()" class="add-btn-h">add new bundle</a>
+		<a href="#" class="add-btn-h" id="a-add-new-wiz">new course wizard</a>
+		<a href="@Url.Action("EditCourse","Course")/@Guid.NewGuid()" class="add-btn-h">add new course</a>
+	</div>  
+	<div id="course-rep-container"> 
+		@Html.Partial("CourseReport/_CoursesList")
+	</div>
+</div>
+
+<div id="d-bundle-container">
+	<div class="list-manage-row">
+		<div class="count-title" id="d-bn-total">0</div>		
+	</div>  
+	<div id="bundle-rep-container"> 
+		@Html.Partial("CourseReport/_BundlesList",Model)
+	</div>
+</div>
+
+<div id="d-review-container">
+	<div class="list-manage-row">
+		<div class="count-title" id="d-rv-total">0</div>        
+	</div>  
+	<div id="reviw-rep-container"> 
+		@Html.Partial("CourseReport/_ReviewGrid")
+	</div>
+</div>
+
+
+	
+<script type="text/x-kendo-template" id="kendo-sort-template">
+	<li>
+		<a data-val="${field}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+	</li>
+</script>

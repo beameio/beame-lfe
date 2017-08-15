@@ -1,0 +1,9 @@
+﻿@model LFE.DataTokens.AccountSettingsDTO
+
+@{
+	ViewBag.Title = "Settings";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@Html.Partial("Account/_UserAccountSettings",Model)

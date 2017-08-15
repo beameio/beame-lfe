@@ -1,0 +1,110 @@
+﻿@model LFE.Portal.Areas.Widget.Models.PaypalCompleteRequestToken
+
+@{
+    ViewBag.Title = "Thank you";
+}
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/Areas/Widget/Content/styles/widget.css" rel="stylesheet" />
+
+    <script src="~/Areas/Widget/Scripts/modernizr-2.6.2.min.js"></script>
+    <script src="~/Areas/Widget/Scripts/jquery.1.9.1.min.js"></script>
+    <script src="~/Areas/Widget/Scripts/jquery.migrate.1.2.1.min.js"></script>
+
+
+    <link href="~/Areas/Widget/Content/styles/buy.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function () {
+
+            $('.close_frame').click(function () {
+                $('.dark', window.parent.document).fadeOut();
+                $('#buyFrameWrapper', window.parent.document).slideToggle();
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Google Code for Sale Conversion Page -->
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        var google_conversion_id = 1002677144;
+        var google_conversion_language = "en";
+        var google_conversion_format = "2";
+        var google_conversion_color = "ffffff";
+        var google_conversion_label = "xYs9CPji1gQQmMeO3gM";
+        var google_conversion_value = 0;
+        /* ]]> */
+    </script>
+    <script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+    </script>
+    <noscript>
+        <div style="display:inline;">
+            <img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1002677144/?value=0&amp;label=xYs9CPji1gQQmMeO3gM&amp;guid=ON&amp;script=0" />
+        </div>
+    </noscript>
+    <title></title>
+
+    <div id="buyWrapper" class="sub_tool_bar4">
+        <div class="title-block">
+            @*<hgroup>
+                <h1>PURCHASE COURSE - @(Model.IsFreeCourse ? "FREE" : string.Format("${0:0.00}", Model.Price))</h1>
+                <h2>@Model.CourseAuthor - @Model.CourseName</h2>
+            </hgroup>*@
+            @* <div>
+                    <a class="close_frame">Close</a>
+                </div>*@
+        </div>
+
+        <div id="confirmation">
+            @*@if (Model.IsFreeCourse)
+            {
+                <h3>@Model.UserName, you are now registered to this course.</h3>
+            }
+            else
+            {
+                <h3>@Model.UserName, thanks for purchasing this course.</h3>
+            }*@
+            @if (Model.IsSuccess)
+            { 
+            <h1>Thanks for purchasing this course.</h1>
+            <br />
+            <br />    
+            <div>
+                A confirmation letter has been sent to the email address you provided.<br />
+                Your new course can now be accessed through the 'My Courses' link in the menu bar.<br />
+                <a id="viewCourse" href='@Model.RedirectUrl' target="_blank" >
+                    Click Here to View the Course Now!
+                </a>
+            </div>
+            }
+            else
+            {
+                 <h3>Sorry, an error has occurred.</h3>
+                <br />
+                <p>
+                    @Model.Message
+                </p>
+            }
+
+
+        </div>
+    </div>
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

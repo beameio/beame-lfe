@@ -1,0 +1,44 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.ItemProductPageToken
+           
+@{
+    var navTabsCSS = "nav-tabs-container col col-xs-12";
+    if (Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE)
+    {
+        navTabsCSS += "col-sm-12 col-md-pull-4 col-md-8";
+
+        <div class="bundle-info col col-xs-12 col-sm-12 col-md-push-8 col-md-4">
+            <div class="inline bundle-totals-box">
+                <div class="tc">
+                    @Model.BundleDetails.BundleCourses.Count course bundle
+                </div>
+                <div class="tw">
+                    Bundle worth $@Model.BundleDetails.TotalCoursesWorth.FormatMoney(2)
+                </div>
+            </div>
+            <div class="bundle-box inline">&nbsp;</div>
+        </div>
+
+    }
+
+}
+<div class="@navTabsCSS">
+    <ul class="nav-tabs" id="pp-nav-tabs">
+        <li class="active">
+            <a href="#tp-content" class="tb-content" data-toggle="tab">content</a>
+        </li>
+        <li>
+            <a href="#tp-author" class="tb-author" data-toggle="tab" data-url="@Url.ActionString("_AuthorProfile", "User", new RouteValueDictionary { { "area", "Widget" }, { "id", Model.Author.UserId }, { "trackingID", Model.TrackingID } })">author</a>
+        </li>
+        @{
+            if (Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+            {
+                <li>
+                    <a href="#tp-reviews" class="tb-review" data-toggle="tab" data-url="@Url.ActionString("GetCourseReviewsPartial", "Item", new RouteValueDictionary { { "area", "Widget" }, { "id", Model.ItemId }, { "rait", Model.Rating } })">Reviews</a>
+                </li>
+            }
+        }
+    </ul>    
+</div>

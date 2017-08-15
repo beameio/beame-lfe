@@ -1,0 +1,74 @@
+﻿
+@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+	var gridId = "UserEventReport_" + Guid.NewGuid();
+}
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindEventReport, rebindEventsGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindEventReport, rebindEventsGrid, null);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.object.rebindKpiEventReport, rebindEventsGrid, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.object.rebindKpiEventReport, rebindEventsGrid, null);
+	});
+
+	function rebindEventsGrid() {
+		$('#@gridId').data("kendoGrid").dataSource.read();
+	}
+	function notify2Player(id, name) {
+		var token = { id: id, name: name };
+		window.getNotifManagerInstance().notify(notifEvents.video.openPlayer, token);
+	}
+
+	function onEventLogsBound(e) {
+		window.boundGridUserDetails(e);
+		$(".col-tooltip").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+			width: 250
+		}).data("kendoTooltip");
+		$(".col-tooltip1").kendoTooltip({
+			position: "top",
+			content: kendo.template($("#tp-template").html()),
+            width: 250
+		}).data("kendoTooltip");
+	}
+</script>
+
+@(Html.Kendo().Grid<UserEventDTO>()
+	  .Name(gridId)
+	  .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+	  .Columns(columns =>
+	  {
+		  columns.Bound(p => p.SessionId).Width(60);
+		  columns.Bound(p => p.EventId).Width(60);
+		  columns.Bound(p => p.UserName).ClientTemplate("<span data-val='${UserId}' title='click to view #=UserName# details' class='list-cmd usr-btn ellipsis col-tooltip' style='width:120px' >#=UserName#</a>").Width(120).Title("User");
+		  columns.Bound(p => p.EventType);
+		  columns.Bound(m => m.ItemName).ClientTemplate("<a href='#=hasValue(ItemPageUrl) ? (ItemPageUrl) : emptyHref##=hasValue(ItemPageUrl) ? \"?mode=admin\" : ''#' title='#=ItemAuthorName# - #=ItemName# - click to view' class='list-cmd ellipsis col-tooltip' style='width:200px' target='_blank'>#=ItemName#</a>").Title("Item").Width(200);
+		  columns.Bound(m => m.StoreName).ClientTemplate(" # if (hasValue(StoreUrl)) { # <a href='#=StoreUrl#' title='#=StoreName# - click to view' target='_blank' class='ellipsis col-tooltip' style='width:120px'>#=StoreName#</a> # } else{# <div class='ellipsis col-tooltip' title='#=StoreName#' style='width:120px'>#=hasValue(StoreName) ? StoreName : ''#</div> #}#").Title("Store").Width(120);
+          columns.Bound(p => p.HostName).ClientTemplate("<span title='#=HostName#' class='col-tooltip1' style='width:120px;white-space:nowrap;display:inline-block;' >#=HostName#</a>").Width(120).Title("Host");
+		  columns.Bound(p => p.VideoName).ClientTemplate(" # if (hasValue(BcIdentifier)) { # <a href='javascript:notify2Player(#=BcIdentifier#,\"#=Encoder.htmlEncode(VideoName)#\")' title='#=VideoAuthorName# click to view' style='margin:3px 0 0;width:120px;' class='list-cmd ellipsis col-tooltip' >#=VideoName#</a> # } #").Width(120).Title("Video");
+		  
+		 // columns.Bound(p => p.AdditionalData).Width(110).ClientTemplate("<div class='ellipsis col-tooltip' title='${AdditionalData} 'style='width:150px'>${AdditionalData}</div>").Width(150);		
+		  columns.Bound(p => p.IPAddress).Width(80);
+		  columns.Bound(p => p.EventDate).Format("{0:MM/dd/yyyy HH:mm:ss}");
+
+		  
+		  //  columns.Bound(p => p.HostName);
+		  //  columns.Bound(p => p.HttpHeaders).Width(110).ClientTemplate("<div class='ellipsis col-tooltip' title='${HttpHeaders} 'style='width:200px'>${HttpHeaders}</div>");
+	  })
+	  .AutoBind(false)
+	  .Events(e=>e.DataBound("onEventLogsBound"))
+	  .Sortable()	
+      .Groupable(g=>g.Enabled(true))
+	  .Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+	  .Filterable(f => f.Enabled(true))
+	  .DataSource(dataSource => dataSource.Ajax()
+							.Model(model => model.Id(p => p.EventId))
+							.Read(read => read.Action("GetEventLogs", "Report").Data("getEventRepData").Type(HttpVerbs.Get)).ServerOperation(true)
+							.PageSize(ViewData["pagesize"] == null ? 20 : Int16.Parse(ViewData["pagesize"].ToString())))
+	  )
+	  
+
+<div style="display:inline-block;"></div>

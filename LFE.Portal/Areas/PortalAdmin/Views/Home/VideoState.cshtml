@@ -1,0 +1,89 @@
+﻿@using LFE.Core.Extensions
+@model LFE.DataTokens.VideoStateResultToken
+
+@{
+    ViewBag.Title = "VideoState";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    if (this.GetCurrentUserId() == 422)
+    {
+        <div style="margin:10px 0 15px">
+            @Html.ActionLink("Back to Actions", "SystemActions", "Home")
+        </div>
+
+    }
+}
+
+<fieldset>
+    <legend>VideoStateResultToken</legend>
+    @{
+        if (Model.IsValid)
+        {
+            if (Model.VideosFoundInBC > 0)
+            {
+                <div class="display-label">
+                    @Html.DisplayNameFor(model => model.VideosFoundInBC)
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.VideosFoundInBC)
+                </div>
+
+                <div class="display-label">
+                    @Html.DisplayNameFor(model => model.NewVideosFoundInBC)
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.NewVideosFoundInBC)
+                </div>
+            }
+
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.TotalUserVideos)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TotalUserVideos)
+            </div>
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.TotalAttachedVideos)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TotalAttachedVideos)
+            </div>
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.TotalAttachedNonExistsVideos)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TotalAttachedNonExistsVideos)
+            </div>
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.TotalNonExistsVideos)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TotalNonExistsVideos)
+            </div>
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.TotalNonAttachedVideos)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TotalNonAttachedVideos)
+            </div>
+        }
+        else
+        {
+            <h3>@Model.Message</h3>
+        }
+    }
+   
+</fieldset>
+
+
+
+
+

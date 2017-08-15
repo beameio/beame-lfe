@@ -1,0 +1,88 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.Widget.Models
+@model   List<LFE.DataTokens.ContentTreeViewItemDTO>
+
+
+@*LFE.DataTokens.ItemViewerPageToken*@
+           
+<div class="tree-collapse-container">
+    <div class="inner">
+        <span class="ec-btn expand rel" title="expand all"> <a href="#" onclick="expandCollapse(1)"><span>Expand all</span></a></span>
+        <span class="ec-btn collapse rel" title="collapse all"> <a href="#" onclick="expandCollapse(2)"><span>Collapse all</span></a></span>
+    </div>
+</div>
+
+<div id="d-ch-tree-container" class="">
+    <ul class="ul-chapters-tree">
+        @{
+            foreach (var contentItem in Model)
+            {
+                <li class="li-chap t-@contentItem.type.ToString()">
+                    @{
+                        if (contentItem.type == CourseEnums.eContentTreeViewItemType.quiz)
+                        {
+                            <div class="ch-title @(contentItem.available ? "" : "disabled")">
+                            @{
+                            if (contentItem.available)
+                            {
+                                <span title="@contentItem.name" class="ch-name inline ellipsis" onclick="loadUserQuiz('@eUserQuizActions.LoadQuiz','@contentItem.quizId',null)" data-target="quiz" data-val="@contentItem.quizId">@contentItem.name</span>
+                            }
+                            else
+                            {
+                                    <span title="not available" class="ch-name inline ellipsis">@contentItem.name</span>
+                                }
+                            }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="ch-title @(contentItem.available ? "" : "disabled")">
+                                @{
+                                    if (contentItem.available)
+                                    {
+                                        <span class="inline tree-nav">
+                                            <span id="btn-ch-toggle-@contentItem.id" class="l-icon l-plus inline" onclick="togglChapter(@contentItem.id, this, 1) "></span>
+                                        </span>
+                                        <span onclick="togglChapter(@contentItem.id, this, 2) " title="@contentItem.name" class="ch-name inline ellipsis">@contentItem.duration  @contentItem.name</span>
+                                    }
+                                    else
+                                    {
+                                        <span  title="not available" class="ch-name inline ellipsis">@contentItem.duration  @contentItem.name</span>
+                                    }
+                                }                                
+                            </div>
+
+                            if (contentItem.available)
+                            {
+                                <ul class="ul-videos-tree expandable" id="ul-v-@contentItem.id" style="display: none">
+                                    @{
+                                        foreach (var video in contentItem.videos)
+                                        {
+                                            <li class="li-video" id="li-@video.id">
+                                                <div class="vd-title">
+                                                    <span class="inline tree-nav"> <span class="l-icon l-plus" title="view details" onclick="togglVideo(@video.id, this) "></span></span>
+                                                    <span id="btn-vd-select-@video.id" class="vd-name inline ellipsis" title="play video" onclick="selectVideo(@contentItem.id, @video.id, this, true) ">
+                                                    <label class="inline">@video.duration</label>
+                                                    <label class="video-name inline ellipsis" title="@video.name" id="lbl-video-name-@video.id">@video.name</label>
+                                                </span>
+                                                </div>
+
+                                                <div style="display: none" id="vd-desc-@video.id" class="vdesc expandable">
+                                                    <img alt="" src="@video.thumb"/>
+                                                    <div class="inline txt ellipsis multiline" id="spn-vd-des-@video.id">
+                                                        @Html.Raw(video.desc)
+                                                    </div>
+                                                    <span class="over"></span>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    }
+                </li>
+                }
+            }
+    </ul>
+</div>

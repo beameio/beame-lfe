@@ -1,0 +1,65 @@
+﻿<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.videoChanged, handleChangeVideo, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setPlayerContentH, null);
+        
+        var video = window.CURRENT_VIDEO_TOKEN;
+
+        if (video == null) return;
+
+        handleChangeVideo(video);
+    });	    
+
+    function setPlayerContentH(h) {
+        if (h != null) {
+            $('#d-chapter-content-container').height(h - 40);
+            $('#d-ch-pd').height(h - 100);
+        }
+        $('#d-ch-pd').nanoScroller();
+    }
+
+    function handleChangeVideo(video) {
+        setVideoContent(video);
+
+        setNavButtonsState(video);
+    }
+
+</script>
+
+<div class="d-chapter-content-container">
+    <div class="ch-cnt-header">
+        <label id="lbl-video-title" class="float-left"></label>
+        <div id="d-player-nav" class="float-right">
+            <span onclick="onNavButtonClicked('prev',this)" class="btn-player-nav prev off" title="Previous Video">Previous</span>
+            <span onclick="onNavButtonClicked('next',this)" class="btn-player-nav next" title="Next Video">Next</span>
+        </div>
+    </div>
+    
+    <div id="d-ch-pd" class="nano">
+        <div class="content" id="d-player-content-container">
+            <div  id="bc-player-container" style="display: block"></div>
+	        <div class="d-content-bottom-row">
+		        <div class="inline ch-desc"></div>
+		        <div class="inline d-chapted-links">
+			        @Html.Partial("CourseViewer/_ChapterLinks")
+		        </div>
+	        </div>        
+        </div>
+    </div>
+
+    	 
+</div>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+            $('#d-chapter-content-container').height(h - 40);
+            $('#d-ch-pd').height(h - 100); //80=20+20 player nav h + 40 tabs + 20margin
+            setReportScroll("#d-ch-pd");
+        }, 100);
+        
+    });
+
+</script>

@@ -1,0 +1,72 @@
+﻿@import "../bootstrap/less/glyphicons";
+
+.no-border{border:none !important;}
+.no-border-top{border-top:none !important;}
+.no-border-bottom{border-bottom:none !important;}
+.no-border-radius{border-radius:0 !important;}
+.no-box-shadow{box-shadow: none !important;}
+
+.no-bg{background:none;}
+.no-repeat{background-repeat:no-repeat;}
+.no-padding{padding:0;}
+.no-margin{margin:0;}
+.semi-bold{font-weight:600;}
+
+.inline{display:inline-block !important;vertical-align:top;}
+.block{display:block;}
+.ellips-base{overflow:hidden;-moz-text-overflow: ellipsis;-ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis;}
+.ellipsis{white-space:nowrap;.ellips-base;}
+.ellipsis-multiline{white-space:normal;.ellips-base;}
+
+.relative{position:relative;}
+.absolute{position:absolute;}
+.pointer{cursor:pointer;}
+.no-pointer{cursor:default;}
+.no-cursor{cursor:none;}
+.upper{text-transform:uppercase;}
+.clear{clear:both;}
+.underline{text-decoration:underline;}
+.invisible{visibility:hidden}
+.float-left{float: left !important}
+.float-right{float: right !important}
+
+.flat-submit{.no-bg;.no-box-shadow;.no-border;}
+
+a:focus, a:active, 
+button::-moz-focus-inner,
+input[type="reset"]::-moz-focus-inner,
+input[type="button"]::-moz-focus-inner,
+input[type="submit"]::-moz-focus-inner,
+select::-moz-focus-inner,
+input[type="file"] > input[type="button"]::-moz-focus-inner {
+    border: 0;
+    outline : 0;
+}
+
+.tri(@color,@width,@height){
+    width: 0;
+    height: 0;
+    border-style: solid;
+    &.up{ border-width: 0 (@width/2) @height (@width/2);
+          border-color: transparent transparent @color transparent;}
+    &.down{border-width: @height (@width/2) 0 (@width/2);
+           border-color: @color transparent transparent transparent;}
+    &.right{border-width:@width 0 @width @height;
+            border-color: transparent transparent  transparent @color;}
+    &.left{border-width: @width @height @width 0;
+           border-color:transparent @color transparent transparent;}
+}
+
+.circle(@size,@bg_color){
+    width:@size;height:@size;border-radius:50%;background-color:@bg_color;text-align:center;
+}
+
+/*arrows imported from bootstrap glyphicon */
+.up{.glyphicon;.glyphicon-arrow-up;}
+.down{.glyphicon;.glyphicon-arrow-down;}
+.eq{.glyphicon;.glyphicon-arrow-eq;}
+
+.glyphicon-arrow-eq {.glyphicon;.glyphicon-resize-horizontal;}
+
+.sweet-overlay{z-index:2147483647;}
+.sweet-alert{z-index:2147483647;}

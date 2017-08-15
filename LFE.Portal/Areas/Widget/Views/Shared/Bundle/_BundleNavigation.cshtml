@@ -1,0 +1,144 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.BundlePurchaseDTO
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#ul-course-tabs').find('a').click(function () {
+            $('#ul-course-tabs').find('a').removeClass('active');
+            $(this).addClass('active');
+        });
+    });
+
+
+
+    function loadView(view) {
+        $("#image_loading").hide();
+        if (isFxSupported()) {
+            $("#d-tab-content").hide();
+            $('#d-tab-content').kendoAnimate({
+                effects: "slideOut:right fadeOut",
+                hide: true,
+                duration: 500,
+                complete: function () {
+                    $('#d-tab-content').html(view).kendoAnimate({
+                        effects: "slideIn:left fadeIn",
+                        show: true,
+                        duration: 500
+                    });
+                }
+            });
+        } else {
+            $('#d-tab-content').slideUp("slow", function () {
+                $('#d-tab-content').html(view).slideDown("slow");
+            });
+        }
+    }
+
+
+    function setTabBegin() {
+        $("#image_loading").show();
+    }
+
+</script>
+
+
+<div class="tabs">
+    <ul class="float-left" id="ul-course-tabs">
+        <li>
+            @Ajax.ActionLink("CONTENT", "_BundleContent", "Course",
+                new
+                {
+                    Area = "Widget",
+                    bundleId = Model.BundleId
+                },
+                new AjaxOptions
+                {
+                    UpdateTargetId = "d-tab-content",
+                    InsertionMode = InsertionMode.Replace,
+                    OnSuccess = "loadView",
+                    OnBegin = "setTabBegin",
+                    HttpMethod = "GET"
+                },
+                new { @id = "frmContent", @class = "active" }
+                )
+        </li>
+
+        <li>
+            @Ajax.ActionLink("AUTHOR", "GetAuthorContentPartial", "Course",
+                new
+                {
+                    Area = "Widget",
+                    authorID = Model.User.userId
+                },
+                new AjaxOptions
+                {
+                    UpdateTargetId = "d-tab-content",
+                    InsertionMode = InsertionMode.Replace,
+                    OnSuccess = "loadView",
+                    OnBegin = "setTabBegin",
+                    HttpMethod = "GET"
+                },
+                new { @id = "frmAuthor" }
+                )
+
+        </li>
+    </ul>
+
+
+    <img id="image_loading" alt="" src="@Url.Content("~/Content/kendo/2013.2.716/Uniform/loading-image.gif")" class="progress" />
+</div>
+<div class="Small-Buy-Button">
+    @if (Model.IsFreeCourse)
+    {
+        <div class="button-wrapper">
+            <a id="buyCourse" href='@Url.GenerateBundlePageUrl(Model.User.fullName, Model.BundleUrlName, null, Model.TrackingID)' target="_blank">
+                <div class="buy-button">GET FOR FREE</div>
+            </a>
+        </div>
+    }
+    else
+    {
+        if (Model.ItemState.IsOwnedByUser || Model.ItemState.IsAccessAllowed)
+        {
+            <div class="button-wrapper">
+                <a href='@Url.GenerateBundlePageUrl(Model.User.fullName,Model.BundleUrlName, null, Model.TrackingID )' target="_blank">
+                    <div class="buy-button">
+                        OPEN BUNDLE
+                    </div>
+                </a>
+            </div>
+        }
+        else
+        {
+            if (Model.Price != null && Model.Price > 0)
+            {
+                <div class="button-wrapper">
+                    @if (Model.MonthlySubscriptionPrice != null)
+                    {
+                        <div class="unlimited">UNLIMITED ACCESS</div>
+                    }
+                    <a id="buyCourse2">
+                        <div class="buy-button">
+                            $@Model.Price.FormatPrice() BUY NOW
+                        </div>
+                    </a>
+                </div>
+            }
+            if (Model.MonthlySubscriptionPrice != null)
+            {
+
+                <div class="button-wrapper">
+                    <div class="unlimited">A MONTH</div>
+                    <a id="buyCourseSubscr2">
+                        <div class="buy-button blue">
+                            $@(Model.MonthlySubscriptionPrice.FormatPrice()) BUY NOW
+                        </div>
+                    </a>
+                </div>
+            }
+
+        }
+    }
+</div>

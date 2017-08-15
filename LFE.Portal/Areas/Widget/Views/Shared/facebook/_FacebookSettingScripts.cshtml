@@ -1,0 +1,285 @@
+﻿@using LFE.Core.Utils
+@model LFE.Portal.Areas.WixEndPoint.Models.SettingsViewToken
+
+
+@{
+    var storeId = Model.StoreId ?? -1;
+
+    var newCourseGuid = Guid.NewGuid();
+    if (Model == null)
+    {
+        <script>
+            var settings = {
+                cpFontColor: '#000',
+                cpBackgroundColor: '#FFF',
+                cpTabsFontColor: '#006699',
+                cbIsTransparent: false,
+                cbIsShowBorder: false,
+                cbIsShowTitleBar: false,
+                txtStoreName: '',
+                storeId: -1,
+                TrackingID: '',
+                UniqueId: ''
+            };
+        </script>
+    }
+    else
+    {
+        <script>
+            var settings = {
+                cpFontColor: '@(!string.IsNullOrEmpty(Model.FontColor) ? Model.FontColor : "#000")',
+                cpBackgroundColor: '@(!string.IsNullOrEmpty(Model.BackgroundColor) ? Model.BackgroundColor : "#FFF")',
+                cpTabsFontColor: '@(!string.IsNullOrEmpty(Model.TabsFontColor) ? Model.TabsFontColor : "#006699")',
+                cbIsTransparent: '@(Model.IsTransparent.ToString().ToLower())',
+                cbIsShowBorder: '@(Model.IsShowBorder.ToString().ToLower())',
+                cbIsShowTitleBar: '@(Model.IsShowTitleBar.ToString().ToLower())',
+                txtStoreName: '@(!string.IsNullOrEmpty(Model.StoreName) ? Model.StoreName : "")',
+                storeId: '@(Model.StoreId ?? -1)',
+                TrackingID: '@Model.TrackingID',
+                UniqueId: '@Model.UniqueId'
+            };
+        </script>
+    }
+
+}
+
+
+<script>
+    function errorPopup(message) {
+        //alert(message);
+        $("#errorMessage").html(message);
+        $("#errorLine").show();
+    }
+    var newCourseGuid = '@newCourseGuid.ToString()';
+    var lastSelectedGUid = newCourseGuid;
+
+    function DisplayChangeName() {
+        $('#divStoreNameChange1').show();
+        $('#divStoreNameChange2').show();
+        $('#divStoreNameChange3').hide();
+        $('#divStoreNameChange4').hide();
+    }
+
+    $(document).ready(function () {
+
+        $('#btnStoreName').click(function () {
+            updateSettingsProperty('txtStoreName', $('#txtStoreName').val());
+        });
+
+        $("#aChangeName").click(function () {
+            DisplayChangeName();
+        });
+
+        $('#btnManageWebstore').click(function () {
+            if (settings.storeId < 0) {
+                updateSettings(settings);
+            }
+            if (settings.storeId > 0) {
+                window.open('@Url.Action("EditStoreByTrackId", "WebStore", new { area = "AuthorAdmin" })' + '?id=' + settings.TrackingID + "#content");
+                return false;
+            }
+            else {
+                errorPopup('Set store name and apply changes first');
+            }
+            return false;
+        });
+
+
+        $('#settingTitle').click(function () {
+            OpenDivAccord(this);
+        });
+
+        $('#webstoreTitle').click(function () {
+            OpenDivAccord(this);
+        });
+
+
+        $('#editCourses').click(function () {
+            OpenDivAccord(this);
+        });
+
+        $('#mainTitle').click(function () {
+
+            $("#divContent").toggle();
+
+            var newHeight = $("#divContainer").height() + 40;
+            $('#frmSettings', window.parent.document).attr("height", newHeight);
+
+        });
+        $('#mainTitle').click();
+
+        $('#btnEditCourse').click(function () {
+            if (settings.storeId < 0) {
+                updateSettings(settings);
+            }
+            if (settings.storeId > 0) {
+                var selectedGuid = $('#ddlCourses').val();
+                if (selectedGuid && selectedGuid != '') {
+                    OpenWizardWindow(selectedGuid);
+                }
+                else {
+                    errorPopup('Please select a course.');
+                }
+            }
+            else {
+                errorPopup('Set store name and apply changes first');
+            }
+        });
+
+        $('#btnAddCourse2Store').click(function () {
+
+            if (settings.storeId > 0) {
+                var selectedGuid = $('#ddlCourses').val();
+                if (selectedGuid && selectedGuid != '') {
+                    var url = '@Url.Action("AddItemToStore", "Home", new {area = "WixEndPoint"})';
+                    var data = {
+                        itemId: selectedGuid,
+                        storeId: '@storeId'
+                    };
+                    $.ajax({
+                        url: url,
+                        cache: false,
+                        type: "Post",
+                        data: JSON.stringify(data),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            if (response.success) {
+                                errorPopup('The course was successfully added to the store');
+                            }
+                            else {
+                                errorPopup(response.error);
+                            }
+                        }
+                    });
+                } else {
+                    errorPopup('Please select a course.');
+                }
+            } else {
+                errorPopup('Please select a course.');
+            }
+        });
+
+        $('#btnCreateNewCourse').click(function () {
+            if (settings.storeId < 0) {
+                updateSettings(settings);
+            }
+
+            if (settings.storeId > 0) {
+                OpenWizardWindow(newCourseGuid);
+            }
+            else {
+                errorPopup('Set store name and apply changes first');
+            }
+        });
+
+        $('#btnRefresh').click(function () {
+            window.refreshApp();
+        });
+
+        var popMessagePrefix = '<div style="margin:10px; line-height: 20px; color:#0099FF; font-size:14px; text-align: justify" >';
+        $('#btnHelp1').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[0] + '</div>', html: true });
+        $('#btnHelp2').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[1] + '</div>', html: true });
+        $('#btnHelp3').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[2] + '</div>', html: true });
+        $('#btnHelp4').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[3] + '</div>', html: true });
+    });
+
+    var helpArray = new Array();
+    helpArray[2] = "Welcome to " + '@(Constants.APP_OFFICIAL_NAME)' + ", learning From Experience. In order to create your first course (or edit existing courses), click on the Create/Edit Courses tab. Once a course is completed, a webstore is placed in the WIX website to enable your audience to browse and purchase the course. This webstore can contain multiple courses, either authored by you or by other LFE authors. All this is managed in the 'Webstore Management' tab below.";
+    helpArray[1] = "'Create New Course' will launch our step-by-step course creation wizard in a new window. You can use the tooltips in the wizard for guidance, if needed, or take a few minutes and watch the Tutorial clip from the link at the top right of this panel.";
+    helpArray[0] = "These settings control how the app will look when integrated into your WIX website. Play around with them - every change will be instantly reflected in the website.";
+    helpArray[3] = "These settings take you to the author Portal on " + '@(Constants.APP_OFFICIAL_NAME)' + ", for advanced management of your website, creation or promotional coupons, generating sales reports, or setting the Payout preferences.";
+
+    function OpenWizardWindow(courseGuid) {
+        window.lastSelectedGUid = courseGuid;
+        var w = 870;
+        var h = 780;
+        var left = (screen.width / 2) - (w / 2);
+        var top = (screen.height / 2) - (h / 2);
+        var str = '@Url.Action("CourseWizard", "Course", new { area = "AuthorAdmin", id = "tempGuid" })';
+        var url = str.replace("tempGuid", courseGuid);
+        return window.open(url, '', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+    }
+
+    function OpenDivAccord(title) {
+        var openDiv = $($(title).parent().children(".feature")[0]);
+
+        openDiv.toggle();
+
+        $(".feature").each(function () {
+            if ($(this).attr("id") != openDiv.attr("id"))
+                $(this).hide();
+        });
+
+        var newHeight = $("#divContainer").height() + 40;
+        $('#frmSettings', window.parent.document).attr("height", newHeight + "px");
+    }
+
+
+    $(document).on('checkbox.change', function (ev, data) {
+        if (window.console) console.log('Checkbox changed');
+        updateSettingsProperty(data.type, data.checked);
+    });
+
+    $(document).on('colorChanged', function (ev, data) {
+        if (window.console) console.log('Color changed');
+        updateSettingsProperty(data.type, data.selected_color);
+    });
+
+
+    function updateSettingsProperty(key, value) {
+        if (window.console) console.log("key=" + key + " value=" + value);
+        settings[key] = value;
+        updateSettings(settings);
+    }
+
+    function updateSettings(settingsJson) {
+        var settingsStr = JSON.stringify(settingsJson).replace('true', '1') || "";
+        if (window.console) console.log(settingsStr);
+
+        $.ajax({
+            'type': 'post',
+            'contentType': 'application/json; charset=utf-8',
+            'url':'@Url.Action("SettingsUpdate","Facebook",new{area="Widget"})',
+            'data': settingsStr,
+            'cache': false,
+            'success': function (res) {
+                checkUpdate(res);
+                if (window.console) console.log("update setting completed");
+            },
+            'error': function () {
+                if (window.console) console.log('error updating data to the app server');
+            }
+        });
+    }
+
+    function checkUpdate(res) {
+
+        if (res.success && res.storeID > 0) {
+            settings.storeId = res.storeID;
+            settings.txtStoreName = res.storeName;
+            settings.UniqueId = res.UniqueId;
+            window.refreshApp();
+            if (window.console) console.log("Refresh App");
+
+            if (res.storeName.length > 0) {
+
+                var storeDisplayName = res.storeName.length < 32 ? res.storeName : res.storeName.substring(0, 32);
+
+                $('#divStoreNameChange1').hide();
+                $('#divStoreNameChange2').hide();
+                $('#divStoreNameChange3').show();
+                $('#divStoreNameChange4').show();
+                $("#strStoreName").html(storeDisplayName);
+                $("#txtStoreName").val(res.storeName);
+            }
+        }
+        else {
+            //message
+        }
+    }
+
+</script>
+
+

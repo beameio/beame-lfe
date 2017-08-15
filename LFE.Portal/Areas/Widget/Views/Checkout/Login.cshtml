@@ -1,0 +1,102 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model CheckoutBaseToken
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapCheckoutLayout.cshtml";
+
+    var registerLink = Url.ActionString("Register", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Model.Refferal } });
+    var purchaseLink = Model.ItemInfo.IsFreeItem ?  Url.ActionString("PurchaseFreeCourse" , "Checkout", new RouteValueDictionary { { "area", "Widget" },{"courseId",Model.ItemInfo.ItemId}, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Request.AppRelativeCurrentExecutionFilePath } }) : Url.ActionString("Index", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId },{ "ref", Model.Refferal } });
+    var forgottenPwdLink = Url.ActionString("ForgottenPassword", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Model.Refferal } });
+}
+
+
+
+
+
+@section CSS
+{
+  
+    <style>
+        .ul-login li input, .ul-reg li input {
+            width: 100%;
+        }
+    </style>
+}
+
+<div class="sc-main-area rel">
+    <div class="inner sc-login">
+        <div class="sub-info">
+            <article>
+                This course by @Model.ItemInfo.Author.FullName is powered by @(Constants.APP_OFFICIAL_NAME)
+                To complete the checkout you’ll need an LFE account
+            </article>
+        </div>
+        <div style="width: 100%;padding-top: 25px">
+            <div style="display: table;width:100%">
+                <div class="tbl-row">
+                    <a class="sc-form-btn sc-btn-gray" href="@registerLink">Create a new LFE account</a>
+                </div>
+
+                <div class="tbl-row">
+                    <div class="line-through">
+                        <span class="inline lbl">OR</span>
+                    </div>
+                </div>
+
+                <div class="tbl-row">
+                    @Html.Partial("Account/MainLogin/_ExternalLogin", new LoginDTO { RedirectUrl = purchaseLink + "&mode=" + eScAuthenticationMode.soc, RegistrationSource = CommonEnums.eRegistrationSources.LFE })
+                </div>
+
+                <div class="tbl-row">
+                    <div class="line-through">
+                        <span class="inline lbl">OR</span>
+                    </div>
+                </div>
+
+                <div class="tbl-row">
+                    <div class="sub-info" style="text-align: left;padding-bottom: 10px">
+                        I already have an account with @(Constants.APP_OFFICIAL_NAME)
+                    </div>
+                    <div id="login-form-container" class="">
+
+                    
+                        @using (Ajax.BeginForm("AjaxLfeLogin", "Account", new { area = "", redirectUrl = purchaseLink + "&mode=" + eScAuthenticationMode.log,TrackingID = Model.TrackingId}, new AjaxOptions {HttpMethod = "Post",OnSuccess = "onLoginEnd",OnBegin = "showLoader()"}, new { @id = "frm-sc-lfe-login", @class = "form-lfe-login" }))
+                        {
+                            @Html.Partial("Account/MainLogin/_LoginForm", new LoginDTO { RegistrationSource = CommonEnums.eRegistrationSources.LFE })
+                        }
+
+                        <div class="d-forgot-pwd">
+                            <a href='@forgottenPwdLink' class="link-button">Forgot Password</a>
+                        </div>
+
+                    </div>                
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="position: absolute;bottom: 0;right: 0;">
+        <a href="#" class="sc-form-btn sc-btn-green" id="sc-btn-login" style="width: 175px">Continue</a>    
+    </div>
+    
+</div>
+
+
+@section JS
+{
+    <script>
+    $(document).ready(function () {
+        $('#sc-btn-login').unbind('click').click(function (e) {
+            e.preventDefault();
+            doLfeLogin('#frm-sc-lfe-login', '.sc-main-area');
+        });
+    });
+
+        saveItemEvent(USER_EVENTS.CHECKOUT_LOGIN, '@Model.TrackingId', '@Model.ItemInfo.ItemId', '@((byte)Model.ItemInfo.ItemType)');
+    </script>
+}

@@ -1,0 +1,110 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.Portal.Areas.Widget.Models.ItemIntroToken
+@{
+    //var backgroundColor = "#95a5a6";
+    //if (ViewBag.BackgroundColor != null)
+    //{
+    //    backgroundColor = ViewBag.BackgroundColor;
+    //}
+
+    var brightcoveVideoID = Constants.LFE_DEFAULT_VIDEO_BCID.ToString();
+
+    if (Model.OverviewVideoIdentifier != null)
+    {
+        brightcoveVideoID = Model.OverviewVideoIdentifier.ToString();
+    }
+
+    //  var viewModel = (BaseModelViewToken)ViewBag.MainLayoutViewModel;
+
+
+    int? cid = null;
+
+    int? bid = null;
+
+    switch (Model.ItemType)
+    {
+        case BillingEnums.ePurchaseItemTypes.COURSE:
+            cid = Model.ItemId;
+            break;
+        case BillingEnums.ePurchaseItemTypes.BUNDLE:
+            bid = Model.ItemId;
+            break;
+    }
+
+
+
+
+    var wrapperId = "video-wrapper-" + Model.ItemId;
+    var isSsl = this.IsUnderSsl();
+
+    if (Model.VideoInfoToken != null && Model.VideoInfoToken.IsValid)
+    {
+
+        @Html.Partial("~/Views/Shared/Common/_JWScripts.cshtml")
+
+
+        <div class="video-wrapper-container">
+            <div class="video-wrapper" id="@wrapperId">
+                Loading the player...
+            </div>
+        </div>
+
+        <script>
+            var playerInstance = jwplayer("@wrapperId");
+
+            var sources = [];
+            var rend = @Html.Raw(Json.Encode(Model.VideoInfoToken.Renditions));
+            var defaultRend = fixSR(rend[0].CloudFrontPath);
+
+            var playList = fixSR('@Model.VideoInfoToken.PlayListUrl');
+//
+//            if (playList.length > 0) {
+//                sources.push({ file: playList,default:true });
+//            }
+
+            for (var i = 0; i < rend.length; i++) {
+
+                var json = {
+                    file:fixSR(rend[i].CloudFrontPath),
+                    label:rend[i].FrameWidth +'x'  +rend[i].FrameHeight
+                }
+
+                sources.push(json);
+            }
+
+            var settings = {
+                sources: sources,
+                image: fixSR('@Model.VideoInfoToken.StillUrl'),
+                autostart: false,
+                width: "100%",
+                aspectratio: "16:9",
+                skin: '/Scripts/jwplayer/jwplayer-skins-premium/vapor.xml',
+                primary: "html"
+            };
+
+           // console.log(settings);
+
+            playerInstance.setup(settings);
+
+            jwplayer().onPlay(onJwPlay);
+
+            var eventSaved = false;
+            function onJwPlay(state) {
+                if (!eventSaved && state.newstate === 'PLAYING') {
+                    saveEventApi(USER_EVENTS.VIDEO_PREVIEW_WATCH, '@Model.TrackingID', '@cid', '@bid', '@brightcoveVideoID', null);
+                    eventSaved = true;
+                }
+            }
+        </script>
+    }
+    else
+    {
+        <h2>Video not found. Please contact support</h2>
+    }
+}
+
+
+
+

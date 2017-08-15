@@ -1,0 +1,51 @@
+﻿@model LFE.DataTokens.ChapterVideoEditDTO
+	
+<li data-val="${VideoId}">
+	@using (Ajax.BeginForm("SaveChapterVideo", "Course", new { area = "AuthorAdmin" }, new AjaxOptions { OnSuccess = "onVideoSaved" }, new { @id = "frmEditVideo", @style = "" }))
+	{
+		@Html.HiddenFor(m=>m.ChapterId)
+		@Html.HiddenFor(m => m.VideoId)
+		@Html.HiddenFor(m => m.OrderIndex)
+		@Html.HiddenFor(m=>m.VideoIdentifier)
+		<div class="content-head-row">
+			<span class="float-left drag-box">&nbsp;</span>
+			<span class="float-left btn-collapse-second expanded">&nbsp;</span>
+			<span class="float-left cn-name cn-vd pt9">
+				@Html.TextBoxFor(m => m.Title, new {@size = 50, @maxlength = 50 })
+			</span>
+			<span class="float-right" style="width: 150px;">
+				<span class="row-btn right btn-save inline" title="Save video"><span class="ico"></span></span>
+
+				<span class="k-cancel-button row-btn btn-cancel inline pt9" title="Cancel" data-val="${VideoId}"><span class="ico k-cancel"></span></span>
+			</span>			
+		</div>
+
+    <div class="video-details edit-mode cn-details" id="ch-vid-${VideoId}">
+        <div class="cn-box cn-vd-desc cn-vd-desc-edit">
+            @(Html.Kendo().EditorFor(m => m.SummaryHTML)
+            //  .Events(e => e.KeyDown("setEditMode"))
+                      .HtmlAttributes(new { @class = "video-summary", @style = "width: 330px;height: 100px" })
+                      .Encode(false)
+                      .Tools(t => t.Clear().Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink())
+            )
+
+        </div>
+        <div class="cn-box cn-vd-container">
+            <div class="inline">
+                <div class="v-thumb" id="d-video-thumb-${VideoId}">
+                    #if(VideoToken != null && VideoToken.identifier != undefined && Number(VideoToken.identifier) > 0 ){setTimeout(function(){buildThumbMediaPlayer({stillUrl: VideoToken.stillUrl, title: VideoToken.title, minutes: VideoToken.minutes, identifier: VideoToken.identifier,videoUrl:VideoToken.videoUrl}, emptyHref + 'd-video-thumb-' + VideoId);},300);} else{setTimeout(function(){setVideoPHClickEvent(emptyHref + 'd-video-thumb-' + VideoId);},300); }#
+                </div>
+            </div>
+            <div class="inline">
+                <div class="vd-name">#=VideoToken != null ? VideoToken.title : ''#</div>
+
+                <a class="browse-video" href="javaScript:openVideoWnd()">Browse video manager</a>
+
+                <span class="vd-public" style="display: none">
+                    @Html.CheckBoxFor(m => m.IsOpen, new { @style = "margin-top: 3px" }) @Html.LabelFor(m => m.IsOpen, new { @style = "width:auto;" })
+                </span>
+            </div>
+        </div>
+    </div>
+    }
+</li>

@@ -1,0 +1,19 @@
+﻿@model LFE.DataTokens.PriceLineDTO
+           
+
+   
+<li class="in-edit">
+    @Html.HiddenFor(m => m.PriceLineID)
+    <div class="float-left">
+        <div class="pl-f pl-title inline">${Title}</div>
+        <div class="pl-f pl-price inline">
+            ${Currency.Symbol}  @(Html.Kendo().CurrencyTextBoxFor(m => m.Price).Spinners(false).HtmlAttributes(new { @class = "k-tb-reset", @style = "width:55px;height:20px !important" }))
+        </div>
+        <div class="pl-f pl-name inline">#=hasValue(Name) ? Name : ''#</div>
+    </div>
+    <div class="float-right">
+        <a class="btn-price-action k-update-button" href="\\#">Update</a>
+        <a class="btn-price-action k-cancel-button" href="\\#">Cancel</a>
+    </div>
+</li>
+   

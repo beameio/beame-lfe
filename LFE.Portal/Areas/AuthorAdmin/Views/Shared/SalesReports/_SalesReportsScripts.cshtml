@@ -1,0 +1,56 @@
+﻿<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().subscribe(notifEvents.report.rebindReport, rebindSubscriptionSalesRep, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.report.rebindReport, rebindSalesRep, null);
+    });
+    function onFilterChanged() {
+        window.getNotifManagerInstance().notify(notifEvents.report.rebindReport);
+    }
+    function rebindSalesRep() {
+        $('#SalesReport').data("kendoGrid").dataSource.read();
+    }
+    function rebindSubscriptionSalesRep() {
+        $('#SubscriptionSalesReport').data("kendoGrid").dataSource.read();
+    }
+    function onSalesReportRequestEnd(e) {
+        try {
+
+            if (e.type != 'read') return;
+
+            var records = e.response.Total;
+            window.getNotifManagerInstance().notify(notifEvents.report.oneTimeRepBound, records);
+
+            if (e.response.AggregateResults == null || e.response.AggregateResults.length == 0) {
+                window.getNotifManagerInstance().notify(notifEvents.report.oneTimeSalesTotal, 0);
+                return;
+            }
+
+            var total = parseFloat(e.response.AggregateResults[0].Value);
+            window.getNotifManagerInstance().notify(notifEvents.report.oneTimeSalesTotal, total);
+        } catch (ex) {
+            if (window.console) console.log(ex);
+        }
+    }
+
+
+
+    function onSubscriptionReportRequestEnd(e) {
+        try {
+            if (e.type != 'read') return;
+            var records = e.response.Total;
+            window.getNotifManagerInstance().notify(notifEvents.report.subscriptionRepBound, records);
+
+
+            if (e.response.AggregateResults == null || e.response.AggregateResults.length == 0) {
+                window.getNotifManagerInstance().notify(notifEvents.report.subscriptionSalesTotal, 0);
+                return;
+            }
+
+            var total = parseFloat(e.response.AggregateResults[0].Value);
+
+            window.getNotifManagerInstance().notify(notifEvents.report.subscriptionSalesTotal, total);
+        } catch (ex) {
+            if (window.console) console.log(ex);
+        }
+    }
+</script>

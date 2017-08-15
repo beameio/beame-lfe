@@ -1,0 +1,41 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Models
+
+@{
+    ViewBag.Title = "Confirm LFE Registration";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+    const eLoginWindowMode mode = eLoginWindowMode.Login;
+    var error = ViewBag.LoginError == null || String.IsNullOrEmpty(ViewBag.LoginError.ToString()) ? null : ViewBag.LoginError;
+ 
+}
+
+<script>
+    var LOGIN_FORM_MODE = 'MAIN';
+</script>
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            initLoginBehavior('@mode.ToString()');
+        });
+    </script>
+    @{
+        if (error != null)
+        {
+            <script>
+                $(document).ready(function () {
+                    showLoginError('@error');
+                });
+            </script>
+        }
+    }
+}
+<div style="margin: 25px auto 0">
+    <h1 class="h1-info">Congrats! You are registered at @(Constants.APP_OFFICIAL_NAME)</h1>    
+</div>
+
+
+@Html.Partial("Account/MainLogin/_LoginBox", new LoginWindowToken{Mode = eLoginWindowMode.Login})
+
+

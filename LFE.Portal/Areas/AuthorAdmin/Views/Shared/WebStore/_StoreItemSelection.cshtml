@@ -1,0 +1,170 @@
+﻿@using LFE.DataTokens
+
+<div class="cn-filters">
+    <label class="inline">Filter by</label>
+
+    <label class="inline">
+        <input type="radio" name="FilterMethod" value="MY" onclick="onFilterOptionChanged(this)">
+        My Content
+    </label>
+
+    <label class="inline" style="margin-right: 5px;">
+        <input type="radio" name="FilterMethod" value="AUTHOR" onclick="onFilterOptionChanged(this)" checked="checked">
+        Author
+    </label>
+
+@*    <label class="inline">*@
+@*        <input type="radio" name="FilterMethod" value="ALL" onclick="onFilterOptionChanged(this)">*@
+@*        Show All*@
+@*    </label>*@
+
+
+
+    <div class="inline">
+        @(Html.Kendo().ComboBox()
+              .Name("ddlAuthors")
+              .HtmlAttributes(new { @class = "l-combo" })
+              .Placeholder("all  authors")
+              .DataTextField("name")
+              .Filter(FilterType.Contains)
+              .MinLength(2)
+              .HighlightFirst(true)
+              .Enable(false)
+              .Events(e => e.Select("onAuthorSelected"))
+                .DataSource(source => source.Read(read => read.Action("GetAuthorsLOV", "WebStore", new { area = "AuthorAdmin" })))
+              .HtmlAttributes(new { @style = "width:140px;background-color:#fff" }))
+    </div>
+
+    <label class="inline" style="margin-right: 5px;">
+        <input type="radio" name="FilterMethod" value="SEARCH" onclick="onFilterOptionChanged(this)">
+        Search
+    </label>
+
+    <div class="inline">
+        @(Html.Kendo().AutoComplete()
+                            .Name("auItems")
+                            .DataTextField("ItemName")
+                            .Filter(FilterType.Contains)
+                            .MinLength(3)
+                            .Enable(false)
+                            .Events(e => e.Select("onSerachItemsSelected"))
+                            .HtmlAttributes(new { @style = "width:140px;background-color:#fff" })
+                            .DataSource(source =>
+                            {
+                                 source.Read(read =>
+                                 {
+                                     read.Action("FindAvailableItems", "WebStore").Data("onAdditionalData");
+                                 })
+                                 .ServerFiltering(true);
+                            })
+        )
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#ddlAuthors').val(null);
+            setFocusAuEvnt('ddlAuthors');
+
+            $('#auItems').val(null);
+            setFocusAuEvnt('auItems');
+        });
+      
+    </script>
+</div>
+<div class="cn-sort">
+    <label class="inline">Sort by</label>
+
+    <a class="inline" href="#" data-target="Author" data-state="none">
+        Author name
+        <i class="k-icon i-hidden"></i>
+    </a>
+
+    <a class="inline" href="#" data-target="ItemName" data-state="none">
+        Course/Bundle Name
+        <i class="k-icon i-hidden"></i>
+    </a>
+
+    <a class="inline" href="#" data-target="Price" data-state="none">
+        Price
+        <i class="k-icon i-hidden"></i>
+    </a>
+
+    <a class="inline" href="#" data-target="SubscriptionPrice" data-state="none">
+        Subscription Price
+        <i class="k-icon i-hidden"></i>
+    </a>
+    <a class="inline" href="#" data-target="Commission" data-state="none">
+        Commission
+        <i class="k-icon i-hidden"></i>
+    </a>
+</div>
+
+<script>
+    $(document).ready(function(){
+        bindItemSort();
+        $('#searchAuthorId').val(window.currentUserId);
+    });
+   
+</script>
+<input type="hidden" id="searchAuthorId"/>
+<input type="hidden" id="searchItemName" />
+<div class="item-list-header">
+    <div class="title">One time</div>
+    <div class="title">Monthly</div>
+    <div class="title">Commission</div>
+</div>
+<div id="d-available-content-container" class="nano" style="height: 460px;margin-top: 1px">
+    <div class="content">
+        @(Html.Kendo().ListView<WebStoreItemListDTO>()
+                .Name("StoreItems")
+                .TagName("ul")
+                .HtmlAttributes(new { @class = "ul-second-level no-drag" })
+                .ClientTemplateId("kendo-item-list-template")
+                .Editable()
+                .Events(e => e.DataBound("onStoreItemsListBound"))
+                .Selectable(s => s.Mode(ListViewSelectionMode.Multiple))
+                //.Pageable(p=>p.Enabled(true))
+                .DataSource(ds => ds.Read(read => read.Action("GetAllAvailableItems", "WebStore", new { area = "AuthorAdmin" }).Data("onItemsRequested").Type(HttpVerbs.Get)).ServerOperation(true) //.Events(e => e.RequestEnd("setItemsDraggable"))
+                .Model(m => m.Id("ItemId"))))
+    </div>
+</div>
+
+<script type="text/x-kendo-template" id="kendo-item-list-template">
+    <li data-val="-1" data-itemid="${ItemId}" class="li-st-item">
+        <div class="content-head-row">
+            <span class="float-left drag-box drag cn-drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-second">&nbsp;</span>
+            <div class="float-left ch-name">
+                <div class="au-name ellipsis" title="#=Encoder.htmlEncode(AuthorName)#">${AuthorName}</div>
+                <div class="it-name ellipsis" title="#=Encoder.htmlEncode(ItemName)#">${ItemName}</div>
+            </div>
+            <div class="float-right">
+                <div class="inline left si-w">
+                    #if(hasValue(Price)){#
+                    ${Price}$
+                    #} else{#
+                    &nbsp;
+                    #}#
+                </div>
+                <div class="inline left si-w">
+                    #if(hasValue(MonthlySubscriptionPrice)){#
+                    ${MonthlySubscriptionPrice}$
+                    #}#
+
+                </div>
+                <div class="inline left si-w">
+                    #: AffiliateCommission#%
+                </div>
+            </div>
+        </div>
+        <div class="cn-details" id="cat-cn-${ItemId}" style="display:none">
+            #if(hasValue(ItemPageUrl)){#
+            <a target='_blank' title='view item page' href='${ItemPageUrl}' class="a-preview-item">Preview #=ItemType==1 ? 'Course' : 'Bundle'#</a>
+            #}#
+            <div>
+                #if(Description!=null){#
+                #: Description#
+                #}#
+            </div>
+        </div>
+    </li>
+</script>

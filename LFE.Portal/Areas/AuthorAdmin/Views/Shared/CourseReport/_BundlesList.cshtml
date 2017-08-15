@@ -1,0 +1,133 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+
+
+@{
+	var kinds = new List<DataSourceSortToken>
+		{
+			new DataSourceSortToken
+				{
+					name    = "Name of Bundle"
+					,field  = "Name"
+					,dir    = "asc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "Date Add"
+					,field  = "AddOn"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name   = "Price"
+					,field = "Price"
+					,dir   = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "Number of Subscribers"
+					,field  = "LearnerCount"
+					,dir    = "desc"
+				},
+				new DataSourceSortToken
+				{
+					name    = "New Reviews"
+					,field  = "ReviewCount"
+					,dir    = "desc"
+				}
+		};
+}
+
+<script type="text/javascript">
+	var emptyHref = '#';
+	function onBundleListBound(e) {
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.report.bundleBound, total);
+		window.getNotifManagerInstance().unsubscribe(notifEvents.report.sortBundle, sortBundleList, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.report.sortBundle, sortBundleList, null);
+
+	    //bind delete button
+		var ds = e.sender.dataSource;
+		$.each(e.sender.wrapper.find('li'), function () {
+		    var li = $(this);
+		    var uid = li.attr('data-uid');
+		    var token = ds.getByUid(uid);
+		    var btn = li.find('.rem');
+		    btn.unbind('click').bind('click', function () {
+		        if (token.IsPurchased) {
+		            alert("Course already purchased and can't be deleted");
+		            return;
+		        }
+		        window.deleteBundle(token.BundleId, token.Name);
+		    });
+		    var aWiz = li.find('[data-role="open-wizard"]');
+		    aWiz.bind("click", function (ev) {
+		        ev.preventDefault();
+		        window.openWizardWindow(token.Uid);
+		    });
+		});
+	}
+	
+	
+
+	function onBundleDeleted(response) {
+	    if (response.success) {
+	        $('#AuthorBundles').data("kendoListView").dataSource.read();
+	    } else {
+	        alert(response.error);
+	    }
+	}
+
+	function sortBundleList(filter) {
+		$('#AuthorBundles').data("kendoListView").dataSource.sort(filter);
+	}
+</script>
+
+
+<div class="d-sort-row">
+	<label>Sort by:</label>
+	@(Html.Kendo().ListView<DataSourceSortToken>()
+			.Name( "lvBundleSort" )
+			.TagName( "ul" )
+			.ClientTemplateId( "kendo-sort-template" )
+			.BindTo( kinds )
+			.HtmlAttributes(new{@data_role="bundle"})
+			.Events( e => e.DataBound( "onSortFiltersBound" ) )     
+	)
+</div>
+
+<div style="width: 100%;text-align: center; ">
+	@(Html.Kendo().ListView<BundleListDTO>()
+		  .Name("AuthorBundles")
+		  .TagName("ul")  
+		  .HtmlAttributes(new{@class="ul-cb-list"})
+          .ClientTemplateId("kendo-bndl-template") 
+		  .Events(e=>e.DataBound("onBundleListBound"))         
+		  .DataSource(ds => ds.Read( read => read.Action("GetAuthorBundleList", "Course").Type(HttpVerbs.Get)).ServerOperation(false))
+	)
+</div>
+
+<script type="text/x-kendo-template" id="kendo-bndl-template">
+    <li title="${Name}" class="#=Status==1 ? 'draft' : (Status==2 ? 'pub' : '')#">
+        <a href="#='@Url.Action("EditBundle","Course")' + '/' + Uid#">
+            <div class="thumb" style="background-image: url('${ImageUrl}');">&nbsp;</div>
+        </a>
+        <label class="name ellipsis" title="${Name}">${Name}</label>
+        <div class="ul-f">
+            <span class="inline addon" title="add on">#= kendo.toString(AddOn,"MM/dd/yy") #</span>
+            <span class="inline free" style="display: #= MonthlySubscriptionPrice == null && Price==null ? '' : 'none !important' #">Not defined</span>
+            <span class="inline price" title="one time price" style="display: #=Price != null && !IsFree ? '' : 'none !important' #">#= kendo.toString(Price, "c") #</span>
+            <span class="inline price-subscr" title="subscription price" style="display: #=MonthlySubscriptionPrice != null && !IsFree ? '' : 'none !important' #">#= kendo.toString(MonthlySubscriptionPrice, "c") #</span>
+            <span class="inline stud" title="subscribers">${LearnerCount}</span>
+        </div>
+        <div class="cmd">
+            <span class="float-left status #=Status==1 ? 'draft' : (Status==2 ? 'pub' : '')#">&nbsp;</span>
+            
+            <a href="#=emptyHref#" class='list-cmd float-right rem' style="margin: 0 0 0 10px; display: #=LearnerCount==0 ? '' : 'none !important' #" title=''>Delete</a>
+
+            <a href="#='@Url.Action("EditBundle","Course")' + '/' + Uid#" class='list-cmd float-right'>Edit</a>
+
+            
+        </div>
+    </li>
+</script>

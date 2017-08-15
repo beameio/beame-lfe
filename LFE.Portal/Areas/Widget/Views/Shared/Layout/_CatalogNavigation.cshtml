@@ -1,0 +1,52 @@
+﻿@using LFE.Core.Utils
+@model LFE.DataTokens.IndexModelViewToken
+@{
+    var viewModel = ViewBag.MainLayoutViewModel == null ? null : (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var trackingId = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "";
+    var isLfeStore = !String.IsNullOrEmpty(trackingId) && trackingId == Constants.LFE_MAIN_STORE_TRACKING_ID;
+}
+
+<div class="navbar navbar-default cat-nav" role="navigation">
+    <div class="container">        
+       @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_NavbarHeader.cshtml")
+        <div class="navbar-collapse collapse nav-catalog" id="nav-catalog">
+            <div class="row">
+                <div class="col nav-menu col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="inner">
+                        @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_NavViewOptions.cshtml")
+                    </div>
+                </div>
+                <div class="col nav-menu col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="inner second-child">
+                        @Html.Partial("~/Areas/Widget/Views/Shared/Layout/_CatalogSort.cshtml")
+                    </div>
+                </div>
+                @{
+                    if (isLfeStore)
+                    {
+                        <div class="col nav-menu col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                            <div class="inner">
+                                <div style="padding: 9px 7px 0 7px">
+                                    <input id="combo-lfe-authors" class="l-k-input" />    
+                                </div>                                
+                            </div>
+                        </div>
+                        <div class="col nav-menu col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                            <div class="inner">
+                                <div style="padding: 9px 7px 0 7px">
+                                    <input id="au-lfe-item" class="l-k-input" />
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="col col-lg-3 hidden-xs hidden-sm hidden-md">&nbsp;</div>
+                        <div class="col col-xs-3 hidden-xs hidden-sm hidden-md">&nbsp;</div>
+                    }
+}
+            </div>                
+        </div><!--/.nav-collapse -->
+    </div>
+</div>

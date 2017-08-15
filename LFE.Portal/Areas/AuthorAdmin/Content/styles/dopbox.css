@@ -1,0 +1,28 @@
+﻿.inner-content{padding: 7px}
+.head{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-drop-head.png') no-repeat 7px 7px #2a2a2a;color: #fff;height: 45px;width: 100%;margin-bottom: 7px;}
+.head .h-title{ padding: 10px 0 0 45px;font-size: 20px;text-transform: uppercase;font-weight: bold}
+
+.info-panel{ background: #cfcfcf;color: #000;padding: 15px 20px 15px 45px;margin-bottom: 7px;}
+.info-panel .i-title{ margin-bottom: 7px;}
+.info-panel p{font-size: 14px}
+
+.drop-buttons{width: 220px;height: 25px;padding:10px 0 3px 50px;color: #fff;text-transform: uppercase;background: #0e3cb4;background-repeat: no-repeat;background-position: 7px 7px;cursor: pointer;}
+.drop-buttons.simulate{background-image: url('../../../../Areas/AuthorAdmin/Content/images/ico-drop-simulate.png')}
+.drop-buttons.create{background-image: url('../../../../Areas/AuthorAdmin/Content/images/ico-drop-create.png')}
+
+
+.drop-zone{ background: #f5f5f5;padding: 15px;height: 540px}
+
+.drop-zone .left{ width:450px;margin-right: 15px;}
+.drop-zone .tri-title{margin-bottom: 7px;padding-bottom: 15px;border-bottom: dotted 1px #000}
+
+#d-tree-container{ max-height: 500px;}
+.drop-zone .right{ width: 450px;}
+
+.c-title{font-weight: bold;font-size: 16px;text-transform: uppercase;}
+label.c-title{ display: block;margin-bottom: 12px}
+
+#p-c-desc{font-size: 12px;max-height: 100px}
+#c-c-container{max-height:500px}
+.ul-course-simulator{ margin-top: 10px;width: 440px}
+.ul-course-simulator li{margin-bottom: 5px;padding: 7px;border: solid 1px #a4a4a4}

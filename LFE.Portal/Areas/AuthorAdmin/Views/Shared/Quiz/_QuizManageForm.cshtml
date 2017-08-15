@@ -1,0 +1,98 @@
+﻿@model LFE.DataTokens.QuizBaseDTO
+@{
+    var quizEditUrl = Url.Action("_QuizEditForm", "Quiz", new { area = "AuthorAdmin", id = Model.QuizId,cid = Model.CourseId });
+    var quizQuestionUrl = Url.Action("_QuizQuestions", "Quiz", new { area = "AuthorAdmin", id = Model.QuizId, cid = Model.CourseId });       
+}
+
+<div class="col-lg-12 quiz-head">
+    <div class="tab-container">
+        <ul class="nav nav-tabs" id="quiz-nav-tabs">
+            <li class="tab">
+                <a id="a-quiz-edit-tab" href="#paneQuizEdit" data-action="EDIT_QUIZ" data-toggle="tab" data-url="@quizEditUrl" role="tab">Quiz Details</a>
+            </li>
+            <li class="tab @(Model.Sid < 0 ? "disabled" : "")">
+                <a id="a-quest-manage-tab" href="#paneQuestManage" data-action="QUIZ_QUESTIONS" data-toggle="tab" data-url="@quizQuestionUrl" role="tab">Add/Edit Questions</a>
+            </li>
+        </ul>      
+    </div> 
+</div>
+
+
+<section class="col-lg-12 s-quiz_form" id="s-qz-content">
+    <div class="row">
+        <div class="tab-content col col-xs-12" id="d-tab-content">
+            <div role="tabpanel" class="tab-pane fade" id="paneQuizEdit"></div>
+            <div role="tabpanel" class="tab-pane fade" id="paneQuestManage"></div>
+        </div>
+    </div>
+</section>
+
+<script>
+    
+    $(document).ready(function () {
+        var request = window.parseQuizHash();     
+        onQuizTabActions(request);
+
+        initQuizTabEvents();
+
+        //window.getNotifManagerInstance().unsubscribe(notifEvents.quiz.quizAdd, onNewQuizAdd, null);
+        //window.getNotifManagerInstance().subscribe(notifEvents.quiz.quizAdd, onNewQuizAdd, null);
+    });
+
+    //function onNewQuizAdd() {
+        
+    //}
+
+
+    function onQuizTabActions(request) {
+
+        // console.log('qmf');
+        // console.log(request);
+
+        switch (request.action) {
+        case window.QuizActions.EDIT_QUIZ:
+            setTimeout(function () {
+                $('#a-quiz-edit-tab').tab('show');
+            }, 100);
+            break;
+        case window.QuizActions.QUIZ_QUESTIONS:
+            setTimeout(function () {
+                $('#a-quest-manage-tab').tab('show');
+            }, 10);
+            break;
+        }
+    }
+
+    function initQuizTabEvents() {
+
+        $('#quiz-nav-tabs > li > a[data-toggle="tab"]').on("click", function (e) {
+            if ($(this).parent().hasClass("disabled")) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        });
+
+        $('#quiz-nav-tabs > li > a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            
+            var action = $(this).attr("data-action");
+            window.location.hash = action + window.hashSeparator + '@Model.QuizId';
+
+            var url = $(this).attr("data-url");
+
+            var target = $(e.target).attr("href"); 
+
+            var pane = $(this);
+            $(target).load(url, function () {
+                pane.tab('show');
+                onQestContentLoaded();
+            });           
+        });
+       
+
+    }
+
+    function onQestContentLoaded() {
+        $("html, body").animate({ scrollTop: 0 }, 450);
+    }
+</script>

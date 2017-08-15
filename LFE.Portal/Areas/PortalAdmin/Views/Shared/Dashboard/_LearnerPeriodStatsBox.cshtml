@@ -1,0 +1,27 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.LearnerPeriodStatsBoxToken
+           
+<div class="total-box">
+    <div class="box-inner">
+        @{
+            <div class="title">@(Utils.GetEnumDescription(Model.Type))</div>
+            <div class="total">
+                @{
+                    if (!String.IsNullOrEmpty(Model.DisplayedValue))
+                    {
+                        <span class="inline">@Model.DisplayedValue</span>
+                        <i title="@Model.Tendency.Tooltip" class="tend @Html.TendencyDirection2CssClass(Model.Tendency.Direction,"arrow-")"></i>
+                    }
+                }                
+            </div>
+            if (Model.Related != null)
+            {
+                <div class="cb">
+                    @(Utils.GetEnumDescription(Model.Related.Type)) <span class="num">@Model.Related.DisplayedValue</span> <i title="@Model.Related.Tendency.Tooltip" class="tend @Html.TendencyDirection2CssClass(Model.Related.Tendency.Direction,"arrow-")"></i>
+                </div>
+            }
+
+    }       
+    </div>
+</div>

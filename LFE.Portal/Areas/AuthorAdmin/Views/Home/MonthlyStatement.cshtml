@@ -1,0 +1,123 @@
+﻿@using System.Globalization
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@model MonthlyStatmentPrintToken
+@{
+    Layout = null;
+
+  
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>MonthlyStatement</title>
+    @*<script language="javascript" type="text/javascript" src="@Url.Content("~/Scripts/kendo/" + Url.ToKendoVersionUrl() + "/kendo.dataviz.min.js")"></script>*@
+</head>
+<body>
+    <div style="width: 100%; text-align: center;">
+        @{
+            if (Model.IsValid && Model.Statments.Any())
+            {
+
+                var nextMonth = new DateTime(Model.Statments[0].Year, Model.Statments[0].Month, 1).AddMonths(1);
+                var payoutDefined = Model.Statments[0].PayoutTypeId != null;
+                
+                <table style="width: 610px; margin: 10px auto; color: #000 !important">
+                    <tr>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td style="padding-bottom: 5px;border-bottom: solid 2px #999 !important">
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td style="width: 50%;text-align: left">
+                                                    <img src="@(String.Format("{0}Content/images/em-logo.png", Utils.GetKeyValue("baseUrl")))" alt="" />
+                                                </td>
+                                                <td style="width: 50%;text-align: right;vertical-align: bottom">
+                                                    <a href="@(Utils.GetKeyValue("homeUrl"))" style="color: blue !important">@(Utils.GetKeyValue("homeUrl"))</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height: 20px;padding: 15px 0 10px;text-align: left;color:#000;font-size: 20px;font-weight: bold;border-bottom: solid 1px #f2f2f2 !important">
+                                        Thanks for using LFE! Here’s your monthly statement:
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size: 15px;color: #000;text-align: left;padding: 10px 0">
+                                        Hi, @Model.Statments[0].User.FullName
+                                        <p style="line-height: 20px;padding: 5px 0 0">
+                                            We appreciate your business and thank you for choosing LFE. Here is the summary of your
+                                            <br />
+                                            monthly statement for the month of <b>@(String.Format("{0} {1}", CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.Statments[0].Month), Model.Statments[0].Year))</b>.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>                        
+                    </tr>
+                    @{
+                        foreach (var statment in Model.Statments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.Partial("~/Views/Shared/Billing/MonthlyStatement/_Totals.cshtml", statment)
+                                </td>
+                            </tr>
+                        }
+                    } 
+                    
+                    @*<tr>
+                        <td style="font-size: 15px;color: #000;text-align: left;padding: 15px 0 5px">
+                            This amount will be paid according to the payment method you defined in your Payout preferences:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: solid 2px #ddd !important; border-top-color: @(payoutDefined ? "#5ba71b" : "red") !important;border-top-width: 5px !important;padding: 18px 0 18px 20px;text-align: left;font-size: 13px;color: #000">
+                            <table>
+                                <tr>
+                                    <td style="width: 42px; height: 42px; padding-right: 15px;">
+                                        <img src="@(String.Format("{0}Content/images/icons/ico-{1}-42.png", Utils.GetKeyValue("baseUrl"), payoutDefined ? "ok" : "error"))" alt="" />
+                                    </td>
+                                    <td style="line-height: 20px;">
+                                        @{
+                                                if (payoutDefined)
+                                                {
+                                                    <div>
+                                                        Automatic payment method: <b>@Model.Statments[0].PaymentMethodName</b>
+                                                    </div>
+                                                    <div>
+                                                        Date: <b>@(String.Format("{0} 1, {1}", CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(nextMonth.Month), nextMonth.Year))</b>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <h3 style="text-transform: uppercase;font-size: 22px">Author payment method not defined</h3>
+                                                }
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>*@
+                   
+                    @*<tr>
+                        <td style="padding: 0">
+                            @Html.Partial("~/Views/Shared/Billing/MonthlyStatement/_Footer.cshtml",Model)
+                        </td>
+                    </tr>*@
+                </table>
+            }
+            else
+            {
+                <h1>@Model.Message</h1>
+            }
+        }        
+    </div>
+</body>
+</html>

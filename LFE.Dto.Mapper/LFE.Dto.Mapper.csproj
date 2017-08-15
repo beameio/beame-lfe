@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E36E90A0-005A-4AB9-9ED8-AE28AC2E6AC9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LFE.Dto.Mapper</RootNamespace>
+    <AssemblyName>LFE.Dto.Mapper</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MailChimp">
+      <HintPath>..\packages\MailChimp.NET.1.1.41.0\lib\net35\MailChimp.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPal, Version=1.7.2.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPal.1.7.2\lib\net45\PayPal.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPalCoreSDK, Version=1.7.0.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPalCoreSDK.1.7.0\lib\net45\PayPalCoreSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PayPalMerchantSDK, Version=2.16.117.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPalMerchantSDK.2.16.117\lib\net20\PayPalMerchantSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DtoMappers\BillingDtoMapper.cs" />
+    <Compile Include="DtoMappers\CategoryDtoMapper.cs" />
+    <Compile Include="DtoMappers\CertificateDtoMapper.cs" />
+    <Compile Include="DtoMappers\CouponDtoMapper.cs" />
+    <Compile Include="DtoMappers\CourseDtoMapper.cs" />
+    <Compile Include="DtoMappers\DiscussionDtoMapper.cs" />
+    <Compile Include="DtoMappers\EmailDtoMapper.cs" />
+    <Compile Include="DtoMappers\FileDtoMapper.cs" />
+    <Compile Include="DtoMappers\GeoDtoMapper.cs" />
+    <Compile Include="DtoMappers\ItemDtoMapper.cs" />
+    <Compile Include="DtoMappers\LogDtoMapper.cs" />
+    <Compile Include="DtoMappers\MailchimpDtoMapper.cs" />
+    <Compile Include="DtoMappers\MessageDtoMapper.cs" />
+    <Compile Include="DtoMappers\PayoutDtoMapper.cs" />
+    <Compile Include="DtoMappers\PluginDtoMapper.cs" />
+    <Compile Include="DtoMappers\QuizDtoMapper.cs" />
+    <Compile Include="DtoMappers\ReportDtoMapper.cs" />
+    <Compile Include="DtoMappers\SaleOrderDtoMapper.cs" />
+    <Compile Include="DtoMappers\UserDtoMapper.cs" />
+    <Compile Include="DtoMappers\WebStoreDtoMapper.cs" />
+    <Compile Include="DtoMappers\WidgetDtoMapper.cs" />
+    <Compile Include="EntityMapper\AuthorEntityMapper.cs" />
+    <Compile Include="EntityMapper\BillingEntityMapper.cs" />
+    <Compile Include="EntityMapper\CertificateEntityMapper.cs" />
+    <Compile Include="EntityMapper\CouponEntityMapper.cs" />
+    <Compile Include="EntityMapper\CourseEntityMapper.cs" />
+    <Compile Include="EntityMapper\DiscussionEntityMapper.cs" />
+    <Compile Include="EntityMapper\EmailEntityMapper.cs" />
+    <Compile Include="EntityMapper\FbEntityMapper.cs" />
+    <Compile Include="EntityMapper\FileEntityMapper.cs" />
+    <Compile Include="EntityMapper\MailchimpEntityMapper.cs" />
+    <Compile Include="EntityMapper\PayoutEntityMapper.cs" />
+    <Compile Include="EntityMapper\PaypalEntityMapper.cs" />
+    <Compile Include="EntityMapper\PluginEntityMapper.cs" />
+    <Compile Include="EntityMapper\QuizEntityMapper.cs" />
+    <Compile Include="EntityMapper\UserEntityMapper.cs" />
+    <Compile Include="EntityMapper\WebStoreEntityMapper.cs" />
+    <Compile Include="Helper\DtoHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DtoMappers\AuthorDtoMapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LFE.Core.Enums\LFE.Core.Enums.csproj">
+      <Project>{2C9FE912-3791-4658-AF46-C77D51DB86DD}</Project>
+      <Name>LFE.Core.Enums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Core.Extensions\LFE.Core.Extensions.csproj">
+      <Project>{7F4F29C2-9FDC-426F-A5BE-24C1A6B662E1}</Project>
+      <Name>LFE.Core.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Core.Utils\LFE.Core.Utils.csproj">
+      <Project>{D29FE10C-BBD6-4CA1-AEC9-C1B45C72881B}</Project>
+      <Name>LFE.Core.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.DataTokens\LFE.DataTokens.csproj">
+      <Project>{D547A46C-CF9C-425A-AE0E-D3408987B073}</Project>
+      <Name>LFE.DataTokens</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Infrastructure\LFE.Infrastructure.NLogger.csproj">
+      <Project>{89A761E3-EA84-4F74-AFFD-7435DE0274B0}</Project>
+      <Name>LFE.Infrastructure.NLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LFE.Model\LFE.Model.csproj">
+      <Project>{6D6C3D7D-B3EC-41E4-BB23-56918A247F10}</Project>
+      <Name>LFE.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

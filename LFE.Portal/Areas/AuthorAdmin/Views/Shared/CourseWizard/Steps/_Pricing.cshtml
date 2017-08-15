@@ -1,0 +1,78 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model  WizardCoursePricingDTO
+<style scoped="scoped">
+	.k-numeric-wrap.k-state-default{background:#fff!important;-ms-border-radius:0!important;border-radius: 0 !important;border-color: #000 !important}
+</style>
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmCoursePrice';
+	
+	$(document).ready(function () {
+
+		window.isFormInEditMode = false;
+		
+		
+		//setCover();
+		//window.getNotifManagerInstance().unsubscribe(notifEvents.course.priceLinesBound, setCover, null);
+		//window.getNotifManagerInstance().subscribe(notifEvents.course.priceLinesBound, setCover, null);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, submitStep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, submitStep, null);
+	});
+	
+	//function setCover() {
+	//    var c = $('#pl-container');
+	//    $('#d-free-cover').width(c.width() + 50).height(c.height()).css({ top: c.offset().top + 'px' });
+	//}
+
+	function submitStep() {
+		$(EDIT_FORM_SELECTOR).submit();
+	}
+
+	function onCoursePriceSaved(response) {
+		hideFormLoader();
+
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Course price saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+			setTimeout(function() {
+				window.getNotifManagerInstance().notify(notifEvents.wizard.stepSaved, null);
+			},500);
+				   
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+
+	function onPriceSaving() {
+		var free = $('#frmCoursePrice #IsFree').is(":checked");
+
+		if (free && $('#CoursePrices > li').length > 0) {
+			if (!window.confirm('Price lines already defined for course and will be removed. Are You sure?')) return false;
+		}
+		return true;
+	}	
+</script>
+
+<div style="margin:30px  0 10px;width:640px">
+	@using (Ajax.BeginForm("SaveWizardCoursePrice", "Course", null, new AjaxOptions {  OnSuccess = "onCoursePriceSaved", LoadingElementId = "site-loader" }, new { @id = "frmCoursePrice", @class = "ajax-form" }))
+	{
+		@Html.HiddenFor(x=>x.CourseId)
+		@Html.HiddenFor(x=>x.Uid)
+
+		@*@Html.Partial("Pricing/_ManageCoursePriceMeta", Model)*@
+		@Html.Partial("Pricing/_ManageAffiliateCommission", new ItemAffiliateCommissionDTO { ItemId = Model.CourseId, ItemType = BillingEnums.ePurchaseItemTypes.COURSE, AffiliateCommission = Model.AffiliateCommission })
+	}
+	
+	@*<div style="display:@(Model.IsFree ? "block" :"none");left: 30px " class="d-cover" id="d-free-cover"></div>*@ 
+
+	@Html.Partial("Pricing/_ManageItemPrices", new PriceLinesManageToken
+	{
+		Item = new BaseItemToken { ItemId = Model.CourseId, ItemType = BillingEnums.ePurchaseItemTypes.COURSE }
+		,Currency = Model.Currency
+	})
+</div>
+  

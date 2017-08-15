@@ -1,0 +1,17 @@
+﻿@model LFE.DataTokens.WizardChapterListEditDTO
+
+
+<li class="in-edit">
+    @using (Ajax.BeginForm("RenameChapter", "Course", new{area="AuthorAdmin"}, new AjaxOptions { OnSuccess = "onChapterRenamed" }, new { @id = "frmEditChapter", @style = "" }))
+    {
+        @Html.HiddenFor(m => m.ChapterId)
+        @Html.HiddenFor(m => m.OrderIndex)
+        <div class="float-left">
+            <div class="img-move inline">&nbsp;</div>	<div class="inline">@Html.TextBoxFor(m => m.Name, new {@class = "wiz-txt-inp", @style = "height:20px", @size = 50, @maxlength = 50})</div>
+        </div>
+    }
+    <div class="float-right">       
+        <a class="btn-action k-update-button" href="\\#">Update</a>
+        <a class="btn-action k-cancel-button" href="\\#">Cancel</a>
+    </div>        
+</li>

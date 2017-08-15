@@ -1,0 +1,187 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "Quiz Report";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+<style scoped>
+    .list-cmd > .k-icon{display: none}
+</style>
+<link href="~/Content/styles/common.css" rel="stylesheet" />
+<script>
+	var quizEditWndUrl             = '@Url.Action("_QuizManageForm", "Quiz", new {area = "AuthorAdmin"})';
+	var quizResponseWndUrl         = '@Url.Action("_ResponseToStudent", "Quiz", new {area = "AuthorAdmin"})';
+	var attemptsWndUrl             = '@Url.Action("_StudentAttemptsWnd", "Quiz", new {area = "AuthorAdmin"})';
+	var WND_QUIZ_MANAGE_SELECTOR   = '#wndQuizManage';
+	var WND_QUIZ_RESPONSE_SELECTOR = '#wndQuizResponse';
+	var QUIZ_REP_SELECTOR          = '#UserQuizzesReport';
+</script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.js"></script>
+<script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.quiz.rep.js"></script>
+<script>
+
+	$(document).ready(function () {
+		
+	});
+
+	function openQuizWnd(id,cid, title) {
+
+		var wnd = $(window.WND_QUIZ_MANAGE_SELECTOR).data("kendoWindow");
+		var url = window.quizEditWndUrl + '?id=' + id + '&cid=' + cid;
+
+		var t = title == null ? "Add Quiz" : title;
+		wnd.title(t);
+		wnd.bind("close", onQuizEditWndClosed);
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+	function onQuizEditClicked(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));       
+		window.openQuizWnd(dataItem.QuizId,dataItem.CourseId, dataItem.Title);
+	}
+
+	
+	function onViewAttemptsClicked(e) {
+		e.preventDefault();
+		var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+		var wnd = $(window.WND_QUIZ_RESPONSE_SELECTOR).data("kendoWindow");
+		var url = window.attemptsWndUrl + '?id=' + dataItem.StudentQuizId;
+		var t = "Student " + dataItem.Student.FullName + " attempts report";
+		wnd.title(t);
+		wnd.refresh(url);
+		wnd.center();
+		wnd.open();
+	}
+
+	
+</script>
+<style scoped="scoped">
+    .k-filter-row > th{border: none;padding: 15px 0;}
+</style>
+<h2 style="margin-bottom: 10px; font-size: 20pt;color: #333">Quiz Report</h2>
+
+@(Html.Kendo().Grid<QuizListDTO>()
+        .Name("UserQuizzesReport")
+        .HtmlAttributes(new { @style = "" })
+        .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+        .HtmlAttributes(new { @style = "" })
+        .Columns(columns =>
+        {
+            columns.Bound(m => m.Author.FullName).Title("Author").Width(150);
+            columns.Bound(p => p.CourseName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(CourseName)#'style='width:150px;'>${CourseName}</div>").Title("Course").Width(150);
+            columns.Bound(p => p.Title).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(Title)#'style='width:150px;'>${Title}</div>").Title("Quiz Name").Width(150);
+            columns.Bound(p => p.NumOfAttempts).Width(50).Title("Attempts").Filterable(false);
+            columns.Bound(p => p.TimeLimitation).Width(80).Title("Time Limit").Filterable(false);
+            columns.Bound(p => p.TotalPass).Width(80).Title("Total Pass").Filterable(false);
+            columns.Bound(p => p.TotalFailed).Width(80).Title("Total Failed").Filterable(false);			
+            columns.Bound(p => p.Status).Title("Status").Width(100).Filterable(false);            						
+            columns.Command(c => c.Custom("Edit").Click("onQuizEditClicked")).Width(50).Title(" ");
+        })
+        .ClientDetailTemplateId("template-quiz-students")
+        .Sortable()
+        .Pageable(pager => pager.Refresh(true).PageSizes(true).Numeric(true))
+        .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Row))
+        .DataSource(dataSource => dataSource.Ajax()
+        .Model(model => model.Id(p => p.QuizId))
+        .Read(read => read.Action("GetUserQuizzes", "Report", new { area="PortalAdmin"}).Type(HttpVerbs.Get))								
+        .PageSize(20))
+)
+
+
+<script id="template-quiz-students" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentQuizDTO>()
+		  .Name("lines_#=QuizId#")
+		  .TableHtmlAttributes(new {@style = "background-image: none !important;"})
+		  .Columns(columns =>
+		  {
+			  columns.Bound(p => p.Student.FullName).Title("Student").Width(200);
+			  columns.Bound(p => p.Student.Email).Title("Email").Width(150).ClientTemplate("<a  style='width:100px;color:blue;' href='mailto:\\#= Student.Email \\#'>\\#= Student.Email \\#</a>");
+			  columns.Bound(p => p.UserScore).Title("Score").Width(80);
+			  columns.Bound(p => p.IsSuccess).Title("Pass").Width(80).ClientTemplate("\\#= IsSuccess ? 'Yes' : 'No' \\#");
+			  columns.Bound(p => p.AvailableAttempts).Title("Attempts Rest").Width(120);
+			  columns.Bound(p => p.LastAttemptDate).Title("Last").Format("{0:d}").Width(80);
+			  columns.Command(c => c.Custom("Reset Attempts").Click("onResetAttemptsClicked")).Width(100).Title(" ");
+			  columns.Command(c => c.Custom("View Attempts").Click("onViewAttemptsClicked")).Width(100).Title(" ");
+		  })
+		  .Sortable(s => s.Enabled(false))
+		  .Pageable(pager => pager.Enabled(false))
+		  .Filterable(f => f.Enabled(false))
+		  .Events(e => e.DataBound("onQuizStudentsBound"))
+		 // .ClientDetailTemplateId("template-quiz-student-attempts")
+		  .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.StudentQuizId)).Read(read => read.Action("GetQuizStudents", "Quiz", new {id = "#=QuizId#"}).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+<script id="template-quiz-student-attempts" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentQuizAttemptDTO>()
+		.Name("lines_#=StudentQuizId#")
+		.TableHtmlAttributes(new {@style = "background-image: none !important;"})
+		.Columns(columns =>
+		{
+			columns.Bound(p => p.UserScore).Title("Score").Width(80);
+			columns.Bound(p => p.IsSuccess).Title("Pass").Width(80).ClientTemplate("\\#= IsSuccess ? 'Yes' : 'No' \\#");              
+			columns.Bound(p => p.StartOn).Title("Completion Date").Format("{0:d}").Width(80);
+			  
+		})
+		.Sortable(s => s.Enabled(false))
+		.Pageable(pager => pager.Enabled(false))
+		.Filterable(f => f.Enabled(false))
+		.ClientDetailTemplateId("template-student-attempt-answers")
+		.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.AttemptId)).Read(read => read.Action("GetStudentsQuizAttempts", "Quiz", new {id = "#=StudentQuizId#"}).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+<script id="template-student-attempt-answers" type="text/kendo-tmpl">
+	@(Html.Kendo().Grid<StudentAnswerToken>()
+					.Name("lines_#=AttemptId#")
+		   .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+		   .Columns(columns =>
+			{
+				columns.Bound(p => p.Question).Title("Question").Width(250);
+				columns.Bound(p => p.Answer).Title("Answer").Width(250);
+				columns.Bound(p => p.IsCorrect).Title("Correct").Width(80).ClientTemplate("\\#= IsCorrect ? 'Yes' : 'No' \\#");
+				columns.Bound(p => p.Score).Width(80);
+			})
+			.Sortable(s => s.Enabled(false))
+			.Pageable(pager => pager.Enabled(false))
+			.Filterable(f => f.Enabled(false))
+							.DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.AttemptId)).Read(read => read.Action("GetStudentsAttemptAnswers", "Quiz", new { id = "#=AttemptId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+	)
+</script>
+
+
+
+@(Html.Kendo().Window()
+	.Name("wndQuizManage")
+	.Title(" ")
+	.Draggable(false)
+	.HtmlAttributes(new { @style = "overflow:hidden;" })
+	.Actions(actions => actions.Close())
+	.Resizable(builder => builder.Enabled(false))
+	.Visible(false)
+	.Height(700)
+	.Width(1160)
+	.Iframe(true)
+	.Modal(true)
+	.Animation(false)
+	.Content("loading .....")
+)
+
+@(Html.Kendo().Window()
+	.Name("wndQuizResponse")
+	.Title(" ")
+	.Draggable(false)
+	.HtmlAttributes(new { @style = "overflow:hidden;" })
+	.Actions(actions => actions.Close())
+	.Resizable(builder => builder.Enabled(false))
+	.Visible(false)
+	.Height(600)
+	.Width(960)
+	.Modal(true)
+	.Animation(false)    
+	.Content("loading .....")
+)

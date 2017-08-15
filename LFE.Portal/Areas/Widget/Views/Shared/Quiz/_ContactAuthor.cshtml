@@ -1,0 +1,55 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+@model StudentQuizDTO
+           
+@{
+    if (Model.IsValid)
+    {
+         <div class="quiz-head">
+            <div class="inner row">
+                <div class="float-left">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_AttemptsCounter.cshtml", new AttemptCounterToken { Attempts = Model.Quiz.Attempts, UserAttempts = Model.UserAttempts, IsCompleteForm = true })
+                </div>
+
+                <div class="float-right">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_StaticTimer.cshtml", Model.Quiz.TimeLimit)
+                </div>
+            </div>
+        </div>
+        <div class="quiz-content-container post">
+            <div class="qz-contact-form">
+                <div class="c-title">
+                    <h4>Contact Author</h4>
+
+                    <label class="detail-info">Enter your message</label>
+                </div>
+
+                <div class="">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_PostMessage.cshtml", new StudentMessageDTO { StudentQuizId = Model.StudentQuizId, QuizId = Model.Quiz.QuizId })
+                </div>
+            </div>
+
+           
+
+            <div class="bottom-row">
+                <div class="inner row">
+                    <label>SEND</label>
+                    <div class="btn-nav ft-action inline" id="btn-send-req">
+                        <i></i>
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#btn-send-req').unbind('click').bind('click', function () {
+                                $('#frm-qz-post-msg').submit();
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}

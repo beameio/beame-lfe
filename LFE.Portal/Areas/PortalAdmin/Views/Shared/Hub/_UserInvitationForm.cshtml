@@ -1,0 +1,43 @@
+﻿@model LFE.DataTokens.HubUserInvitationDTO
+<script>
+    $(document).ready(function () {
+
+        var form = $('#frmSendInvitation');
+
+        initUnobstructiveFormValidation(form);
+
+    });
+
+    function onInvitationSent(response) {
+        hideLoader();
+        if (response.success) {
+            swal("Invitation sent to " + $('#frmSendInvitation #Email').val(), "", "success");
+            $('#frmSendInvitation #Email').val(null);
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+</script>      
+<div class="d-invite-container">
+    @using (Ajax.BeginForm("SendUserInvitation", "Hub", new { Model.HubId }, new AjaxOptions { OnBegin = "javaScript:window.showFormLoader('#d-hub-container');", OnSuccess = "onInvitationSent" }, new { @id = "frmSendInvitation", @style = "" }))
+    {
+        <fieldset style="padding: 10px">
+            <legend style="display: block !important;padding: 7px;font-size: 18px;font-weight: bold">Send User invitation</legend>
+
+
+            <div class="row">
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Email)
+                </div>
+                <div class="editor-field">
+                    @Html.EditorFor(model => model.Email)
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+            </div>
+
+            <p>
+                <input class="l-button" type="submit" value="Send Invitation" />
+            </p>
+        </fieldset>
+    }
+</div>

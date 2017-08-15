@@ -1,0 +1,30 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.UserProfileCartToken
+
+
+<div class="user-cart">
+		<div class="profile-pic inline">
+			<img src="@Model.Profile.PhotoUrl" alt="@Model.Profile.fullName" />
+		</div>
+		<div class="inline data">
+			<span class="user-name">
+				@Model.Profile.fullName    
+			</span>
+			<div class="cnt-container">
+				@{
+					if (Model.TotalTeach > 0)
+					{
+						<div class="row">
+							Teaches <span class="cc">@Model.TotalTeach Courses</span>
+						</div>
+					}
+					
+					if (Model.TotalLearn > 0)
+					{
+						<div class="row">
+							Learns <span class="cc">@Model.TotalLearn Courses</span>
+						</div>
+					}
+				}
+			</div>
+		</div>    
+	</div>

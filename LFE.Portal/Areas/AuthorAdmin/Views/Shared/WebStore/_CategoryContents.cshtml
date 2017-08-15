@@ -1,0 +1,78 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.WebstoreCategoryContentsToken
+
+           
+
+    @(Html.Kendo().ListView<WebStoreItemListDTO>()
+            .Name("CategoryItems_" + Model.CategoryId)
+            .TagName("ul")
+            .HtmlAttributes(new { @class = "ul-second-level ul-cat-items" })
+            .ClientTemplateId("kendo-ci-list-template")
+            .Events(e => e.DataBound("onCategoryContentsListBound"))
+                    .DataSource(ds => ds.Read(read => read.Action("GetStoreCategoryItemsList", "WebStore", new { id = Model.CategoryId }).Type(HttpVerbs.Get))
+                    .Destroy("DeleteCategoryItem", "WebStore").ServerOperation(false)
+                            .Model(m => m.Id("WebstoreItemId")))
+    )
+
+@*@(Html.Kendo().Sortable()
+        .For("#CourseChapters")
+        .Filter(".li-cat-content")
+        .Handler(".drag")
+        .HintHandler("onChapterHint")
+        .PlaceholderHandler("placeholder")
+        .Events(events => events.Change("onChapterSortChanged"))
+)*@
+
+<script type="text/x-kendo-template" id="kendo-ci-list-template">
+    <li data-val="${WebstoreItemId}" data-itemid="${ItemId}" class="li-cat-content">
+        <div class="content-head-row">
+            <span class="float-left drag-box drag cn-drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-second">&nbsp;</span>
+            <div class="float-left ch-name">
+                <div class="au-name ellipsis" title="#=Encoder.htmlEncode(AuthorName)#">${AuthorName}</div>
+                <div class="it-name ellipsis" title="#=Encoder.htmlEncode(ItemName)#">${ItemName}</div>
+            </div>
+            <span class="float-right btn-area left" style="width:75px;">
+                <span class="row-btn btn-remove inline pt9" title="Delete item" data-val="${WebstoreItemId}"><span class="ico"></span></span>
+            </span>
+        </div>
+        <div class="cn-details" id="cat-cn-${WebstoreItemId}" style="display:none">
+            <div class="inner">
+                #if(hasValue(ItemPageUrl)){#
+                <a target='_blank' title='view item page' href='${ItemPageUrl}' class="a-preview-item">Preview #=ItemType==1 ? 'Course' : 'Bundle'#</a>
+                #}#
+                <div class="price-row">
+                    <div class="inline ci-w">
+                        #if(hasValue(Price)){#
+                        ${Price}$ One-Time
+                        #} else{#
+                        &nbsp;
+                        #}#
+                    </div>
+                    <div class="inline ci-w">
+                        #if(hasValue(MonthlySubscriptionPrice)){#
+                        ${MonthlySubscriptionPrice}$ / month
+                        #}#
+
+                    </div>
+                    <div class="inline ci-w">
+                        #: AffiliateCommission#% Commission
+                    </div>
+                </div>
+                <div>
+                    #if(Description!=null){#
+                    #: Description#
+                    #}#
+                </div>
+            </div>
+        </div>
+    </li>
+</script>
+   
+@*@(Html.Kendo().Sortable()
+            .For("#ChapterVideos_" + Model.ChapterId)
+            .HintHandler("onContentHint")
+            .PlaceholderHandler("placeholder")
+            .Handler(".drag")
+            .Events(events => events.Change("onVideoSortChanged"))
+        )*@

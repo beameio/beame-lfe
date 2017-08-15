@@ -1,0 +1,134 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Helpers
+@using LFE.Portal.Areas.PortalAdmin.Models
+@{
+    var dates = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+                      | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                      | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+    ViewData["periodKinds"] = dates;
+
+    var levels = Utils.EnumWithDescToList<CommonEnums.eLogLevels>();
+    var modules = Utils.EnumWithDescToList<CommonEnums.LoggerObjectTypes>();
+
+    var userAC = new CTRL_UserAutoComplete { SelectedCallback = "onUserSelected", };
+}
+
+
+
+<h2 class="page-title">System logs report</h2>
+
+<div id="rep-param-row" style="margin: 0 0 25px 0">
+    <input type="hidden" id="hidUserId" />
+    <div id="period-combo-container" class="inline" style="visibility: hidden;">
+        @(Html.Kendo().DropDownList()
+              .Name("periodSelectionKind")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["periodKinds"])
+              .HtmlAttributes(new { @class = "combo-ps" })
+              .Events(e => e.Select("onFilterSelected"))
+              )
+        <script>
+            $(document).ready(function () {
+                $('#periodSelectionKind').data("kendoDropDownList").value('@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())');
+                setVisibility('#period-combo-container', true);
+                //  window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+            });
+        </script>
+    </div>
+
+    <div id="level-combo-container" class="inline" style="visibility: hidden;margin: 0 0 0 50px">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlLogLevels")
+              .OptionLabel("..select log level")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo(levels)
+              .HtmlAttributes(new { @class = "combo-ps" })
+              .Events(e => e.Select("onFilterSelected"))
+              )
+        <script>
+            $(document).ready(function () {
+                $('#ddlLogLevels').data("kendoDropDownList").value(null);
+                setVisibility('#level-combo-container', true);
+            });
+        </script>
+    </div>
+
+    <div id="module-combo-container" class="inline" style="visibility: hidden;margin: 0 0 0 50px">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlModules")
+              .OptionLabel("..select module")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo(modules)
+              .HtmlAttributes(new { @class = "combo-ps" })
+              .Events(e => e.Select("onFilterSelected"))
+              )
+        <script>
+            $(document).ready(function () {
+                $('#ddlModules').data("kendoDropDownList").value(null);
+                setVisibility('#module-combo-container', true);
+            });
+        </script>
+    </div>
+    </div>
+
+    <div id="rep-param-row" style="margin: 0 0 25px 0">
+
+        <div class="inline" style="margin: 0 0 0 0px">
+            @Html.Partial("~/Areas/PortalAdmin/Views/Shared/Report/_CTRL_UserAutoComplete.cshtml", userAC)
+        </div>
+
+        <div class="inline" style="margin: 0 0 0 50px">
+            <label for="sessId">SessionId</label>
+            <input type="number" width="120" id="sessId" style="height: 22px;" />
+        </div>
+
+        <div class="inline" style="margin: 0 0 0 50px">
+            <label for="ip">Ip</label>
+            <input type="text" width="120" id="ip" style="height: 22px;" />
+        </div>
+
+        <div class="inline">
+            <a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+        </div>
+    </div>
+@Html.Partial("Report/_SystemLogsGrid")
+
+
+<script>
+    function onFilterSelected() {
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function getSystemLogRepData() {
+        return {
+            periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())'
+			, level: $('#ddlLogLevels').data("kendoDropDownList") != undefined ? $('#ddlLogLevels').data("kendoDropDownList").value() : null
+			, module: $('#ddlModules').data("kendoDropDownList") != undefined ? $('#ddlModules').data("kendoDropDownList").value() : null
+            , userId: $('#hidUserId').val()
+            , sessionId: $('#sessId').val()
+            , ipAddress: $('#ip').val()
+        };
+    }
+    function clearFilters() {
+        $('#ddlLogLevels').data("kendoDropDownList").value(null);
+        $('#ddlModules').data("kendoDropDownList").value(null);
+        $('#periodSelectionKind').data("kendoDropDownList").val(null);
+        $('#hidUserId').val(null);
+        $('#sessId').val(null);
+        $('#ip').val(null);
+        @userAC.Clear()
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onUserSelected(value) {
+        $('#hidUserId').value(value);
+        onFilterSelected();
+    }
+</script>

@@ -1,0 +1,112 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Helpers
+@model LFE.Portal.Areas.AuthorAdmin.Models.CourseStoresToken
+
+@{
+    if (Model.IsValid)
+    {
+        <script>
+            var saveCourseCategoryUrl = '@Url.Action("SaveCourseStoreCategory", "Course", new { courseId = Model.CourseId })';
+            var FORM_HEIGHT = 480;
+            var EDIT_FORM_SELECTOR = '#frmCourseStores';
+            var formCourseStoreNotifManager;
+            $(document).ready(function () {
+
+                $(window).resize(function () {
+                    adjustCmdPosition(EDIT_FORM_SELECTOR);
+                });
+                $(document).scroll(function () {
+                    adjustCmdPosition(EDIT_FORM_SELECTOR);
+                });
+                adjustCmdPosition(EDIT_FORM_SELECTOR);
+
+                formCourseStoreNotifManager = new UserNotificationManager('#cd-info', '.alert', false);
+
+                setReportScroll("#d-store-tree-container");
+            });
+
+            function addRemoveCategory($this, id) {
+                var attach = $($this).is(":checked");
+             
+                var data = {
+                    catId: id,
+                    attached: attach
+                };
+                ajaxAction(window.saveCourseCategoryUrl, data, onStoreCategoryItemSaved, '#frmCourseStores');
+            }
+
+            function onStoreCategoryItemSaved(response) {
+                var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+                var msg = response.success ? response.message : response.error;
+
+                if (response.success) {
+                    window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+                    setStoreSelectionState(response.result);//catdId
+                }
+
+                window.formCourseStoreNotifManager.show({ message: msg, kind: kind });
+            }
+        </script>
+
+        <div style="height: auto;width: 530px" id="frmCourseStores">
+            <div class="tree-collapse-container">
+                <span class="ico-expand inline"></span> <span class="inline ec-btn expand" title="expand all" onclick="expandCollapse(1)">Expand all</span>
+
+                <span class="ico-collapse inline"></span> <span class="inline ec-btn collapse" title="collapse all" onclick="expandCollapse(2)">Collapse all</span>
+            </div>            
+            <div id="d-store-tree-container" class="nano" style="overflow-y: hidden;height: 500px">
+                <div class="content">
+                    <ul class="ul-stores-tree">
+                        @{
+                            foreach (var store in Model.Stores)
+                            {
+                                <li class="li-store">
+                                    <div class="ch-title">
+                                        <span class="inline tree-nav">
+                                            <span id="btn-ch-toggle-@store.Id" class="l-icon l-plus inline" onclick="togglStore(@store.Id,this,1)"></span>
+                                        </span>
+                                        <div class="inline" onclick="togglStore(@store.Id,this,2)">
+                                            <span class="store-name inline" title="click to view categories">@store.Name</span>
+                                            <div class="inline">
+                                                <input class="inline" type="checkbox" @Html.ToStoreCategoryChecked(store.CourseIncluded) disabled="disabled" />
+                                                <span class="incl">attached to store</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <ul class="ul-categories-tree expandable" id="ul-c-@store.Id" style="display: none">
+                                        @{
+                                            foreach (var category in store.Categories)
+                                            {
+                                                <li class="li-cat" id="li-@category.Id">
+                                                    <div class="row-cat">
+                                                        <input class="inline" type="checkbox" @Html.ToStoreCategoryChecked(category.Attached) onclick="addRemoveCategory(this,'@category.Id')" />
+                                                        <span class="ch-name inline">@category.Name</span>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>           
+            <div class="form-cmd-row wrap" id="d-cr">
+                <div class="inner">
+                    <div class="info-box" id="cd-info">
+                        <p class="alert"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}
+

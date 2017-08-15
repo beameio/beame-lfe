@@ -1,0 +1,16 @@
+﻿@model LFE.Portal.Areas.Widget.Models.PriceNameBoxToken
+           
+
+<div class="price-container @Model.cssCLass" data-target="@Model.id" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+@{
+    if (Model.IsUnderGRP)
+    {
+        <div class="icon-grp-small"></div>
+    }
+}
+    <div class="price-name">@Model.name</div>
+    <div class="price-val">
+        <span itemprop="priceCurrency" data-content="@Model.iso">@Model.iso</span><span itemprop="price" data-content="@Model.price">@Model.price</span>            
+    </div>
+    <div class="buy-now">Buy now</div>
+</div>

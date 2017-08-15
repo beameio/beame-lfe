@@ -1,0 +1,33 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+
+@model UserViewDto
+
+
+@{
+	ViewBag.Title = Model.fullName + " Dashboard";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/dash.css" )" rel="stylesheet" type="text/css"  /> 	
+	<style>
+		.k-grid tbody,.k-grid tbody tr{background-color: #f2f2f2 !important;}
+	</style>
+}
+
+@section scripts
+{
+
+	<script type="text/javascript">
+		var DEFAULT_PERIOD_SELECTION = '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())';
+		$(document).ready(function () {
+			window.getNotifManagerInstance().subscribe(notifEvents.report.reviewBound, setReviewTotals, null);
+			window.getNotifManagerInstance().notify(notifEvents.report.periodChanged, null);
+		});		
+	</script>
+}
+
+@Html.Action("DashboardPartial","Author")

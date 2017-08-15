@@ -1,0 +1,53 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.SalesReportConfigToken
+
+<style>
+    .user-thumb{ width: 25px;height: 25px;}
+</style>
+<script>
+	$(document).ready(function () {		
+	    window.getNotifManagerInstance().subscribe(notifEvents.report.courseChanged, rebindSubscribersGrid, null);
+	    $('.btn-export-csv').unbind('click').bind('click', function () {
+	        //e.preventDefault();
+	        var courseId = window.getSelectedCourse().courseId;
+	      //  console.log(this);
+	     //   $('#a-hid-export').remove();
+
+	        $('.btn-export-csv').attr({ 'href': '@Url.Action("ExportSubscribers","Author")' + '/' + courseId });
+	         //a.trigger('click');
+	        //a.focus();
+	        //a.click();
+	    });
+	});
+
+	function rebindSubscribersGrid() {
+	    $('#AuthorSubscribersReport').data("kendoGrid").dataSource.read();
+	}
+</script>
+
+<div id="d-subscr-rep-container">
+
+<a class="btn-export-csv inline" href="#"><span>Export to CSV</span></a>
+
+@*<a href="#" class="inline" style="visibility: visible" id="a-hid-export">export</a>*@
+
+@(Html.Kendo().Grid<SubscriberDTO>()
+      .Name("AuthorSubscribersReport")     
+      .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+      .Columns(columns =>
+      {
+          columns.Bound(p => p.url).Width(30).ClientTemplate("<img class='user-thumb' alt='${name}' src='${url}' />").Title(" ");
+          columns.Bound(p => p.name).Title("Name");
+          columns.Bound(p => p.email).Title("Email").Width(270);
+
+      })
+      .Sortable()
+      .Pageable(pager => pager.Numeric(true).PageSizes(Model.showPageSizes))
+      .Filterable(f => f.Enabled(false))
+      .DataSource(dataSource => dataSource.Ajax()                                
+                            .Model(model => model.Id(p => p.id))
+                            .Read(read => read.Action("GetAuthorSubscribers", "Author").Data("getSelectedCourse").Type(HttpVerbs.Get))
+                            .PageSize(Model.pageSize))
+      )
+      
+    </div>

@@ -1,0 +1,70 @@
+﻿@model LFE.Portal.Areas.Widget.Models.ItemReviewsPageToken
+
+<div class="item-reviews_container">
+    <div class="cr-header">
+        @if (!Model.reviews.Any())
+        {
+
+            <div id="not-rewiewed-wrapper">
+                <div id="not-reviewed">This course has not been reviewed</div>
+            </div>
+        }
+        else
+        {
+
+            if (Model.raiting > 0)
+            {
+                <div class="star-container">
+                    <div id="total-item-rait" class="rateit" data-rateit-value="@Model.raiting"  data-rateit-readonly="true"></div>
+                    <script>
+                        $('#total-item-rait').rateit();
+                    </script>
+                </div>
+                <div class="cnt-container inline">
+                    <span class="count">Based on @Model.reviews.Count() review@(Model.reviews.Count>1 ?"s" :"") </span>
+                </div>
+            }
+        }    
+    </div>
+    
+
+    <div class="reviews-list-container">
+        <ul>
+            @{
+                foreach (var review in Model.reviews)
+                {
+                    <li class="row">
+                        <div class=" star-container">
+                            <div class="rateit" data-rateit-value="@review.Rating" data-rateit-max="5" data-rateit-readonly="true"></div>
+                        </div>
+                        <div class="review-details">
+                            <div class="dt-head">
+                                <div class="rw-title">@review.Title</div>
+                                <div class="rw-by">by @review.LearnerFullName</div>
+                            </div>
+                            <div class="rw-text ellipsis multiline">
+                                @Html.Raw(review.Text.Replace("\n", "<br/>"))
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+        <script>
+            (function ($) {
+
+                $(".reviews-list-container > ul > li > .star-container > .rateit").rateit();
+
+            })(jQuery);
+        </script>
+    </div>
+   
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        console.log('notify review loaded');
+        window.getNotifManagerInstance().notify(notifEvents.window.contentLoaded, null);
+    });
+</script>

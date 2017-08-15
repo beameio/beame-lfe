@@ -1,0 +1,135 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.BundleViewerPageToken
+
+
+
+<div class="bndl-container">
+    <h3 class="h">@Model.Author.fullName</h3>
+    <h1 class="h">@Model.Bundle.BundleName</h1>
+
+    <div class="tabs">
+        <script>
+            $(document).ready(function() {
+                $('#ul-bundle-tabs').find('.btn').unbind('click').bind('click', function () {
+                    var link = $(this);
+                    var target = link.attr('href').substring(1);
+                   
+                    $('#ul-bundle-tabs').find('.btn').removeClass('active');
+                    link.addClass('active');
+
+                    var c = $('#d-content');
+                    var a = $('#d-author');
+                    var tab2Show, tab2Hide;
+                    switch (target) {
+                        case 'content':
+                            tab2Show = c;
+                            tab2Hide = a;
+                            break;
+                        case 'author':
+                            tab2Show = a;
+                            tab2Hide = c;
+                            break;
+                        default:
+                            return;
+                    }
+
+                    if (tab2Show.is(":visible")) return;
+
+                    tab2Hide.slideToggle('slow', function() {
+                        tab2Show.slideToggle('slow');
+                    });
+                });
+
+                var h = window.location.hash ? window.location.hash.substring(1) : 'content';
+
+                $('#ul-bundle-tabs > li > .btn[data-val=' + h + ']').click();
+            });
+        </script>
+        <ul class="float-left" id="ul-bundle-tabs">
+            <li>
+                <a href="#content" data-val="content" title="view bundle content" class="btn active" id="btn-content-tab">CONTENT</a>
+            </li>
+            <li>
+                <a href="#author" data-val="author" title="view author overview" class="btn">AUTHOR</a>
+            </li>
+        </ul>
+    </div>
+    
+    <div>
+        <div class="c-tabs-content inline">
+            <div id="d-content">
+                @{
+                    var videoId = Model.Bundle.PromoVideoIdentifier ?? 2830351594001;
+                }
+                <script>
+                    $(document).ready(function() {
+                        var videoId = '@videoId';
+                        BCL.addPlayer($('#d-bundle-player'), videoId, 600, 338);
+                    });
+                </script>
+                <div id="d-bundle-player"></div>  
+                <div class="bundle-desc">@Model.Bundle.Description</div>
+                <div id="d-bundle-courses">
+                    <div class="bndl-sub-title">Courses included in this bundle</div>
+                    
+                    <ul class="ul-bundle-tree">
+                        
+
+                        @foreach (var course in Model.BundleCourses)
+                        {
+                            <li data-val="@course.id">
+                                <a href="@course.pageUrl" title="click to view" target="_blank">
+                                    <img width="120" height="67" src="@course.url" alt="@course.name" class="inline" />
+                                    <div class="inline" style="width:465px">
+                                        <h4 class="crs-name">@course.name</h4>
+                                        <div class="crs-desc ellipsis multiline">@course.desc</div>
+                                    </div>
+                                </a>
+                            </li>
+                        }
+                        
+                    </ul>
+
+                    @*@(Html.Kendo().ListView<BundleCourseListDTO>()
+                          .Name("BundleCourses")
+                          .TagName("ul")
+                          .HtmlAttributes(new { @class = "ul-bundle-tree" })
+                          .ClientTemplateId("kendo-bc-list-template")
+                          .BindTo(Model.BundleCourses)
+                    )
+
+                    <script type="text/x-kendo-template" id="kendo-bc-list-template">
+                    <li data-val="${id}">
+                        <a href="${pageUrl}" title="click to view" target="_blank">
+                            <img width="120" height="67" src="#:data.url#" alt="#:data.name#" class="inline" />
+                            <div class="inline" style="width:465px">
+                                <h4 class="crs-name">${name}</h4>
+                                <div class="crs-desc ellipsis multiline">${desc}</div>
+                            </div>
+                        </a>                        
+                    </li>
+                    </script>*@
+                </div>
+            </div>
+            <div id="d-author" style="display: none">
+                <h3 class="h" style="padding: 0 0 20px 0">@Model.Author.fullName</h3>
+                
+                @{
+                    if(!String.IsNullOrEmpty(Model.Author.PhotoUrl))
+                    {
+                        <img width="200" height="200"  src="@Model.Author.PhotoUrl" alt="@Model.Author.fullName"   />
+                    }
+
+                    if (!String.IsNullOrEmpty(Model.Author.bioHtml))
+                    {
+                        <p>
+                            @Model.Author.bioHtml
+                        </p>
+                    }
+                }
+                
+
+            </div>
+        </div>
+        <div class="inline right-col"></div>
+    </div>
+</div>

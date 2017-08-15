@@ -1,0 +1,35 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.StudentMessageDTO
+
+<script>
+    $(document).ready(function () {
+        initUnobstructiveFormValidation($('#frm-qz-post-msg'));      
+    });
+
+    function onQuizMessageSent(response) {
+        hideLoader();
+        if (response.success) {
+            swal(
+            {
+                title: "Success",
+                text: "Message send",
+                type: "success",
+                timer: 1000
+            });
+            
+            loadUserQuiz('@eUserQuizActions.ContactAuthorResult', '@Model.QuizId', null);
+
+
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+</script>
+
+@using (Ajax.BeginForm("SendMessage", "Quiz", new { area = "Widget", Model.StudentQuizId, Model.QuizId }, new AjaxOptions { OnSuccess = "onQuizMessageSent", OnBegin = "showLoader()", HttpMethod = "post" }, new { @id = "frm-qz-post-msg", @class = "" }))
+{
+    @Html.TextAreaFor(x => x.Message, new { @class = "qz-txt" })
+
+    @Html.ValidationMessageFor(model => model.Message)
+}
+           

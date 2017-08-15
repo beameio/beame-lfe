@@ -1,0 +1,703 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6D6C3D7D-B3EC-41E4-BB23-56918A247F10}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LFE.Model</RootNamespace>
+    <AssemblyName>LFE.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <SccProjectName>Svn</SccProjectName>
+    <SccLocalPath>Svn</SccLocalPath>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccProvider>SubversionScc</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ADMIN_DeletedVideosLog.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN_SaleSummaryToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN_SummaryReportToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN_SystemLogToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ADMIN_VideoStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ApiSessions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="APP_PluginInstallations.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="APP_PluginInstallationStores.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="APP_PluginsInstallationsRep.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BASE_CurrencyLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BASE_CurrencyToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BILL_ItemsPriceList.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BILL_ItemsPriceRevisions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Categories.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CAT_CategoryListToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CAT_CategoryToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CERT_CertificateLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CERT_StudentCertificates.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CERT_TemplatesLOV.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ChapterLinks.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ChapterVideos.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CHIMP_ItemSubscribers.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CHIMP_ListSegments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CHIMP_MissingSegmentToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CHIMP_Rejects.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CHIMP_UserLists.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CouponInstances.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Coupons.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CourseCategories.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CourseChapters.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CourseLinks.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Courses.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_Assets.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_AvailableCourseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_BundleCategories.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_BundleCourses.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_BundleCourseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_BundleInfoToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_BundleListToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_Bundles.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_CouponToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_CourseBaseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_CourseChangeLog.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_CourseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_LearnerToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_ReviewAuthorMessageToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_ReviewLearnerMessageToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CRS_WizardStepsLOV.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_AuthorEventStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_AuthorSalesStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_CouponUsageToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_CustomEvents.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_RefundDetailToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_SaleDetailsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DB_SubscriptionCancelToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DROP_JobFileToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DROP_JobToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_AuhtorRoomToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_ClassRoom.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_Followers.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_Hashtags.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_MessageHashtags.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_Messages.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_MessageUsers.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_NotificationsFbToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DSC_RoomMessageToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EMAIL_Messages.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EMAIL_NotificationMessageToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EMAIL_Templates.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_AbandonHostToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DailyStats.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DailyTotals.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_AuthorPeriodStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_AuthorTotalStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_LearnerPeriodCouponStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_LearnerPeriodStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_NewPeriodTotalsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_PeriodSalesStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_PeriodSalesTotalsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_PlatformStats.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_DASH_TotalsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_EventAgg.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_EventsDailyStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_HostEventToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FACT_OwnerEventDailyStatsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FB_ActionsLOV.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FB_PostInterface.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GEO_CountriesLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GEO_States.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LFEAuthorModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LFEAuthorModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="lfeModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>lfeModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="lfeModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LogTable.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LOG_EmailInterfaceToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LOG_FbPostInterfaceToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LOG_FileInterfaceToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LRNR_ItemToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PAYPAL_IpnLogs.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PAYPAL_PaymentRequests.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PendingPayPalTransactions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PO_MonthlyPayoutToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PO_PayoutExecutions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PO_PayoutExecutionToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PO_PayoutStatmentToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PO_UserPayoutStatments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QZ_AttemptAnswerOptionToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_CourseQuizToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_CourseQuizzes.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_QuestionAnswerOptions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_QuizBaseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_QuizQuestionsLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_StudentAttemptToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_StudentQuizAnswers.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_StudentQuizAttempts.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_StudentQuizInfoToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_StudentQuizzes.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="QZ_UserCourseQuizToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_BaseItemToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_OrderLinePaymentRefunds.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_OrderLinePayments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_OrderLines.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_OrderLineViewToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_Orders.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_RefundRequests.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_SalesStatisticToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SALE_Transactions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_USER_GetVideosState_Result.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StatusLOV.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Tags.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UDEMY_JobToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserCourseReviews.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserNotifications.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserProfile.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Users.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserS3FileInterface.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UsersAgents.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserSessions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserSessionsEventLogs.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserStatusTypes.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserTypes.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_Addresses.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_AuthorWithCourseCountToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_BillingAddressToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_Bundles.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_CourseListToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_Courses.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_CourseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_CourseWatchState.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_ItemToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_Logins.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_MonthlyStatementToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_NotificationToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_PaymentInstruments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_RefundProgramRevisions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_ReviewToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_StatisticToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_VideoInfoToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_Videos.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_VideosRenditions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_VideoStats.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="USER_VideoToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_CERT_StudentCertificates.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_DSC_MessageHashtags.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_EVENT_Logs.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_FACT_EventAggregates.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_QZ_CourseQuizzes.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_QZ_QuizQuestionsLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLinePaymentRefunds.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLinePayments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLinePaymentsTotalRefunds.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLines.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLinesTotalRefunds.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderLineTotalPayments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_Orders.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_OrderTotalPayments.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_SALE_Transactions.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_Authors.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_EventsLog.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_Items.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_Statistics.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_UserLogins.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_USER_UsersLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_WS_Items.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vw_WS_StoresLib.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="webpages_Membership.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="webpages_OAuthMembership.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="webpages_Roles.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebStoreCategories.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebStoreItems.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebStores.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WebStoresChangeLog.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WIDGET_CourseListToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_AffiliateItemToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_BaseStoreToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_ItemCandidateToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_ItemsToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_NotIncludedCourseToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_StoreListToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="WS_WixStoreToken.cs">
+      <DependentUpon>lfeModel.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <EntityDeploy Include="LFEAuthorModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>LFEAuthorModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="LFEAuthorModel.edmx.diagram">
+      <DependentUpon>LFEAuthorModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lfeModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>lfeModel.Context.cs</LastGenOutput>
+      <DependentUpon>LFEAuthorModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="lfeModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>lfeModel.cs</LastGenOutput>
+      <DependentUpon>LFEAuthorModel.edmx</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

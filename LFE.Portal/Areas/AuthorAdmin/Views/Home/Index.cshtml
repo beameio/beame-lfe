@@ -1,0 +1,17 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+@model DashboardToken
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminLayout.cshtml";
+}
+
+
+@Html.Partial("Dashboard/_dbMainStats",Model)
+
+
+@Html.Partial("~/Areas/AuthorAdmin/Views/Shared/Dashboard/_dbFooter.cshtml")
+
+<script>
+    var saveEventUrl = '@Url.Action("SaveEvent","EventApi",new{area=""})';
+    saveEventApi(USER_EVENTS.DASHBOARD_VIEW, null,null,null, null, null);
+</script>

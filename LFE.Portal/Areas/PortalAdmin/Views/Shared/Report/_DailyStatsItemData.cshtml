@@ -1,0 +1,27 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model List<ItemListDTO>
+
+@(Html.Kendo().Grid<ItemListDTO>()
+            .Name("ItemReport")
+            .TableHtmlAttributes(new { @style = "background-color: #fff !important;background-image: none !important;" })
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.AuthorName).Title("Author").ClientTemplate("<span data-val='${AuthorId}' title='click to view user details' class='list-cmd usr-btn'>#=AuthorName#</a>");
+                columns.Bound(m => m.ItemName).ClientTemplate("<a href='#=ItemPageUrl#?mode=admin' style='' title='click to view course page' class='list-cmd'  target='_blank'>#=ItemName#</a>").Title("Name");
+                columns.Bound(p => p.ItemType).Title("Type").Width(80);
+                columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+                columns.Bound(p => p.Status).Width(80);
+                columns.Bound(p => p.IsFree).Width(80);
+                columns.Bound(p => p.Price).Title("Price").Format("{0:c}").Width(120);
+                columns.Bound(p => p.MonthlySubscriptionPrice).Title("Subscription").Format("{0:c}").Width(120);
+                columns.Bound(p => p.SubscribersCount).Title("Number of Subscribers ").Width(150);
+                columns.Bound(p => p.ReviewCount).Title("Reviews").Width(120);
+            })
+            .Sortable()
+            .Pageable(pager => pager.Numeric(true).PageSizes(true))
+            .Filterable(f => f.Enabled(true))            
+            .BindTo(Model)
+            .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+            .PageSize(10))
+)

@@ -1,0 +1,106 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.TrainingViewToken
+
+@{
+    ViewBag.Title = "Manage " + Model.Title;
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminLayout.cshtml";
+    var backUrl = @Url.Action("Manage", "Training");
+}
+
+
+@section css
+{
+    @Styles.Render("~/admin/g2t/less")   
+    <link href="@Url.Content("~/Content/styles/sweet-alert.css")" rel="stylesheet" />    
+    <link href="~/Areas/AuthorAdmin/Content/styles/common.css" rel="stylesheet" />
+    <link href="~/Areas/AuthorAdmin/Content/styles/course.css" rel="stylesheet" />
+}
+@section scripts
+{
+    @Html.Partial("~/Views/Shared/Common/_BrightcoveScripts.cshtml")
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/notif.manager.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.global.js"></script>
+    <script src="~/Areas/AuthorAdmin/Scripts/lfe/lfe.video.js"></script>
+    <script src="~/Areas/Widget/Scripts/plugins/countdown.min.js"></script>
+    <script src="~/Scripts/plugins/sweet-alert.min.js"></script>
+
+}
+<div class="col-lg-12 g2t-view-container">
+    @{
+        if (Model.IsValid)
+        {
+            <section>
+                <a href="@backUrl" class="a-back">< LIVE SESSIONS</a>
+            </section>
+            <section class="section-sub-title">
+                <div class="inline">
+                    <img src="@Model.BannerUrl" alt=""/>
+                </div>
+                <div class="inline">
+                    <span class="item">@Model.ItemName /</span> <span>@Model.Title</span>
+                </div>                
+            </section>
+
+            <section class="section-header">
+                @Html.Partial("Training/_SessionPageHeader",Model)
+            </section>
+
+            <section class="section-view">
+                <h3>Training Details</h3>
+                @Html.Partial("Training/_TrainingView", Model)
+            </section>
+
+            <section class="section-action">
+                @{
+                    if (Model.Status == TrainingEnums.eTrainingStatus.WAIT)
+                    {
+                        <h3>Message to Students</h3>
+                        @Html.Partial("Training/_EditGreetingMessage", Model)
+                    }
+                    else
+                    {
+                        <h3>Upload Recorded Session</h3>
+                        @Html.Partial("Training/_UploadVideo", Model)
+
+                        <h3 style="padding: 25px 0 0">Or select from existing</h3>
+                        
+                        @Html.Partial("Training/_VideoBrowser", Model)
+                    }
+                }
+
+            </section>
+
+            <section class="section-students">
+                <div class="head-title">contact your students</div>
+
+                <div class="sub-title">
+                    <div class="float-left">a "history of screws" mailing list was created in your mailchimp account</div>
+                    <div class="float-left">
+                        <a class="a-mc" href="#">to mailchimp</a>
+                    </div>
+                </div>
+
+                <div class="list-title">
+                    attending students <span class="red">@Model.Students.Count</span>/25
+                </div>
+
+                <ul class="ul-students">
+                    @{
+                        foreach (var token in Model.Students)
+                        {
+                            <li>
+                                <span>@token.StudentInfo.FullName</span>
+                                
+                                <span>Registered since @token.JoinOn.ToShortDateString()</span>
+                            </li> 
+                        }
+                    }
+                </ul>
+            </section>
+        }
+        else
+        {
+            <h2>@Model.Message</h2>
+        }
+    }
+</div>

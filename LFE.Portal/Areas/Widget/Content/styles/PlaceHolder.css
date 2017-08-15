@@ -1,0 +1,29 @@
+﻿ .placeholder-header {
+            display: table;
+            height: 90px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+            .placeholder-header .inner {
+                display: table-cell;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+            .placeholder-header .title {
+                font-size: 27px;
+                font-weight: bold;
+            }
+
+            .placeholder-header .subtitle {
+                font-size: 18px;
+            }
+
+        .placeholderTopper {
+            top: 90px;
+        }
+
+        .subPlaceHolder{
+            top: 119px;
+        }

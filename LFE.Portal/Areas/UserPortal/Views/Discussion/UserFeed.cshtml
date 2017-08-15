@@ -1,0 +1,59 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model LFE.Portal.Areas.UserPortal.Models.HashtagFeedToken
+@{
+	ViewBag.Title = "Feed";
+	Layout = "~/Areas/UserPortal/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+	<style>
+		.k-grid tbody tr{cursor: pointer}
+		 .k-grid tbody tr.k-alt{background: #fff !important}
+		.k-grid tbody tr.k-state-selected{ background: #ff6c00 !important;}
+	</style>
+}
+
+@section scripts
+{
+	<script>
+		function onNotifSelected() {
+			var selectedRow = this.select();
+			if (selectedRow.length == 0) return;
+			var dataItem = this.dataItem(selectedRow[0]);
+			window.onMessageClicked(dataItem.Uid);
+		}
+	</script>
+}
+
+<h2 style="margin: 25px 0 0;font-size: 24px">Your notifications</h2>
+
+<div style="margin: 50px 0 0">    
+	@(Html.Kendo().Grid <UserNotificationDTO>()    
+		  .Name("UserNotifications")
+		  .HtmlAttributes(new{@style=""})
+		  .Columns(columns => {
+								  columns.Bound(p => p.CreatorName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(CreatorName)#'style='width:110px'>${CreatorName}</div>").Title("Creator").Width(110);
+								  columns.Bound(p => p.CourseName).Width(200).ClientTemplate("<div class='ellipsis col-tooltip' title='${CourseName} 'style='width:200px'>${CourseName}</div>").Title("Course");
+								  columns.Bound(p => p.MessageText).Width(400).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(MessageText)#' style='width:400px'>${MessageText}</div>").Title("Message");
+								  columns.Bound(p => p.RoomName).ClientTemplate("<div class='ellipsis col-tooltip' title='#=Encoder.htmlEncode(RoomName)#'style='width:110px'>${RoomName}</div>").Title("Room");
+								  columns.Bound(p => p.PostedOn).Title("Date").Format("{0:d}").Width(150);
+		  })    
+		  .Sortable()
+		  .Pageable(pager => pager.Numeric(true))
+		  .Filterable(f=>f.Enabled(false))
+		  .Selectable(s=>s.Enabled(true).Type(GridSelectionType.Row))
+		  .Events(e=>e.Change("onNotifSelected"))
+		  .DataSource(dataSource => dataSource.Ajax()
+			  .Model(model => model.Id(p => p.MessageId))
+			  .Read(read => read.Action("GetUserNotifications", "User",new{area="UserPortal"}).Type(HttpVerbs.Get))
+			  .PageSize(10)))
+	  
+	@(Html.Kendo().Tooltip()
+	.For("#UserNotifications")
+	.Filter(".col-tooltip")
+	.Position(TooltipPosition.Top)
+	.Width(300)
+)
+</div>

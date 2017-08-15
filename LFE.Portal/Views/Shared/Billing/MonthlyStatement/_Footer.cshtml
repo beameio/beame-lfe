@@ -1,0 +1,18 @@
+﻿@using LFE.Core.Utils
+@model LFE.DataTokens.MonthlyStatmentPrintToken
+@{
+    var name = string.Empty;
+
+    if (Model.Statments.Any())
+    {
+        name = Model.Statments[0].User.FullName;
+    }
+}
+<hr style="margin: 5px 0" />
+<div style="background: #f7f7f7;font-size: 11px;line-height: 13px;padding: 10px">
+    @(Constants.APP_OFFICIAL_NAME) sent this message to @name about your account registered on <a style="color: blue" href="@(Utils.GetKeyValue("homeUrl"))">@(Constants.APP_OFFICIAL_NAME)</a>
+    <br />
+    Visit our <a href="@(Utils.GetKeyValue("homeUrl"))privacy/" style="color: blue">privacy policy and user agreement</a> if you have any questions.
+    <br />
+    Copyright © 2014 @(Constants.APP_OFFICIAL_NAME)
+</div>

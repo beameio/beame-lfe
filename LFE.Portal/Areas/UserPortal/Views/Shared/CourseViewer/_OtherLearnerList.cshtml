@@ -1,0 +1,48 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int
+
+<script>
+    var otherListSelector = '#d-other-list-container';
+    $(document).ready(function () {
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setLearnerListH, null);
+    });
+
+    function setLearnerListH(h) {
+        if (h != null) {
+            $(otherListSelector).height(h - 110);
+        }
+        //setReportScroll(otherListSelector);
+        $(otherListSelector).nanoScroller();
+    }
+    
+    function onLearnersBound(e) {
+        $.each(e.sender.wrapper.find('li'), function () {
+            var li = $(this);
+            li.unbind("click").bind('click', function () {
+                window.showLearner(parseInt(li.attr('data-val')));
+            });
+        });
+
+        var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+        $(otherListSelector).height(h - 110); //100 =#d-ol-container h4 => h20+ margin 25*2 =70+40tabs
+        setReportScroll(otherListSelector);
+    }
+</script>
+
+<h4>Who else is taking this course?</h4>
+
+<div id="d-other-list-container" class="nano" style="">
+    <div class="content" id="d-learners-container">
+        @(Html.Kendo().ListView<LearnerListItemDTO>()
+              .Name("OtherLearnersList")
+              .Pageable(p=>p.Enabled(true))
+              .TagName("ul")  
+              .HtmlAttributes(new{@class="ul-ol-list"})  
+              .ClientTemplateId("kendo-ol-list-template")
+              .Events(e=>e.DataBound("onLearnersBound"))
+              .DataSource(ds => ds.Read( read => read.Action("GetOtherLearners", "Course",new{id=Model}).Type(HttpVerbs.Get)).PageSize(10).ServerOperation(false))
+              )
+      
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.WidgetTrainingUserRegisterDTO
+
+<div class="user-g2t-register-container">
+    <div class="head">
+        @Html.Partial("Training/_Header", new TrainingTimerToken
+            {
+                Start        = Model.EventDate
+                ,LoadTimer   = true
+                ,ContainerId = "g2t-user-form-timer"
+                ,Template    = "<span>{days} days,</span><span>{hours} hours,</span><span>{minutes} minutes </span><span>and {seconds} seconds</span>"
+            })
+    </div>
+
+    <div class="g2t-details-container">
+        @Html.Partial("Training/_RegistrationForm",Model)
+    </div>
+    
+    <div class="g2t-foot">
+        <div class="float-left">
+            @Html.Partial("Training/_FooterLinks",new TrainingFooterLinksToken
+            {
+                Item          = Model.Item
+                ,AuthorEmail  = Model.AuthorEmail
+                ,State        = eUserG2TStates.Register
+                ,RegistrantId = -1
+            })
+        </div>
+        <div class="float-right">
+            @Html.Partial("Training/_ActionButton", new TrainingButtonToken { Text = "Sign me up" })
+        </div>
+    </div>
+</div>

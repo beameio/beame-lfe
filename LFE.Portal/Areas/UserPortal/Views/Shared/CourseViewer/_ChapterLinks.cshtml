@@ -1,0 +1,53 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.DataTokens
+
+<script>
+    function onChapterLinkRequest() {
+        return {
+            id: currentChapterId
+        };
+    }
+</script>
+<label class="title">Additional Links</label>
+<div class="" style="" id="video-list-container">
+	@(Html.Kendo().ListView<ChapterLinkListToken>()
+			.Name("ChapterDocs")
+			.TagName("ul")  
+			.HtmlAttributes(new{@class="ul-link-list docs"})  
+			.ClientTemplateId("kendo-ch-list-template") 
+			.AutoBind(false)
+			.DataSource(ds => ds.Read( read => read.Action("GetChapterLinks", "Course",new{area="UserPortal",kind=CourseEnums.eChapterLinkKind.Document}).Data("onChapterLinkRequest").Type(HttpVerbs.Get)).ServerOperation(false))
+	)
+</div>
+<div class="" style="" id="link-list-container">
+	@(Html.Kendo().ListView<ChapterLinkListToken>()
+		    .Name("ChapterLinks")
+		    .TagName("ul")  
+		    .HtmlAttributes(new{@class="ul-link-list links"})  
+		    .ClientTemplateId("kendo-ch-list-template") 
+		    .AutoBind(false)
+            .DataSource(ds => ds.Read(read => read.Action("GetChapterLinks", "Course", new { area = "UserPortal", kind = CourseEnums.eChapterLinkKind.Link }).Data("onChapterLinkRequest").Type(HttpVerbs.Get)).ServerOperation(false))
+		  )			    
+</div>
+
+<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.chapterChanged, rebindChapterLinks, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.chapter.chapterChanged, rebindChapterLinks, null);        
+
+        if (currentChapterId > 0)  rebindChapterLinks(currentChapterId);
+    });
+
+    function rebindChapterLinks(chapterId) {
+        window.currentChapterId = chapterId;
+        $('#ChapterDocs').data("kendoListView").dataSource.read();
+        $('#ChapterLinks').data("kendoListView").dataSource.read();
+    }
+</script>
+
+<script type="text/x-kendo-template" id="kendo-ch-list-template">
+	<li>
+		<a href="${url}" target="_blank"  title="#=Encoder.htmlEncode(name)#" class="list-btn">${name}</a>
+	</li>
+</script>

@@ -1,0 +1,140 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@{
+    ViewBag.Title = "Manage Trainings";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AuthorAdminLayout.cshtml";
+
+
+    var baseEditPageUrl = @Url.Action("SessionPage", "Training");
+}
+
+@section css
+{
+    @Styles.Render("~/admin/g2t/less")
+}
+
+@section scripts
+{
+    @{
+        if (Request.IsSecureConnection)
+        {
+            <script src="https://da7xgjtj801h2.cloudfront.net/@Url.ToKendoVersionUrl()/js/kendo.timezones.min.js"></script>
+        }
+        else
+        {
+            <script src="http://cdn.kendostatic.com/@Url.ToKendoVersionUrl()/js/kendo.timezones.min.js"></script>
+        }
+}
+    <script>
+        function startChange() {
+            var endPicker = $("#End").data("kendoDateTimePicker"),
+                startDate = this.value();
+
+            if (startDate) {
+                startDate = new Date(startDate);
+                startDate.setDate(startDate.getDate() + 1);
+                endPicker.min(startDate);
+            }
+        }
+
+        function endChange() {
+            var startPicker = $("#Start").data("kendoDateTimePicker"),
+                endDate = this.value();
+
+            if (endDate) {
+                endDate = new Date(endDate);
+                endDate.setDate(endDate.getDate() - 1);
+                startPicker.max(endDate);
+            }
+        }
+
+        function onEventEdit(e) {
+            var token = e.event;
+
+            if (token.TrainingId > 0 && token.strStatus !== "wait") {
+                e.preventDefault();
+                window.showLoader();
+                window.location.href = '@baseEditPageUrl/' + token.TrainingId;
+                return;
+            }
+
+            var title = token.TrainingId > 0 ? token.title: "New Live Session";
+            $('.k-window-titlebar > .k-window-title').html(title);
+            //setTimeout(function () {
+
+            //    $('.k-scheduler-update').on('click', function (e) {
+            //       // console.log(e);
+            //        //showContainerLoader('.k-scheduler-edit-form');
+            //    });
+            //}, 300);
+
+        }
+        function onEventSaving() {
+           // console.log(e);
+            showContainerLoader(".k-scheduler-edit-form");
+        }
+    </script>       
+}
+
+<div class="col-lg-12">
+    <img src="@Url.Content("~/Areas/AuthorAdmin/Content/images/g2t/citrix.png")" alt="" />        
+</div>
+
+<script id="event-template" type="text/x-kendo-template">
+    <div class="event-template #: strStatus#">
+
+        <div class="top-row">
+            <img src="#= BannerUrl #" alt="">
+            <div class="info-container" title="${title}">
+                <h3>#: title #</h3>
+                <p>
+                    #: kendo.toString(start, "HH:mm") # - #: kendo.toString(end, "HH:mm") #
+                </p>
+            </div>
+        </div>
+
+        <a href="@baseEditPageUrl/#= TrainingId #">Session Page</a>
+    </div>
+</script>
+
+<div class="col-lg-12">
+    @(Html.Kendo().Scheduler<ScheduledTrainingDTO>()
+    .Name("scheduler")
+    .Date(DateTime.Now)
+    .Height(660)
+    .Min(DateTime.Now)
+    //.Resources(resource =>
+    //{
+    //    resource.Add(m => m.ItemId)
+    //        .Title("Course")
+    //       .DataTextField("Name")
+    //        .DataValueField("CourseId")
+    //        .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course")));
+    //})
+    .Views(views =>
+    {
+        views.DayView();
+        views.WeekView(m => m.Selected(true));
+        views.MonthView();
+        views.AgendaView();
+      
+    })
+    .Events(e=>e.Edit("onEventEdit").Save("onEventSaving"))
+    .EventTemplateId("event-template")
+    .Editable(e => e.TemplateName("ScheduledTrainingDTO"))
+    .DataSource(d => d
+            .Model(m =>
+            {
+                m.Id(f => f.TrainingId);
+                m.Field(f => f.TrainingId).DefaultValue(-1);
+                m.Field(f => f.ItemType).DefaultValue(BillingEnums.ePurchaseItemTypes.COURSE);
+                m.Field(f => f.Title).DefaultValue("No title");
+            })
+            .Read("GetTrainings", "Training")
+            .Create("SaveTraining", "Training")
+            .Destroy("DestroyTraining", "Training")
+            .Update("SaveTraining", "Training")
+        )
+    )
+</div>

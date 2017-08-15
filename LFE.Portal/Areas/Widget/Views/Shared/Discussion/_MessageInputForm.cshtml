@@ -1,0 +1,81 @@
+﻿@model LFE.DataTokens.DiscussionMessageInputDTO
+@{
+    var prefix = (Model.ParentMessageId == null ? "" : "-" + Model.ParentMessageId);
+	var msgId = "UserMessage" + prefix;
+    var btnId = "btn-send-msg" + prefix;
+    var formId = "frmDiscusMessage" + prefix;
+    var alertId = "frmDiscusMessage" + prefix;
+    var charsRemainId = "cnt-rem-char" + prefix;
+}
+<script> 
+	//var MESSAGE_FORM_SELECTOR = '#@formId';
+	//var formUserNotifManager;	
+	
+	$(document).ready(function () {
+	    var form = $('#@formId');
+
+		initUnobstructiveFormValidation(form);
+
+		//formUserNotifManager = new UserNotificationManager('#@alertId', '.alert', false);
+
+		//USERS_LOV = $.parseJSON('Html.Raw(Json.Encode(Model.UsersLOV))');
+
+	    var settings = {
+	        msgInputId: '@msgId',
+	        btnId: '@btnId',
+	        formId: '@formId',
+	        charsRemainId: '@charsRemainId',
+	        alertId: '@alertId',
+	        parentId:'@Model.ParentMessageId'
+	    };
+
+		//configMessageTextArea(settings);
+
+	    var mngr = new MsgInputManager(settings);
+
+	    // console.log(USERS_LOV);
+	});
+	
+		
+</script>
+
+@using (Ajax.BeginForm("SaveMessage", "Discussion", new{area="Widget"}  , null, new {@id = formId, @style = "display: block;position: relative" }))
+{
+	@Html.HiddenFor(m=>m.TagsArrayStr)
+	@Html.HiddenFor(m=>m.NamesArrayStr)
+	@Html.HiddenFor(m=>m.RoomId)
+	@Html.HiddenFor(m=>m.CourseId)
+    @Html.HiddenFor(m=>m.ParentMessageId)
+	@Html.HiddenFor(m=>m.Kind)
+
+	<fieldset class="fs-msg">
+		<legend></legend>
+		
+		<ul class="ul-edit-form vd">
+			<li>
+				<div class="remaning" id="@charsRemainId">256 chars remaining</div>
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.UserMessage,new{@placeholder="Type your message here",@class="txt-area-msg",@maxlength=256,@rows=2,@cols=40,@id=msgId})            
+				</div>			
+			</li>			
+		</ul>
+		
+		
+		<div class="form-cmd-row colx-xs-12" id="d-dm">
+			<div class="inner">
+				<div class="info-box" id="@alertId">
+					<p class="alert"></p>
+				</div>
+			    <div class="btn-container">
+			        @{
+			            if (Model.ParentMessageId != null)
+			            {
+			                <span class="cmd-btn btn-cancel inline" onclick="cancelReplay('@Model.ParentMessageId')">Cancel</span>        
+			            }
+			        }			        
+			        <span class="btn-submit-msg inline" id="@btnId">Send message</span>
+			    </div>
+			</div>
+		</div>
+	</fieldset>
+}

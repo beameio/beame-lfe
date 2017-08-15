@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "ThankYou";
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            self.parent.showLoader();
+            self.parent.location.reload(true);
+        });
+    </script>
+}
+
+<h2 style="width: 600px; margin: 25px auto 0" id="hm">
+    Thank You for purchasing course on LFE.
+    <br/>
+    
+    The course page will be reload shortly
+
+</h2>
+

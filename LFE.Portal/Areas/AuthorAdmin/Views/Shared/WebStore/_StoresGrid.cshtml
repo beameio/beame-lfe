@@ -1,0 +1,31 @@
+﻿@using LFE.DataTokens
+
+
+@(Html.Kendo().Grid <WebStoreGridDTO>()    
+	.Name("WsStoresReport")
+	.TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+	.Columns(columns => {
+		columns.Bound(m => m.Name).ClientTemplate("<a href='" + Url.Action("EditStore", "WebStore") + "/#=Uid#' style='' title='click to edit store' class='list-cmd' >#=Name#</a>").Title("Name of Store");
+		columns.Bound(p => p.TrackingID).Title("TrackingID");
+		columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);
+		columns.Bound(p => p.CoursesCount).Title("Number of Courses").Width(150);	
+		columns.Bound(p => p.SubscribersCount).Title("Number of Subscribers").Width(150);
+		columns.Bound(m => m.StoreId).ClientTemplate("<a href='" + Url.Action("EditStore", "WebStore") + "/#=Uid#' style='margin:3px 0 0' class='list-cmd' >Edit</a>").Title(" ").Width(50);
+		columns.Command(c => c.Destroy().HtmlAttributes(new{@class="list-cmd"})).Title(" ").Width(50);
+	})          
+	.Sortable()
+	.Pageable(pager => pager.Enabled(false))
+	.Filterable(f=>f.Enabled(false))
+	.Events(e=>e.DataBound("onStoresBound"))
+	.DataSource(dataSource => dataSource.Ajax()
+						.Model(model => model.Id(p => p.StoreId))
+						.Read(read => read.Action("GetStores", "WebStore").Type(HttpVerbs.Get)).ServerOperation(false)
+						.Destroy(d=>d.Action("DestroyStore","WebStore")))
+)  
+
+<script>
+	function onStoresBound(e) {
+		var total = e.sender.dataSource._data.length;
+		window.getNotifManagerInstance().notify(notifEvents.report.storesBound, total);
+	}
+</script>

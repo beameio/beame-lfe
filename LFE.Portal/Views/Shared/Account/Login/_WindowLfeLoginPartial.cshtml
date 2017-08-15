@@ -1,0 +1,17 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+<div style="position: relative">
+    
+    <div id="login-form-container" class="flip">
+
+        @using (Ajax.BeginForm("AjaxLfeLogin", "Account", new { area = "", Model.RedirectUrl, Model.TrackingID }, new AjaxOptions { HttpMethod = "Post", OnSuccess = "onLoginEnd" }, new { @id = "frm-lfe-login", @class = "form-lfe-login rel" }))
+        {
+            @Html.Partial("Account/MainLogin/_LoginForm")
+        }
+
+        <div class="d-forgot-pwd">
+            <a href="#" class="link-button" id="a-fp">Forgot Password</a>
+        </div>
+
+    </div>
+</div>

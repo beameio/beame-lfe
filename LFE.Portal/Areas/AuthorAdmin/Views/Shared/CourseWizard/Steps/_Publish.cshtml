@@ -1,0 +1,166 @@
+﻿@using LFE.Portal.Helpers
+
+
+@model LFE.DataTokens.WizardCoursePublishDTO
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmCoursePublish';
+	
+	$(document).ready(function () {
+		window.isFormInEditMode = false;
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, submitStep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, submitStep, null);
+	});
+	
+	function submitStep() {
+		$(EDIT_FORM_SELECTOR).submit();
+	}
+
+	function onCoursePublished(response) {
+		hideFormLoader();
+
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Course creation finished successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+		   
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+			
+			var selector = '#';
+			var status = response.result;
+			var inner = $('.published .inner-msg');
+
+			switch (status) {
+				case "pub":
+					selector = selector + "kendo-pub-template";
+					inner.removeClass('draft');
+					break;
+				case "draft":
+					selector = selector + "kendo-draft-template";
+					inner.addClass('draft');
+					break;
+				default:
+					return;
+			}
+
+			var template = kendo.template($(selector).html());
+
+			if ($('.ul-checklist').is(':visible')) {
+				$('.ul-checklist').fadeOut(300, function () {
+					inner.html(template);
+					$('.published').fadeIn(300);
+				});
+			} else {
+				inner.hide().fadeOut(300, function () {
+					inner.html(template);
+					inner.fadeIn(300);
+				});
+			}
+
+			
+		}
+	}
+
+	function onCoursePublishing() {
+	    var isPurchased = $('#IsCoursePurchased').val().toLowerCase() == 'true';
+	    if (isPurchased) {
+	        var published = $('#OrigStatus').val().toLowerCase() == 'published';
+	        var status = $('#Status').data('kendoDropDownList').value();
+
+	        if (status == 1 && published) //status changed to draft from published
+	        {
+	            if (!window.confirm('Course already published.Are You sure change status to draft?')) return false;
+	        }
+
+	    }
+
+	    showContainerLoader('#main', null);
+	    return true;
+	}
+</script>
+
+<div id="d-status-container" style="height: 190px;margin-top: 20px;">
+	
+	<ul class="ul-checklist">
+		<li>
+			<h5 class="pub-sub">Publishing checklist:</h5>
+		</li>
+		@{
+			for (var i = 0; i < Model.Checklist.Count; i++)
+			{
+				var row = Model.Checklist[i];
+				<li>
+					<label class="inline ico  @row.CssClass">@row.Name</label>					
+				</li>
+			}
+		}
+	</ul>
+	<div class="published">
+		<img alt="" src="@Url.Content("~/Areas/AuthorAdmin/Content/images/ico-pub.png")"/>
+		<div class="inner-msg">
+			<span style="padding-top: 20px;">Your course has been</span>
+		
+			<span class="pub">published !</span>
+		</div>        
+	</div>
+</div>
+	
+
+@using (Ajax.BeginForm("PublishCourse", "Course", null, new AjaxOptions { OnBegin = "javaScript:return onCoursePublishing()", OnSuccess = "onCoursePublished", LoadingElementId = "site-loader" }, new { @id = "frmCoursePublish", @class = "ajax-form" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.Uid)
+	@Html.HiddenFor(m=>m.IsCoursePurchased)
+    @Html.Hidden("OrigStatus",Model.Status)
+	<fieldset>
+		<legend></legend>
+        <ul class="ul-edit-form crs pub">
+            <li class="sub">
+                <h5 class="pub-sub">How will paying learners see your course:</h5>
+            </li>
+            <li class="bt">
+                <a href="@Url.CoursePageUrl(this.CurrentUser().FullName,Model.CourseName)" target="_blank" class="vm-link crs-page-link">Preview course page</a>
+            </li>
+            <li class="sub">
+                <h5 class="pub-sub">How will potential buyers see your course:</h5>
+            </li>
+            <li class="bt">
+                <a href="@Url.CoursePageUrl(this.CurrentUser().FullName,Model.CourseName,LFE.Core.Utils.Constants.QS_COURSE_PREVIEW_PREFIX)" target="_blank" class="vm-link crs-page-link">Preview product page</a>
+            </li>
+            <li>
+                @Html.LabelFor(m => m.Status,new{@style="margin-bottom: 10px"})
+                <div class="input-container">
+                    @Html.EditorFor(m => m.Status)
+                </div>
+            </li>
+            <li style="">
+                @Html.Label("When published, your course will be live at:", new { @style = "width: auto;padding-top: 2px;font-size: 14px;margin-bottom: 5px" })
+                <div class="" style="height: auto;">
+                    <a href="@Url.CoursePageUrl(this.CurrentUserFullName(),Model.CourseName)" target="_blank" style="color: blue;font-size: 13px">@Url.GenerateCourseFullPageUrl(this.CurrentUserFullName(), Model.CourseName,null)</a>
+                </div>
+            </li>
+        </ul>
+	</fieldset>
+}
+
+<script type="text/x-kendo-template" id="kendo-pub-template">
+		<span style="padding-top: 20px;">Your course has been</span>
+		
+		<span class="pub">published !</span>	
+</script>
+
+<script type="text/x-kendo-template" id="kendo-draft-template">
+	<span style="padding-top: 10px;width:195px;">
+			A DRAFT of your course
+			has been save
+	</span>
+		
+	<span class="pub">successfully</span>	
+</script>

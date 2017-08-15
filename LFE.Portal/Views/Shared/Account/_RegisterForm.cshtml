@@ -1,0 +1,24 @@
+﻿@model LFE.DataTokens.RegisterDTO
+
+<label style="margin: 25px 0 4px" class="title">New to LFE? Register below:</label>
+
+@using (Html.BeginForm("RegisterUser", "Account", new {ViewBag.ReturnUrl,Model.RequiredConfirmation }, FormMethod.Post, new { @id = "frmRegisterUser", @class = "reg-form" }))
+{
+    @Html.ValidationSummary(false)
+
+    <fieldset id="fs-reg">
+        <legend></legend>
+        <ul class="ul-reg">
+            <li>@Html.TextBoxFor(m=>m.Nickname,new{@placeholder="Nickname",title="Nickname"})</li>
+            <li>
+                @Html.TextBoxFor(m=>m.FirstName,new{@placeholder="First name",title="First name",@style="",@class="inline inp-name-w"})
+                @Html.TextBoxFor(m=>m.LastName,new{@placeholder="Last name",title="Last name",@style="",@class="inline inp-name-w"})
+            </li>
+            <li>@Html.TextBoxFor(m=>m.Email, new{@placeholder="Email",title="Email", @type="email"})</li>
+            <li>@Html.TextBoxFor(m=>m.Password,new{@placeholder="Password, minimum 8 chars length",title="Password, minimum 8 chars length", type="password" }) </li>
+            <li>@Html.TextBoxFor(m=>m.ReenterPassword,new{@placeholder="Reenter password",title="Reenter password", type="password" })</li>
+        </ul>
+    </fieldset>
+    
+    <input type="submit" class="btn-reg-form" value="Register" />    
+}

@@ -1,0 +1,70 @@
+﻿@model List<LFE.DataTokens.ContentTreeViewItemDTO>
+<script>
+    $(document).ready(function () {
+        fixDescriptionH();
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setTreeH, null);
+       
+    });
+    function setTreeH(h) {        
+        if (h != null) {
+            $('#d-ch-tree-container').height(h);       
+        }
+        setReportScroll("#d-ch-tree-container");
+    }
+</script>
+
+<div class="tree-collapse-container">
+    <span class="ico ico-expand inline"></span> <span class="inline ec-btn expand" title="expand all" onclick="expandCollapse(1)">Expand all</span>
+    
+    <span class="ico ico-collapse inline"></span> <span class="inline ec-btn collapse" title="collapse all" onclick="expandCollapse(2)">Collapse all</span>
+</div>
+
+<div id="d-ch-tree-container" class="nano" style="overflow-y: hidden;">
+    <div class="content">            
+        <ul class="ul-chapters-tree">
+            @{
+                foreach (var chapter in Model)
+                {
+                    <li class="li-chap">
+                        <div class="ch-title">
+                            <span class="inline tree-nav"><span id="btn-ch-toggle-@chapter.id" class="l-icon l-plus inline" onclick="togglChapter(@chapter.id,this,1)"></span></span><span onclick="togglChapter(@chapter.id,this,2)" class="ch-name inline">@chapter.duration  @chapter.name</span>    
+                        </div>
+                
+                
+                        <ul class="ul-videos-tree expandable" id="ul-v-@chapter.id" style="display: none">
+                            @{
+                                foreach (var video in chapter.videos)
+                                {
+                                    <li class="li-video" id="li-@video.id">
+                                        <div class="vd-title">
+                                            <span class="inline tree-nav"> <span class="l-icon l-plus" title="view details" onclick="togglVideo(@video.id,this)"></span></span>  
+                                            <span  id="btn-vd-select-@video.id" class="vd-name inline" title="play video" onclick="selectVideo(@chapter.id,@video.id,this,true)">
+                                                <label class="inline">@video.duration</label>
+                                                <label class="video-name inline ellipsis" title="@video.name" id="lbl-video-name-@video.id" >@video.name</label>                                          
+                                            </span>    
+                                        </div>
+                                
+                                        <div style="display: none" id="vd-desc-@video.id" class="vdesc expandable">
+                                            <img alt="" src="@video.thumb"/>
+                                            <div class="inline txt ellipsis multiline" id="spn-vd-des-@video.id">                                      
+                                                @Html.Raw(video.desc)
+                                            </div>
+                                            <span class="over"></span>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var h = $('#d-ch-tree-container').parent().parent().parent().height() - 40; // get .c-content height minus 40 expand-collapse row
+        setTreeH(h);       
+    });
+</script>

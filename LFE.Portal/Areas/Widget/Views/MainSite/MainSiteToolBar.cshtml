@@ -1,0 +1,123 @@
+﻿@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Helpers
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>MainSiteToolBar</title>
+    <script>
+        document.domain = "beame.io";
+        @if (Convert.ToBoolean(ViewBag.IsLogout))
+        {
+            <text>
+                parent.location.href = parent.location.href;
+            </text>          
+        }            
+    </script>
+
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Scripts.Render("~/bundles/kendo")
+
+    @Styles.Render("~/Content/plugin/scroll")
+
+    @Scripts.Render("~/bundles/plugin/scroll")
+
+    @Scripts.Render("~/bundles/lfe/common")
+    <link href="~/Areas/Widget/Content/styles/widget.css" rel="stylesheet" />
+    <link href="~/Content/styles/toolbar.css" rel="stylesheet" />
+    <style>
+        #d-usr-not-link {
+            display: inline-block;
+            padding: 3px 8px 0;
+        }
+    </style>
+
+
+    <script>
+         function resizeIframe(height) {
+            try {
+                //console.log('resize function' + height);
+                var frame = window.parent.document.getElementById('lfe_Login_Iframe');
+                
+                //innerDoc = (frame.contentDocument) ? frame.contentDocument : frame.contentWindow.document;
+                //frame.style.height = height + "px";
+                frame.height = height + "px";
+                
+            }
+            catch (err) {
+                window.status = err.message;
+            }
+        }
+    </script>
+</head>
+<body>
+ <div class="tool_bar" >   
+    @*@Html.Action("_UserIndicatorMainSite", "User", new { area = "Widget" })*@
+    @Html.Partial("Account/_UserLoginLinksMainSite", this.GetUserIndicatorViewModel())
+</div>
+
+<!-- sub tools bar -->
+<div id="loginWrapper" class="sub_tool_bar">
+    @Html.Partial("~/Areas/Widget/Views/Shared/Account/_LoginMainSite.cshtml", new LoginDTO { IsWidget = false })
+</div>
+
+<div id="registerWrapper" class="sub_tool_bar2" >
+    @Html.Partial("~/Areas/Widget/Views/Shared/Account/_RegisterMainSite.cshtml", new RegisterDTO
+    {
+        RequiredConfirmation = true
+        ,ParentWindowURL = (Request.UrlReferrer != null && !string.IsNullOrEmpty(Request.UrlReferrer.AbsoluteUri)) ? Utils.GetKeyValue("baseUrl") : null
+    })
+</div>
+
+
+<div class="dark" style="display: none"></div>
+
+@{
+    var fbappid = Utils.GetKeyValue("fbAppId");
+}
+<script type="text/javascript">
+    var facebookAppId = '@fbappid';  
+</script>
+<script>
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=" + window.facebookAppId;
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    $(document).ready(function () {
+        $('#facebookLogin, #facebookLoginBig').click(function () {
+            if (typeof FB !== 'undefined' && typeof FB.login === 'function') {
+                FB.login(function (response) {
+                    if (response.authResponse && response.status === 'connected') {
+                        onFacebokLogin(response.authResponse);
+                    }
+                }, { scope: '@Constants.FB_SCOPE' });
+            }
+        });
+    });
+
+
+    function onFacebokLogin(response) {
+        $.post(socialLoginUrl, { provider: 'facebook', token: response.accessToken }, function (data) {
+            if (data.isSuccess) {
+                //console.log(response.accessToken);
+              //  $.post(window.updateTokenUrl, { token: response.accessToken });
+                top.location.reload();
+            } else {
+                loginSucceeded = false;
+                $('#loginError').text('Failed to login with facebook').show();
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

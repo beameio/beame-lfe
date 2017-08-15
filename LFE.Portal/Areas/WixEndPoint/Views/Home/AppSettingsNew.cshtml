@@ -1,0 +1,633 @@
+﻿@model LFE.Portal.Areas.WixEndPoint.Models.SettingsViewToken
+@using LFE.Portal.Helpers
+
+@using LFE.Core.Utils
+@{
+    Layout = "~/Areas/WixEndPoint/Views/Shared/_SettingsLayout.cshtml";
+
+    var user = this.CurrentUser();
+
+    var newCourseGuid = Guid.NewGuid();
+    var shortStoreName = "";
+    if (!string.IsNullOrEmpty(Model.StoreName))
+    {
+        shortStoreName = Model.StoreName.Length > 32 ? Model.StoreName.Substring(0, 32) + "..." : Model.StoreName;
+    }
+
+    var storeId = Model.StoreId ?? -1;
+}
+<style scoped>
+    #ddlCourses > option{text-align: left}
+</style>
+
+@section HeaderScripts
+{
+    @Scripts.Render("~/bundles/kendo/widget")
+    @* ReSharper disable once NativeTypePrototypeExtending *@
+    <script>
+        var courseApiUrl = '@Url.ToApiUrl("Course", "get")';
+        var webstoreApiUrl = '@Url.ToApiUrl("WebStore", "getByTrack")';
+
+
+        var lastSaveStoreDate = null;
+
+        var lastSaveItemDate = null;
+
+        function refreshApp() {
+            Wix.Settings.refreshApp();
+            bindUserCourses();
+        }
+
+
+        function bindUserCourses() {
+            var url = '@Url.Action("GetAuthorCoursesLOV", "Course",new{area="AuthorAdmin"})';
+
+            $.ajax({
+                url: url,
+                dataType: "json",
+                cache: false,
+                success: function (array) {
+
+                    $.each($('#ddlCourses > option'), function() {
+                        var option = $(this);
+                        if (option.attr('value') !== "") option.remove();
+                    });
+
+                    $.each(array, function() {
+                        var item = this;
+
+                        var opt = $('<option />').attr({ 'value': item.Uid }).html(item.Name);
+
+                        $('#ddlCourses').append(opt);
+                    });
+                }
+            });
+
+        }
+
+
+        $(document).ready(function() {
+            $('#a-reload').attr({ 'href': window.location });
+            checkPageState();
+            //console.log('@storeId');
+        });
+
+        function getCourseLastChange() {
+
+            if (!hasValue(window.lastSelectedGUid)) return;
+
+            var url = courseApiUrl + window.lastSelectedGUid;
+
+            $.ajax({
+                url: url,
+                dataType: "json",
+                cache: false,
+                success: function(response) {
+                    if (response.result != null) {
+                        var last = kendo.parseDate(response.result);
+                        if (lastSaveItemDate == null) {
+                            lastSaveItemDate = last;
+                            refreshApp();
+                        } else {
+                            if (last > lastSaveItemDate) {
+                                //console.log('do item refresh');
+                                lastSaveItemDate = last;
+                                refreshApp();
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+
+        function getStoreLastChange() {
+            var sid = settings.InstanceId;
+
+            if (!hasValue(sid)) return;
+
+            var url = webstoreApiUrl + sid;
+
+            $.ajax({
+                url: url,
+                dataType: "json",
+                cache: false,
+                success: function(response) {
+                    if (response.result != null) {
+                        var last = kendo.parseDate(response.result);
+                        if (lastSaveStoreDate == null) {
+                            lastSaveStoreDate = last;
+                            refreshApp();
+                        } else {
+                            if (last > lastSaveStoreDate) {
+                                //console.log('do item refresh');
+                                lastSaveStoreDate = last;
+                                refreshApp();
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+
+        function checkPageState() {
+
+            setTimeout(checkPageState, 5000);
+            getCourseLastChange();
+
+            getStoreLastChange();
+        }
+
+
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+
+        function hasValue(value) {
+
+            if (value == null) return false;
+
+            if (isNumber(value)) {
+                return value > 0;
+            }
+
+            return value.length > 0;
+        }
+
+        function validateAlphaNumeric(event) {
+
+            var theEvent = event || window.event;
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+            var regex = /[a-zA-Z0-9 -]|\./;
+            if (!regex.test(key) && event.keyCode !== 8) {
+                theEvent.returnValue = false;
+                if (theEvent.preventDefault) theEvent.preventDefault();
+            }
+        }
+
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=" + '@Utils.GetKeyValue("fbAppId")';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+
+        String.prototype.trunc = String.prototype.trunc ||
+            function(n) {
+                return this.length > n ? this.substr(0, n - 1) + '&hellip;' : this;
+            };
+
+        //use to check if there were updates for urse content in wizard
+        var newCourseGuid = '@newCourseGuid.ToString()';
+        var lastSelectedGUid = newCourseGuid;
+
+        function DisplayChangeName() {
+            $('#divStoreNameChange1').show();
+            $('#divStoreNameChange2').show();
+            $('#divStoreNameChange3').hide();
+            $('#divStoreNameChange4').hide();
+        }
+
+        var wixSiteUrl = '';
+        $(document).ready(function() {
+
+
+            $("#txtStoreName").keypress(function(e) {
+                // Check if the value of the input is valid
+                validateAlphaNumeric(e);
+            });
+
+            if (typeof console === "undefined") {
+                //console = { log: function() {} };
+            }
+
+            $("#aChangeName").click(function() {
+                DisplayChangeName();
+            });
+
+            $('#cpFontColor').ColorPicker({ startWithColor: settings.cpFontColor });
+            $('#cpBackgroundColor').ColorPicker({ startWithColor: settings.cpBackgroundColor });
+            $('#cpTabsFontColor').ColorPicker({ startWithColor: settings.cpTabsFontColor });
+            $('#cbIsTransparent').Checkbox({ checked: settings.cbIsTransparent });
+            $('#cbIsShowBorder').Checkbox({ checked: settings.cbIsShowBorder });
+            $('#cbIsShowTitleBar').Checkbox({ checked: settings.cbIsShowTitleBar });
+
+            $('#btnStoreName').click(function() {
+                updateSettingsProperty('txtStoreName', $('#txtStoreName').val());
+            });
+
+            $('#btnManageWebstore').click(function() {
+
+                if (settings.storeId > 0) {
+                    window.open('@Url.Action("EditStoreByTrackId", "WebStore", new {area = "AuthorAdmin"})' + '?id=' + settings.InstanceId + '#content');
+                    return false;
+                } else {
+                    errorPopup('Set store name and apply changes first');
+                }
+                return false;
+            });
+
+            $('#settingTitle').click(function() {
+                OpenDivAccord(this);
+            });
+
+            $('#webstoreTitle').click(function() {
+                OpenDivAccord(this);
+            });
+
+
+            $('#editCourses').click(function() {
+                OpenDivAccord(this);
+            });
+
+            $('#btnEditCourse').click(function() {
+
+                if (settings.storeId > 0) {
+                    var selectedGuid = $('#ddlCourses').val();
+                    if (selectedGuid) {
+                        OpenWizardWindow(selectedGuid);
+                    } else {
+                        errorPopup('Please select a course.');
+                    }
+                } else {
+                    errorPopup('Set store name and apply changes first');
+                }
+            });
+
+            $('#btnAddCourse2Store').click(function() {
+
+                if (settings.storeId > 0) {
+                    var selectedGuid = $('#ddlCourses').val();
+                    if (selectedGuid && selectedGuid.length > 0) {
+                        var url = '@Url.Action("AddItemToStore", "Home", new {area = "WixEndPoint"})';
+                        var data = {
+                            itemId: selectedGuid,
+                            storeId: '@storeId'
+                        };
+                        $.ajax({
+                            url: url,
+                            cache: false,
+                            type: "Post",
+                            data: JSON.stringify(data),
+                            datatype: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function(response) {
+                                if (response.success) {
+                                    errorPopup('The course was successfully added to the store');
+                                }
+                                else
+                                {
+                                    errorPopup(response.error);
+                                }
+                            }
+                        });
+                    } else {
+                        errorPopup('Please select a course.');
+                    }
+                } else {
+                    errorPopup('Please select a course.');
+                }
+            });
+
+            $('#btnCreateNewCourse').click(function() {
+                if (settings.storeId > 0) {
+                    var url = '@Url.Action("GetNewGuid","Home",new{area=""})';
+                    $.ajax({
+                        url: url,
+                        cache: false,
+                        async: false,
+                        type: "Post",
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (guid) {
+                            newCourseGuid = guid;
+                            OpenWizardWindow(newCourseGuid);
+                        }
+                    });
+
+                } else {
+                    errorPopup('Set store name and apply changes first');
+                }
+            });
+
+            $('#btnRefresh').click(refreshApp);
+
+            var popMessagePrefix = '<div style="margin:10px; line-height: 20px; color:#0099FF; font-size:14px; text-align: justify" >';
+            $('#btnHelp1').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[0] + '</div>', html: true });
+            $('#btnHelp2').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[1] + '</div>', html: true });
+            $('#btnHelp3').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[2] + '</div>', html: true });
+            $('#btnHelp4').popover({ trigger: "hover", placement: 'left', content: popMessagePrefix + helpArray[3] + '</div>', html: true });
+
+
+            //async call to wix to get site info
+            Wix.getSiteInfo(function (siteInfo) {
+                console.log('Wix get site info', siteInfo);
+                wixSiteUrl = siteInfo.baseUrl;
+                settings.WixSiteUrl = siteInfo.baseUrl;
+                updateSettings(settings);
+            });
+
+
+        });
+
+
+        function errorPopup(message) {
+            //alert(message);
+            $("#errorMessage").html(message);
+            $("#errorLine").show();
+
+            setTimeout(function() {
+                $("#errorMessage").html(null);
+                $("#errorLine").hide();
+            },5000);
+        }
+
+        function onClose() {
+        }
+
+        var helpArray = new Array();
+        helpArray[2] = "Welcome to " + '@(Constants.APP_OFFICIAL_NAME)' + ", learning From Experience. In order to create your first course (or edit existing courses), click on the Create/Edit Courses tab. Once a course is completed, a webstore is placed in the WIX website to enable your audience to browse and purchase the course. This webstore can contain multiple courses, either authored by you or by other LFE authors. All this is managed in the 'Webstore Management' tab below.";
+        helpArray[1] = "'Create New Course' will launch our step-by-step course creation wizard in a new window. You can use the tooltips in the wizard for guidance, if needed, or take a few minutes and watch the Tutorial clip from the link at the top right of this panel.";
+        helpArray[0] = "These settings control how the app will look when integrated into your WIX website. Play around with them - every change will be instantly reflected in the website.";
+        helpArray[3] = "These settings take you to the author Portal on " + '@(Constants.APP_OFFICIAL_NAME)' + ", for advanced management of your website, creation or promotional coupons, generating sales reports, or setting the Payout preferences.";
+
+        function OpenWizardWindow(courseGuid) {
+            lastSelectedGUid = courseGuid;
+            var w = 870;
+            var h = 780;
+            var left = (screen.width / 2) - (w / 2);
+            var top = (screen.height / 2) - (h / 2);
+            var str = '@Url.Action("CourseWizard", "Course", new {area = "AuthorAdmin", id = "tempGuid"})';
+            var url = str.replace("tempGuid", courseGuid);
+            return window.open(url, '', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+        }
+
+        function OpenDivAccord(title) {
+            var openDiv = $($(title).parent().children(".feature")[0]);
+
+            openDiv.toggle();
+
+            $(".feature").each(function() {
+                if ($(this).attr("id") !== openDiv.attr("id"))
+                    $(this).hide();
+            });
+
+            setTimeout(window.wixAdjustH, 500);
+        }
+
+    </script>
+}
+
+<div>
+  
+    <div class="box">
+        <h3 id="editCourses">Create/Edit Courses</h3>
+        <button class="submit btn help help1" id="btnHelp2">
+            <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+        </button>
+        <div class="feature" id="divEditCourses">
+            <ul class="simple-list">
+                <li id="errorLine" style="display:none">
+                    <span id="errorMessage" style="color:red"></span>
+                </li>
+                <li style="margin-left: 28px;">
+                    <button class="submit btn connect" style="width: 200px" id="btnCreateNewCourse">Create New course</button>
+                </li>
+                <li style="margin-left: 28px;">
+                    <div style="font-weight: bold">Or</div>
+                </li>
+                <li style="margin-left: 28px;">
+                    <div style="width: 430px">
+                        <select class="btn" id="ddlCourses" style="width: 200px; display: inline-block; float: left; border: 1px solid #DDDDDD">
+                            <option value="" selected disabled>Select Course</option>
+                            @foreach (var course in Model.UserCoursesList)
+                            {
+                                <option value="@course.Uid">@course.Name</option>
+                            }
+                        </select>
+
+                        <button class="submit btn connect" id="btnAddCourse2Store" style="width: 110px; display: inline-block; float: right; margin-left: 10px">Add To Store</button>
+
+                        <button class="submit btn connect" id="btnEditCourse" style="width: 100px; display: inline-block; float: right; margin-left: 10px">Edit Course</button>
+
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="box" style="display: block">
+        <h3 id="settingTitle">Display Settings</h3>
+        <button class="submit btn help help1" id="btnHelp1">
+            <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+        </button>
+
+        <div class="feature" id="divSetting" style="border-top: 0; padding: 0 0; display: none">
+            <ul class="list">
+                @*<li class="listFirst">
+                    <span class="cell">Font Color</span>
+                    <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpFontColor"></a></span>
+
+
+                </li>*@
+                <li>
+                    <span class="cell">Background Color</span>
+                    <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpBackgroundColor"></a></span>
+                    <span class="checkbox" id="cbIsTransparent">
+                        <span class="check"></span>
+                        Transparent
+                    </span>
+                </li>
+                @*<li>
+                    <span class="cell">Tabs Font Color</span>
+                    <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpTabsFontColor"></a></span>
+                </li>
+                <li>
+                    <span class="checkbox cell" id="cbIsShowBorder">
+                        <span class="check"></span>
+                        Show Border
+                    </span>
+                    <span class="checkbox cell" id="cbIsShowTitleBar">
+                        <span class="check"></span>
+                        Show Title Bar
+                    </span>
+                </li>*@
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="box">
+        <h3 id="webstoreTitle">Webstore Management</h3>
+        <button class="submit btn help help1" id="btnHelp4">
+            <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+        </button>
+
+        <div class="feature" id="divSetting2" style="border-top: 0; padding: 0 0; display: none">
+            <ul class="list">
+                <li class="firtsRow noborder">
+                    <div class="title@(!string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange1" style="display: inline-block">
+                        <div class="text"><strong>Store Name</strong></div>
+                        <input class="storeNameInput" type="text" id="txtStoreName" placeholder="Store Name" value="@(!string.IsNullOrEmpty(Model.StoreName) ? Model.StoreName : "")" style="float: none;display: inline-block" />
+                    </div>
+                    <div class="apply@(!string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange2" style="width: 160px;display: inline-block">
+                        <button class="submit btn connect" style="color: white; width:150px" id="btnStoreName">Apply Changes</button>
+                    </div>
+
+                    <div class="name@(string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange3" style="display: inline-block">
+                        <div class="text">Store Name:  <strong id="strStoreName">@shortStoreName</strong></div>
+                    </div>
+                    <div class="change@(string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange4" style="width: 160px;display: inline-block">
+                        <a id="aChangeName">Change Name</a>
+                    </div>
+
+                </li>
+                <li class="noborder">
+                    <button class="submit btn default" style="width: 40%;" id="btnManageWebstore">Add/Remove Courses</button>
+                </li>               
+                <li class ="noborder">                                        
+                    <button class="submit btn default" style="width:40%;" onclick="window.open('@Url.Action("Coupons", "Author", new { Area = "AuthorAdmin" })'); return false;">Generate Coupons</button>
+                </li>             
+                <li class="noborder">
+                    <button class="submit btn default" style="width:40%;"  onclick="window.open('@Url.Action("SalesReport", "Author", new { Area = "AuthorAdmin" })'); return false;">Sales Report</button>
+                </li>
+                <li class="noborder">
+                    <button class="submit btn default" style="width:40%;" id="btnDashboard" onclick="window.open('@Url.Action("Index", "Home", new { Area = "AuthorAdmin" })'); return false;">Full Dashboard</button>
+                </li>
+                <li class="noborder">
+                    
+                    <button class="submit btn default" style="width:40%;" onclick="window.open('@(Url.Action("Settings", "Author", new { area = "AuthorAdmin" }))#payout'); return false;">Payout Options</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
+
+@section FooterScripts
+{
+    @{
+        
+        
+        if (Model == null)
+        {
+           <script>
+               var settings = {
+                   cpFontColor: '#000',
+                   cpBackgroundColor : '#FFF',
+                   cpTabsFontColor: '#006699',
+                   cbIsTransparent: false,
+                   cbIsShowBorder: false,
+                   cbIsShowTitleBar: false,
+                   txtStoreName: '',
+                   storeId : -1,
+                   InstanceId : Wix.Utils.getInstanceId(),
+                   UniqueId : '',
+                   WixSiteUrl : wixSiteUrl               
+               };
+           </script>
+        }
+        else
+        {
+            <script>
+                var settings = {
+                    cpFontColor: '@(!string.IsNullOrEmpty(Model.FontColor) ? Model.FontColor : "#000")',
+                    cpBackgroundColor: '@(!string.IsNullOrEmpty(Model.BackgroundColor) ? Model.BackgroundColor : "#FFF")',
+                    cpTabsFontColor: '@(!string.IsNullOrEmpty(Model.TabsFontColor) ? Model.TabsFontColor : "#006699")',
+                    cbIsTransparent: '@(Model.IsTransparent.ToString().ToLower())',
+                    cbIsShowBorder: '@(Model.IsShowBorder.ToString().ToLower())',
+                    cbIsShowTitleBar: '@(Model.IsShowTitleBar.ToString().ToLower())',
+                    txtStoreName: '@(!string.IsNullOrEmpty(Model.StoreName) ? Model.StoreName : "")',
+                    storeId: '@(Model.StoreId ?? -1)',
+                    InstanceId: Wix.Utils.getInstanceId(),
+                    UniqueId: '@Model.UniqueId',
+                    WixSiteUrl: wixSiteUrl
+                };
+            </script>
+        }
+}
+    
+    
+
+    <script>
+        var userID = '@user.UserId';
+
+        $(document).on('checkbox.change', function (ev, data) {
+            //console.log('Checkbox changed');
+            updateSettingsProperty(data.type, data.checked);
+        });
+
+        $(document).on('colorChanged', function (ev, data) {
+            //console.log('Color changed');
+            updateSettingsProperty(data.type, data.selected_color);
+        });
+
+
+        function updateSettingsProperty(key, value) {
+            //console.log("key=" + key + " value=" + value);
+            settings[key] = value;
+            updateSettings(settings);
+        }
+
+        function updateSettings(settingsJson) {
+            Wix.getSiteInfo(function (siteInfo) {
+                console.log('update settings,Wix get site info', siteInfo);
+                wixSiteUrl = siteInfo.baseUrl;
+                settingsJson.WixSiteUrl = siteInfo.baseUrl;
+            });
+            var settingsStr = JSON.stringify(settingsJson).replace('true', '1') || "";
+            //console.log(settingsStr);
+
+            //var compId = Wix.Utils.getOrigCompId();
+            $.ajax({
+                'type': 'post',
+                'contentType': 'application/json; charset=utf-8',
+                'url': '@Url.Action("SettingsUpdate","Home",new {area="WixEndPoint"})',
+                'data': settingsStr,
+                'cache': false,
+                'success': function (res) {
+                    checkUpdate(res);
+                    //rssModel.settings = settingsJson;
+                    //Wix.Settings.refreshAppByCompIds(compId);
+                    //console.log("update setting completed");
+                },
+                'error': function (err) {
+                    console.log('error updating data to the app server',err);
+                }
+            });
+        }
+
+        function checkUpdate(res) {
+            if (res.success && res.storeID > 0) {
+                settings.storeId = res.storeID;
+                settings.txtStoreName = res.storeName;
+                settings.UniqueId = res.UniqueId;
+                Wix.Settings.refreshApp();
+                //console.log("Refresh App");
+
+                if (res.storeName.length > 0) {
+                    $('#divStoreNameChange1').hide();
+                    $('#divStoreNameChange2').hide();
+                    $('#divStoreNameChange3').show();
+                    $('#divStoreNameChange4').show();
+                    $("#strStoreName").html(res.storeName.trunc(32));
+                    $("#txtStoreName").val(res.storeName);
+                }
+            }
+            
+        }
+
+
+    </script>
+}
+

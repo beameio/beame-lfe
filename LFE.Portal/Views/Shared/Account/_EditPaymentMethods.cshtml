@@ -1,0 +1,47 @@
+﻿@using LFE.DataTokens
+@model List<PaymentInstrumentViewDTO>
+
+
+<script>
+    var listSelector = '#UserPaymentInstruments';
+    function onPmRemoving(e) {
+
+        if (!confirm('Are You sure?')) {
+            e.preventDefault();
+            return;
+        }       
+    }
+</script>
+
+@{
+    if (Model.Any())
+    {
+        @(Html.Kendo().ListView<PaymentInstrumentViewDTO>()
+            .Name("UserPaymentInstruments")
+            .TagName("ul")
+            .HtmlAttributes(new { @class = "ul-pm" })
+            .ClientTemplateId("kendo-pm-template")
+            .Pageable(p => p.Enabled(false))
+            .Editable(e => e.Enabled(false))
+            .Events(e => e.Remove("onPmRemoving"))
+            .BindTo(Model)
+            .DataSource(ds => ds.Destroy(d => d.Action("DeleteStoredPM", "Account", new { area = "" }))
+            .Model(model => model.Id("InstrumentId")))
+        )        
+    }
+    else
+    {
+        <h2 class="h2-no-pm">No saved payment instruments found</h2>
+    }
+}
+    
+<script type="text/x-kendo-template" id="kendo-pm-template">
+    <li>
+        <div class="float-left">
+            <div class="ch-name inline">${DisplayName}</div>
+        </div>
+        <div class="float-right">
+            <a class="btn-action k-delete-button" href="\\#">Remove</a>
+        </div>
+    </li>
+</script>

@@ -1,0 +1,85 @@
+﻿
+@model LFE.DataTokens.DropboxCourseToken
+           
+<div class="tri-title c-title">
+@Model.Name
+</div>
+
+<div id="p-c-desc" class="nano">
+    <div class="content">
+        <div style="width:440px;">
+            @Html.Raw(Model.Overview)
+        </div>        
+    </div>    
+</div>
+
+<script>
+    $(document).ready(function() {
+        setReportScroll('#p-c-desc');
+    });
+</script>
+
+<label class="c-title">Chapters</label>
+
+<div id="c-c-container" class="nano">
+    <div class="content">
+        <ul class="ul-course-simulator">
+            @{
+                foreach (var chapter in Model.Chapters)
+                {
+                    <li>
+                        <label>@chapter.Name</label>
+                        <hr />
+
+                        @{
+                            if (chapter.Videos.Any())
+                            {
+                                <div style="margin-left: 30px;">
+                                    <label>Videos:</label>
+                                    <br />
+                                    <ul style="margin-left: 30px;">
+                                        @{
+                                            foreach (var video in chapter.Videos)
+                                            {
+                                                <li>@video.Name</li>
+                                            }
+                                        }
+                                    </ul>
+
+                                </div>
+
+                            }
+
+                            if (chapter.Documents.Any())
+                            {
+                                <div style="margin:30px 0 0  30px;">
+                                    <label>Documents:</label>
+                                    <br />
+                                    <ul style="margin-left: 30px">
+                                        @{
+                                            foreach (var document in chapter.Documents)
+                                            {
+                                                <li>@document.Name</li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+                    </li>
+
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setReportScroll('#c-c-container');
+    });
+</script>
+
+
+
+

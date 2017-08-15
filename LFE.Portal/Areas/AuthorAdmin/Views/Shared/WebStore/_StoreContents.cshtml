@@ -1,0 +1,114 @@
+﻿@using LFE.Core.Extensions
+@using LFE.DataTokens
+
+@model BaseEntityDTO
+
+<script>
+    var isFormInEditMode = false;
+    var CONTENT_CONTAINER_SELECTOR = '#d-category-container';
+    var CATEGORY_LIST_SELECTOR = '#StoreCategories';
+    var STORE_ITEMS_CONTAINER_SELECTOR = '#d-available-content-container';
+    var ITEM_LIST_SELECTOR = '#StoreItems';
+    var CURRENT_STORE_ID = '@Model.id';
+    var formUserNotifManager;
+    var saveCategoryOrderUrl = '@Url.Action("SaveCategoriesOrder", "WebStore", new { area = "AuthorAdmin" })';
+    var categoryContentsUrl = '@Url.Action("_CategoryContents", "WebStore", new { area = "AuthorAdmin" })';
+    var saveItemOrderUrl = '@Url.Action("SaveCategoryItemsOrder", "WebStore", new { area = "AuthorAdmin" })';
+    var saveItemsUrl = '@Url.Action("SaveCategoryItems", "WebStore", new { area = "AuthorAdmin" })';
+    var deleteItemUrl = '@Url.Action("DeleteItem", "WebStore", new { area = "AuthorAdmin" })';
+
+    var currentUserId = parseInt('@this.GetCurrentUserId()');
+    console.log('currentUserId', currentUserId);
+    $(document).ready(function () {
+        //disable caching
+        $.ajaxSetup({ cache: false });
+
+        //bind command row position events
+        $(window).resize(function () {
+
+        });
+        $(document).scroll(function () {
+
+        });
+
+        //init form notification manager
+        formUserNotifManager = new UserNotificationManager('#cn-info', '.alert', false);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.webstore.categorySaved, showNotification, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.webstore.categorySaved, showNotification, null);
+
+        $('.transfer-btn').click(attachItems2Category);
+    });
+
+
+    function onStoreContentChanged(response) {
+        window.sendApiUpdate();
+        if (response == null) return;
+        window.showNotification(response);
+
+    }
+</script>
+
+@Html.Hidden("CurrentStoreId", Model.id)
+<div id="d-contents-container" style="position: relative;height: 640px">
+
+    <div style="height:40px;position: relative">
+        <div class="float-left">
+            <span class="row-btn btn-add-first btn-add-cat" onclick="addNewCategory()"><span class="ico inline"></span></span>
+        </div>
+        <div class="tree-collapse-container float-left" style="padding-top:6px">
+            <span class="ico ico-expand inline"></span> <span class="inline ec-btn expand" title="expand all" onclick="expandCollapseCategories(1)">Expand all</span>
+
+            <span class="ico ico-collapse inline"></span> <span class="inline ec-btn collapse" title="collapse all" onclick="expandCollapseCategories(2)">Collapse all</span>
+        </div>
+        <div class="info-box float-right cn-info" id="cn-info">
+            <p class="alert" style="width:100%"></p>
+        </div>
+    </div>
+
+    <div id="d-category-container" class="inline nano" style="height: 580px">
+        <div class="content" id="d-cat-content">
+            @(Html.Kendo().ListView<WebStoreCategoryEditDTO>()
+                  .Name("StoreCategories")
+                  .TagName("ul")
+                  .HtmlAttributes(new { @class = "ul-first-level" })
+                  .ClientTemplateId("kendo-ch-list-template")
+                  .Editable()
+                  .Selectable(s => s.Mode(ListViewSelectionMode.Single))
+                  .Events(e => e.DataBound("onCategoryListBound").Edit("onStoreCategoryEdit").Cancel("onStoreCategoryListStateChanged").Remove("onStoreCategoryRemoved"))
+                  .DataSource(ds => ds.Read(read => read.Action("GetStoreEditCategoriesList", "WebStore", new { area = "AuthorAdmin", Model.id }).Type(HttpVerbs.Get)).ServerOperation(false)
+                      .Destroy(d => d.Action("DeleteStoreCategoryFromList", "WebStore", new { area = "AuthorAdmin" }))
+                      .Model(m => m.Id("WebStoreCategoryId")))
+            )
+        </div>
+    </div>
+    <div class="inline transfer-area">
+        <div class="transfer-btn">Add to selected category</div>
+    </div>
+    <div class="inline cn-container">
+        <div class="inner">
+            @Html.Partial("~/Areas/AuthorAdmin/Views/Shared/WebStore/_StoreItemSelection.cshtml")
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/x-kendo-template" id="kendo-ch-list-template">
+    <li data-val="${WebStoreCategoryId}">
+        <div class="chap-row">
+            <span class="float-left drag-box drag" title="drag to reorder">&nbsp;</span>
+            <span class="float-left btn-collapse-first">&nbsp;</span>
+            <span title="#=Encoder.htmlEncode(CategoryName)#" class="float-left ch-name pt9 ellipsis">${CategoryName}</span>
+            <span class="float-right btn-area" style="width:150px;">
+                <span class="k-edit-button row-btn right btn-edit inline" title="Edit chapter"><span class="ico"></span></span>
+
+                <span class="k-delete-button row-btn btn-remove inline pt9" title="Delete chapter"><span class="ico"></span></span>
+            </span>
+        </div>
+        <div class="first-contents" data-load="false" id="cat-cn-${WebStoreCategoryId}">
+
+        </div>
+    </li>
+</script>
+

@@ -1,0 +1,189 @@
+﻿.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.no-bg {
+  background: none;
+}
+.no-repeat {
+  background-repeat: no-repeat;
+}
+.no-padding {
+  padding: 0;
+}
+.no-margin {
+  margin: 0;
+}
+.semi-bold {
+  font-weight: 600;
+}
+.inline {
+  display: inline-block !important;
+  vertical-align: top;
+}
+.block {
+  display: block;
+}
+.ellips-base {
+  overflow: hidden;
+  -moz-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  -moz-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.ellipsis-multiline {
+  white-space: normal;
+  overflow: hidden;
+  -moz-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.upper {
+  text-transform: uppercase;
+}
+.cert-v {
+  width: 842px;
+  height: 595px;
+  display: table-cell;
+  position: relative;
+  text-align: center;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+.cert-v span {
+  display: block;
+  position: absolute;
+}
+.cert-v span.cert-c-name {
+  top: 45px;
+  color: #000;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+}
+.cert-v span.cert-title {
+  top: 95px;
+  color: #000;
+  width: 100%;
+  font-size: 13pt;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.cert-v span.cert-stud-name {
+  top: 130px;
+  color: #000;
+  width: 100%;
+  font-size: 20pt;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.cert-v span.cert-desc {
+  top: 235px;
+  color: #000;
+  width: 100%;
+  font-size: 20px;
+}
+.cert-v span.cert-desc > label {
+  width: 60%;
+  margin: 0 auto;
+  -ms-word-break: normal;
+  word-break: normal;
+}
+.cert-v span.cert-date {
+  bottom: 45px;
+  left: 10%;
+  color: #000;
+  text-align: center;
+}
+.cert-v span.cert-date > label {
+  font-weight: 600;
+  font-size: 14px;
+}
+.cert-v span.cert-date > label.d {
+  font-size: 15px;
+}
+.cert-v span.cert-sign {
+  bottom: 45px;
+  right: 10%;
+  color: #000;
+}
+.cert-v span.cert-sign > img {
+  width: 160px;
+  height: 44px;
+}
+.cert-v span.cert-sign > label {
+  font-weight: 600;
+  font-size: 14px;
+}
+.cert-v span.cert-sign > label > span {
+  display: inline-block !important;
+  vertical-align: top;
+  position: relative;
+}
+.cert-v span.cert-sign > label > span.n {
+  text-transform: capitalize;
+  font-size: 15px;
+}
+.cert-v span > label {
+  display: block;
+  overflow: hidden;
+}
+.cert-v.t1 span.cert-title {
+  color: #fff;
+  top: 130px;
+}
+.cert-v.t1 span.cert-stud-name {
+  top: 200px;
+}
+.cert-v.t1 span.cert-desc {
+  top: 335px;
+}
+.cert-v.t2 span.cert-stud-name {
+  top: 230px;
+}
+.cert-v.t2 span.cert-desc {
+  top: 340px;
+}
+.cert-v.t2 span.cert-sign {
+  bottom: 65px !important;
+  right: 110px;
+}
+.cert-v.t2 span.cert-date {
+  bottom: 65px !important;
+  left: 15%;
+}
+.cert-v.t3 span.cert-c-name,
+.cert-v.t3 span.cert-title,
+.cert-v.t3 span.cert-desc {
+  color: #1c7c8a;
+}
+.cert-v.t3 span.cert-c-name {
+  top: 60px;
+}
+.cert-v.t3 span.cert-title {
+  top: 130px;
+}
+.cert-v.t3 span.cert-stud-name {
+  top: 200px;
+}
+.cert-v.t3 span.cert-desc {
+  top: 335px;
+}
+.cert-v.t3 span.cert-sign {
+  bottom: 60px !important;
+}
+.cert-v.t3 span.cert-date {
+  bottom: 60px !important;
+  left: 15%;
+}

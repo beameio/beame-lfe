@@ -1,0 +1,99 @@
+﻿@model int
+
+<script>
+	var OL_LIST_CONTAINER_SELECTOR = '#d-ol-full-list';
+	var OL_PERSONAL_CONTAINER_SELECTOR = '#d-ol-personal';
+	var OL_CONTAINER_SELECTOR = '#d-ol-container';
+	
+	var effect;
+	var reverse = false;
+	var flipSupported;
+	
+	$(document).ready(function () {
+	   
+
+	    flipSupported = isFxSupported();
+	    
+        if (flipSupported) {
+            effect = kendo.fx("#d-ol-container").flipHorizontal($(OL_LIST_CONTAINER_SELECTOR), $(OL_PERSONAL_CONTAINER_SELECTOR)).duration(1000);
+        }
+	    
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setLearnerH, null);
+	});
+
+	function setLearnerH(h) {
+	    if (h != null) {
+	        $('#d-ol-container').height(h - 40);
+	        $('#d-ol-full-list').height(h - 40); //minus 40 tabs row
+	        $('#d-ol-personal').height(h - 40); //minus 40 tabs row
+	    }
+	   // setReportScroll("#d-ch-tree-container");
+	}
+
+	function showLearner(id) {
+		ajaxAction('@Url.Action("GetOtherLearnerPersonalPartial","Course")',{id:id},showLearnerPersonal,null);
+	}
+
+    function showLearnerPersonal(view) {
+        
+        if (flipSupported) {
+            $(OL_PERSONAL_CONTAINER_SELECTOR).html(view);
+          //  $(OL_CONTAINER_SELECTOR).height(800);
+            effect.stop();
+            reverse ? effect.reverse() : effect.play();
+            reverse = !reverse;
+        } else {
+            $(OL_LIST_CONTAINER_SELECTOR).toggle("slide", function () {
+            //    $(OL_CONTAINER_SELECTOR).height(800);
+                $(OL_PERSONAL_CONTAINER_SELECTOR).html(view).toggle("slide");
+            });
+        }
+		
+	}
+	
+    function showFullList() {
+        if (flipSupported) {
+           // $(OL_CONTAINER_SELECTOR).height(675);
+            effect.stop();
+            reverse ? effect.reverse() : effect.play();
+           // $(OL_PERSONAL_CONTAINER_SELECTOR).html(null);
+            reverse = !reverse;
+        } else {
+            $(OL_PERSONAL_CONTAINER_SELECTOR).toggle("slide", function () {
+             //   $(OL_CONTAINER_SELECTOR).height(675);
+                $(OL_PERSONAL_CONTAINER_SELECTOR).html(null);
+                $(OL_LIST_CONTAINER_SELECTOR).toggle("slide");
+            });
+        }        
+    }
+    
+    
+</script>
+
+<div id="d-ol-container">    
+	<div id="d-ol-full-list" class="flip">
+        @Html.Partial("CourseViewer/_OtherLearnerList",Model)
+	</div>
+	
+	<div id="d-ol-personal" style="display: none" class="flip"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+        setLearnerH(h);
+    });
+</script>
+
+<script type="text/x-kendo-template" id="kendo-ol-list-template">
+	<li data-val="${id}">
+        <div class="d-lo-cart">   
+		    <div class="cell">
+			    <img src="${photoUrl}" alt="${name}" />
+		    </div>
+		    <div class="cell">
+			    <label class="name">${name}</label>
+		    </div>
+        </div>
+	</li>
+</script>

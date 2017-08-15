@@ -1,0 +1,60 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.CouponReportPageToken
+
+@{
+    var types = Utils.EnumWithDescToList<CourseEnums.CouponType>();
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.coupon.couponSaved, rebindBundleCoupons, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.coupon.couponSaved, rebindBundleCoupons, null);
+     });
+
+    function rebindBundleCoupons() {
+        $('#CouponsReport').data("kendoGrid").dataSource.read();
+    }
+
+    function onDestroyCouponClicked(e) {
+        if (!e.model.IsDeleteAllowed) {
+            alert(userMessages.COUPON_PREVENT_DELETE);
+            e.sender.cancelChanges();
+            e.preventDefault();
+        }
+    }
+
+    function editCoupon(id) {
+        window.getNotifManagerInstance().notify(notifEvents.coupon.couponInitEdit, id);
+    }
+</script>
+
+@(Html.Kendo().Grid<CouponDTO>()
+        .Name("CouponsReport")
+        .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.CouponName).Title("Coupon Name");
+            columns.ForeignKey(p => p.Type, types, "Value", "Title").Title("Type");            
+            columns.Bound(p => p.KindDisplayName).Title("Kind").Visible(Model.ShowAuthorFields);
+            columns.Bound(p => p.ItemName).Title("Item").Visible(Model.ShowAuthorFields);
+            columns.Bound(p => p.Amount).Title("Amount");
+            columns.Bound(p => p.IsActive).Title("Active");
+            columns.Bound(p => p.ExpirationDate).Title("Valid Until").Format("{0:d}");
+            columns.Bound(p => p.UsageLimit).Title("Limit");
+            columns.Bound(p => p.ActualUsage).Title("Actual");
+            columns.Bound(p => p.CouponCode).Title("Code");
+            columns.Bound(m => m.CouponId).ClientTemplate("<span class='grid-btn' title='Edit #=CouponName#' onclick='editCoupon(#=CouponId#)'>Edit</span>").Title(" ").Filterable(false);            
+            columns.Command(c => c.Destroy().HtmlAttributes(new { @class = "list-cmd" })).Title(" ").Width(50);
+        })
+        .Sortable()
+        .Pageable(pager => pager.Numeric(true).Refresh(true))
+        .Filterable(f => f.Enabled(false))
+        .Events(e=>e.Remove("onDestroyCouponClicked"))
+        .DataSource(dataSource => dataSource.Ajax()
+                                            .Model(model => model.Id(p => p.CouponId))
+                                            .Read(read => read.Action(Model.Action, "Course", new {id = Model.Id }).Type(HttpVerbs.Get)).ServerOperation(false)
+                                            .PageSize(Model.PageSize)
+                                            .Destroy(d=>d.Action("DestroyCoupon","Course")))
+    )

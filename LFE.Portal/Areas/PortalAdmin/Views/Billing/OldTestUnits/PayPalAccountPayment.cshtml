@@ -1,0 +1,36 @@
+﻿@model LFE.Portal.Areas.PortalAdmin.Models.PaypalTesterToken
+
+
+@{
+    ViewBag.Title = "PayPal Account Payment";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_BillingLayout.cshtml";
+}
+
+
+
+<div data-ng-controller="CourseSelectCntrl" id="dSlctCourse">
+	
+	
+    <input id="course-name" style="width: 400px"  data-kendo-auto-complete="" data-k-options="options"  data-k-on-select="courseSelected(kendoEvent)"/>
+	
+    <hr/>
+    <form name="frmDirectPay"  action="@Url.Action("CreateAccountPayment","Billing")" method="POST">
+		
+        <input type = "text" data-ng-show = "false" name="courseId" value="{{CourseId}}" />
+        <input type = "text" data-ng-show = "false" name="price"  value="{{Price}}"/>
+        <input type = "text" data-ng-show = "false" name="chkSaveAgreement"  value="true"/>
+
+        <h2>Course name: {{Name}}</h2>
+		
+        <h3>Price: {{Price}}</h3>
+		
+        <div style="margin: 10px 0">
+            <label>Save agreement</label> <input type="checkbox" id="chkAgreement" name="chkAgreement" class="inline"/>    
+        </div>
+        
+
+        <input type="submit" style="padding: 7px;margin: 15px 0 0" class="k-button" title="Pay" value="Do Payment" /> 
+    </form>     
+</div>
+
+@Html.Partial("Billing/_CourseSelectionController")

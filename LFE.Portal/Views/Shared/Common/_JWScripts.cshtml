@@ -1,0 +1,6 @@
+﻿@using LFE.Portal.Helpers
+
+@*<script src="http@(Request.IsSecureConnection ? "s" : "")://jwpsrv.com/library/VR_oHg9rEeWY1A4AfQhyIQ.js"></script>*@
+
+<script src="@Url.Content("~/Scripts/jwplayer/jwplayer.js")"></script>
+<script>jwplayer.key = "@this.JwPlayerKey()";</script>

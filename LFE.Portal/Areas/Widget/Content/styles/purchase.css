@@ -1,0 +1,147 @@
+﻿/*body{ font-family: 'Open Sans',Arial;min-width:280px;background: #e8efff;overflow-y: hidden}*/
+
+hr{ padding: 0;margin: 25px 0;height: 2px;background: #0f4162}
+
+.sc-container{color:#0f4162;margin:0 auto;max-width:640px;min-width:280px;width:100%}
+.sc-container > .row{ padding-top: 25px;}
+.sc-container .form-row{display: table}
+
+.sc-container .sc-input{ height: 45px;width: 155px;color: #64769a;font-size: 14px;background-color: #ccd7ed;border: none;border-radius: 0;display: table-cell;vertical-align: middle}
+.sc-container input[type="submit"]{border: none;border-radius: 0;cursor:pointer;height:45px;text-align:center;width:auto;}
+
+.sc-container .sc-btn{ background: #2574a9;color: #fff;border: none;border-radius: 0;cursor:pointer;height:45px;text-align:center;display: table-cell;vertical-align: middle}
+
+.sc-container  .foot{ height: 100px;   }
+.sc-container  .btn-buy{ color: #fff;background: #26a65b;height: 65px;width:150px;position: absolute;bottom: 0;right: 0;font-size: 24px;display: table}
+.sc-container  .btn-buy > .inner {display: table-cell;text-align: center;vertical-align: middle;cursor: pointer}
+
+.sc-container .sc-input-coupon{ width: 235px}
+.sc-container .sc-btn-coupon{ width:70px}
+.toggle-coupon{ text-decoration: underline;color: inherit}
+.sc-container .sc-btn-paypal{background: #aac4d6;color:#162e3e}
+.sc-container .sc-btn-saved-cc{background: #c9daea;color:#162e3e}
+
+.sc-row{ padding: 0 !important;margin: 0 !important}
+.sc-row .col{padding: 0}
+
+.coupon-container{text-align: left}
+
+.pay-course-head { text-transform: capitalize;text-align: left}
+.pay-course-head .item-price-title{ font-size: 25px;font-weight: 600}
+.pay-course-head .item-title{ font-size: 18px;}
+
+@media (max-width: 319px) {
+    .sc-container .sc-input-coupon{ width: 205px}
+   .pay-course-head .item-price-title{ font-size: 20px;}
+    .pay-course-head .item-title{ font-size: 14px;}
+}
+@media (min-width: 320px) and (max-width: 589px) {
+   .sc-container .sc-input-coupon{ width: 215px}
+   .pay-course-head .item-price-title{ font-size: 22px;}
+   .pay-course-head .item-title{ font-size: 16px;}
+}
+
+#msg-container{font-size:13px;min-height:20px}
+#msg-container.error{color:red}
+#msg-container.info{color:green}
+
+.pay-method-container{text-align: left}
+.pay-method-container > .po-row{ width: 100%;margin-top: 5px}
+.pay-method-container > .po-row > .sc-btn {display: table}
+.pay-method-container > .po-row > .sc-btn > span{ display: table-cell;width: 100%;height: 100%;vertical-align: middle;text-align: center }
+.pay-method-container > .po-row > .sc-btn > span.active,#scc-selected > .scc-opt-container > .po-box.active{ color: #162b3c;background: #fff;font-weight: 600}
+
+.cc-editor{ height: auto;}
+.cc-editor label{ font-size: 14px;text-align: left !important}
+.cvv-label{ padding-top: 8px !important;}
+@media (max-width: 589px) {
+    .pay-method-container > .po-row > .sc-btn > span{ text-align: left;padding-left: 10px }    
+    #cc-addr-editor-box{margin-top: 15px}  
+    .cvv-label{ padding-top: 0 !important;}
+}
+
+
+/*saved cc ddl*/
+.css-selected,#scc-selected{height: 45px}
+
+.scc-ddl{height: 45px}
+
+.sc-btn-saved-cc .dropdown-menu{border-radius:0;margin:0;min-width:0;padding:0;width: 100%;border-top: 1px solid #0f4162;top:43px}
+.sc-btn-saved-cc .dropdown-menu > li {height:45px;}
+
+.mandatory{ color: red;font-size: 11px; margin: 0 0 10px 15px;padding-left: 15px;}
+.error-pane{min-height: 30px;height: auto;margin-top: 15px;display: none;color: #fff;font-size: 12px;}
+.error-pane > .inner{height: auto;width: 100%;background: red;}
+.error-pane > .inner > .e-row{vertical-align: middle;padding-left: 15px;height: 30px;width: 100%;}
+.error-pane > .inner > .e-row.common { display: table-cell}
+.error-pane > .inner > .e-row.common a{ color: #fff;text-decoration: underline;}
+.error-pane > .inner > .e-row.pp-error { display: none;border-top: solid 2px #fff}
+.error-pane > .inner > .e-row.pp-error > span{ display: table-cell;vertical-align: middle;width: 100%;height: 30px}
+
+
+.d-po-selection-container{ background: #fff;width: 100%;height: auto;position: relative;top: -3px;padding: 10px 0 0}
+#d-pp-container{text-align: left}
+.d-po-selection-container .info-label{ font-size: 20px;width: auto;color: inherit;margin: 15px}
+.scc-container > div{ display: inline-block;vertical-align: top;width: 100%}
+
+.scc-opt-container{ width: 100%;height: 100%;display: table}
+.scc-opt-container > span.po-box{ display: table-cell;vertical-align: middle;text-align: center;background: #c9daea;}
+.scc-opt-container > span.po-box.scc:after{content: "Saved Credit Card"}
+
+@media (max-width: 589px) {
+    .scc-opt-container > span.po-box.scc:after{content: "Saved Card"}
+}
+
+b.scc-ddl-caret{ position: absolute;display: block;top: 50%;right: 10px;cursor: pointer;}
+
+/*bootstrap form*/
+.form-horizontal .form-group{ margin: 0 !important;height: 32px;margin-bottom: 5px !important;margin-left: 15px !important}
+.form-horizontal .form-group .col{padding: 0}
+.form-horizontal .form-group label{ width: 100px;height: 100%;vertical-align: bottom;display: inline-block }
+.form-horizontal .form-group input.sc-input{height: 32px}
+
+.form-drop.k-dropdown{ padding: 0;border: 0;border-radius: 0;margin: 0;height: 100%;width: 155px !important}
+.form-drop.k-dropdown.small-combo{width: 75px !important}
+.form-drop.k-dropdown .k-dropdown-wrap{background: #ccd7ed;border-radius: 0;border: none;height: 32px;}
+.form-drop.k-dropdown .k-dropdown-wrap .k-state-focus{box-shadow: none}
+.form-drop.k-dropdown .k-input{color: #0f4162 !important;font-size: 13px;padding: 4px 0 0 12px}
+
+.scc-drop.k-dropdown{ padding: 0;border: 0;border-radius: 0;margin: 0;height: 100%;width: 100% !important}
+.scc-drop.k-dropdown .k-dropdown-wrap{background: #c9daea;border-radius: 0;border: none;height: 45px;}
+.scc-drop.k-dropdown .k-dropdown-wrap .k-state-focus{box-shadow: none}
+.scc-drop.k-dropdown .k-input{color: #162e3e !important;font-size: 13px;padding: 4px 0 0 12px}
+
+@media (max-width: 589px) {
+    .form-horizontal .form-group { padding-bottom: 10px;height: auto}
+    .form-horizontal .form-group label { width: 200px;height: 20px}
+}
+
+
+.k-list > li{ border: none;border-radius: 0;background: #c9daea;color: #0f4162 !important;height: 32px;margin: 0}
+.k-list > .k-state-selected{color: #fff !important}
+
+/*kendo*/
+.k-state-border-up{box-shadow: none !important}
+.k-popup{ margin: 0;padding: 0 !important;border: none !important;border-radius: 0 !important}
+.k-list .k-item,.k-input{font-size: 13px !important}
+ label{font-weight: normal !important}
+
+ #CountryId_listbox{width: 180px}
+ #UserSavedCards_listbox{width:99%}
+
+ /*misc*/
+.inline{ display: inline-block !important;vertical-align: top}
+.no-pad{padding: 0 !important}
+.no-marg{margin: 0 !important}
+.rel{position: relative}
+.disabled{opacity:.5}
+div.validator-container{color:red;display:inline-block;vertical-align:top;width: 8px;float:left}
+.field-validation-error{ color: red;position: absolute;left: -8px;top: 4px;}
+
+/*loader*/
+.loader-mask{ position: absolute;background: #fff;opacity: 0.8;display: none}
+.loader-mask > .inner{ width: 100%;height: 100%;text-align: center;}
+.loader-mask > .inner > .info{ position: relative;top: 150px;width: auto;margin: 0 auto;font-size: 18px;color: #000;}
+.loader-mask > .inner > .loader{ background: url('../../../../Content/images/main-loader.gif') no-repeat;width: 128px;height: 128px;position: relative;top: 200px;margin: 0 auto}
+
+.icon-grp { width:69px;height:67px;position:absolute;right:0px;top:65px; background:url(../../../../Areas/Widget/Content/assets/ico-grp.png) no-repeat; }

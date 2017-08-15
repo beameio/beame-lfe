@@ -1,0 +1,14 @@
+﻿@model LFE.DataTokens.ItemAffiliateCommissionDTO
+    
+@Html.HiddenFor(x => x.ItemId)
+@Html.HiddenFor(x => x.ItemType)
+<ul class="ul-edit-form cp1 inline">
+    <li>
+        <div class="input-container" style="width: 90px;">
+            @(Html.Kendo().NumericTextBoxFor(m => m.AffiliateCommission).Events(e => e.Change("setEditMode")).Format("{0:N0}").Decimals(0).Min(0).Max(100).Spinners(false).HtmlAttributes(new { @class = "k-tb-reset", @style = "width:85px" }))
+        </div>
+        <label class="symb">%</label>
+        @Html.LabelFor(m => m.AffiliateCommission, new { @style = "width: auto" })
+    </li>
+</ul>
+

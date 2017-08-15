@@ -1,0 +1,9 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.PortalAdmin.Models
+@{
+	ViewBag.Title = "Events Log Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+@Html.Partial("Report/_EventReportFilters", new EventFiltersToken { PeriodKind = ReportEnums.ePeriodSelectionKinds.week })
+
+@Html.Partial("Report/_EventLogsGrid")

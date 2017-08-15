@@ -1,0 +1,25 @@
+﻿@model LFE.Portal.Areas.Widget.Models.PaypalCompleteRequestToken
+@{
+    ViewBag.Title = "ThankYou";
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            var success = '@Model.IsSuccess'.toLowerCase() == 'true';
+            
+            if (success) {
+                window.opener.location.href = '@Model.RedirectUrl';
+                window.close();
+                return;
+            }
+            $('#hm').html('@Model.Message');
+        });
+    </script>
+}
+
+<h2 style="width: 400px; margin: 25px auto 0" id="hm">
+    Completing payment
+</h2>

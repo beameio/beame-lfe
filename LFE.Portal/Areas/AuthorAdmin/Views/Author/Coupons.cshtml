@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Author coupons manage";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+@section css
+{
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/course.css" )" rel="stylesheet" type="text/css" />
+    <style>
+        #d-cpn .info-box p{width: 555px}
+        #d-cpn .info-box { width: 585px; }
+        .form-cmd-row { background-color: #CACACA; border-bottom: 1px solid #9F9F9F; border-top: 1px solid #9F9F9F; }
+        .form-cmd-row .btn-container{margin: 5px 0 0}
+        .form-cmd-row a { background-position: 0 2px; background-repeat: no-repeat; color: #333333; display: inline-block; font-size: 16px; padding-left: 20px; text-transform: uppercase; vertical-align: top; }
+    </style>
+}
+@section scripts
+{
+    @Scripts.Render("~/Areas/AuthorAdmin/bundles/course")
+}
+
+@Html.Partial("Coupons/_AuthorCouponManage")

@@ -1,0 +1,259 @@
+﻿@using LFE.DataTokens;
+@model LFE.Portal.Areas.AuthorAdmin.Models.ChartsModel
+
+<div class="charts">
+	<div class="chart-main spanned">
+		<div class="headerBG"><div><span></span></div></div>
+		@(Html.Kendo().Chart<DashboardKpiChartDTO>()
+			.Events(e => e.LegendItemClick("charts.onLegendClick").LegendItemHover("charts.onLegendHover").DataBound("function(){ hideLoader('.charts'); }"))
+			.Name("kpiChart_main")
+			.HtmlAttributes(new { @style = "height:400px" })
+			.Title(t => t.Visible(false))
+			.Legend(legend => legend.Position(ChartLegendPosition.Left).Labels(l=>l.Font("9px Open Sans").Padding(5, 0, 5, 0)))
+			.AutoBind(false)
+			.DataSource(ds => ds.Read(r => r.Action("GetMainChartData", "Home").Data(Model.GetFilter)))
+			.Series(series =>
+			{
+				series.Line(model => model.items).Name("PRODUCT PAGE VIEW").Color("#6c7a89").Tooltip(t => t.Template("Total #=value# product page views"));
+				series.Line(model => model.stores).Name("STORE VIEWS").Color("#f27935").Tooltip(t => t.Template("Total #=value# store views"));
+				series.Line(model => model.video_preview_watch).Name("PREVIEW CLIP").Color("#00b16a").Tooltip(t => t.Template("Total #=value# promo video views"));
+				series.Line(model => model.buy_entered).Name("BUY PAGE ENTERED").Color("#913d88").Tooltip(t => t.Template("Enter buy page #=value# times"));
+				series.Line(model => model.purchase_complete).Name("PURCHASE COMPLETE").Color("#81cfe0").Tooltip(t => t.Template("Complete Purchase #=value# times"));
+			})
+			.SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Style(ChartLineStyle.Smooth).Tooltip(t => t.Color("#000")))
+			.CategoryAxis(axis => axis
+				.Date()                
+				.BaseUnit(ChartAxisBaseUnit.Days)
+				.Categories(model => model.date)
+				.Labels(labels => labels.Rotation(-90))			
+			)
+			.ValueAxis(axis => axis.Logarithmic()
+				.Labels(labels => labels.Format("{0:N0}"))
+			)
+			.Tooltip(tooltip => tooltip
+				.Visible(true)
+				.Format("{0:N0}")
+				.Template("Total #=value# views")
+		))
+	</div>
+	<div class="chart-comp hidden">
+		<div class="headerBG"><div><span></span></div></div>
+		@(Html.Kendo().Chart<DashboardKpiChartDTO>()
+			.Events(e => e.DataBound("function(){ hideLoader('.charts'); }"))
+			.Name("kpiChart_comp")
+			.HtmlAttributes(new { @style = "height:400px" })
+			.Title(t => t.Visible(false))
+			.AutoBind(false)
+			.Legend(legend => legend
+				.Position(ChartLegendPosition.Left).Visible(false)
+			)
+			.DataSource(ds => ds.Read(r => r.Action("GetCompChartData", "Home").Data(Model.GetFilter)))
+			.Series(series =>
+			{
+				series.Line(model => model.items).Name("PRODUCT PAGE VIEW").Color("#6c7a89").Tooltip(t => t.Template("Total #=value# product page views"));
+				series.Line(model => model.stores).Name("STORE VIEWS").Color("#f27935").Tooltip(t => t.Template("Total #=value# store views"));
+				series.Line(model => model.video_preview_watch).Name("PREVIEW CLIP").Color("#00b16a").Tooltip(t => t.Template("Total #=value# promo video views"));
+				series.Line(model => model.buy_entered).Name("BUY PAGE ENTERED").Color("#913d88").Tooltip(t => t.Template("Enter buy page #=value# times"));
+				series.Line(model => model.purchase_complete).Name("PURCHASE COMPLETE").Color("#81cfe0").Tooltip(t => t.Template("Complete Purchase #=value# times"));
+			})
+			.SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Style(ChartLineStyle.Smooth).Tooltip(t => t.Color("#000")))
+			.CategoryAxis(axis => axis
+				.Date()
+				.BaseUnit(ChartAxisBaseUnit.Days)
+				.Categories(model => model.date)
+				.Labels(labels => labels.Rotation(-90))
+			)
+			.ValueAxis(axis => axis.Logarithmic()
+				.Labels(labels => labels.Format("{0:N0}"))
+			)
+			.Tooltip(tooltip => tooltip
+				.Visible(true)
+				.Format("{0:N0}")
+				.Template("Total #=value# views")
+		))
+	</div>
+</div>
+
+<script>
+	
+	(function(){
+		var getGroupBy = @Model.GetGroupBy;
+		var getFilter = @Model.GetFilter;
+		function mainChart() { return $('#kpiChart_main').data('kendoChart'); }
+		function compChart() { return $('#kpiChart_comp').data('kendoChart'); }
+		function getNote(color, date, name) {
+			var abbr = name.toString()[0].toUpperCase();
+			return {
+				label: { color: color, visible: true, text: abbr }, 
+				value: date
+				,line: {
+					color: color,length:300
+				},
+				icon: {
+					type: "circle",
+					background:color,
+					border: { color:color}
+				}
+			};
+		}
+	
+		function dropDown() { return $('#' + window.GROUPBY_DDL_ID).data('kendoDropDownList'); }
+		var removedItems = {};
+		function removeDataItems(nameList) {
+			var ddl = dropDown();
+			$(ddl.dataSource.data()).each(function(index){
+				if (nameList.indexOf(this.Name) > -1) 
+					removedItems[this.Name] = ddl.dataSource.at(index);
+			});
+			for (var key in removedItems) {
+				ddl.dataSource.remove(removedItems[key]);
+			}
+		}
+		function restoreDataItems(nameList) {
+			var ddl = dropDown();
+			for (var key in removedItems) {
+				if (nameList && nameList.indexOf(key) == -1) continue;
+				ddl.dataSource.add(removedItems[key]);
+				delete removedItems[key];
+			}
+			ddl.dataSource.sort({ field:'Value', dir:'asc' });
+		}
+		function findItem(name) {
+			var ddl = dropDown();
+			var item = null;
+			$(ddl.dataSource.data()).each(function(index){
+				if (this.Name == name) {
+					item = ddl.dataSource.at(index);
+					return;
+				}
+			});
+			return item;
+		}
+		function selectItem(name) {
+			var item = findItem(name);
+			dropDown().value(item.Value);
+			dropDown().select(item);
+		}
+		function setGroupBy() {
+			var days = Math.round(window.PeriodsToken.Period.to.DaysDiff(window.PeriodsToken.Period.from));
+			restoreDataItems();
+			if (days < 21) {
+				removeDataItems(['months', 'weeks']);
+				selectItem('days');
+			} else
+			if (days < 32) {
+				removeDataItems(['months']);
+				selectItem('days');
+			} else
+			if (days < 91) {
+				removeDataItems(['days']);
+				selectItem('weeks');
+			} else {
+				removeDataItems(['days']);
+				selectItem('months');
+			}
+		}
+	
+		window.charts = {
+			groupBy: function(data) {
+				mainChart().options.categoryAxis.baseUnit = data.Name;
+				compChart().options.categoryAxis.baseUnit = data.Name;
+				mainChart().redraw();
+				compChart().redraw();
+			},
+			reload: function() { 
+				setGroupBy();
+				showContainerLoader('.charts');
+				var baseUnit = getGroupBy() ? getGroupBy().Name : 'days';
+				var filter = getFilter();
+				mainChart().options.categoryAxis.baseUnit = baseUnit;
+				//mainChart().options.categoryAxis.baseUnitStep = 3;
+				compChart().options.categoryAxis.baseUnit = baseUnit;
+
+				//if (baseUnit == 'days') {
+				//    compChart().options.categoryAxis.labels.skip = 2;
+				//    compChart().options.categoryAxis.labels.step = 2;    
+				//}
+			
+				if (filter.IsCompareMode) { 
+					$('.chart-main').removeClass('spanned');
+					$('.chart-comp').removeClass('hidden');
+
+					//if (baseUnit == 'days') {
+					//    mainChart().options.categoryAxis.labels.skip = 2;
+					//    mainChart().options.categoryAxis.labels.step = 2;    
+					//}
+
+					mainChart().dataSource.read();
+					compChart().dataSource.read();
+				}
+				else {
+					$('.chart-main').addClass('spanned');
+					$('.chart-comp').addClass('hidden');
+					mainChart().dataSource.read();
+				}
+			},
+			addNotes: function(evDataArr) {
+				var notesArr = [];
+				$(evDataArr).each(function(){
+					notesArr.push(getNote(this.Color, this.Date, this.Name));
+				});
+			
+				mainChart().setOptions({
+					categoryAxis: [{
+						baseUnit: getGroupBy().Name,
+						//baseUnitStep: 3,
+						field: "date",
+						labels: { rotation:-90 },
+						notes: {data: notesArr}
+					}]
+				});
+				compChart().setOptions({
+					categoryAxis: [{
+						baseUnit: getGroupBy().Name,
+						field: "date",
+						labels: { rotation:-90 },
+						notes: {data: notesArr}
+					}]
+				});
+			},
+			removeNotes:function() {
+			
+				mainChart().setOptions({
+					categoryAxis: [{
+						field: "date",
+						labels: { rotation:-90 },
+						notes: {
+							data: []
+						}
+					}]
+				});
+				compChart().setOptions({
+					categoryAxis: [{
+						field: "date",
+						labels: { rotation:-90 },
+						notes: {data: window.notesArr}
+					}]
+				});
+			},
+			onLegendClick: function(e) {
+				compChart()._legendItemClick(e.seriesIndex); 
+				//compChart().options.series[e.seriesIndex].visible = !e.series.visible;
+				//compChart().redraw();
+			},
+			onLegendHover: function() {
+				//compChart()._legendItemHover(e, '');
+				//console.log(e);
+			},
+			refresh: function() {
+				mainChart().refresh();
+				compChart().refresh();
+			}
+		}
+	}());
+	$(window).bind("resize", function () {
+		charts.refresh();
+
+	});
+
+</script>

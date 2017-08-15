@@ -1,0 +1,470 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@using LFE.Portal.Helpers
+@model LFE.Portal.Areas.AuthorAdmin.Models.PriceLinesManageToken
+
+@{
+    var periodTypes = (BillingEnums.eBillingPeriodType.HOUR | BillingEnums.eBillingPeriodType.DAY | BillingEnums.eBillingPeriodType.WEEK | BillingEnums.eBillingPeriodType.MONTH).ToTranslatedArray();
+
+}
+
+<script>
+    var PL_CONTAINER_SELECTOR = '#d-pl-container';
+    var isFree = false;
+    $(document).ready(function () {
+        $('#btn-submit-pl').unbind('click').click(function (e) {
+            e.preventDefault();
+            $('#frmNewPrice').submit();
+        });
+
+        setReportScroll(PL_CONTAINER_SELECTOR);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.course.pricelessFlagChanged, setFreeCourseFlag, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.course.pricelessFlagChanged, setFreeCourseFlag, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.course.coursePriceMetaSaved, rebindPriceLines, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.course.coursePriceMetaSaved, rebindPriceLines, null);
+    });
+
+    function setFreeCourseFlag(checked) {
+        isFree = checked;
+    }
+
+    function rebindPriceLines() {
+        // if (isFree) return;
+        $('#CoursePrices').data('kendoListView').dataSource.read();
+    }
+
+    function onPriceListBound() {
+
+        itemPriceModel.updateListState();
+        setReportScroll(PL_CONTAINER_SELECTOR);
+        window.getNotifManagerInstance().notify(notifEvents.course.priceLinesBound, null);
+    }
+    function onPlRequestEnd(e) {
+        var type = e.type;
+
+        switch (type) {
+            case 'read':
+                break;
+            case 'destroy':
+                if (!e.response.success) {
+                    handleErrorMessage(response.error);
+                    return;
+                }
+                break;
+            case 'update':
+                if (e.response.success) return;
+                handleErrorMessage(response.error);
+                break;
+        }
+    }
+
+    function handleErrorMessage(error) {
+        if (window.formPriceUserNotifManager) {
+            var kind = NotificationKinds.Error;
+            window.formPriceUserNotifManager.show({ message: error, kind: kind });
+        } else {
+            alert(error);
+        }
+    }
+
+    function onPriceLineRemoved(e) {
+        if (!window.confirm('Delete price?')) e.preventDefault();
+    }
+
+
+    function onPriceLineSaving() {
+        var type = itemPriceModel.get('insertPriceType');
+
+        if (type == '@BillingEnums.ePricingTypes.FREE.ToString()') return true;
+
+        //if (isFree) {
+        //    handleErrorMessage("Price couldn't be set for free course");
+        //    return false;
+        //}
+
+        if (!hasValue($('#frmNewPrice #Price').data("kendoNumericTextBox").value())) {
+
+            handleErrorMessage("Price required");
+
+            return false;
+        }
+
+
+
+        if (type == '@BillingEnums.ePricingTypes.RENTAL') {
+
+            if (!hasValue($('#PeriodType').data('kendoDropDownList').value())) {
+
+                handleErrorMessage("Select Rental Period");
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function onPriceLineSaved(response) {
+
+
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? "Course price saved successfully" : response.error;
+
+        if (response.success) {
+            window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+            rebindPriceLines();
+            $('#frmNewPrice #Price').data("kendoNumericTextBox").value(null);
+            exitEditMode();
+        }
+
+        if (window.formPriceUserNotifManager) window.formPriceUserNotifManager.show({ message: msg, kind: kind });
+
+        window.isFormInEditMode = false;
+    }
+
+    function filterPeriodUnits() {
+        return {
+            type: $("#PeriodType").val()
+        };
+    }
+
+    function onCurrencySelected() {
+        setTimeout(function () {
+            itemPriceModel.setCurrency();
+        }, 150);
+
+    }
+</script>
+
+<div class="rel" id="pl-container" style="width:640px">
+    <div class="d-price-tabs">
+        <div>
+            <span data-target="1" data-bind="events:{click:onTabClicked},attr: { class: tab1Class }">Add one-time price</span>
+            <span data-target="2" data-bind="events:{click:onTabClicked},attr: { class: tab2Class }">Add Monthly Subscription price</span>
+            <span data-target="3" data-bind="events:{click:onTabClicked},attr: { class: tab3Class }">Add time-limited rental price</span>
+            @{
+                if (Model.Item.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+                {
+                    <span data-target="4" data-bind="events:{click:onTabClicked},attr: { class: tab4Class }">Set Free price</span>
+                }
+            }            
+        </div>
+        <div class="d-price-exp">
+            Please price this course in the currency you chose for the store you wish to attach it to.
+            If the currency chosen does not match that of the store and you didn’t define a price in $ as well for your course,
+            no price will be displayed for this course on your store!
+        </div>
+    </div>
+    <style>
+        .ul-price-list {
+            margin: 10px 0;
+            padding: 0;
+        }
+
+            .ul-price-list li {
+                margin: 0;
+                padding: 0;
+            }
+
+        .li-pl-container {
+            height: 120px;
+        }
+    </style>
+    <div class="li-pl-container nano" id="d-pl-container" data-bind="style:{display:priceListStyle}">
+        <div class="content">
+            @(Html.Kendo().ListView<PriceLineDTO>()
+                    .Name("CoursePrices")
+                    .TagName("ul")
+                    .HtmlAttributes(new { @class = "ul-price-list" })
+                    .ClientTemplateId("kendo-ch-list-template")
+                    .Pageable(p => p.Enabled(false).Refresh(true))
+                    .Editable(e => e.Enabled(true))
+                    .Events(e => e.DataBound("onPriceListBound").Remove("onPriceLineRemoved"))
+                    .DataSource(ds => ds.Read(r => r.Action("GetItemPriceLines", "Course", new { area = "AuthorAdmin", id = Model.Item.ItemId, type = Model.Item.ItemType }).Type(HttpVerbs.Get)).Events(e => e.RequestEnd("onPlRequestEnd"))
+                                        .Update(u => u.Action("UpdatePrice", "Course", new { area = "AuthorAdmin" }))
+                                        .Destroy(d => d.Action("DeletePriceLine", "Course", new { area = "AuthorAdmin" }))
+                                        .Model(model => model.Id("PriceLineID"))
+                  ))
+        </div>
+    </div>
+    <script>
+        setReportScroll('#d-pl-container');
+    </script>
+    <div id="li-tabs-container" style="margin-bottom: 30px;" data-bind="style:{display:tabsDisplayStyle}">
+        @using (Ajax.BeginForm("SaveItemPriceLine", "Course", new { id = Model.Item.ItemId }, new AjaxOptions { OnBegin = "javascript:return onPriceLineSaving()", OnSuccess = "onPriceLineSaved", LoadingElementId = "site-loader" }, new { @id = "frmNewPrice", @style = "position:relative" }))
+        {
+            <h3 data-bind="text:editFormTitle" class="pl-frm-title"></h3>
+
+            @Html.Hidden("ItemId", Model.Item.ItemId)
+            @Html.Hidden("ItemType", Model.Item.ItemType)
+
+            <input type="hidden" name="PriceType" data-bind="value:insertPriceType" />
+
+            <ul class="ul-edit-form cp1" style="margin-right: 100px">
+                <li id="li-free-price-row" data-bind="style:{display:freePriceRowStyle}">
+                    Free course
+                </li>
+                <li id="li-price-row" data-bind="style:{display:priceRowStyle}">
+                    <label data-bind="text:priceTitle"></label>
+                    <div class="input-container" style="width: 80px;padding: 0 10px 0 0">
+                        @(Html.Kendo().DropDownListFor(m => m.Currency.CurrencyId)
+                              .BindTo(this.ActiveCurrencies())
+                              .TemplateId("kendo-currency-template")
+                              .ValueTemplateId("kendo-currency-template")
+                              .DataValueField("CurrencyId")
+                              .DataTextField("CurrencyName")
+                              .SelectedIndex(0)
+                              .Events(e => e.Select("onCurrencySelected").Change("setEditMode"))
+                              .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:150px;font-size:13px;" })
+                        )
+                    </div>
+                    <div class="input-container" style="width: 100px;padding: 0 0 0 10px">
+                        @(Html.Kendo().CurrencyTextBox().Name("Price").Format("#,##0.00;(#,##0.00)").Events(e => e.Change("setEditMode")).Spinners(false).HtmlAttributes(new { @class = "k-tb-reset", @style = "width:150px;height:24px;font-size:13px" }))
+                    </div>
+                    <label class="symb" data-bind="text:currentCurrencySymbol"></label>
+                </li>
+                <li id="li-rental-combos" data-bind="style:{display:rentalCombosStyle}">
+                    <label>Rental Period</label>
+                    <div class="input-container">
+                        @(Html.Kendo().DropDownList()
+                              .Name("PeriodType")
+                              .DataValueField("Value")
+                              .DataTextField("Title")
+                              .OptionLabel("rental period")
+                              .BindTo(periodTypes)
+                              .Events(e => e.Change("setEditMode"))
+                              .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:150px;font-size:13px;" })
+                        )
+                    </div>
+                    <div class="input-container" style="padding-left: 20px">
+                        @(Html.Kendo().DropDownList()
+                              .Name("NumOfPeriodUnits")
+                              .DataValueField("Value")
+                              .DataTextField("Title")
+                              .HtmlAttributes(new { @class = "k-tb-reset", @style = "width:150px;font-size:13px;" })
+                              .DataSource(source => source.Read(read => read.Action("GetPeriodUnits", "Course").Data("filterPeriodUnits")).ServerFiltering(true))
+                              .AutoBind(false)
+                              .CascadeFrom("PeriodType")
+                              .Enable(false)
+                              .Events(e => e.Change("setEditMode"))
+                        )
+                    </div>
+                </li>
+            </ul>
+
+            <a href="#" style="right: 2px;bottom: 0;" class="action-button" id="btn-submit-pl">Add</a>
+        }
+    </div>
+</div>
+
+<script>
+    var itemPriceModel;
+
+    itemPriceModel = kendo.observable({
+        one_time_exist: false,
+        subscription_exist: false,
+        current_total_pl: 0,
+        isFree: false,
+        tab1Class: '',
+        tab2Class: '',
+        tab3Class: '',
+        tab4Class: '',
+        priceListStyle: 'none',
+        rentalCombosStyle: 'none',
+        priceRowStyle: 'block',
+        tabsDisplayStyle:'block',
+        freePriceRowStyle: 'none',
+
+        insertPriceType: null,
+        priceTitle: null,
+        editFormTitle: null,
+        currentCurrencySymbol: null,
+
+        priceList: null,
+        comboCurrency: null,
+
+        init: function () {
+            this.priceList = $('#CoursePrices').data('kendoListView');
+
+            if ($('#Currency_CurrencyId').data('kendoDropDownList') != null) {
+                this.comboCurrency = $('#Currency_CurrencyId').data('kendoDropDownList');
+                this.setCurrency();
+            }
+            var isFree = '@Model.IsFree.ToString().ToLower()' == 'true';
+            this.set("isFree", isFree);
+
+            if (this.isFree) {
+                this.set('tabsDisplayStyle', "none");
+            }
+        },
+
+        setCurrency: function () {
+            var currency = this.comboCurrency.dataItem(this.comboCurrency.selectedIndex);
+            this.set('currentCurrencySymbol', hasValue(currency.Symbol) ? currency.Symbol : currency.ISO);
+        },
+
+        setFreeCourseMode: function () {
+            if (this.isFree) {
+                this.set('tabsDisplayStyle', "none");
+                this.set('tab1Class', "disabled");
+                this.set('tab2Class', "disabled");
+                this.set('tab3Class', "disabled");
+                this.set('tab4Class', "active");
+            }
+        },
+
+        resetTabs: function () {
+            this.set('tabsDisplayStyle', "block");
+            this.set('tab1Class', "");
+            this.set('tab2Class', "");
+            this.set('tab3Class', "");
+            this.set('tab4Class', "");
+            this.set('priceRowStyle', "block");
+            this.set('rentalCombosStyle', "none");
+            this.set('freePriceRowStyle', "none");
+        },
+
+
+        setEditForm: function (type) {
+
+            this.set('insertPriceType', type);
+            this.resetTabs();
+            var title, priceTitle;
+
+        //    console.log(type);
+
+            switch (type) {
+                case '@BillingEnums.ePricingTypes.ONE_TIME':
+                    this.set('tab1Class', "active");
+                    title = 'One time payment';
+                    priceTitle = 'Course price';
+                    break;
+                case '@BillingEnums.ePricingTypes.SUBSCRIPTION':
+                    title = 'Monthly subscription payment';
+                    this.set('tab2Class', "active");
+                    priceTitle = 'Monthly price';
+                    break;
+                case '@BillingEnums.ePricingTypes.RENTAL':
+                    title = 'Time-limited rental payment';
+                    this.set('tab3Class', "active");
+                    this.set('rentalCombosStyle', "block");
+                    priceTitle = 'Rental price';
+                    break;
+                case '@BillingEnums.ePricingTypes.FREE':
+                    title = 'Set Free Price';
+                    this.set('tab4Class', "active");
+                    this.set('priceRowStyle', "none");
+                    this.set('freePriceRowStyle', "block");
+                    priceTitle = 'Free price';
+                    this.setFreeCourseMode();
+                    break;
+                default:
+                    return;
+            }
+
+            this.set('editFormTitle', title);
+            this.set('priceTitle', priceTitle);
+        },
+
+        onTabClicked: function (e) {
+            e.preventDefault();
+            //  this.resetTabs();
+            var target = $(e.currentTarget).attr('data-target');
+            var type;
+
+            if (this.isFree) return;
+
+            switch (target) {
+                case '1':
+                    // if (this.one_time_exist) return;
+                    type = '@BillingEnums.ePricingTypes.ONE_TIME';
+                    break;
+                case '2':
+                    // if (this.subscription_exist) return;
+                    type = '@BillingEnums.ePricingTypes.SUBSCRIPTION';
+                    break;
+                case '3':
+                    type = '@BillingEnums.ePricingTypes.RENTAL';
+                    break;
+                case '4':
+                    type = '@BillingEnums.ePricingTypes.FREE';
+                    break;
+                default:
+                    return;
+            }
+
+            this.setEditForm(type);
+        },
+
+        updateListState: function () {
+            var data = this.priceList.dataSource.data();
+
+            this.set('priceListStyle', data.length > 0 ? 'block' : 'none');
+
+            this.set('one_time_exist', this.findLineByType(data, '@((byte)BillingEnums.ePricingTypes.ONE_TIME)'));
+            this.set('subscription_exist', this.findLineByType(data, '@((byte)BillingEnums.ePricingTypes.SUBSCRIPTION)'));
+            this.set('isFree', this.findLineByType(data, '@((byte)BillingEnums.ePricingTypes.FREE)'));
+
+            var type = null;
+
+            if (this.isFree) {
+                type = '@BillingEnums.ePricingTypes.FREE';
+            } else {
+                if (!this.one_time_exist) {
+                    type = '@BillingEnums.ePricingTypes.ONE_TIME';
+                }
+
+                if (!this.subscription_exist) {
+                    if (type == null) type = '@BillingEnums.ePricingTypes.SUBSCRIPTION';
+                }
+
+                if (type == null) {
+                    type = '@BillingEnums.ePricingTypes.RENTAL';
+                }
+            }
+
+
+
+            this.setEditForm(type);
+
+        },
+
+        findLineByType: function (data, type) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].PriceType == type) return true;
+            }
+
+            return false;
+        }
+
+    });
+
+    $(document).ready(function () {
+        itemPriceModel.init();
+        kendo.bind($("#pl-container"), itemPriceModel);
+    });
+
+
+
+</script>
+
+
+
+<script type="text/x-kendo-template" id="kendo-ch-list-template">
+    <li data-val="${PriceLineID}">
+        <div class="float-left">
+            <div class="pl-f pl-title inline">${Title}</div>
+            <div class="pl-f pl-price inline">${Currency.Symbol} ${Price}</div>
+            <div class="pl-f pl-name inline">${hasValue(Name) ? Name : ''}</div>
+        </div>
+        <div class="float-right">
+            # if(PriceType < 8){#
+            <a class="btn-price-action k-edit-button" href="\\#">Edit</a>
+            #}#            
+            <a class="btn-price-action k-delete-button" href="\\#">Delete</a>
+        </div>
+    </li>
+</script>

@@ -1,0 +1,88 @@
+﻿@model LFE.DataTokens.ScheduledTrainingDTO
+
+@{
+    //required in order to render validation attributes
+    ViewContext.FormContext = new FormContext();
+}
+
+@functions{
+    public Dictionary<string, object> generateDatePickerAttributes(
+           string elementId,
+           string fieldName,
+           string dataBindAttribute,
+           Dictionary<string, object> additionalAttributes = null)
+    {
+
+        Dictionary<string, object> datePickerAttributes = additionalAttributes != null ? new Dictionary<string, object>(additionalAttributes) : new Dictionary<string, object>();
+
+        datePickerAttributes["id"] = elementId;
+        datePickerAttributes["name"] = fieldName;
+        datePickerAttributes["data-bind"] = dataBindAttribute;
+        datePickerAttributes["required"] = "required";
+        datePickerAttributes["style"] = "z-index: inherit;";
+
+        return datePickerAttributes;
+    }
+}
+
+<fieldset style="padding: 15px;">
+    <legend>Create training</legend>
+   
+    <ul class="ul-frm">
+        <li data-container-for="ItemId">
+            <label>Course</label>
+            <div data-container-for="ItemId" class="k-edit-field">
+                @Html.HiddenFor(m => m.ItemType)
+                @(Html.Kendo().DropDownListFor(m => m.ItemId)
+                      .HtmlAttributes(new { style = "width: 200px" })
+                      .DataValueField("CourseId")
+                      .DataTextField("Name")
+                      .ValuePrimitive(true)
+                      .OptionLabel("select course")
+                      .DataSource(ds => ds.Read(r => r.Action("GetAuthorCoursesLOV", "Course"))))
+
+                <span data-for="ItemId" class="k-invalid-msg"></span>
+            </div>
+        </li>
+
+        <li>
+            <label>Title</label>
+
+            <div data-container-for="Title" class="k-edit-field inline">@(Html.TextBoxFor(m => m.Title, new { data_bind = "value:title" }))</div>
+        </li>
+
+        <li data-container-for="Description">
+            <label>Description</label>
+            <div data-container-for="Description" class="k-edit-field inline">
+                @(Html.TextAreaFor(model => model.Description, new { @cols = 20, @rows = 2, data_bind = "value:description" }))
+            </div>
+        </li>
+
+        <li data-container-for="Start">
+            <label>from</label>
+            <div data-container-for="Start" class="k-edit-field inline">
+                @(Html.Kendo().DateTimePickerFor(model => model.Start)
+                .Min(DateTime.Now)
+                .HtmlAttributes(generateDatePickerAttributes("startDate", "start", "value:start")))
+
+
+                <span data-for="start" class="k-invalid-msg"></span>
+            </div>
+        </li>
+
+        <li data-container-for="End">
+            <label>To</label>
+            <div data-container-for="End" class="k-edit-field inline">
+                @(Html.Kendo().DateTimePickerFor(m => m.End)
+        .HtmlAttributes(generateDatePickerAttributes(
+            "endDate",
+            "end",
+            "value:end",
+            new Dictionary<string, object>() { { "data-dateCompare-msg", "End date should be greater than or equal to the start date" } })))
+
+                <span data-for="end" class="k-invalid-msg"></span>
+            </div>
+        </li>
+    </ul>
+
+</fieldset>

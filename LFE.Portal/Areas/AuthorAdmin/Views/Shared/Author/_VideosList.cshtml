@@ -1,0 +1,225 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Helpers
+
+@model AuthorVideosPageToken
+
+@{
+	var kinds = new List<DataSourceSortToken>
+		{
+			new DataSourceSortToken
+			{
+				name    = "Date Add"
+				,field  = "addon"
+				,dir    = "desc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Name of Video"
+				,field  = "title"
+				,dir    = "asc"
+			},
+
+			new DataSourceSortToken
+			{
+				name    = "Number of Uses"
+				,field  = "uses"
+				,dir    = "desc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Length"
+				,field  = "millisec"
+				,dir    = "desc"
+			}
+		};
+}
+
+
+<script src="@Url.Content("~/Areas/AuthorAdmin/Scripts/lfe/lfe.video.js")" type="text/javascript"></script>
+
+<script>
+    var isAdmin = '@this.IsCurrentUserAdmin().ToString().ToLower()' === 'true';
+    var listId = 'AuthorVideos';
+    var isDynamicPS = '@Model.IsDynamicPageSize'.toLowerCase() === 'true';
+
+    $(document).ready(function () {
+        if (!isDynamicPS) { // if fixed PS => show container
+            setVisibility('.d-video-list-container', true);
+        }
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.searchVideos, searchVideos, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.searchVideos, searchVideos, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.videoSaved, rebindVideoList, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.videoSaved, rebindVideoList, null);
+
+        //window.transcodeVideo('9227872380309853', 'WIN_20150510_103506.MP4');
+    });
+
+    function rebindVideoList() {
+        $('#AuthorVideos').data("kendoListView").dataSource.read();
+    }
+
+    function searchVideos(filter) {
+
+        var filterExists = filter.filters.length > 0;
+
+        if (filterExists) {
+            checkFilter(filter, listId, "kendoListView");
+            filterReport(filter, listId, "kendoListView");
+        } else {
+            filterReport(null, listId, "kendoListView");
+        }
+    }
+
+    function onSortFiltersBound(e) {
+        var listView = e.sender;
+
+        $.each(listView.element.children().find('a'), function (i) {
+            var token = listView.dataSource._data[i];
+            var link = $(this);
+            link.unbind('click');
+            link.bind('click', function () {
+                listView.element.children().find('a').removeClass('active');
+                $(this).addClass('active');
+                var sort = { field: token.field, dir: token.dir };
+                $('#' + listId).data("kendoListView").dataSource.sort(sort);
+            });
+            if (i == 0) link.addClass('active');
+        });
+    }
+
+    function onVideoRequestStart() {
+        showContainerLoader("#video-rep-container", null);
+    }
+    function deleteVideo(identifier, fileId, uses) {
+
+        if (!window.confirm(userMessages.UPLOAD.VIDEO_DELETE_CONFIRM)) return;
+
+        if (uses > 0) {
+            alert(userMessages.UPLOAD.VIDEO_PREVENT_DELETE);
+            return;
+        }
+
+        var url = '@Url.Action("DeleteVideo","Author")' + '/' + identifier + (fileId != null ? '?fileId=' + fileId : '');
+		var data = { id: identifier };
+		ajaxAction(url, data, onVideoDeleted, null);
+	}
+
+	function onVideoDeleted(response) {
+		if (response.success) {
+			//alert(userMessages.UPLOAD.VIDEO_UPDATED);
+			rebindVideoList();
+			return;
+		}
+
+		alert(response.error);
+	}
+
+	function hideReportLoader() {
+		window.hideLoader();
+	}
+
+    
+</script>
+
+<div class="d-sort-row">
+	<label>Sort by:</label>
+	@(Html.Kendo().ListView<DataSourceSortToken>()
+			.Name("lvCourseSort")
+			.TagName("ul")
+			.ClientTemplateId("kendo-sort-template")
+			.BindTo(kinds)
+			.HtmlAttributes(new { @data_role = "course" })
+			.Events(e => e.DataBound("onSortFiltersBound"))
+	)
+</div>
+
+<div class="d-video-list-container" style="visibility: hidden">
+	@(Html.Kendo().ListView<UserVideoDto>()
+		  .Name("AuthorVideos")
+		  .TagName("ul")
+		  .HtmlAttributes(new { @class = "ul-video" })
+		  .Events(e => e.DataBound("onVideosBound"))
+		  .ClientTemplateId("kendo-video-template")
+					.Pageable(p => p.Enabled(true).Refresh(true))
+					.DataSource(ds => ds.Read(read => read.Action("GetAuthorVideosReport", "Author").Type(HttpVerbs.Get))
+					.PageSize(Model.ListPageSize)
+					.Events(e => e.RequestStart("onVideoRequestStart").RequestEnd("hideReportLoader")).ServerOperation(false))
+	)
+	<script>
+		$(document).ready(function () {
+			if (!isDynamicPS) return;
+			setListPS();
+			$(window).resize(function () {
+				setVisibility('.d-video-list-container', false);
+				delay(function () {
+					setListPS();
+				}, 300);
+			});
+
+
+		});
+
+		function setListPS() {
+			var lv = $('#AuthorVideos').data("kendoListView");
+			if (lv == undefined) return;
+			var w = $('.ul-video').width();
+			var ps = (parseInt(w / 285));
+			lv.dataSource.pageSize(ps * 2);
+			lv.refresh();
+			setVisibility('.d-video-list-container', true);
+		}
+	</script>
+</div>
+
+<script type="text/x-kendo-template" id="kendo-video-template">
+    <li data-val="${bcid}" title="${title}">
+
+        # if(hasValue(stillUrl)) { #
+        <div class="preview abs" id="thumb-#=bcid#" style="background: url('#=fixSR(stillUrl)#') no-repeat;">&nbsp;</div>
+        # }  else{#
+        <div class="preview abs int" id="thumb-#=bcid#"><span>processing video</span></div>
+        #}#
+
+        # if(hasValue(videoUrl)) { #
+        <div class="hint abs" style="display:none;" id="hint-${bcid}">
+            <span class="play" id="play-${bcid}">Play</span>
+        </div>
+        # }#
+
+        <div style="display:none;" class="list-player abs" id="player-${bcid}"></div>
+
+        <div class="video-info">
+            <div class="v-title-row ellipsis">
+                <span style="float: left" class="v-title">${title}</span>
+                <span style="float: right" class="v-title">${minutes}</span>
+            </div>
+
+            <div class="d-cmd-row">
+                <div class="addon">
+                    #= kendo.toString(addon,"MM/dd/yy") #
+                </div>
+                <div class="use">${uses}</div>
+                <div class="cmd">
+                    # if(!hasValue(videoUrl) && isAdmin) { #
+                    <a href="javascript:transcodeVideo('#=bcid#','#=Encoder.htmlEncode(name)#')" class='list-cmd inline'>Retranscode</a>
+                    # }#
+
+                    # if(hasValue(videoUrl)) { #
+                    <a href="javascript:editVideo('#=bcid#',#=fileId#,'#=Encoder.htmlEncode(title)#')" class='list-cmd inline' style='margin: 0 0 0 10px;'>Edit</a>
+                    # }#
+
+                    <a href="javascript:deleteVideo('#=bcid#',#=fileId#,#=uses#)" class='list-cmd inline rem' style='margin: 0 0 0 10px;' title=''>Delete</a>
+                </div>
+            </div>
+        </div>
+    </li>
+</script>
+
+<script type="text/x-kendo-template" id="kendo-sort-template">
+	<li>
+		<a data-val="${field}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+	</li>
+</script>

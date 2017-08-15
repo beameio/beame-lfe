@@ -1,0 +1,4 @@
+﻿@using LFE.DataTokens
+@model BaseHubDTO
+           
+@Html.Partial("Hub/_UserInvitationForm",new HubUserInvitationDTO{HubId = Model.HubId})

@@ -1,0 +1,188 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "Host event Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css{
+
+}
+
+@{
+
+	var periodKinds = (ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.thisMonth
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.week | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+	var groupKinds = (ReportEnums.eChartGroupping.Month | ReportEnums.eChartGroupping.Week | ReportEnums.eChartGroupping.Quarter | ReportEnums.eChartGroupping.Year | ReportEnums.eChartGroupping.Day).ToTranslatedArray();
+}
+
+<h2>Summary Report</h2>
+
+<div style="margin: 10px 0">
+	<div class="inline">
+		@(Html.Kendo().DropDownList()
+				.Name("periodSelectionKind")
+				.DataTextField("Title")
+				.DataValueField("Value")
+				.Value(((short)ReportEnums.ePeriodSelectionKinds.last90).ToString())
+				.BindTo(periodKinds)
+				.HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+				.Events(e => e.Select("setRepParams"))
+		)
+	</div>
+
+	<div class="inline">
+		@(Html.Kendo().DropDownList()
+			  .Name("groupKinds")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .Value(((short)ReportEnums.eChartGroupping.Month).ToString())
+			  .BindTo(groupKinds)
+			  .HtmlAttributes(new { @class = "c2", @style = "height:22px !important;font-size:12px  !important" })
+			  .Events(e => e.Select("setRepParams"))
+		)
+	</div>
+
+	<div class="inline">
+		<input type="text" style="width: 200px;height: 22px;" placeholder="type host name" id="txt-host" />
+	</div>
+
+	<div class="inline" style="margin-left: 25px;" id="frmSubmitRep">
+		@Html.Hidden("periodKind")
+		@Html.Hidden("groupKind")
+
+		<span class="" style="text-decoration: underline;cursor: pointer;color: #000;font-size: 16px;" id="btn-submit-rep">Generate Report</span>
+	</div>
+
+	<div class="inline" style="margin:0 0 0 30px">
+		<a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+		$('#btn-submit-rep').unbind('click').click(submitReport);
+		setTimeout(submitReport, 300);
+	});
+	function submitReport() {
+		$('#HostEventsReport').data('kendoGrid').dataSource.read();
+	}
+
+	function setRepParams() {
+		$('#frmSubmitRep #periodKind').val($('#periodSelectionKind').data('kendoDropDownList').value());
+		$('#frmSubmitRep #groupKind').val($('#groupKinds').data('kendoDropDownList').value());
+	}
+
+	function getRepFilters() {
+		setRepParams();
+		return {
+			periodKind: $('#frmSubmitRep #periodKind').val()
+			, groupKind: $('#frmSubmitRep #groupKind').val()
+			, host: $('#txt-host').val()
+		};
+	}
+
+	function clearFilters() {
+		$('#groupKinds').data("kendoDropDownList").value('@(((short)ReportEnums.eChartGroupping.Month).ToString())');
+		$('#periodSelectionKind').data("kendoDropDownList").value('@(((short)ReportEnums.ePeriodSelectionKinds.last90).ToString())');
+		$('#txt-host').val(null);
+		setRepParams();
+		submitReport();
+	}
+</script>
+
+<div id="d-rep-container">
+
+	@(Html.Kendo().Grid<HostEventDTO>()
+			.Name("HostEventsReport")
+			.TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+			.Columns(columns =>
+			{
+				columns.Bound(p => p.HostName).ClientTemplate("<a href='#=HostName#' style='' title='click to view page' class='list-cmd'  target='_blank'>#=HostName#</a>").Width(200);
+				columns.Bound(p => p.Period).Width(150);
+				columns.Bound(p => p.TotalEvents).Title("Total").Width(100).Groupable(false).Filterable(false);
+				columns.Bound(p => p.STORE_VIEW).Title("Store View").Width(100).Groupable(false).Filterable(false);
+				columns.Bound(p => p.COURSE_PREVIEW_ENTER).Title("Preview").Width(100).Groupable(false).Filterable(false);
+				columns.Bound(p => p.REGISTRATION_SUCCESS).Title("Register").Width(100).Groupable(false).Filterable(false);				
+				columns.Bound(p => p.BUY_PAGE_ENTERED).Title("Buy Enter").Width(100).Groupable(false).Filterable(false);
+				columns.Bound(p => p.PURCHASE_COMPLETE).Title("Purchased").Width(100).Groupable(false).Filterable(false);
+			})
+			.AutoBind(false)
+			.ToolBar(tools => tools.Excel())
+			.Excel(excel => excel
+				.FileName(DateTime.Now.ToShortDateString() + " Host Events Report.xlsx")
+				.Filterable(false).AllPages(true)
+				.ProxyURL(Url.Action("Export_Save", "Home", new { area = "" }))
+			)
+			.Sortable()
+			.Groupable(g => g.Enabled(true).ShowFooter(true).Messages(m=>m.Empty("Group by host or period")))
+			.Pageable(pager => pager.Numeric(true).PageSizes(true).Refresh(true))
+			.Filterable(f => f.Enabled(true).Mode(GridFilterMode.Row))
+			.DataSource(ds => ds.Ajax().Sort(x => x.Add(c => c.TotalEvents).Descending()).Read(read => read.Action("GetHostEvents", "Report", new { area = "PortalAdmin" }).Data("getRepFilters").Type(HttpVerbs.Get)).ServerOperation(true))
+			//.Group(g => g.Add(c => c.HostName))
+	)
+</div>
+
+
+@*<div id="d-pivot-container">
+				  @(Html.Kendo().PivotConfigurator()
+		.Name("configurator")
+		.Height(570)
+				)
+
+				@(Html.Kendo().PivotGrid<HostEventDTO>()
+					.Name("pivotgrid")
+					.Configurator("#configurator")
+					.ColumnWidth(120)
+					.Height(570)
+					.DataSource(dataSource => dataSource
+						.Ajax()
+							.Transport(t => t.Read("GetHostPivotEvents", "Report",new{area="PortalAdmin"}))
+							.Schema(schema => schema
+							.Cube(cube => cube
+								.Dimensions(dimensions =>
+								{
+                                    dimensions.Add(model => model.STORE_VIEW).Caption("STORE_VIEW");
+                                    dimensions.Add(model => model.COURSE_PREVIEW_ENTER).Caption("COURSE_PREVIEW_ENTER");
+                                    dimensions.Add(model => model.REGISTRATION_SUCCESS).Caption("REGISTRATION_SUCCESS");
+                                    dimensions.Add(model => model.BUY_PAGE_ENTERED).Caption("BUY_PAGE_ENTERED");
+								})
+								.Measures(measures => measures.Add("StoreView Count").Field(model => model.HostName).AggregateName("sum"))
+							))
+                        .Columns(columns =>
+                        {
+                            columns.Add("STORE_VIEW").Expand(true);
+                            columns.Add("COURSE_PREVIEW_ENTER").Expand(true);
+                            columns.Add("COURSE_VIEWER_ENTER").Expand(true);
+                            columns.Add("COURSE_VIEWER_ENTER").Expand(true);
+                        })
+                        .Rows(rows => rows.Add("Period").Expand(true))
+                        //.Measures(measures =>
+                        //{
+                        //    measures.Values("STORE_VIEW Sum");
+                        //    measures.Values("COURSE_PREVIEW_ENTER Sum");
+                        //    measures.Values("REGISTRATION_SUCCESS Sum");
+                        //    measures.Values("BUY_PAGE_ENTERED Sum");
+                        //})
+					)
+				)
+
+				<style>
+					#pivotgrid {
+						display: inline-block;
+						vertical-align: top;
+						width: 70%;
+					}
+
+					#configurator {
+						display: inline-block;
+						vertical-align: top;
+					}
+				</style>
+	</div>*@
+

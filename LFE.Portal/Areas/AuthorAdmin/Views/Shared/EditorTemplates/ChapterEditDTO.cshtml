@@ -1,0 +1,23 @@
+﻿@model LFE.DataTokens.ChapterEditDTO
+
+@*<li data-val="${id}">*@
+    <div class="chap-row">
+        @using (Ajax.BeginForm("SaveContentChapter", "Course", new { area = "AuthorAdmin" }, new AjaxOptions { OnSuccess = "onChapterSaved" }, new { @id = "frmEditChapter", @style = "" }))
+        {
+            @Html.HiddenFor(m => m.ChapterId)
+            @Html.HiddenFor(m => m.CourseId)
+            @Html.HiddenFor(m => m.OrderIndex)
+            <span class="float-left drag-box">&nbsp;</span>
+            <span class="float-left btn-collapse-first">&nbsp;</span>
+            <span class="float-left" style="padding-top: 4px">
+                @Html.TextBoxFor(m => m.Name, new { @class = " ch-name", @style = "height:20px", @size = 50, @maxlength = 50 })    
+            </span>
+            
+            <span class="float-right" style="width:150px;">
+                <span class="k-update-button row-btn right btn-save inline" title="Save chapter"><span class="ico"></span></span>
+
+                <span class="k-cancel-button row-btn btn-cancel inline pt9" title="Cancel"><span class="ico"></span></span>
+            </span>            
+        }        
+    </div>
+@*</li>*@

@@ -1,0 +1,117 @@
+﻿@model LFE.DataTokens.WizardAboutAuthorDTO
+
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmAboutYou';
+	var PICTURE_PREVIEW_CONTAINER_SELECTOR = '#d-profile-pic';
+	
+	$(document).ready(function () {
+
+		window.isFormInEditMode = false;
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, submitStep, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, submitStep, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.file.fileUploaded, setEditMode, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.file.fileUploaded, setEditMode, null);
+
+		window.uploadConsole = $('#async-upload-console');
+
+		$("#a-fake-thumb-upload").click(openPictureSelector);
+		$("#d-profile-pic").click(openPictureSelector);
+	});
+	
+	function openPictureSelector() {
+		$('#ProfilePicture').data("kendoUpload").wrapper.find("input[type='file']").click();
+	}
+
+	function submitStep() {
+		$(EDIT_FORM_SELECTOR).submit();
+	}
+
+	function onUserSettingsSaved(response) {
+		hideFormLoader();
+
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Your info saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+			setTimeout(function() {
+				window.getNotifManagerInstance().notify(notifEvents.wizard.stepSaved, null);
+			},500);
+			
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+	
+</script>
+@Html.Partial("Account/_EditAccountScripts")
+
+@using (Ajax.BeginForm("SaveUserSettings", "Course", null, new AjaxOptions { OnBegin = "javaScript:showFormLoader('#frmAboutYou')", OnSuccess = "onUserSettingsSaved", LoadingElementId = "site-loader" }, new { @id = "frmAboutYou", @class = "ajax-form" }))
+{
+	@Html.HiddenFor(x=>x.UserId)
+	
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form crs about">
+			<li>
+				@Html.LabelFor(m=>m.BioHtml)
+				<div class="input-container">
+					   @(Html.Kendo().EditorFor(m=>m.BioHtml)
+						  .Events(e=>e.KeyDown("setEditMode"))
+						  .HtmlAttributes(new { @style = "width:420px;height:140px !important;" }) 
+						  .Encode(false)
+						  .Tools(t=>t.Clear()
+							  .Bold().Italic().Underline().JustifyLeft().JustifyCenter().InsertUnorderedList().Indent().Outdent().CreateLink().Unlink()
+						  )
+						  )
+				</div>				
+			</li>
+			<li class="li-auth-pict-container">
+			   @Html.Label("Your picture (300*200 px)")
+				@{
+					if (Model.FbUid == null)
+					{
+						<div id="d-profile-pic" class="thumb-container" title="click to select picture">
+							@{
+								if (!String.IsNullOrEmpty(Model.PictureURL))
+								{
+									<img alt="" src="@Model.PictureURL" class="img-preview"/>
+								}
+							}
+						</div>                                                
+		
+						<a class="browse browse-image" href="#" id="a-fake-thumb-upload">Select file</a>  
+		
+						<span style="display: none">
+								@(Html.Kendo().Upload()
+										.Name("ProfilePicture")
+										.Multiple(false)
+										.ShowFileList(true)
+										.Events(e => e.Upload("onPictureUploadAction").Success("onPictureUploadSuccess").Remove("onPictureRemove"))
+										.Async(a => a.AutoUpload(true)
+										.Save("SaveProfilePicture", "Upload")
+										.Remove("RemoveProfilePicture", "Upload")
+								))
+								@Html.HiddenFor(m => m.PictureName)
+						 </span>
+							
+					}
+					else
+					{
+						<div class="thumb-container">
+							<img src="http://graph.facebook.com/@Model.FbUid/picture?type=normal" class="img-preview" alt=""/>
+						</div>
+					}
+				}
+				
+			</li>
+		</ul>
+	</fieldset>
+}

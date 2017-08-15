@@ -1,0 +1,51 @@
+﻿@model LFE.Portal.Areas.Widget.Models.PaypalCompleteRequestToken
+@{
+    ViewBag.Title = "ThankYou";
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+
+    string iframeThankYouUrl = Url.Action("ThankYouStore", new { isSuccess = Convert.ToInt32(Model.IsSuccess), message = Model.Message, returnUrl = Model.RedirectUrl });
+}
+
+@if (Model.IsSuccess)
+{
+    @section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                window.opener.parent.location.reload(false);//n =  '@iframeThankYouUrl'.replace('&amp;', '&');
+                document.location = '@Model.RedirectUrl';
+            });
+        </script>
+    }
+    <h2 style="width: 600px; margin: 25px auto 0" id="hm">
+        Thank You for purchasing the course on LFE.
+        <br />
+        The course page will be reload shortly....
+        <br /> 
+    </h2>
+    <div style="text-align:center">
+        <img class="login-loader" src="http://@Request.Url.Authority/Content/images/webstore/login-ajax-loader.gif" />   
+    </div>
+    <div style="width: 600px; margin: 25px auto 0">
+        A confirmation letter has been sent to the email address you provided.<br />
+        Your new course can now be accessed through the 'My Courses' link in the menu bar.<br />
+        <a id="viewCourse" href='@Model.RedirectUrl'>
+            Click Here to View the Course Now!
+        </a>
+    </div>
+}
+else
+{
+    @section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                //  window.opener.reloadCoursePage();
+                // document.location = '';
+            });
+        </script>
+    }
+    <h2 style="width: 600px; margin: 25px auto 0" id="hm">
+        @Model.Message
+    </h2>
+}

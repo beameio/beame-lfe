@@ -1,0 +1,97 @@
+﻿@using LFE.Core.Utils
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.NextPayoutViewToken
+
+<div class="nextpayout">
+    <h1>NEXT PAYOUT <span>(@(this.ToNexMonthFirstDate().ToString("MMMM dd, yyyy")))</span></h1>
+    <div class="numbersCont">
+
+        @{
+            var whiteBorder = Model.Statments.Count > 1 ? "border" : string.Empty;
+            foreach (var token in Model.Statments)
+            {
+                var arrowClass = token.IsUp ? "arr-total-up" : "arr-total-down";
+
+                <div class="table-row">
+                    <div class="table-cell">
+                        <div class="number @whiteBorder currency">@token.Currency.Symbol @token.Currency.ISO</div>
+                    </div>
+                    <div class="table-cell">
+                        <div class="number @whiteBorder">@token.Currency.Symbol@token.Sales</div>
+                    </div>
+                    <div class="table-cell">
+                        <div class="number @whiteBorder">-@token.Currency.Symbol@token.Mbg</div>
+                    </div>
+                    <div class="table-cell">
+                        <div class="number @whiteBorder">-@token.Currency.Symbol@token.Fees</div>
+                    </div>
+                    <div class="table-cell">
+                        <div class="number @whiteBorder total">= @token.Currency.Symbol@token.TotalPayout<div class="@arrowClass"></div></div>
+                    </div>
+                </div>
+            }
+        }
+        <div class="table-row">
+            <div class="table-cell">
+                <div class="header">CURRENCY</div>
+            </div>
+            <div class="table-cell">
+                <div class="header">Sales</div>
+            </div>
+            <div class="table-cell">
+                <div class="header">MBG WITHHELD SUMS<div class="q-mark" data-tooltip="tooltip-mbg">?</div></div>
+            </div>
+            <div class="table-cell">
+                <div class="header">FEES <div class="q-mark" data-tooltip="tooltip-fees">?</div></div>
+            </div>
+            <div class="table-cell">
+                <div class="header">TOTAL PAYOUT SUM</div>
+            </div>
+        </div>
+    </div>
+    <div class="download" id="btn-down">
+        @using (Html.BeginForm("DownloadMonthlyStatement", "Home", new { area = "AuthorAdmin",userId = Model.UserId }, FormMethod.Post, new { id = "frm-download", target = "_blank" }))
+        {
+            <span>DOWNLOAD MONTHLY STATEMENT</span>
+        }
+        <script>
+            $(document).ready(function () {
+                $('#btn-down').unbind('click').bind('click', function () {
+                    $('#frm-download').submit();
+                });
+            });
+
+        </script>
+    </div>
+   
+    <script id="tooltip-fees" type="text/x-kendo-template">
+        <div class="tt-container">
+            <h1>This amount is made up of the total of the following fees:</h1>
+            <ul>
+                <li>PayPal fees incurred for purchases of your course</li>
+                <li>Affiliate fees for courses sold by affiliates. The fees represent the % paid to the affiliate for their sale of your course</li>
+                <li>LFE commission – 15%</li>
+                <li>Total refunds requested by your learners</li>
+                <li>PayPal fees incurred as a result of handling refunds requested by your learners</li>
+            </ul>
+        </div>
+    </script>
+    <script id="tooltip-mbg" type="text/x-kendo-template">
+        <div class="tt-container" style="width:350px;">
+            This sum represents the payments you received for your courses that are covered under the <b>Money Back Guarantee</b> program. Once the 30 day period ends, this sum will be added to your Sales total.
+        </div>
+    </script>
+    <script>
+        $(function () {
+
+            $('.nextpayout .q-mark').each(function () {
+                var template = $('#' + $(this).attr('data-tooltip')).html();
+                $(this).kendoTooltip({
+                    content: kendo.template(template),
+                    position: "bottom"
+                });
+            });
+
+        });
+    </script>
+</div>

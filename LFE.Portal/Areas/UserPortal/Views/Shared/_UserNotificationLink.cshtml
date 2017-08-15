@@ -1,0 +1,47 @@
+﻿@model int
+@{
+	var isUserLoggedIn = WebSecurity.IsAuthenticated;    
+}
+
+<script>
+	var USER_UNREAD_REFRESH_INTERVAL;
+	$(document).ready(function () {
+		var isUserLogged = '@isUserLoggedIn'.toLowerCase() == 'true';
+		if (!isUserLogged) {
+			$('#btn-notif-menu').hide();
+			return;
+		}
+		$('#btn-notif-menu').show();
+		setUnread('@Model');
+		clearInterval(USER_UNREAD_REFRESH_INTERVAL);
+		USER_UNREAD_REFRESH_INTERVAL = setInterval(checkUnread, NOTIFICATION_REFRESH_TIMEOUT);
+	});
+
+	function checkUnread() {
+		$.ajax({
+			url: '@Url.Action("GetUserUnreadCount", "User", new { area = "UserPortal" })',
+			cache: false,
+			contentType: "application/json; charset=utf-8",
+			success: setUnread
+		});
+	}
+
+	function setUnread(cnt) {
+		try {
+			if (!hasValue(cnt) || parseInt(cnt) == 0) {
+				$('#not-unread').hide();
+				return;
+			}
+			$('#not-unread').html(cnt).show();
+		} catch (e) {
+		    if (window.console) console.log(e);
+			$('#not-unread').hide();
+		}
+		
+	}
+</script>
+
+<div id="d-usr-not-link" style="position: relative">
+	<a  href="@Url.Action("UserFeed","Discussion",new{area="UserPortal"})" target="_blank" id="btn-notif-menu">Notifications</a>
+	<span id="not-unread" class="new-un" style="display: none"></span>    
+</div>

@@ -1,0 +1,53 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+@model AuthorStatementRequestToken
+
+
+@(Html.Kendo().Chart<StatementKpiChartDTO>()
+            .Name("kpiChart_" + Model.userId)
+            .HtmlAttributes(new { @style = "height:300px" })
+            .Title("KPI")
+            .Legend(legend => legend
+                .Position(ChartLegendPosition.Top)
+            )
+                .DataSource(ds => ds.Read(r => r.Action("GetStatementKpiData", "Report",Model)))
+            .Series(series =>
+            {
+                series.Line(model => model.items).Name("Course views").Color("red");
+                series.Line(model => model.stores).Name("Store views").Color("blue");
+                series.Line(model => model.sales).Name("Sales").Color("green").Tooltip(t=>t.Template("Total #=value# sales"));
+            })
+            .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+            .CategoryAxis(axis => axis
+                .Date()
+                .BaseUnit(ChartAxisBaseUnit.Days)
+                .Categories(model => model.date)
+                .Labels(labels => labels.Rotation(-90))
+            )
+            .ValueAxis(axis => axis.Numeric()
+                .Labels(labels => labels.Format("{0:N0}"))
+            )
+            .Tooltip(tooltip => tooltip
+                .Visible(true)
+                .Format("{0:N0}")
+                .Template("Total #=value# views")
+      ))
+
+
+<script>
+    $(document).ready(function () {
+
+        setTimeout(function() {
+            var chart = $("#kpiChart_" + '@Model.userId').data("kendoChart");
+            var image = chart.imageDataURL();
+            //console.log(image);
+            var hid = $("#hidChart_" + '@Model.userId');
+
+            if (hid) hid.val(image);
+        }, 500);
+        
+    });
+
+</script>
+

@@ -1,0 +1,12 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+
+@model DashboardToken
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_AdminDashboardLayout.cshtml";
+}
+
+
+@Html.Partial("Dashboard/_dbMainStats",Model)
+
+

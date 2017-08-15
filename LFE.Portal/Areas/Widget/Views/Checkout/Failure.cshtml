@@ -1,0 +1,47 @@
+﻿@model LFE.Portal.Areas.Widget.Models.CheckoutBaseToken
+@using LFE.Portal.Helpers
+@{
+    ViewBag.Title = "Purchase failure";
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapCheckoutLayout.cshtml";
+    var indexPageLink = Url.ActionString("Index", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingId }, { "id", Model.PriceLineId }, { "ref", Model.Refferal } });
+}
+
+@section CSS
+{
+    <style>
+        .sc-error-main { color:#17496e; }
+        .sc-error-main h1, h2, h3 { margin:0; }
+        .sc-error-main h1 { margin:60px 0px 0px 0px; }
+        .sc-error-main h2 { margin:0px 0px 0px 0px; font-size:1.2em; font-weight:normal;}
+        .sc-error-main h4 { margin:0px 0px 0px 0px; font-size:1em; font-weight:normal; color:#6e0f0f;}
+        .sc-error-main .line { position:relative;height:1px;background-color:#aac4d6;margin:40px 0; }
+        .sc-error-main a { display:block;width:100%;background-color:#606774;padding:10px 0; text-align:center; color:#FFFFFF;font-size:1.2em; }
+        .sc-error-main a:hover { text-decoration:none; }
+    </style>    
+}
+
+
+<div class="sc-main-area rel">
+    <div class="sc-wide-cart sc-error-main">
+        <h1>OOPS...</h1>
+        <h2>Purchase not complete!</h2>
+        <div class="line"></div>
+        We could not complete the purchase process due to the following problem:<br /><br />
+        <h4>@Model.Message</h4>
+        <div class="line"></div>
+        <a href="@indexPageLink">Click here to go back to payment options screen</a>
+    </div>
+</div>
+
+
+@section JS
+{
+    @{
+        if (Model.ItemInfo != null)
+        {
+            <script>
+                saveItemEvent(USER_EVENTS.CHECKOUT_ERROR, '@Model.TrackingId', '@Model.ItemInfo.ItemId', '@((byte)Model.ItemInfo.ItemType)');
+            </script>
+        }
+    }
+}

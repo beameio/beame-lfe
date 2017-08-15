@@ -1,0 +1,84 @@
+﻿@using LFE.Portal.Helpers
+@{
+	var isSecured = this.IsUnderSsl();
+}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+	<meta name="viewport" content="width=device-width" />
+	<title>@ViewBag.Title</title>
+
+	@Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+	<link href="~/Content/kendo/@Url.ToKendoVersionUrl()/kendo.bootstrap.min.css" rel="stylesheet" />
+	@Styles.Render("~/Content/styles/common")
+	
+	@Styles.Render("~/bundles/styles/bootstrap")
+	@Styles.Render("~/admin/dash/less")
+
+	@RenderSection("CSS", false)
+	@Scripts.Render("~/bundles/modernizr")
+	
+	
+	@Html.Partial("~/Views/Shared/Layout/_HeaderScripts.cshtml")
+
+   
+	<script>
+		var isSecured = '@(isSecured.ToString().ToLower())' == 'true';
+	</script>
+	
+	@Scripts.Render("~/bundles/jqueryval")
+	@Scripts.Render("~/bundles/kendoall")
+	@Scripts.Render("~/bundles/bootstrap")
+	@Scripts.Render("~/bundles/scripts/common")
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.min.js"></script>
+    @Scripts.Render("~/Areas/PortalAdmin/bundles/lfe")
+    @Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+	@RenderSection("JS", required: false)   
+</head>
+<body style="min-width: 1160px;">
+
+	@Html.Partial("~/Views/Shared/Layout/_SiteHeader.cshtml")
+	
+	<div class="container">
+		<div class="row">
+			<div class="nav-container col-xs-12">
+				@Html.Partial("_Navigation")
+			</div>
+		</div>
+	</div>
+	
+	
+	
+	<div class="container rel" id="main-container" style="margin-bottom: 30px;">
+		@RenderBody()
+	</div>
+
+	@Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+	
+
+	<script>
+			var effect;
+			var reverse = false;
+			var flipSupported;
+
+			var initMode = 'Login';
+
+			var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+	</script>
+
+
+	<script>
+
+			//_NavViewOptions
+			$(document).ready(function () {
+				$('.nav-inner-toggle').unbind('click').click(function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).siblings($(this).attr('data-target')).toggle(300);
+				});
+			});
+	</script>
+</body>
+</html>

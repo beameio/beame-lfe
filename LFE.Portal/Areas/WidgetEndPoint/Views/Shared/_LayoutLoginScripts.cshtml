@@ -1,0 +1,68 @@
+﻿@using LFE.Portal.Models
+@model LFE.Portal.Areas.WidgetEndPoint.Models.PluginIndexToken
+@{
+    var verifyUrl = Url.Action("SavePluginOwner", "Home", new {area = "WidgetEndPoint", id = Model.Uid});
+
+    var loginFormUrl = Url.Action("LoginWindow", "Account", new { area = ""});
+    var registerFormUrl = Url.Action("LoginWindow", "Account", new { area = ""});
+    const bool requiredConfirmation = false;
+}
+@Html.Partial("~/Views/Shared/Common/_ReferrerScripts.cshtml")
+<script>
+    $(document).ready(function () {
+        $('#a-login').unbind('click').click(openLoginWnd);
+        $('#a-register').unbind('click').click(openRegisterWnd);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.openLogin, onOpenLoginWnd, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.openLogin, onOpenLoginWnd, null);
+
+        initLoginBehavior();
+    });
+
+    function onOpenLoginWnd() {
+        var url = '@loginFormUrl';
+        openLoginModalWnd(url, {});
+    }
+
+    function openLoginWnd(e) {
+        e.preventDefault();
+        var url = '@loginFormUrl';
+        var params = { mode: '@eLoginWindowMode.Login', type:'@Model.RegistrationSource' };
+        openLoginModalWnd(url, params);
+    }
+
+    function openRegisterWnd(e) {
+        e.preventDefault();
+        var url = '@registerFormUrl';
+        var params = { mode: '@eLoginWindowMode.Register', requiredConfirmation :'@requiredConfirmation', type:'@Model.RegistrationSource' };
+        openLoginModalWnd(url, params);
+    }
+
+    function openLoginModalWnd(url, params) {
+        var m = $('#modLogin');
+        params.returnUrl = '@verifyUrl';
+        params.isPlugin = true;
+        params.Uid = '@Model.Uid';
+        console.log(params);
+        m.find('.modal-body').load(url, params, function () {
+            m.modal('show');
+        });
+    }
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="modLogin" tabindex="-1" role="dialog">
+    <div class="modal-dialog login-wnd-container">
+        <div class="modal-content">
+            <div class="modal-header login-head rel">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Login</h4>
+            </div>
+            <div class="modal-body no-pad">
+                <div class="inner">
+                    <div class="modal-body-wrapper"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

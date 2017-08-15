@@ -1,0 +1,9 @@
+﻿@model List<LFE.DataTokens.AuthorPeriodStatsBoxToken>
+           
+
+@{
+    foreach (var token in Model.OrderBy(x => x.Index).ToArray())
+    {
+        @Html.Partial("Dashboard/_AuthorPeriodStatsBox", token)
+    }
+}

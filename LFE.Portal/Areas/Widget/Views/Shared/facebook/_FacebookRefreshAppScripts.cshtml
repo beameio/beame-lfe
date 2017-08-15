@@ -1,0 +1,100 @@
+﻿@using LFE.Portal.Helpers
+<script>
+    var courseApiUrl = '@Url.ToApiUrl("Course", "get")';
+    var webstoreApiUrl = '@Url.ToApiUrl("WebStore", "getByTrack")';
+
+
+
+    var lastSaveStoreDate = null;
+
+    var lastSaveItemDate = null;
+    function refreshApp() {
+        parent.refreshApp();
+    }
+   
+
+    $(document).ready(function () {
+        $('#a-reload').attr({'href':window.location});
+        checkPageState();
+        
+    });
+
+    function getCourseLastChange() {
+        
+        if (!hasValue(window.lastSelectedGUid)) return;
+
+        var url = courseApiUrl + window.lastSelectedGUid;
+
+        $.ajax({
+            url: url
+               , dataType: "json"
+               , cache: false
+               , success: function (response) {
+                    if (response.result != null) {
+                       var last = kendo.parseDate(response.result);
+                       if (lastSaveItemDate == null) {
+                           lastSaveItemDate = last;
+                       } else {
+                           if (last > lastSaveItemDate) {
+                               //console.log('do item refresh');
+                               lastSaveItemDate = last;
+                               window.refreshApp();
+                           }
+                       }
+                   }
+               }
+        });
+
+    }
+
+    function getStoreLastChange() {
+        var sid = window.settings.TrackingID;
+
+        if (!hasValue(sid)) return;
+
+        var url = webstoreApiUrl + sid;
+
+        $.ajax({
+            url: url
+               , dataType: "json"
+               , cache: false
+               , success: function (response) {
+                   if (response.result != null) {
+                       var last = kendo.parseDate(response.result);
+                       if (lastSaveStoreDate == null) {
+                           lastSaveStoreDate = last;
+                       } else {
+                           if (last > lastSaveStoreDate) {
+                               //console.log('do item refresh');
+                               lastSaveStoreDate = last;
+                               window.refreshApp();
+                           }
+                       }
+                   }
+               }
+        });
+       
+    }
+    function getFrameForDocument(document) {
+        var w = document.defaultView || document.parentWindow;
+        var frames = w.parent.document.getElementsByTagName('iframe');
+        for (var i = frames.length; i-- > 0;) {
+            var frame = frames[i];
+            try {
+                var d = frame.contentDocument || frame.contentWindow.document;
+                if (d === document)
+                    return frame;
+            } catch (e) { }
+        }
+
+        return null;
+    }
+    function checkPageState() {
+        
+        setTimeout(checkPageState, 5000);
+        getCourseLastChange();
+
+        getStoreLastChange();
+    }
+
+</script>

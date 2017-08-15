@@ -1,0 +1,240 @@
+﻿#d-course-container{height: auto}
+.stat-container {height: 88px;width: 100%;}
+
+
+.upl-consol{bottom:0;font-size:13px;left:500px;margin:5px 0 0;position:relative;width:255px}
+
+
+a.btn-prev-course{ background-image: url('../../../../Areas/AuthorAdmin/Content/images/ico-preview-crs.png');background-repeat: no-repeat;background-position: 0 2px;padding-left:20px;margin-left: 15px;}
+a.btn-prev-prod{ background-image: url('../../../../Areas/AuthorAdmin/Content/images/ico-preview-page.png');background-repeat: no-repeat;background-position: 0 2px;padding-left:20px;}
+a.browse-video{display:block;font-size:14px;position:relative;text-align:right;text-decoration:underline;width:166px}
+
+.coupon-container .b-title,.price-row .b-title{ text-transform: uppercase;padding:0 0 15px 5px;border-bottom: solid 2px #9a9a9a;margin-bottom: 15px;height: 23px;color: #333;}
+
+
+.ul-stats{ height: 70px;padding: 9px 10px 0 20px}
+.ul-stats li{ float: left;}
+.ul-stats li:last-child{float: right;margin: 0}
+.ul-stats li.stat{ height: 62px;width:62px;background-repeat: no-repeat}
+.ul-stats li.course{background-image:url('../../../../Areas/AuthorAdmin/Content/images/circle-red.png');-moz-background-size:61px 62px;-o-background-size:61px 62px;-webkit-background-size:61px 62px;-ms-background-size:61px 62px;background-size:61px 62px}
+
+.ul-stats li.bundle{background-image:url('../../../../Areas/AuthorAdmin/Content/images/circle-green.png');-moz-background-size:62px 62px;-o-background-size:62px 62px;-webkit-background-size:62px 62px;-ms-background-size:62px 62px;background-size:62px 62px}
+
+.ul-stats li.review{height:72px;background-position:0 5px;background-image:url('../../../../Areas/AuthorAdmin/Content/images/ico-cmnt-xs.png');-moz-background-size:66px 62px;-o-background-size:66px 62px;-webkit-background-size:66px 62px;-ms-background-size:66px 62px;background-size:66px 62px}
+
+.ul-stats li  .count{ color: #fff;font-size: 40px;font-weight: bold;font-style: italic;margin: 3px 0 0;text-align: center;}
+.ul-stats li.course  .count{width: 62px;height: 62px;}
+.ul-stats li.review  .count{width: 66px;height: 62px;}
+
+.ul-stats li  .course-label{text-transform: uppercase;font-size: 24px;color: #424242;font-style: italic;display: block;font-weight: bold;margin: 14px 60px 0 5px;cursor: pointer;text-decoration: underline}
+
+
+
+/*-- grid/list buttons --*/
+
+.ul-stats li .list-type-button{ width: 30px;background-repeat: no-repeat;padding: 38px 0 0;margin: 5px 10px 0 15px;text-transform: uppercase;font-size: 12px;text-align: center;cursor: pointer} 
+.ul-stats li .list-type-button.a{color: #333;}
+
+
+/*course/bundle list*/
+
+#d-contents-container .b-title, .bc-title{padding: 0 0 15px 15px}
+.ul-cb-list { width: 100%;text-align: left;overflow-x: hidden;border: none}
+.ul-cb-list > li{ width: 230px;height: 240px;display: inline-block;vertical-align: top;margin: 0 10px 25px 0;color: #000;text-align: left}
+.ul-cb-list > li.pub{color: #000 !important}
+.ul-cb-list > li.draft{color: #970000 !important}
+.ul-cb-list>li .thumb{width:100%;height:130px;background-repeat:no-repeat;-moz-background-size:230px 130px;-o-background-size:230px 130px;-webkit-background-size:230px 130px;-ms-background-size:230px 130px;background-size:230px 130px}
+
+.ul-cb-list > li .name{width:100%;height: 18px;font-size: 14px;line-height: 20px;padding: 9px 0 15px 0;display: block;}
+.ul-cb-list > li .ul-f span{margin: 0 2px 0 0;font-size: 12px;height: 30px;}
+.ul-cb-list > li .ul-f span.addon{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-list-add.png') no-repeat; padding: 0 0 0 20px}
+.ul-cb-list > li .ul-f span.price{ padding: 0 0 0 12px;font-size: 13px;font-weight: bold;color: green !important}
+.ul-cb-list > li .ul-f span.stud{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-list-lrnr.png') no-repeat; padding: 0 0 0 18px}
+.ul-cb-list > li .ul-f span.rev{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-list-cmnt.png') no-repeat 0 3px; padding: 0 0 0 20px}
+.ul-cb-list > li .cmd{ height: 28px;padding: 2px 0 0}
+.ul-cb-list > li .cmd a.list-cmd{ color: inherit !important;padding: 2px 0 0}
+.ul-cb-list > li .cmd span.status{ margin-right: 15px;padding: 0 0 0 18px;text-decoration: underline;}
+.ul-cb-list > li .cmd span.pub{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-st-pub.png') no-repeat 0 3px;}
+.ul-cb-list > li .cmd span.pub:after{content: "Published";}
+.ul-cb-list > li .cmd span.draft{ background: url('../../../../Areas/AuthorAdmin/Content/images/ico-st-draft.png') no-repeat 0 3px;}
+.ul-cb-list > li .cmd span.draft:after{content: "Draft";}
+
+
+.list-manage-row  > #d-mr-total.count-title:after{content: "courses";}
+.list-manage-row  > #d-bn-total.count-title:after{content: "bundles";}
+.list-manage-row  > #d-rv-total.count-title:after{content: "reviews";}
+
+/*bundle contents*/
+.cn-col .list-container {height:500px}
+.bndl-crs-col,.cn-bndl-crs{width: 400px;}
+.bndl-crs-col .list-container{width: 100%}
+.bndl-crs-col .ul-cn-list{ width: calc(100% - 10px);}
+.bndl-crs-col .ul-cn-list > li {width: calc(100% - 15px);height: 50px;position: relative}
+li span.it-name{width: calc(100% - 95px);max-height: 45px;}
+.bndl-crs-col .ul-cn-list > li .btn-del{ visibility: hidden;width:18px;height: 18px;position: absolute;top: calc(50% - 10px);right: 5px;cursor: pointer;background: url('../../../../Areas/AuthorAdmin/Content/images/ico-x.png') no-repeat}
+.bndl-crs-col .ul-cn-list > li:hover .btn-del{visibility: visible}
+
+.cn-col .ul-ac-list>li{background:none repeat scroll 0 0 #f4f4f4;border-bottom:2px solid #fff;border-top:2px solid #fff;color:#333;font-size:14px;height:auto;margin:0;min-height:20px;padding:7px 5px 7px 15px;position:relative;text-transform:uppercase;width:calc(100% - 15px);cursor:pointer}
+.cn-col .ul-ac-list-plus > li {background-image: url("../../../../Areas/AuthorAdmin/Content/images/ico-save.png");background-repeat: no-repeat;background-position: 360px center;height: 50px}
+.cn-col .ul-ac-list{border:none}
+/*course details*/
+.ul-edit-form.cd li label{ width: 180px;} 
+.ul-edit-form.cd li div.input-container{width:570px}
+.ul-edit-form.cd li div.input-container .txt-inp{ width: 570px;}
+.ul-edit-form.cd li div.input-container textarea{width: 570px !important}
+.ul-edit-form.cd li .validator-container{ display: table-cell;width: 190px}
+
+.ul-edit-form.cd li .validator-container .field-validation-error.forthumb{min-height: 200px;max-height: 200px;left:-3px;top: -2px;padding:0 0 0 4px;position:relative;}
+#valid-thumb .forthumb{ max-height: 120px !important;min-height: 120px !important}
+
+/*content*/
+.content-lists-sep{width: 210px;}
+
+/*pricing*/
+.price-row{ padding: 12px 0 0;}
+.price-row .b-title{ font-size: 24px;border-bottom-width: 1px !important;}
+
+.action-button{position: absolute;text-decoration: underline;font-size: 16px;color:#000 !important}
+
+.d-cover{position: absolute;left:0;background: #cdcdcd; -ms-opacity: 0.7; opacity: 0.7;z-index: 1000}
+
+.ul-edit-form.cp { width: 760px;}
+.ul-edit-form.cp li label{ width: 130px;padding: 5px 0 0} 
+.ul-edit-form.cp li div.input-container{width:530px}
+.ul-edit-form.cp li div.input-container .txt-inp{ width: 530px;}
+.ul-edit-form.cp li div.input-container textarea{width: 530px !important}
+.ul-edit-form.cp li .validator-container{ display: table-cell;width: 100px}
+
+#cp-info{ height: 20px;margin-left: 130px}
+#frmCoursePrice,#frmBundlePrice{ padding-bottom: 25px;}
+.ul-edit-form li .validator-container .field-validation-valid:before {content: "";}
+    
+.ul-edit-form.cp1 label{ width: 100px;display: table-cell;vertical-align: middle;padding: 0 }
+    
+.ul-edit-form.cp1 li:last-child {margin: 0}
+    
+.ul-edit-form.cp1 label.symb{width: auto;padding: 0 5px}
+
+.d-price-tabs{ height:auto;padding: 25px 0;border: solid 1px #a4a4a4;border-left: none;border-right: none;}
+.d-price-tabs span {font-size: 14px;text-decoration: underline;color: #000;cursor: pointer;margin: 0 15px 0 0;display: inline-block}
+.d-price-tabs span.active{font-weight: bold}
+.d-price-tabs span.disabled{color: #999;text-decoration: none;cursor: default}
+.d-price-exp{ margin: 10px 0 0;font-size: 14px;color: red !important}
+
+.li-pl-container { padding-bottom: 25px;border-bottom: 1px solid #a4a4a4;max-height: 240px; }
+
+#li-tabs-container > div{display:none}
+#li-tabs-container > div.active{display:block}
+
+.ul-price-list{ margin: 25px 0;width:calc(100% - 15px)}
+.ul-price-list li { height:	1.65em; padding: 5px 0}
+.ul-price-list li .btn-price-action{ font-size: 14px;color: #000;text-decoration: underline}
+
+.pl-f{font-size: 16px;color: #000;}
+.pl-title{width: 150px;}
+.pl-price{width: 80px;}
+.pl-name{width: 200px;}
+
+.pl-frm-title { font-size: 16pt;font-weight: bold;display: block;margin: 30px 0 18px }
+/*coupons*/
+.coupon-container{padding: 25px 0 0}
+.coupon-container .b-title{font-size: 24px;border-bottom-width: 1px !important;}
+.coupon-container .add-btn{padding: 3px 5px 0 40px;font-size: 18px}
+
+.ul-edit-form.cpn-left { width: 530px;}
+.ul-edit-form.cpn-left li label{ width: 130px;padding: 5px 0 0} 
+.ul-edit-form.cpn-left li div.input-container{width:270px}
+.ul-edit-form.cpn-left li div.input-container .txt-inp{ width: 270px;}
+.ul-edit-form.cpn-left li div.input-container textarea{width: 270px !important}
+.ul-edit-form.cpn-left li .validator-container{ display: table-cell;width: 125px;height: 36px;}
+
+.ul-edit-form.cpn-right { width: 380px;}
+.ul-edit-form.cpn-right li label{ width:80px;padding: 5px 0 0} 
+.ul-edit-form.cpn-right li div.input-container{width:190px}
+.ul-edit-form.cpn-right li div.input-container .txt-inp{ width:190px;}
+.ul-edit-form.cpn-right li .validator-container{ display: table-cell;width: 90px;height: 36px;}
+
+
+#d-cpn .info-box{ width: 690px;}
+#d-cpn .btn-container{ width: 220px;text-align: right}
+.grid-btn{color:#666;text-decoration: underline;cursor: pointer}
+
+
+
+.ul-stores-tree {width: 500px;color: #000;font-size: 14px;}
+.ul-stores-tree li{height: auto;}
+.ul-stores-tree li.li-store{background-color: transparent;}
+.ul-stores-tree li.li-store .ch-title{font-weight: bold;border-bottom: dotted 1px #727272;min-height: 18px;padding: 12px 10px;background: #e5e5e5}
+.ul-stores-tree li.li-store:last-child .ch-title{border-bottom: none}
+.ul-stores-tree li.li-store .ch-title .store-name{ width: 330px;cursor: pointer}
+.ul-stores-tree li.li-store .ch-title .incl{ font-size: 13px;padding: 4px 0 0 7px;color: #727272}
+.vd-name,.ch-name,.cn-name,.vd-name label{ cursor: pointer;white-space: normal}
+
+.ul-categories-tree{background: #fff;}
+.ul-categories-tree li{min-height: 18px;height: auto;}
+    
+.ul-categories-tree li.li-cat{ background: #fff;border-bottom: 1px dotted #a4a4a4}
+    
+.ul-categories-tree li .row-cat{height: 18px;padding: 12px 0 12px 55px}/*55 - video left margin*/
+
+.ul-categories-tree li .row-cat input[type=checkbox] {padding: 7px 7px 0 0}
+
+.tree-nav{width: 10px;height: 10px;margin-right: 4px}
+.l-icon{width: 0;height: 0;border-style: solid;line-height: 0;cursor: pointer;display: block}
+    
+.l-plus{border-width: 4px 0 4px 7px;border-color: transparent transparent transparent #000000;margin-top: 5px;}
+.l-minus{border-width: 7px 5px 0 5px;border-color: #000000 transparent transparent transparent;margin-top: 7px;}
+
+
+/*categories templates*/
+.tag-image{width:25px;height:25px;margin-right:5px;vertical-align:top}
+.item-image{width:45px;height:45px;margin-right:5px;vertical-align:top;display:inline-block}
+.item-image img{width:45px;height:45px}
+.cat-h4{vertical-align:top;display:inline-block!important;font-size:16px;margin:0 0 0 10px;padding:0}
+
+/*thumbs */
+.thumb-box{width: 180px; height: 118px;border: 1px solid #000;text-align: center}
+.thumb-box  img{width: 180px; height: 118px}
+.thumb-box.video-th,.thumb-box.video-th img{width: 295px; height: 198px;}
+.thumb-box .prompt{ display: block;color: #cfcfcf;font-size:22px;margin: 30px auto 0 auto}
+.thumb-box.video-th .preview{ width: 295px;height: 198px;z-index: 1}
+.thumb-box.video-th .hint{width:300px;height:200px;position:relative;top:0;left:0;-ms-opacity:.7;opacity:.7;z-index:1000;background:#000;color:#fff;font-size:16px;margin:-300px 0 0 0;text-align:center}
+
+.thumb-box.video-th .list-player{position: relative;top: 0;left: 0;width:300px;height:200px;}
+.thumb-box.video-th .play{ margin: 100px 0 0;display: block;cursor: pointer;padding: 100px 0 0;font-size: 20pt }
+
+.d-sort-row{ border-bottom: 1px solid #a0a0a0;margin: 7px 0;padding: 0 0 7px 14px;height: 20px}
+
+/*discussion*/
+a.btn-cancel{background-image:url('../../../../Areas/AuthorAdmin/Content/images/ico-cancel.png')}
+a.btn-submit{background-image:url("../../../../Areas/AuthorAdmin/Content/images/ico-save.png");}
+/*kendo overrides*/
+
+.k-upload-button{width: auto}
+
+/*editor*/
+.k-editor{ background: none !important;border:solid 1px #000}
+.k-editor .k-editor-combobox .k-combobox,.k-editor .k-editor-selectbox .k-dropdown{width: 120px}
+.k-editor .k-editor-toolbar{font-size: 13px}
+
+/*combo/dropdown/multiselect*/
+.k-popup{-ms-border-radius:0;border-radius:0;border:1px solid #000}
+.c2 .k-multiselect-wrap,.c2 .k-dropdown-wrap{font-size: 12px}
+.k-multiselect-wrap,.k-dropdown-wrap{font-size: 14px}
+.k-multiselect-wrap .k-readonly{padding: 6px 0 0}
+
+
+/*window*/
+.k-window{-ms-border-radius:0;border-radius:0;border:1px solid #000}
+
+.k-window .k-window-titlebar{ background: none;border-bottom-color: #000}
+
+/*date picker*/
+.k-numerictextbox{ border: none;background: none}
+.k-datepicker,.k-numerictextbox .k-input {
+    background: #fff !important;border: 1px solid #000000;
+    -ms-border-radius: 0;
+    border-radius: 0;
+}
+
+.k-datepicker .k-select,.k-datepicker .k-input{-ms-border-radius:0;border-radius:0}

@@ -1,0 +1,4 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.Core.Enums.CommonEnums.eAdminStatuses
+
+@Html.Kendo().EnumComboBoxFor(x => x, Model, "", "", new { @style = "width:200px", @class = "l-combo" })

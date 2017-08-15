@@ -1,0 +1,204 @@
+﻿@using LFE.Portal.Helpers
+
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.CourseWizardPageToken
+
+@{
+    ViewBag.Title = Model.user.fullName + " | " + Model.WizardDto.Name + " Manage";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_WizardLayout.cshtml";
+}
+
+@section css
+{
+    <link href="~/Content/kendo/@Url.ToKendoVersionUrl()/kendo.bootstrap.min.css" rel="stylesheet" />
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/video.css" )" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/wizard.css" )" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/chapters.css" )" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/anime.css" )" rel="stylesheet" type="text/css" />
+    @Styles.Render("~/admin/course/less")
+    <style>
+        .ul-s-video {
+            margin: 10px 0;
+        }
+
+            .ul-s-video li {
+                margin: 10px 3px 0 1px;
+            }
+
+        #d-video-selection {
+            margin: 6px 0 !important;
+            width: 100% !important;
+        }
+
+        #wndVideo .k-pager-wrap {
+            width: 780px;
+        }
+
+        #d-contents-container {
+            height: 580px;
+        }
+
+        #d-chapters-container {
+            max-height: 540px;
+        }
+
+        .ul-first-level li .first-contents {
+            margin-left: 30px !important;
+        }
+
+        .ul-second-level li .cn-details .cn-box.cn-vd-container {
+            top: 0;
+            left: 0;
+        }
+
+        .ul-second-level li .cn-details .cn-box.cn-vd-desc.cn-vd-desc-edit {
+            top: 150px;
+        }
+
+        .ul-second-level li .video-details {
+            height: 190px;
+        }
+
+            .ul-second-level li .video-details.edit-mode {
+                height: 290px;
+            }
+
+        .link-container {
+            display: none;
+        }
+    </style>
+}
+
+@section scripts
+{
+    <script src="@Url.Content("~/Areas/AuthorAdmin/Scripts/lfe/chapters.js")"></script>
+
+    <script type="text/javascript">
+        var HID_COURSE_ID_SELECTOR = '#ThisCourseId';
+        var HID_CHAPTER_CNT_SELECTOR = '#ChaptersCnt';
+        var videoSelectionUrl = '@Url.Action("VideoSelection", "Course")';
+        var useApi = '@Html.UseWebStoreApi()'.toLowerCase() == 'true';
+        var apiUrl = '@Url.ToApiUrl("Course","updatelog")';
+
+        $(document).ready(function () {
+            $.ajaxSetup({
+                // Disable caching of AJAX responses
+                cache: false
+            });
+
+            window.getNotifManagerInstance().unsubscribe(notifEvents.course.courseStateChanged, sendApiUpdate, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.course.courseStateChanged, sendApiUpdate, null);
+
+            window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.courseCreated, onCourseCreated, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.wizard.courseCreated, onCourseCreated, null);
+
+            window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.courseNameChanged, updateCourseName, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.wizard.courseNameChanged, updateCourseName, null);
+
+            var cid = parseInt('@Model.WizardDto.CourseId');
+            $(HID_COURSE_ID_SELECTOR).val(cid);
+
+
+            window.onbeforeunload = function () {
+                if (isFormInEditMode) return CHANGE_CONFIRM;
+                return true;
+            };
+
+            //$(window).on('hashchange', function () {
+            //    handleHashStateOnLoad();
+            //});
+
+            //handleHashStateOnLoad();
+            // $('#frmWizMaqnager').submit();
+        });
+
+        function closeEditorWarning() {
+            return validateEditMode();
+        }
+
+        function handleHashStateOnLoad() {
+            var hash = window.location.hash ? window.location.hash.substring(1) : null;
+            if (hasValue(hash)) {
+                var current = getStepIndex(getManagerStep(stepKinds.current));
+                if (current == null) {
+                    $('#frmWizMaqnager').submit();
+                    return;
+                }
+                var redirectByHash = handleHash(hash, current);
+                if (redirectByHash) return;
+            }
+
+            $('#frmWizMaqnager').submit();
+        }
+
+        function updateCourseName(name) {
+            $('#li-page-name').html(name);
+        }
+
+        function onCourseCreated(courseId) {
+            $(HID_COURSE_ID_SELECTOR).val(courseId);
+            window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+        }
+
+        function sendApiUpdate() {
+            var id = $(HID_COURSE_ID_SELECTOR).val();
+            if (!hasValue(id) || parseInt(id) < 0) return;
+
+            $.ajax({
+                url: apiUrl + $(HID_COURSE_ID_SELECTOR).val(),
+                dataType: "json",
+                type: "Post",
+                cache: false
+            });
+        }
+    </script>
+}
+
+@Html.Hidden("ThisCourseId")
+@Html.Hidden("ChaptersCnt", Model.WizardDto.ChapersCount)
+
+@using (Ajax.BeginForm("ChangeWizardStep", "Course", new { area = "AuthorAdmin", uid = Model.WizardDto.Uid }, new AjaxOptions { OnBegin = "window.showLoader();", OnSuccess = "loadCurrentStep", UpdateTargetId = "wizard-container-inner", InsertionMode = InsertionMode.Replace }, new { @id = "frmWizMaqnager" }))
+{
+    @Html.Hidden("nextStep", Model.WizardDto.NextWizardStep)
+    @Html.Hidden("lastStep", Model.WizardDto.LastCompletedStep)
+    @Html.Hidden("currentStep", Model.WizardDto.CurrentWizardStep)
+    @Html.Hidden("selectedChapterId")
+
+}
+
+<div class="wizard-container">
+    @{
+        Model.WizardDto.LoadFromHash = true;
+    }
+    <img src="@Url.Content("~/Areas/AuthorAdmin/Content/images/logo-wiz.png")" class="wiz-logo" alt="LFE" />
+    <div id="wizard-container-inner" style="height: 100%">
+        @Html.Partial("CourseWizard/_WizardContainer", Model.WizardDto)
+    </div>
+</div>
+
+
+@(Html.Kendo().Window()
+        .Name("wndVideo")
+        .Title("Select Video")
+        .Draggable(false)
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Height(580)
+        .Width(860)
+        .Modal(true)
+        .Animation(false)
+        .Events(e => e.Close("cleanWndContent"))
+        .Content("loading video library.....")
+)
+
+<script type="text/x-kendo-template" id="kendo-video-thumb-template">
+    <div class="preview" id="thumb-${identifier}" style="background: url('${fixSR(stillUrl)}') no-repeat;">&nbsp;</div>
+
+    <div class="hint" style="display:none;" id="hint-${identifier}">
+        <span class="play" id="play-${identifier}">Play</span>
+    </div>
+
+    
+    <div style="display:none;" class="list-player jwp" id="player-#=newGuid#"></div>
+</script>

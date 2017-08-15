@@ -1,0 +1,118 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+
+<script>
+    function onSubscriptionRepRequestEnd(e) {
+        try {
+            if (e.type != 'read') return;
+            var total = e.response.Data.length;
+            window.getNotifManagerInstance().notify(notifEvents.report.subscriptionRepBound, total);
+        } catch (ex) {
+            if (window.console) console.log(ex);
+        }
+    }
+
+    function cancelSubscription(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        //SALE = 1
+        //SUBSCRIPTION = 2          
+        if (dataItem.LineType != 2 || dataItem.Status != 'Active') {
+            alert('cancel not allowed');
+            return;
+        }
+        var itemName = dataItem.ItemName;
+        if (!window.confirm('Are you are you want to cancel your subscription to the ' + itemName + '?')) return;
+
+        var data = {
+            id: dataItem.LineId
+			, paymentMethod: dataItem.PaymentMethod
+        };
+        window.showLoader();
+        $.ajax({
+            url: '@Url.Action("CancelSubscription","Billing",new{area=""})',
+            cache: false,
+            type: "Post",
+            data: JSON.stringify(data),
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                window.hideLoader();
+                if (response.success) {
+                    alert("The "+ itemName + " was successfully canceled. You can access this course until the end of the current month.");
+                    $('#SubscriptionReport').data("kendoGrid").dataSource.read();
+                } else {
+                    alert(response.error);
+                }
+            }
+            //,beforeSend: function(xHr) {
+            //    console.log('=== beforeSend ===');
+            //    console.log(xHr);
+            //    console.log('=============');
+            //}
+            //,error: function(xHr) {
+            //    console.log('=== error ===');
+            //    console.log(xHr);
+            //    console.log('=============');
+            //}
+        });
+    }
+
+    function onSubscriptionReportBound(e) {
+        var grid = e.sender;
+        var data = grid.dataSource.data();
+        $.each(data, function (i, row) {
+            //console.log(row);
+            if (row.LineType != 2 || row.Status != 'Active') // subscription
+                $('tr[data-uid="' + row.uid + '"] ').find(".k-grid-CancelSubscription").hide();
+        });
+    }
+</script>
+@(Html.Kendo().Grid<OrderLineDTO>()
+        .Name("SubscriptionReport")
+        .TableHtmlAttributes(new { @style = "background-color: #f2f2f2 !important;background-image: none !important;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.ItemName).Title("Course");
+            columns.Bound(p => p.Seller.FullName).Title("Author");
+            columns.Bound(p => p.OrderDate).Title("Purchase Date").Format("{0:d}");
+            columns.Bound(p => p.TotalAmount).Title("Amount").ClientTemplate("#=kendo.toString(TotalAmount, \"n2\")##=Currency.Symbol#").Width(150);
+            columns.Bound(p => p.Status).Title("Status");
+            columns.Command(c => c.Custom("Cancel Subscription").Click("cancelSubscription")).Width(80).Title(" ");
+        })
+        .Events(e => e.DataBound("onSubscriptionReportBound"))
+        .Sortable()
+        .Pageable(pager => pager.Numeric(true).Refresh(true))
+        .Filterable(f => f.Enabled(false))
+        .ClientDetailTemplateId("template-payment")
+        .DataSource(dataSource => dataSource.Ajax()
+                            .Model(model => model.Id(p => p.LineId))
+                            .Read(read => read.Action("GetSubscriptions", "User").Type(HttpVerbs.Get)).Events(e => e.RequestEnd("onSubscriptionRepRequestEnd")).ServerOperation(false)
+                            .PageSize(20))
+)
+@*@(Html.Kendo().Tooltip()
+    .For("#SubscriptionReport")
+    .Filter(".col-tooltip")
+    .Position(TooltipPosition.Top)
+    .Width(300)
+)
+@(Html.Kendo().Tooltip()
+    .For("#SubscriptionReport")
+    .Filter(".prof")
+        .LoadContentFrom("PaypalSubscriptionTooltip", "Billing", new { area = "PortalAdmin" })
+    .Position(TooltipPosition.Center)
+    .Width(600)
+    .Height(300)
+        .Events(events => events.RequestStart("requestPaypalStart"))
+)
+@(Html.Kendo().Tooltip()
+    .For("#SubscriptionReport")
+    .Filter(".pay")
+        .LoadContentFrom("SubscriptionPaymentsTooltip", "Billing",new{area="PortalAdmin"})
+    .Position(TooltipPosition.Center)
+    .Width(700)
+        //.Height(300)
+    .Events(events => events.RequestStart("requestPaymentStart"))
+)*@
+

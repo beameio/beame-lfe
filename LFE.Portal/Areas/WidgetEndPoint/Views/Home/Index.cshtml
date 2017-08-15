@@ -1,0 +1,57 @@
+﻿@model LFE.Portal.Areas.WidgetEndPoint.Models.PluginIndexToken
+
+@{
+    ViewBag.Title = "Wordpress landing page";
+    Layout = "~/Areas/WidgetEndPoint/Views/Shared/_Layout.cshtml";
+
+
+    var rq = String.IsNullOrEmpty(Request.QueryString["ReturnUrl"]) ? Url.Action("UserEndPoint", "Account", new { area = "" }) : Request.QueryString["ReturnUrl"];
+
+    ViewBag.ReturnUrl = rq;
+}
+@section css
+{
+    <link href="~/Content/styles/login.css" rel="stylesheet" />
+}
+@section JS{
+    <script src="~/Scripts/lfe/lfe.login.js"></script>
+    @Html.Partial("_LayoutLoginScripts",Model)
+}
+<div class="wep_topbox">
+    <h2>Learning From Experience</h2>
+    <h1>Sell Online Courses from your website</h1>
+    <span>Welcome to the world of LFE. LFE’S mission is to enable experts in all fields to share their knowledge and earn money online through creating and selling online courses. Creating a course is easy - all it takes is a few clicks and great video content. Sign up or Login and let’s roll!</span>
+</div>
+<div class="wep_bottombox">
+    <div style="height:65px;"></div>
+    <div class="cell">
+        <a href="#" id="a-register">
+            <h3>I'm a new user</h3><img src="~/Areas/WidgetEndPoint/Content/assets/create.png" /><br /><br /><h4>CREATE</h4>an account
+        </a>
+        <div class="vert_separator"></div>
+    </div>
+    <div class="cell">
+        <a href="#" id="a-login">
+            <h3>I have an LFE account</h3><img src="~/Areas/WidgetEndPoint/Content/assets/login.png" /><br /><br /><h4>LOGIN</h4>to my account
+        </a>
+    </div>
+</div>
+
+
+<div id="wep_msgCont">
+    <div class="cover"></div>
+    <div id="divMsg"></div>
+</div>
+<script>
+$(document).ready(function() {
+    var message = '@Model.Message';
+    if (message && message != '') {
+        var msgCont = $('#wep_msgCont');
+        msgCont.css('display', 'block');
+        msgCont.unbind('click').click(function(e) {
+            msgCont.css('display', 'none');
+        });
+        $('#divMsg').html(message);
+    }
+});
+</script>

@@ -1,0 +1,70 @@
+﻿@using LFE.Portal.Helpers
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>@ViewBag.Title</title>
+		<!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge" /><![endif]-->
+		<meta charset="utf-8" />
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <link href="@Url.Content( "~/Content/styles/bootstrap/bootstrap.css" )" rel="stylesheet" type="text/css" />
+	    @Styles.Render("~/Content/kendo/"+ Url.ToKendoVersionUrl() + "/css")        
+	    @Styles.Render("~/Content/styles/common")	
+        <link href="@Url.Content("~/Areas/Widget/Content/styles/purchase.css")" rel="stylesheet" />
+	    @Scripts.Render("~/bundles/modernizr")		   
+		@Scripts.Render("~/bundles/jquery/jquery")
+        <script src="@Url.Content( "~/Scripts/bootstrap.min.js" )" type="text/javascript"></script>
+        <script src="@Url.Content( "~/Scripts/respond.min.js" )" type="text/javascript"></script>
+		@Scripts.Render("~/bundles/jquery/jqueryval")
+		@Scripts.Render("~/bundles/kendo")
+		@Scripts.Render("~/bundles/lfe/common")
+
+		<script>
+            kendo.culture("en-US");
+            var saveEventUrl = '@Url.Action("SaveEvent","EventApi",new{area=""})';
+			var notificationManager;
+		 
+			function getNotifManagerInstance() {
+				if (notificationManager == undefined || notificationManager == null) {
+					notificationManager = new NotificationManager();
+				}
+				return notificationManager;
+			}
+		</script>
+		@RenderSection("css", false)	
+			  
+	</head>
+    <body style="height: 100%">
+        @RenderBody()    
+        
+		
+        <div id="site-loader" class="k-loading-mask" style="width: 100%; height: 100%; top: 0; left: 0;display: none;opacity: 0.5;background-color: #cfcfcf">
+            <span class="k-loading-text">Loading...</span>
+            <div class="k-loading-image"></div>
+            <div class="k-loading-color"></div>
+        </div>
+        <script type="text/x-kendo-template" id="feed-list-template">
+			<li >
+				<div class="inline img-container" >
+					<img alt="" src="${CreatorPhotoUrl}"/>
+				</div> 
+				<div class="inline row">   
+					<div class="auth">
+						<a href="#='@Url.Action("UserProfile","User",new{area="UserPortal"})' + '?id=' + CreatorId#" class="a-profile-link">
+							<span class="cr-name">${CreatorName}</span>
+						</a>
+						 
+						<span class="post-on">${PostedOn}</span>
+					</div>
+					<div class="room">${RoomName}/${CourseName}</div>
+					<div class="txt">
+						#=Encoder.htmlDecode(HTMLMessage)#
+					</div>            
+				</div>
+			</li>
+		</script>
+        
+        @RenderSection("scripts", false)
+    </body>
+</html>

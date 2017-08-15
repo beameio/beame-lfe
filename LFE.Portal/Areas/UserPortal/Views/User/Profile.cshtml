@@ -1,0 +1,19 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.UserProfilePageToken
+
+@{
+	ViewBag.Title = @Model.ProfileCart.Profile.fullName + " Profile";
+	Layout = "~/Areas/UserPortal/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+	if (Model.IsValid)
+	{
+		@Html.Partial("User/_UserProfile",Model)        
+	}
+	else
+	{
+		<h3>@Model.Message</h3>
+	}
+}
+

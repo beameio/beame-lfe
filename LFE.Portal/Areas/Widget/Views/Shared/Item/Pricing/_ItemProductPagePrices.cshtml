@@ -1,0 +1,36 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.ItemProductPageToken
+           
+@{
+    if (Model.IsFreeItem)
+    {
+        var actionLink = "#";
+        
+        if (Model.PriceLines.Any())
+        {
+            var price = Model.PriceLines[0];
+            actionLink = User.Identity.IsAuthenticated ? Url.ActionString("PurchaseFreeCourse" , "Checkout", new RouteValueDictionary { { "area", "Widget" },{"courseId",Model.ItemId}, { "trackingId", Model.TrackingID }, { "id", price.PriceLineID }, { "ref", Request.RawUrl } }) :
+                                                         Url.ActionString("Login", "Checkout", new RouteValueDictionary { { "area", "Widget" }, { "trackingId", Model.TrackingID }, { "id", price.PriceLineID }, { "ref", Request.RawUrl } });
+        }
+        
+        <a class="buy-action-link" href="@actionLink">
+            <div class="price-container free-course">
+                <label class="free">Free Course</label>
+                <div class="buy-now">get it!</div>
+            </div>
+        </a>                
+    }
+    else
+    {
+        if (Model.PriceLines.Any())
+        {
+            @Html.Partial("~/Areas/Widget/Views/Shared/Item/Pricing/_ItemPricesRow.cshtml", new ItemPricesPageToken { PriceLines = Model.PriceLines, Mode = ePricesDisplayMode.FULL, TrackingID = Model.TrackingID })
+        }
+        else
+        {
+            <label class="no-price">No price defined</label>
+        }
+    }
+
+}

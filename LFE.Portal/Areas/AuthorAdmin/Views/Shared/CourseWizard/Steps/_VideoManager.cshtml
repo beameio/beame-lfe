@@ -1,0 +1,35 @@
+﻿@model LFE.DataTokens.WizardVideoManageDTO
+
+<script>
+    $(document).ready(function () {
+        window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.saveStep, leaveVideoManager, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.wizard.saveStep, leaveVideoManager, null);
+
+        $('#a-open-vm').unbind('click').click(openVM);
+    });
+    
+    function leaveVideoManager() {
+        window.getNotifManagerInstance().notify(notifEvents.wizard.stepSaved, null);
+    }
+    
+    function openVM(e) {
+        e.preventDefault();
+        window.open('@Url.Action("MyVideos","Course",new{area="AuthorAdmin"})', 'My Videos', 'width=890,height=740,location=0,menubar=0,toolbar=0,resizable=0,scrollbars=0,status=1,titlebar=1');
+    }
+</script>    
+
+<div class="d-video-tab">
+    <div class="inner">
+        <div class="top-row">
+            <a href="#" class="vm-link" id="a-open-vm">Open Video Manager in new window</a>
+            <div style="min-height:20px;height:20px"></div>
+            <a href="#3" class="vm-skip btn-next">I've already uploaded my video files - Skip to next step</a>
+            @*@Html.ActionLink("Open Video Manager in new window","MyVideos","Course",new{area="AuthorAdmin",id=Model.Uid},new{@target="_blank",@class="vm-link"})*@
+        </div>
+        <div class="bottom-row">
+            <div class="v-info">
+                @Html.Raw(Model.Info)
+            </div>            
+        </div>
+    </div>
+</div>

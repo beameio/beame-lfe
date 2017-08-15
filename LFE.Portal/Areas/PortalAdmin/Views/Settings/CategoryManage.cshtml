@@ -1,0 +1,72 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+
+@{
+    ViewBag.Title = "CategoryManage";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Categories Manage</h2>
+<script type="text/javascript">
+    function onCategoryRemove(e) {
+        //console.log(e.model);
+        if (e.model.cnt > 0) {
+            alert("Category has attached courses and can't be deleted");
+            e.sender.cancelChanges();
+            e.preventDefault();
+        }
+        
+    }
+    function onReportBound(e) {
+        var data = this._data;
+        for (var x = 0; x < data.length; x++) {
+            var dataItem = data[x];
+            var tr = $("#CategoryReport").find("[data-uid='" + dataItem.uid + "']");
+
+            if (dataItem.cnt > 0) {
+                tr.find('.k-grid-delete').css('visibility', 'hidden');
+            } else {
+                tr.find('.k-grid-delete').css('visibility', 'visible');
+            }
+
+        }
+    }
+</script>
+
+
+
+
+@(Html.Kendo().Grid<CategoryEditDTO>()    
+      .Name("CategoryReport")    
+      .Columns(columns => {        
+            columns.Bound(p => p.name).Title("Name");
+            columns.Bound(p => p.isActive).Title("Is Active");
+            columns.Bound(p => p.cnt).Title("Total Attached");
+            columns.Command(command => command.Edit()).Width(100);
+            columns.Command(command => command.Destroy()).Width(100);
+      })
+        .Events(e => e.Remove("onCategoryRemove").DataBound("onReportBound"))
+      .ToolBar(toolbar => toolbar.Create())
+      .Sortable()
+      .Filterable(f=>f.Enabled(true))
+      .Pageable(p=>
+      {
+          p.Numeric(true);
+          p.PreviousNext(true);
+          p.Refresh(true);
+      })
+      .DataSource(dataSource => dataSource.Ajax()
+        .PageSize(20)
+        .Model(model =>
+        {
+            model.Id(p => p.id);
+            model.Field(m => m.id).DefaultValue(-1);
+            model.Field(m => m.isActive).DefaultValue(true);
+            model.Field(m => m.cnt).Editable(false);
+        })
+        .ServerOperation(false)
+        .Read(a => a.Action("ReadCategories", "Settings",new{area="PortalAdmin"}).Type(HttpVerbs.Get))
+        .Create(a => a.Action("SaveCategory", "Settings").Type(HttpVerbs.Post))
+        .Update(a => a.Action("SaveCategory", "Settings").Type(HttpVerbs.Post))
+        .Destroy(a => a.Action("DestroyCategory", "Settings").Type(HttpVerbs.Post))
+))

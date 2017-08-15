@@ -1,0 +1,91 @@
+﻿@using LFE.Portal.Models
+@model LFE.DataTokens.AccountSettingsDTO
+
+<script>
+    var formUserNotifManager;
+    $(document).ready(function () {
+        formUserNotifManager = new UserNotificationManager('#as-info', '.alert', false);
+
+    });
+
+    function onCommunicationSettingsSaved(response) {
+        hideFormLoader();
+        var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+        var msg = response.success ? accountMessages.ACCOUNT.COMM_SETTINGS_UPDATED : response.error;
+
+        formUserNotifManager.show({ message: msg, kind: kind });
+    }
+</script>
+
+	
+
+@using (Ajax.BeginForm("UpdateCommunicationSettings", "Account", new { area = "" }, new AjaxOptions { OnBegin = "javascript:showFormLoader('#frmCommSettings')", OnSuccess = "onCommunicationSettingsSaved" }, new { @id = "frmCommSettings", @style = "position:relative" }))
+{
+	
+	if (Model.FbUser != null)
+	{
+		<div class="fb-user-container">
+			Connected Facebook account: &nbsp;&nbsp;&nbsp; <b>@Model.FbUser.name</b>
+		</div>
+	}
+	
+	
+	
+	<h4>How will LFE and course authors communicate with You?</h4>
+	
+	@Html.HiddenFor(x => x.UserId)
+	<fieldset class="fs-cs">
+		<legend></legend>
+		<ul class="ul-edit-form">
+			<li>
+				<div class="inline row-title">
+					Discussion feed summary (Daily)
+				</div>
+				@{
+	                if (Model.IsSocialLogin)
+	                {
+						<div class="inline" style="margin-right: 25px">
+							@Html.CheckBoxFor(m => m.DisplayDiscussionFeedDailyOnFB)  Facebook
+						</div>        
+	                }
+				}
+				
+				<div class="inline">
+					@Html.CheckBoxFor(m => m.ReceiveDiscussionFeedDailyOnEmail)  Email
+				</div>
+			</li>
+			
+			<li>
+				<div class="inline row-title">
+					Course news and updates (Weekly)
+				</div>
+				@{
+	                if (Model.IsSocialLogin)
+	                {
+						<div class="inline" style="margin-right: 25px">
+							@Html.CheckBoxFor(m => m.DisplayCourseNewsWeeklyOnFB)  Facebook
+						</div>        
+	                }
+				}
+				
+				<div class="inline">
+					@Html.CheckBoxFor(m => m.ReceiveCourseNewsWeeklyOnEmail)  Email
+				</div>
+			</li>
+			
+			<li style="margin-top: 50px;">
+				@Html.CheckBoxFor(m => m.DisplayActivitiesOnFB, new { @class = "inline chk" })  @Html.LabelFor(m => m.DisplayActivitiesOnFB, new { @class = "inline" })
+			</li>
+			
+			<li style="">
+				@Html.CheckBoxFor(m => m.ReceiveMonthlyNewsletterOnEmail, new { @class = "inline chk" })  @Html.LabelFor(m => m.ReceiveMonthlyNewsletterOnEmail, new { @class = "inline" })
+			</li>
+		</ul>				
+	</fieldset>
+}
+
+@Html.Partial("Account/_EditSettingsCommandRow", new AccountSettingsCommandRowToken
+{
+    Role = Model.Role,
+    FormName = "frmCommSettings"
+})

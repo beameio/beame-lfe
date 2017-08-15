@@ -1,0 +1,140 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@{
+    ViewData["periodKinds"] = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+                               | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+                               | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+
+
+    ViewData["statusLOV"] = Utils.EnumWithDescToList<BillingEnums.eSubscriptionStatuses>();
+
+    ViewData["pmLOV"] = Utils.EnumWithDescToList<BillingEnums.ePaymentMethods>();
+}
+<script>
+    function onFilterSelected() {
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function getSubscriptionFilters() {
+        return {
+            periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)ReportEnums.ePeriodSelectionKinds.all).ToString())'
+            , status: $('#ddlStatuses').data("kendoDropDownList").value()
+            , pm: $('#ddlPm').data("kendoDropDownList").value()
+            , authorUserId: $('#ddlAuthorsLOV').data("kendoComboBox").value()
+            , courseId: $('#ddlCoursesLOV').data("kendoComboBox").value()
+            , subscriberId: $('#ddlLearnersLOV').data("kendoComboBox").value()
+        };
+    }
+    function clearFilters() {
+        $('#periodSelectionKind').data("kendoDropDownList").value(null);
+        $('#ddlStatuses').data("kendoDropDownList").value(null);
+        $('#ddlPm').data("kendoDropDownList").value(null);
+        $('#ddlAuthorsLOV').data("kendoComboBox").value(null);
+        $('#ddlCoursesLOV').data("kendoComboBox").value(null);
+        $('#ddlLearnersLOV').data("kendoComboBox").value(null);
+        window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+    }
+
+    function onReportBound() {
+        $(".col-tooltip").kendoTooltip({
+            position: "top",
+            content: kendo.template($("#tp-template").html()),
+            width: 250
+        }).data("kendoTooltip");
+    }
+</script>
+<div id="rep-param-row" style="margin:25px 0">
+    <div id="period-combo-container" class="inline">
+        @(Html.Kendo().DropDownList()
+              .Name("periodSelectionKind")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["periodKinds"])
+                      .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+              .Events(e => e.Select("onFilterSelected"))
+              .Value(((int)ReportEnums.ePeriodSelectionKinds.all).ToString())
+        )
+    </div>
+
+    <div id="status-combo-container" class="inline">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlStatuses")
+              .OptionLabel("..select status")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["statusLOV"])
+              .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+              .Events(e => e.Select("onFilterSelected")))
+    </div>
+
+    <div id="pm-combo-container" class="inline">
+        @(Html.Kendo().DropDownList()
+              .Name("ddlPm")
+              .OptionLabel("..select payment method")
+              .DataTextField("Title")
+              .DataValueField("Value")
+              .BindTo((IEnumerable)ViewData["pmLOV"])
+              .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+              .Events(e => e.Select("onFilterSelected")))
+    </div>
+</div>
+<div id="rep-param-row" style="margin: 0 0 25px 0">
+    <div id="author-combo-container" class="inline" style="">
+        @(Html.Kendo().ComboBox()
+            .Name("ddlCoursesLOV")
+            .DataValueField("CourseId")
+            .DataTextField("Name")
+            .Placeholder("select course")
+            .HighlightFirst(true)
+            .Filter(FilterType.Contains)
+            .Suggest(true)
+            .MinLength(2)
+            .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+            .BindTo((IEnumerable)ViewData["CoursesLOV"])
+            .Events(e => e.Select("onFilterSelected"))
+        )
+    </div>
+    <div id="author-combo-container" class="inline" style="">
+        @(Html.Kendo().ComboBox()
+            .Name("ddlAuthorsLOV")
+            .DataValueField("id")
+            .DataTextField("name")
+            .Placeholder("select author")
+            .HighlightFirst(true)
+            .Filter(FilterType.Contains)
+            .Suggest(true)
+            .MinLength(2)
+            .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+            .BindTo((IEnumerable)ViewData["AuthorsLOV"])
+            .Events(e => e.Select("onFilterSelected"))
+        )
+    </div>
+    <div id="author-combo-container" class="inline" style="">
+        @(Html.Kendo().ComboBox()
+            .Name("ddlLearnersLOV")
+            .DataValueField("id")
+            .DataTextField("name")
+            .Placeholder("select subscriber")
+            .HighlightFirst(true)
+            .Filter(FilterType.Contains)
+            .Suggest(true)
+            .MinLength(2)
+            .HtmlAttributes(new { @class = "combo-ps", @style = "width:250px" })
+            .BindTo((IEnumerable)ViewData["LearnersLOV"])
+            .Events(e => e.Select("onFilterSelected"))
+        )
+    </div>
+
+
+</div>
+<div class="inline">
+    <a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(clearFilters, 200);
+    });  
+</script>

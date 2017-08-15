@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Purchase canceled";
+    Layout = "~/Areas/Widget/Views/Shared/_PurchaseLayout.cshtml";
+}
+
+<script>
+    if (window.opener) {
+        window.opener.showErrorPage('Purchase canceled');
+    }
+    window.close();
+</script>
+

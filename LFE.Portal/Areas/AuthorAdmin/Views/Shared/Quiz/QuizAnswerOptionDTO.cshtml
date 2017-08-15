@@ -1,0 +1,84 @@
+﻿@using LFE.DataTokens
+@model QuizQuestionDTO
+
+<h3>Answer options</h3>
+
+<a href="#" id="btn-add-answer">Add new answer</a>
+
+<script>
+    function onAnswerListBound() {
+
+        setListSortable('#AnswersList', '@Url.Action("SaveAnswerOrder", "Quiz", new {area = "AuthorAdmin"})', onAOrderSaved, 'data-val');
+
+
+    }
+</script>
+
+<div class="d-answers-container">
+    @(Html.Kendo().ListView<QuizAnswerOptionDTO>()
+            .Name("AnswersList")
+            .TagName("ul")
+            .ClientTemplateId("answer-template")
+            .HtmlAttributes(new { @class = "ul-quiz-a-list" })
+            .Events(e => e.DataBound("onAnswerListBound"))
+            .DataSource(dataSource => dataSource
+              .Model(model =>
+              {
+                  model.Id("OptionId");
+                  model.Field(f => f.OptionId).DefaultValue(-1);
+                  model.Field(f => f.QuestionId).DefaultValue(Model.QuestionId);
+                  model.Field(f => f.IsActive).DefaultValue(true);
+              })
+              .Create(create => create.Action("CreateAnswer", "Quiz"))
+              .Read(read => read.Action("ReadAnswers", "Quiz",new{id=Model.QuestionId}))
+              .Update(update => update.Action("UpdateAnswer", "Quiz"))
+              .Destroy(destroy => destroy.Action("DestroyAnswer", "Quiz"))
+          )
+          .Pageable(p => p.Enabled(false))
+          .Editable()
+    )
+</div>
+
+<script type="text/x-kendo-tmpl" id="answer-template">
+    <li data-val="${OptionId}" class="">
+        <div class="inner">
+            <div class="drag-box drag" title="drag to reorder">&nbsp;</div>
+            <div class="a-container">
+                <div class="chk-field">
+                    ${IsCorrect}
+                </div>
+
+                <div title="#=Encoder.htmlEncode(OptionText)#" class="ellipsis">${OptionText}</div>
+            </div>
+            <div class="btn-container">
+                <span class="btn-action k-edit-button" title="Edit answer">Edit</span>
+                <span class="btn-action k-delete-button" title="Delete answer">Delete</span>
+            </div>
+        </div>
+    </li>
+</script>
+
+<script>
+    function onAOrderSaved(response) {
+        if (response.success) {
+            swal(
+            {
+                title: "Success",
+                text: "Answers reordered",
+                type: "success"
+            }, function () {
+            });
+
+        } else {
+            sweetAlert("Oops...", response.error, "error");
+        }
+    }
+    $(function () {
+        var listView = $("#AnswersList").data("kendoListView");
+
+        $("#btn-add-answer").click(function (e) {
+            listView.add();
+            e.preventDefault();
+        });
+    });
+</script>

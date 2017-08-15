@@ -1,0 +1,57 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.WidgetTrainingBoxesDTO
+@{
+    if (Model.IsValid)
+    {
+        <ul class="ul-g2t-boxes">
+            <li>
+                <div class="inner static live"></div>
+            </li>
+            <li>
+                <div class="inner static camera"></div>
+            </li>
+            <li>
+                <div class="inner dynamic places">
+                    <span class="cnt">@Model.PlacesLeft</span>
+
+                    <span class="msg">places left</span>
+                </div>
+            </li>
+            <li>
+                <div class="inner dynamic count">
+                    <div class="timer-container">
+                        @Html.Partial("Training/_CountdownTimer", new TrainingTimerToken
+                        {
+                            Start        = Model.EventDate
+                            ,LoadTimer   = true
+                            ,ContainerId = "g2t-box-timer"
+                            ,Template    = "<span>{days}:</span><span>{hours}:</span><span>{minutes}:</span><span>{seconds}</span>"
+                        })
+                    </div>
+                </div>
+            </li>
+            @{
+                if (Model.IsInViewer)
+                {
+                    <li>
+                        <div class="inner dynamic sign pointer" id="g2t-box-sign-btn"></div>
+                        <script>
+                            var el = document.getElementById("g2t-box-sign-btn");
+                            el.addEventListener("click", notifyActionClickEvent, false);
+                            function notifyActionClickEvent(e) {
+                                e.preventDefault();
+                                window.getNotifManagerInstance().notify(notifEvents.training.loadUserFormClicked, null);
+                            }                    
+                        </script>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <div class="inner dynamic more"></div>
+                    </li>
+                }
+            }
+        </ul>
+    }
+}

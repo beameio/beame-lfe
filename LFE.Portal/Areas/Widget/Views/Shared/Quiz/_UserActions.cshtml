@@ -1,0 +1,47 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.StudentQuizAttemptDTO
+
+
+@{
+    var isQuizAvailable = Model.AvailableAttempts == null || Model.AvailableAttempts > 0;
+
+    var rerunQuizTitle = Model.IsSuccess ? "want to try to improve your score ?" : "click to try again";
+
+    const string contactAuthorSubTitle = "click to contact course author";
+
+    var subTitle = isQuizAvailable ? rerunQuizTitle : contactAuthorSubTitle;
+
+    var action = isQuizAvailable ? eUserQuizActions.QuizIntro : eUserQuizActions.ContactAuthor;
+}
+
+<div class="col-xs-8 col-xs-offset-1 col-sm-7 col-sm-offset-2 col-md-6 col-md-offset-3">
+    <div class="info-panel">
+        @{
+
+            if (Model.AvailableAttempts != null && Model.AvailableAttempts > 0)
+            {
+                <label>you have @Model.AvailableAttempts attempt@(Model.AvailableAttempts > 1 ? "s" : "") remaining</label>
+            }
+            
+            <label>@subTitle</label>
+        }
+    </div>
+    <div class="row">
+
+
+
+    </div>
+</div>
+
+<div class="col-xs-3">
+    <div class="btn-nav ft-action inline" id="btn-qz-action">
+        <i></i>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $('#btn-qz-action').unbind('click').bind('click', function () {
+            loadUserQuiz('@action', '@Model.Quiz.QuizId', null);
+        });
+    });
+    </script>
+</div>

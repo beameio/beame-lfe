@@ -1,0 +1,30 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model UserViewDto
+
+@{
+	ViewBag.Title = "User Videos";
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+
+    var token = new AuthorVideosPageToken
+    {
+        user = Model,
+        ListPageSize = 8
+    };
+}
+
+@section css
+{
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/video.css" )" rel="stylesheet" type="text/css"  />      
+}
+
+@section scripts
+{	
+}
+
+<script>
+    var BC_PLAEYR_W = 300;
+    var BC_PLAEYR_H = 200;       
+</script>
+
+@Html.Partial("Video/_VideoManager",token)

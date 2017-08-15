@@ -1,0 +1,74 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Helpers
+@using LFE.Portal.Helpers
+
+@{
+    var periodKinds = (ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.previousMonth | ReportEnums.ePeriodSelectionKinds.thisMonth
+            | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+            | ReportEnums.ePeriodSelectionKinds.week ).ToTranslatedArray();
+
+    var defaultPeriod = ((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString();
+}
+<script>
+
+    function notifyDashFilters() {
+        setTimeout(function () {
+            var filter = {
+                period: getDddlValue('period', '@defaultPeriod')
+                , currencyId: getDddlValue('currencyId', '@Constants.DEFAULT_CURRENCY_ID')
+            }
+           
+            window.getNotifManagerInstance().notify(notifEvents.dashboard.filtersChanged, filter);
+        }, 300);
+
+    }
+
+    function clearFilters() {
+        $('#periodSelectionKind').data("kendoDropDownList").select(0);
+        $('#currencies').data("kendoDropDownList").select(0);
+    }
+</script>
+<div id="d-dash-filter-row" class="row filter-row">
+    <div class="inline">
+            @(Html.Kendo().DropDownList()
+                .Name("period")
+                .DataTextField("Title")
+                .DataValueField("Value")
+                .BindTo(periodKinds)
+                .HtmlAttributes(new {@style = "font-size:13px;width:200px;"})
+                .Events(e => e.Select("notifyDashFilters"))
+            )
+        </div>
+        <div class="inline">
+            @(Html.Kendo().DropDownList()
+                  .Name("currencyId")
+                  .DataTextField("CurrencyName")
+                  .DataValueField("CurrencyId")
+                  .BindTo(this.ActiveCurrencies())
+                  .HtmlAttributes(new {@style = "font-size:13px;width:200px;"})
+                  .Events(e => e.Select("notifyDashFilters"))
+            )
+        </div>    
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        
+        setDddlValue('period', '@defaultPeriod');
+        setDddlValue('currencyId', '@Constants.DEFAULT_CURRENCY_ID');
+        
+        notifyDashFilters();
+    });
+
+    function setDddlValue(id, value) {
+        $('#' + id).data('kendoDropDownList').value(value);
+    }
+
+    function getDddlValue(id, defaultValue) {
+        var val = $('#' + id).data('kendoDropDownList').value();
+        return hasValue(val) ? val : defaultValue;
+    }
+</script>

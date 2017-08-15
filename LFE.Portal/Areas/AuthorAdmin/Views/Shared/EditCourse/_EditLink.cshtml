@@ -1,0 +1,162 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.ChapterLinkEditDTO
+
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmChapterLink';    
+	var deleteUrl = '@Url.Action("DeleteChapterLink", "Course")';
+	//var uploadConsole;
+	
+	$(document).ready(function () {
+
+		var id = Number('@Model.LinkId');
+		var name = Encoder.htmlDecode('@Model.Title');	    
+
+		var token = {
+			 kind: ChapterFormKinds.link
+			,title: id < 0 ? 'Add new ' + ('@Model.Kind.ToString().ToLower()' == 'link' ? 'link' : 'document') : 'Edit ' + name
+			,id: id
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : deleteUrl + '/' + id
+		};
+		
+		//window.uploadConsole = $('#async-upload-console');
+
+		window.getNotifManagerInstance().notify(notifEvents.chapter.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();	    		
+	});
+	
+	function onLinkSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? response.message : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+		    exitEditMode();
+			$(EDIT_FORM_SELECTOR).find('#LinkId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.chapter.linkSaved, response.result);
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		}
+	}
+	
+	function onDocUploadAction(e) {
+		// Array with information about the uploaded files
+		var files = e.files;
+
+		if (files.length > 1) {
+			alert("Only one document can be uploaded");
+			e.preventDefault();
+			return;
+		}
+
+	    e.data = { chapterId: '@Model.ChapterId' };
+	}
+	
+	function onDocUploadSuccess(e) { 
+		var operation = e.operation;
+		var response = e.response;
+
+		hideLoader();
+
+		if (!response) return;
+
+		if (!response.success) {
+			alert(response.error);
+
+			return;
+		}
+
+		//clearUploadConsole();
+	 
+		switch (operation) {
+			case "remove":
+				break;
+			case "upload":
+				try {
+					$('#a-doc-preview').html(response.result.url).attr({ href: response.result.url });
+					$('#LinkHref').val(response.result.url);
+					$(EDIT_FORM_SELECTOR).validate().element($('#LinkHref'));
+				    setEditMode();
+					if (hasValue($('#frmChapterLink #Title').val())) return;
+				    $('#frmChapterLink #Title').val(response.result.name);
+				} catch (e) {
+				    if (window.console) console.log(e);
+				}
+				break;
+		}
+
+	}
+</script>
+
+
+@using (Ajax.BeginForm("SaveChapterLink", "Course", null, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#main', null)", OnSuccess = "onLinkSaved", LoadingElementId = "site-loader" }, new { @id = "frmChapterLink", @style = "" }))
+{
+	@Html.HiddenFor(x => x.LinkId)
+	@Html.HiddenFor(x => x.ChapterId)
+	@Html.HiddenFor(x => x.Kind)
+	@Html.HiddenFor(x => x.OrderIndex)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cn">
+			<li>
+				@Html.LabelFor(m => m.Title)
+				<div class="input-container">
+					@Html.TextAreaFor(m => m.Title, new { @class = "txt-inp", @rows = 4, @columns = 20, @onchange = "onTxtBoxChanged(this)", @size = 500, @maxlength = 500 })
+					<span class="input-info">Maximum 500 symbols</span>
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.Title, null, new { @class = String.IsNullOrEmpty(Model.Title) ? "" : "pass" })
+				</div>
+			</li>
+			@{
+				if (Model.Kind == CourseEnums.eChapterLinkKind.Link)
+				{
+					<li>
+						@Html.Label("Web site URL")
+						<div class="input-container">
+							@*@(Html.Kendo().EditorFor(m=>m.LinkHref)
+											  .HtmlAttributes(new { @style = "width:338px;height:80px;" }) 
+											  .Encode(false)
+											  .Tools(t=>t.Clear().CreateLink())
+										)*@
+							@Html.TextAreaFor(m => m.LinkHref, new { @class = "txt-inp", @rows = 4, @columns = 20, @onchange = "onTxtBoxChanged(this)", @size = 500, @maxlength = 500 })
+							<span class="input-info">Maximum 500 symbols</span>
+						</div>
+						<div class="validator-container">
+							@Html.ValidationMessageFor(model => model.LinkHref, null, new { @class = String.IsNullOrEmpty(Model.LinkHref) ? "" : "pass" })
+						</div>
+					</li>
+				}
+				else
+				{
+					<li>
+							@Html.Label("Upload document")
+							@Html.HiddenFor(m => m.LinkHref)
+							<div class="input-container" style="width:340px;height: 120px">
+							   @(Html.Kendo().Upload()
+									.Name("file")
+									.Events(e => e.Upload("onDocUploadAction").Success("onDocUploadSuccess"))
+									.Async(a => a.Save("SaveCourseDoc", "Upload").AutoUpload(true))
+								)
+								
+							   @* <div id="async-upload-console" class="upl-consol"></div>*@
+
+								<a href="@(String.IsNullOrEmpty(Model.LinkHref) ? "#" : Model.LinkHref)" target="_blank"  title="open document" id="a-doc-preview">@(String.IsNullOrEmpty(Model.LinkHref) ? "" : Model.LinkHref)</a>
+							</div>  
+
+							 <div class="validator-container">
+								@Html.ValidationMessageFor(model => model.LinkHref, null, new { @class = String.IsNullOrEmpty(Model.LinkHref) ? "" : "pass" })
+							</div>
+						</li>
+				}
+			}            					   		    
+		</ul>		
+	</fieldset>
+}

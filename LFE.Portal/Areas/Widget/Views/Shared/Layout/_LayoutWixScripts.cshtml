@@ -1,0 +1,140 @@
+﻿@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var storeId = viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.WebStoreID.ToString() : string.Empty;
+    var lfeWixSiteUrl = viewModel != null && viewModel.WebStore != null && !String.IsNullOrEmpty(viewModel.WebStore.WixSiteUrl) ? viewModel.WebStore.WixSiteUrl : string.Empty;
+    // #region wix logic
+    if (viewModel != null && viewModel.WebStore != null && !String.IsNullOrEmpty(viewModel.WebStore.WixInstanceID) && viewModel.WebStore.WixInstanceID != Guid.Empty.ToString())
+    {
+       
+    
+        <script>
+            var lfeStoreId = '@storeId';
+            var lfeWixSiteUrl = '@lfeWixSiteUrl';
+            var wixSiteUrl = '';
+
+            function updateWixSiteUrl() {
+                Wix.getSiteInfo(function (siteInfo) {
+                    wixSiteUrl = siteInfo.baseUrl;
+
+                        $.ajax({
+                            'type': 'post',
+                            'contentType': 'application/json; charset=utf-8',
+                            'url': '@Url.Action("UpdateWixStoreUrl","Home",new{area="WixEndPoint"})',
+                            'data': '{"StoreId":"' + lfeStoreId + '","WixSiteUrl":"' + wixSiteUrl + '"}',
+                            'cache': false,
+                            'success': function () {
+                                //console.log('site url updated');
+                            },
+                            'error': function () {
+                                //console.log('error updating data to the app server');
+                            }
+                        });
+                    
+                });
+
+
+            }
+
+            function wixAdjustH() {
+               // console.log('wix adjust height');
+                var h = Math.min(document.documentElement["scrollHeight"], document.documentElement["offsetHeight"]); 
+            
+                if (typeof (Wix) == 'undefined') {
+                    console.log('wix undefined');
+                    return;
+                } else {
+                    Wix.setHeight(h);
+                    //console.log('height changed to ' + h);
+                }
+            }
+        
+            $(document).ready(function () {
+                //page not in iframe
+                if (window.top == window.self) return;
+
+                window.getNotifManagerInstance().subscribe(notifEvents.window.contentLoaded, wixAdjustH, null);
+
+                wixAdjustH();
+
+                var viewMode = Wix.Utils.getViewMode();
+                if (viewMode == 'editor' || viewMode == 'preview') {
+                    // CheckRefresh();
+                    $('a').addClass('disabled');
+                    $('a').click(function () {
+                        if ($(this).hasClass('disabled'))
+                            return false;
+                    });
+                }
+
+                updateWixSiteUrl();
+
+                Wix.addEventListener(Wix.Events.COMPONENT_DELETED, function (data) {
+                    var url = window.wixLogAppDeletedUrl.replace("instanceId_PlaceHolder", Wix.Utils.getInstanceId()).replace("wixSiteUrl_PlaceHolder", wixSiteUrl);
+                    $.ajax({
+                        url: url
+                        , dataType: "json"
+                        , cache: false
+                        , success: function (response) { }
+                    });
+                });
+                Wix.addEventListener(Wix.Events.SITE_PUBLISHED, function (data) {
+                    var url = window.wixLogAppPublishUrl.replace("instanceId_PlaceHolder", Wix.Utils.getInstanceId()).replace("wixSiteUrl_PlaceHolder", wixSiteUrl);
+                    $.ajax({
+                        url: url
+                        , dataType: "json"
+                        , cache: false
+                        , success: function (response) { }
+                    });
+                });
+
+            });
+
+
+       
+            var wixLogAppDeletedUrl = '@Url.Action("LogAppDeletedEvent", "Account", new { area = "WixEndPoint", instaceId = "instanceId_PlaceHolder", wixSiteUrl = "wixSiteUrl_PlaceHolder" })';
+            var wixLogAppPublishUrl = '@Url.Action("LogAppPublishEvent", "Account", new { area = "WixEndPoint", instaceId = "instanceId_PlaceHolder", wixSiteUrl = "wixSiteUrl_PlaceHolder" })';
+        </script>
+        
+        if (viewModel.WebStore != null)
+        {
+            <script>
+                var lfeStoreId = '@viewModel.WebStore.WebStoreID.ToString()';
+                var lfeWixSiteUrl = '@(String.IsNullOrEmpty(viewModel.WebStore.WixSiteUrl) ? "" : viewModel.WebStore.WixSiteUrl)';
+            </script>
+        }
+    }
+    else
+    {
+        <script>
+            var windowParentUrl = encodeURIComponent(getParameterByName('parentUrl'));
+            $(document).ready(function () {
+                AddParentUrl();
+                window.parent.postMessage(document.location.href, '*');
+            });
+
+            function AddParentUrl() {
+                if (!lfeIsEmpty(windowParentUrl)) {
+                    $('a').each(function () {
+                        var href = $(this).attr('href');
+
+                        if (href) {
+                            href += (href.match(/\?/) ? '&' : '?') + "parentUrl=" + windowParentUrl;
+                            $(this).attr('href', href);
+                        }
+                    });
+                }
+            }
+            function lfeIsEmpty(str) {
+                return (!str || 0 === str.length);
+            }
+
+            function getParameterByName(name) {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                    results = regex.exec(location.search);
+                return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            }
+        </script>
+    }
+    //#endregion
+}

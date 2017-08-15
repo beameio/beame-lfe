@@ -1,0 +1,85 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+@model int
+@{
+	var dates = (ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all).ToTranslatedArray();
+
+	ViewData["periodKinds"] = dates;
+
+	var events = Utils.EnumWithDescToList<CommonEnums.eUserEvents>();
+}
+
+<script>
+   
+	function onPeriodKindSelected() {
+		//var dataItem = this.dataItem(e.item.index());
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function onEventTypeSelected() {
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	}
+
+	function getEventRepData() {
+		return {
+		    periodSelectionKind: $('#periodKind').data("kendoDropDownList") != undefined ? $('#periodKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())'
+			, eventTypeId: $('#ddlEventTypes').data("kendoDropDownList") != undefined ? $('#ddlEventTypes').data("kendoDropDownList").value() : null
+			, userId: '@Model'
+			, courseId: null  
+			, bundleId: null
+			, storeId: null
+		};
+	}
+	function clearFilters() {
+		$('#ddlEventTypes').data("kendoDropDownList").value(null);
+		$('#periodKind').data("kendoDropDownList").value(null);
+	   
+
+	}
+</script>
+
+
+<div id="rep-param-row" style="margin: 20px 0 25px 0">
+	<div id="period-combo-container" class="inline">
+		@(Html.Kendo().DropDownList()
+			  .Name("periodKind")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo((IEnumerable)ViewData["periodKinds"])
+			  .HtmlAttributes(new { style = "width:250px", @class = "combo-ps" })
+			  .Events(e => e.Select("onPeriodKindSelected"))
+		)		
+	</div>
+
+	<div id="type-combo-container" class="inline" style="margin: 0 0 0 25px">
+		@(Html.Kendo().DropDownList()
+			  .Name("ddlEventTypes")
+			  .OptionLabel("..select event type")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo(events)
+			  .HtmlAttributes(new { style = "width:250px", @class = "combo-ps" })
+			  .Events(e => e.Select("onEventTypeSelected"))
+		)		
+	</div>
+	
+</div>
+
+
+<div style="margin: 10px 0">
+	<a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+</div>
+
+@Html.Partial("Report/_EventLogsGrid")
+
+<script>
+	$(document).ready(function () {
+		clearFilters();
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindEventReport, null);
+	});
+</script>

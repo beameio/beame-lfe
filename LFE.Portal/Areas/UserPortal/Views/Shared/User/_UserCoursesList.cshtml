@@ -1,0 +1,20 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model LFE.Portal.Areas.UserPortal.Models.UserCoursesPageToken
+
+
+<div class="list-title">@Model.Title</div>
+
+<div class="d-user-courses-container">
+	@(Html.Kendo().ListView<CourseListDTO>()
+		  .Name(Model.ListId)
+		  .TagName("ul")  
+		  .HtmlAttributes(new{@class="ul-cba-list"})  
+		  .ClientTemplateId("kendo-cba-template") 
+		  .BindTo(Model.courses)
+          .Pageable(p=>p.Enabled(true))
+		  .DataSource(ds=>ds.PageSize(Model.PageSize).ServerOperation(false))	
+          .Events(e=>e.DataBound("onUserCourseListBound"))	  
+	)
+</div>
+

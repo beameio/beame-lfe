@@ -1,0 +1,91 @@
+﻿@model LFE.DataTokens.ChimpUserListDTO
+
+@using (Html.BeginForm("Submit", "Mailchimp", FormMethod.Post,new{ @id="frm-chimp-login" }))
+{
+    @Html.HiddenFor(x => x.ListId)
+    @Html.HiddenFor(x => x.IsActive)
+    @Html.HiddenFor(x => x.UserId)
+
+    <div class="mc-inpBox">
+        <span class="number">1</span>
+        <h2>Start by connecting your existing MailChimp account</h2>
+        <div id="hlpApiKey" class="help"></div>
+        <div>
+            <label for="inpKey">Enter your MailChimp API Key </label>
+            @Html.TextBoxFor(model => model.ApiKey, htmlAttributes: new { @id = "inpKey" })
+            <span style="position: relative;top:-5px;">
+                @Html.ValidationMessageFor(model => model.ApiKey)
+            </span>
+        </div>
+    </div>
+
+    <div class="mc-inpBox">
+        <span class="number">2</span>
+        <h2>In your MailChimp account, please create a mailing list named “My LFE Learners”</h2>
+        <div id="hlpListKey" class="help"></div>
+        <div>
+            <label for="inpListId">Enter the List ID</label>
+            @Html.TextBoxFor(model => model.Uid, htmlAttributes: new { @id = "inpListId" })    
+            <span style="position: relative;top:-5px;">
+                @Html.ValidationMessageFor(model => model.Uid)
+            </span>
+        </div>
+    </div>
+
+    <div class="mc-inpBox">
+        <span class="number">3</span>
+        <h2>Click the ‘Create” button below, and LFE will create the following segments under the “My LFE Learners” mailing list you created in step 2</h2>
+        <div>
+            <label style="width: 100%;">
+                LFE. [[Course name]] Subscribers<br />
+                LFE. My active learners<br />
+                LFE. My non active learners<br />
+                LFE. [[Course name]] New learners
+            </label>
+        </div>
+        <div class="createBox">
+            Once created, you will be able to update and refresh the list and segments whenever you want!
+            <input type="submit" value="Create" onclick="showLoader()"/>
+        </div>
+    </div>
+}
+<!--------------- Tooltips ----------------------->
+<!------------------------------------------------>
+<script id="helpTmpl_1" type="text/x-kendo-template">
+    <div class="mc-tooltip-help">
+        <div><b>1.</b> Login to your MailChimp account</div>
+        <div><b>2.</b> Click your profile name to open the Account Panel and choose Account Settings.</div>
+        <div><b>3.</b> Click the Extras drop-down menu and choose API keys.</div>
+        <div><b>4.</b> Copy an existing API key or click the Create A Key button.</div>
+        <div><b>5.</b> Label your key to keep your keys organized.</div>
+        <div><b>6.</b> For more information click <a target="_blank" href="http://kb.mailchimp.com/article/where-can-i-find-my-api-key">here</a>.</div>
+    </div>
+
+</script>
+
+<script id="helpTmpl_2" type="text/x-kendo-template">
+    <div class="mc-tooltip-help">
+        <div><b>1.</b> Login to your MailChimp account</div>
+        <div><b>2.</b> Navigate to the Lists page.</div>
+        <div><b>3.</b> Click the list's drop-down menu and select Settings.</div>
+        <div><b>4.</b> Scroll down to the bottom of the Settings page to find the unique List ID for the list.</div>
+        <div><b>5.</b> Look for the list ID associated with the My LFE customers list you created.</div>
+    </div>
+</script>
+
+<script>
+    $(document).ready(function() {
+
+        var form = $('#frm-chimp-login');
+        initUnobstructiveFormValidation(form);
+
+        $("#hlpApiKey").kendoTooltip({
+            content: kendo.template($("#helpTmpl_1").html()),
+            position: "bottom"
+        });
+        $("#hlpListKey").kendoTooltip({
+            content: kendo.template($("#helpTmpl_2").html()),
+            position: "bottom"
+        });
+    });
+</script>

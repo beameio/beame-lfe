@@ -1,0 +1,40 @@
+﻿@model LFE.Portal.Areas.UserPortal.Models.UserProfilePageToken
+
+<script>
+    var containerSelector = '#d-ol-profile-container';
+    $(document).ready(function () {
+
+        window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setDiscussProfileH, null);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.course.listBound, initDiscussProfileScroll, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.course.listBound, initDiscussProfileScroll, null);
+        
+        setDiscussProfileH();
+    });
+
+    function initDiscussProfileScroll() {
+        var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+        $(containerSelector).height(h - 110); //100 =#d-ol-container h4 => h20+ margin 25*2 =70+40tabs
+        setReportScroll(containerSelector);
+    }
+
+    function setDiscussProfileH(h) {
+        if (h != null) {
+            $(containerSelector).height(h - 110);
+        }
+        setReportScroll(containerSelector);
+    }
+</script>
+
+<div class="title-row">
+    <div class="float-right">
+        <span class="back btn" onclick="showRoomFeed()">back to room feed</span>
+    </div>
+</div>
+
+
+<div id="d-ol-profile-container" class="nano">
+    <div class="content">
+       @Html.Partial("User/_UserProfile",Model)    
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿@{
+	ViewBag.Title = "PayPal Billing Agreement";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_BillingLayout.cshtml";
+}
+
+
+<div data-ng-controller="PlanSelectCntrl" id="dSlctPlan">
+	
+	
+	<input id="plan-name" class="" style="width: 400px"  data-kendo-drop-down-list="" data-k-options="options"  data-k-on-select="planSelected(kendoEvent)"/>
+	
+	<hr/>
+	
+	<label for="chk-cc">Use Credit card</label>  <input id="chkuse-cc" class="inline" type="checkbox" data-ng-model="useCC" data-ng-change="onChkCcChanged()" />
+	
+	<hr/>
+   
+	<form name="frmSunscriptionPay"  action="@Url.Action("CreateReccuringPaymentAgreement","Billing")" method="POST">
+	
+	   
+			
+		<input type = "text" data-ng-show = "false" name="planId" value="{{PlanId}}" />
+		<input type = "text" data-ng-show = "false" name="price"  value="{{Price}}"/>
+		<input type = "text" data-ng-show = "false" name="planName"  value="{{Name}}"/>
+		<input type = "text" data-ng-show = "false" name="chkCc"  value="{{useCC}}"/>
+
+		<h2>Plan name: {{Name}}</h2>
+		
+		<h3>Price: {{Price}}</h3>
+		
+		<div id="d-cc-container" data-ng-bind-html="CcForm" data-ng-show="useCC" style="width: 670px;margin: 25px 0 15px;border:solid 1px #a4a4a4;padding: 10px"></div>
+			
+		<input type="submit" style="padding: 7px;margin: 15px 0 0" class="k-button" title="Create Agreement" value="Create Agreement" />         
+	</form>     
+</div>
+
+@Html.Partial("Billing/_PlanSelectionController")
+
+

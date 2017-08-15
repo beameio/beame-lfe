@@ -1,0 +1,180 @@
+﻿@using LFE.Portal.Helpers
+
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditBundlePageToken
+
+@{
+    ViewBag.Title = Model.user.fullName + " | " + Model.bundle.name + " Manage";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+
+    <link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/course.css" )" rel="stylesheet" type="text/css" />
+    <style>
+        .field-validation-error, .validation-summary-errors {
+            margin: 0 0 0 4px;
+        }
+
+        #arrow-ph {
+            left: 420px;
+            position: absolute;
+            top: 300px;
+        }
+
+        #arrow {
+            width: 128px;
+            height: 32px;
+            background-color: #fff;
+            border: 1px solid #999;
+            border-right: none;
+            position: relative;
+        }
+
+            #arrow:after {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: 128px;
+                width: 0;
+                height: 0;
+                border: 17px solid transparent;
+                border-left: 12px solid #999;
+            }
+            /*#arrow:before { content: ''; position: absolute; top: 0; left: 129px; width: 0; height: 0; border: 17px solid transparent; border-left: 12px solid #999; }*/
+            #arrow span {
+                color: #666666;
+                display: block;
+                font-size: 14px;
+                padding: 7px 0 0 10px;
+                text-transform: uppercase;
+            }
+
+        .cn-col .ul-ac-list > li:hover {
+            background-color: #d7d7d7;
+        }
+    </style>
+}
+
+@section scripts
+{
+    
+    <script type="text/javascript">
+		var videoSelectionUrl = '@Url.Action("VideoSelection","Course")';
+	    var apiUrl = '@Url.ToApiUrl("Course","updatelog")';
+		var isFormInEditMode = false;
+
+		$(document).ready(function () {
+
+			setTabsState('@Model.mode');
+
+			$('#ul-course-tabs').find('a').unbind('click').bind('click', function () {
+
+				if (isFormInEditMode) {
+				    if (!window.confirm(CHANGE_TAB_CONFIRM)) {
+						return;
+					}
+				}
+
+				var ind = $(this).attr('data-index');
+				var id = $('#CurrentBundleId').val();
+				if (id < 0 && ind > 0) {
+					alert('Save bundle first');
+					setTimeout(function () {
+						window.location.hash = 'details';
+					}, 50);
+					return;
+				}
+				var link = $(this);
+				$('#ul-course-tabs').find('a').removeClass('active');
+				link.addClass('active');
+				isFormInEditMode = false;
+				link.parent().submit();
+
+			});
+
+			var h = window.location.hash;
+
+			if (!hasValue(h)) {
+				h = '#details';
+			}
+			$('#ul-course-tabs > li > form > a[href=' + h + ']').click();
+
+			//save on course created event
+			window.getNotifManagerInstance().unsubscribe(notifEvents.course.bundleCreated, handleBundleSaveEvent, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.course.bundleCreated, handleBundleSaveEvent, null);
+
+		});
+    </script>
+}
+
+<ul class="ul-crumb">
+    <li>
+        @Html.ActionLink("My courses & bundles", "Courses", "Author")
+    </li>
+    <li id="li-page-name">
+        @Model.title
+    </li>
+</ul>
+
+<div class="c-tabs upper-gray-box">
+    @Html.Hidden("CurrentBundleId", Model.bundle.id)
+    <ul id="ul-course-tabs">
+        <li>
+            @using (Ajax.BeginForm("BundleDetails", "Course", new { Model.bundle.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmDetails" }))
+            {
+                @Html.Hidden("Uid", Model.bundle.Uid)
+                <a href="#details" data-index="0">Bundle details</a> }
+        </li>
+        <li>
+            @using (Ajax.BeginForm("BundleContent", "Course", new { Model.bundle.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmContent" }))
+            {
+                <a href="#content" data-index="1">Contents</a>}
+        </li>
+        <li>
+            @using (Ajax.BeginForm("BundlePricing", "Course", new { Model.bundle.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmPrice" }))
+            {
+                <a href="#price" data-index="2">Pricing & Coupons</a>}
+        </li>
+        <li>
+            @using (Ajax.BeginForm("BundleSales", "Course", new { Model.bundle.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmSales" }))
+            {
+                <a href="#sales" data-index="4">Sales</a>}
+        </li>
+        <li style="display: none">
+            @using (Ajax.BeginForm("CourseMarketing", "Course", new { Model.bundle.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmMarket" }))
+            {
+                <a href="#market" data-index="5">Marketing</a>}
+        </li>
+    </ul>
+</div>
+
+
+<div class="c-tabs-content" id="c-tabs-content" style="min-height: 500px">
+
+</div>
+
+@(Html.Kendo().Window()
+        .Name("wndVideo")
+        .Title("Select Video")
+        .Draggable(false)
+        .Actions(actions => actions.Close())
+        .Resizable(builder => builder.Enabled(false))
+        .Visible(false)
+        .Height(580)
+        .Width(880)
+        .Modal(true)
+        .Animation(false)
+        .Events(e => e.Close("cleanWndContent"))
+        .Content("loading video library.....")
+)
+
+<script type="text/x-kendo-template" id="kendo-video-thumb-template">
+    <div class="preview" id="thumb-${identifier}" style="background: url('${fixSR(stillUrl)}') no-repeat;">&nbsp;</div>
+
+    <div class="hint" style="display:none;" id="hint-${identifier}">
+        <span class="play" id="play-${identifier}">Play</span>
+    </div>
+    <div style="display:none;" class="list-player jwp" id="player-#=newGuid()#"></div>
+</script>

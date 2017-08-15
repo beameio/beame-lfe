@@ -1,0 +1,137 @@
+﻿@using LFE.Portal.Areas.AuthorAdmin.Models
+@using LFE.Portal.Areas.UserPortal.Models
+@model UserProfilePageToken
+
+
+ @{
+		const string t = "UserAuthorCourses";
+		const string l = "UserLearnerCourses";
+
+		var sortKinds = new List<DataSourceSortToken>
+		{
+			
+			new DataSourceSortToken
+			{
+				name    = "Popularity"
+				,field  = "LearnerCount"
+				,dir    = "desc"
+			},
+			new DataSourceSortToken
+			{
+				name    = "Author"
+				,field  = "AuthorFullName"
+				,dir    = "asc"
+			},    
+				  
+			new DataSourceSortToken
+			{
+				name   = "Price"
+				,field = "Price"
+				,dir   = "desc"
+			} ,
+			
+			new DataSourceSortToken
+			{
+				name    = "Name of Course"
+				,field  = "Name"
+				,dir    = "asc"
+			}           
+		};
+}
+
+<script>
+		$(document).ready(function () {
+			window.getNotifManagerInstance().unsubscribe(notifEvents.report.sortCourse, sortCourses, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.report.sortCourse, sortCourses, null);
+		});
+
+		function sortCourses(filter) {
+			sortListById('@t', filter);
+			sortListById('@l', filter);
+		}
+		
+        function sortClickHandler($this,field,dir) {
+            $('#lvUserCourseSort').children().find('.btn').removeClass('active');
+            $($this).addClass('active');
+            var filter = { field: field, dir: dir };
+            window.getNotifManagerInstance().notify(notifEvents.report.sortCourse, filter);
+        }
+	</script>
+
+<div class="d-profile-container">
+	
+	@Html.Partial("User/_UserProfileCart",Model.ProfileCart)
+	
+	@{
+		if (Model.AuthorCourses.Count > 0 || Model.LearnerCourses.Count > 0)
+		{            
+			 <div class="d-sort-row" style="border: 0;padding: 0;margin: 30px 0 15px">
+			     <label>Sort by:</label>
+			     <ul id="lvUserCourseSort">
+			         @{
+			             var i = 0;
+			             foreach (var s in sortKinds)
+			             {
+			                <li>
+			                    <span data-val="@s.field" class="btn @(i==0 ? "active":"")" onclick="sortClickHandler(this,'@s.field','@s.dir')" title="Sort by @s.name">@s.name</span>
+			                </li>
+
+			                i++;
+			             }
+			         }
+			     </ul>
+				@*@(Html.Kendo().ListView<DataSourceSortToken>()
+					  .Name( "lvUserCourseSort" )
+					  .TagName( "ul" )
+					  .ClientTemplateId( "kendo-sort-template" )
+					  .BindTo( sortKinds )
+					  .Events( e => e.DataBound( "onSortFiltersBound" ) )
+				 )*@
+			</div>
+	
+            if (Model.AuthorCourses.Count > 0)
+            {
+			    @Html.Partial("User/_UserCoursesList", new UserCoursesPageToken
+                {
+                    courses   = Model.AuthorCourses
+                    ,Title    = String.Format("{0} teaches these courses:", Model.ProfileCart.Profile.firstName)
+                    ,ListId   = t
+                    ,PageSize = Model.PageSize
+                })
+            }
+
+            if (Model.LearnerCourses.Count > 0 && Model.AuthorCourses.Count > 0)
+            {
+			    <div style="height: 15px;">&nbsp;</div>
+            }
+
+            if (Model.LearnerCourses.Count > 0)
+            {
+			    @Html.Partial("User/_UserCoursesList", new UserCoursesPageToken
+                {
+                    courses   = Model.LearnerCourses
+                    ,Title    = String.Format("{0} learns these courses:", Model.ProfileCart.Profile.firstName)
+                    ,ListId   = l
+                    ,PageSize = Model.PageSize
+                })
+		    }   
+		}
+	}
+
+   
+</div>
+
+<script type="text/x-kendo-template" id="kendo-cba-template">
+	<li  title="${Name}" class="box">
+        <a href="${CoursePageUrl}" target="_blank">
+		    <div class="upper-row">
+			    <span class="float-left price">${Price}</span>
+			    <span class="float-right subscrib">${LearnerCount}</span>
+		    </div>
+		    <div class="thumb" style="background-image: url('${ImageUrl}');">&nbsp;</div>
+		    <div class="auth">${AuthorFullName}</div>
+		    <div class="name ellipsis multiline">${Name}</div>
+        </a>
+	</li>
+</script>
+

@@ -1,0 +1,33 @@
+﻿@quiz_images_root: "../../assets/quiz";
+
+/*#region colors */
+@qz_bg_color:#21ace7;
+@qz_form_bg_color:#f2f1ef;
+@qz_head_bg_color:#1b78c8;
+
+
+@g2t_box_static_bg_color:#0b47a9;
+@g2t_box_dynamic_bg_color:#1b63d9;
+
+@g2t_box_user_bg_color:#4278c2;
+@g2t_box_user_detail_bg_color:#2c5c9c;
+
+@g2t_box_user_detail_blue:#1e4280;
+/*#endregion */
+
+/*#region dimensions */
+@g2t_box_user_detail_height:280px;
+/*#endregion */
+
+/*#region fonts */
+
+/*#endregion */
+
+.bg(@image_name,@bg_color){
+        .bg_color(@bg_color);     
+        background-image:url("@{quiz_images_root}/ico-@{image_name}.png") !important;    
+        background-repeat:no-repeat !important;
+}
+.bg_color(@bg_color){
+    background-color:@bg_color !important;
+}

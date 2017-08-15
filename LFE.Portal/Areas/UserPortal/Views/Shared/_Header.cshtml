@@ -1,0 +1,78 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Helpers
+
+
+@{
+	var user = this.CurrentUser();
+}
+<style scoped="scoped">
+header{ background-color: #242424;width: 100%;position: fixed;height: 36px; border-bottom: 3px solid #bec1c1;position: absolute}
+header .links { padding: 9px 0 0}
+header .links ul {float: right}
+header .links ul li{ display: inline-block;line-height: 13px;width: auto;padding: 0 10px;border-right: 1px solid #fff}
+header .links ul li:last-child{padding: 0 0 0 10px; border: none}
+header .links ul li,header .links ul li a{ font-family: Arial;font-size: 13px;color:#fff}
+</style>
+<header>
+	<div class="wrap links">
+		<ul>
+			@{
+				if (user != null)
+				{
+					<li>
+						@Html.Action("_NotificationMenu","Home" , new{area="UserPortal"})						
+					</li>
+					<li>
+						@Html.Action("_UserCoursesCombo","Home",new{area="UserPortal"})
+					</li>
+				}
+			}
+			<li>
+				<a href="https://itunes.apple.com/us/app/lfe.com/id576166691?mt=8" target="_blank" class="link" >Mobile Viewer Apps</a>
+			</li>
+			@{
+				if (user != null)
+				{
+					if (this.IsCurrentUserAdmin())
+					{
+						<li>
+							@Html.ActionLink("Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { style = "text-decoration:none" })
+						</li>
+					}                       
+					<li>@Html.ActionLink("Author Portal", "Index", "Home", new { area = "AuthorAdmin" }, new { @style = "text-decoration: none" })</li>
+					<li>@Html.ActionLink("Account Settings", "UserSettings", "Account", new { area = "" }, new { @style = "text-decoration: none" })</li>
+					<li style="text-transform: capitalize">Hi, @user.FullName</li>
+					<li>@Html.ActionLink("Log Out", "SignOff", "Account", new{area="",returnUrl= Request.Url != null ? Request.Url.PathAndQuery : ""}, new { style = "" })</li>        
+				}
+				else
+				{
+					<li>
+						<a id="btnRegister" href="#" class="toolbar-arrow">Register</a>
+						<a id="btnLogin" href="#" class="toolbar-arrow">Login</a>
+					</li>
+				}
+			}
+			
+		</ul>
+	</div>
+</header>
+
+@Html.Action("_FeedWindow","Home" , new{area="UserPortal"})
+
+
+@{
+    if (!User.Identity.IsAuthenticated)
+    {
+        <div id="loginWrapper" class="sub_tool_bar">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Account/_Login.cshtml", new LoginDTO { IsWidget = true })
+        </div>
+
+        <div id="registerWrapper" class="sub_tool_bar2">
+            @Html.Partial("~/Areas/Widget/Views/Shared/Account/_Register.cshtml", new RegisterDTO { RequiredConfirmation = true, ParentWindowURL = Url.ToCurrentUrl() })
+        </div>
+
+    }
+}
+
+
+ 

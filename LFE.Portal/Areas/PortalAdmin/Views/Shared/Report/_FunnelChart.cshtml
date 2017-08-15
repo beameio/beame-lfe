@@ -1,0 +1,58 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.DataTokens
+@model FunnelViewToken
+           
+<div style="height: 400px">
+    @(Html.Kendo().Chart(Model.ChartData)
+          .Name("funnelChart")
+          .Title("KPI")
+          .HtmlAttributes(new{@style="height:100%"})
+          .Legend(legend => legend
+              .Position(ChartLegendPosition.Top)
+          )            
+          .Series(series =>
+          {
+              series.Line(model => model.ProductViews).Name("Product Page").Color("violet");
+              series.Line(model => model.ClipViews).Name("Clip Views").Color("blue");
+              series.Line(model => model.BuyEntered).Name("Purchase button").Color("orange");
+              series.Line(model => model.PurchaseCompleted).Name("Purchase complete").Color("green");
+          })
+            .SeriesDefaults(sd => sd.Line().Aggregate(ChartSeriesAggregate.Sum).Tooltip(t => t.Color("#fff")))
+            .CategoryAxis(axis => axis
+              .Date()
+              .BaseUnit(ChartAxisBaseUnit.Days)
+              .Categories(model => model.date)
+              .Labels(labels => labels.Rotation(-90))
+          )
+          .ValueAxis(axis => axis.Numeric()
+              .Labels(labels => labels.Format("{0:N0}"))        
+          )
+          .Tooltip(tooltip => tooltip
+              .Visible(true)
+              .Format("{0:N0}")
+          ))
+</div>
+<div style="margin: 10px 0 0">
+    <script>
+        function getEventRepData() {
+            return {
+                periodSelectionKind: '@((int)Model.RequestToken.period)'
+                , eventTypeId: null
+                , userId: null
+                , courseId: '@(Model.RequestToken.itemType == null ? null : (Model.RequestToken.itemType == CommonEnums.eEventItemTypes.COURSE ? Model.RequestToken.itemId : null))'
+                , bundleId: '@(Model.RequestToken.itemType == null ? null : (Model.RequestToken.itemType == CommonEnums.eEventItemTypes.BUNDLE ? Model.RequestToken.itemId : null))'
+                , storeId: '@Model.RequestToken.storeId'
+            };
+        }
+    </script>
+
+    @Html.Partial("Report/_EventLogsGrid", new ViewDataDictionary { { "pagesize", 8} })
+
+    <script>
+        
+        $(document).ready(function () {
+            window.getNotifManagerInstance().notify(notifEvents.object.rebindKpiEventReport, null);
+        });
+    </script>
+</div>

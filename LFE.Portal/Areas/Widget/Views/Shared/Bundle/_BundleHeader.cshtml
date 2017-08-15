@@ -1,0 +1,20 @@
+﻿
+@model LFE.DataTokens.BundlePurchaseDTO
+<div class="crs-header inline">
+    <div class="row-bottom">
+        <span class="author-name float-left">@Model.User.fullName</span>
+        <div class="rait float-right">
+            <div class="inline">
+                @if (@Model.NumSubscribers != null && @Model.NumSubscribers > 0)
+                {
+                    <div class="numSubscribers right">@Model.NumSubscribers Subscriber@(Model.NumSubscribers > 1 ? "s" : "")</div>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="row-top">
+        @Model.BundleName
+    </div>
+</div>
+

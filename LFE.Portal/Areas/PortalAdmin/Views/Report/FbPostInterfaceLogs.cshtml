@@ -1,0 +1,26 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Models
+
+@{
+    ViewBag.Title = "FB Post Interface Logs";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	var dates = ( ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all ).ToTranslatedArray();
+
+	ViewData["periodKinds"] = dates;
+
+	var statuses = Utils.EnumWithDescToList<FbEnums.ePostInterfaceStatus>();
+
+	ViewData["statusLOV"] = statuses;
+}
+
+<h2 class="page-title">FB posts interface report</h2>
+
+@Html.Partial("Report/_ReportFilters",new ReportFilterViewToken{Action = "GetFbPostInterfaceUsersLOV"})
+
+@Html.Partial("Report/_FbPostInterfaceLogsGrid")

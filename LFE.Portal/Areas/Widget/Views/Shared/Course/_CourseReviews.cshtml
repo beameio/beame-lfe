@@ -1,0 +1,58 @@
+﻿@model LFE.DataTokens.WidgetCourseReviewsToken
+
+<div id="reviews_listing">
+    @if (!Model.ReviewsList.Any())
+    {  
+
+        <div id="not-rewiewed-wrapper">
+
+            <div id="not-reviewed">This course has not been reviewed</div>
+            @*  @if (Model.UserCanAddReview)
+            { 
+                <span class="suggestion">Be the first to write a review -</span>
+
+                <a class="write-review-button text-hide" onclick="showAddReview()">Write review</a>
+                
+                <div class="clear"></div>
+            }*@
+        </div>    
+    }
+    else
+    {   
+ @* show rating stars and rating count *@
+        if (Model.Item.Rating > 0)
+        {
+        <span class="star_@Model.Item.Rating"></span>    
+
+        <span class="count">Based on @Model.ReviewsList.Count() reviews </span>
+        @*
+            if (Model.UserCanAddReview)
+            {
+
+        <a class="write-review-button text-hide" onclick="showAddReview()">Write review</a>
+
+        <div class="clear"></div>
+            }*@
+        }
+    }
+
+
+    @* reviews listing *@
+    @foreach (var review in Model.ReviewsList)
+    {
+
+        <div class="review_item">
+            <header class="title">
+                <div class="nickname">@review.LearnerNickname</div>
+                <div class="rate"><div class="star_@review.Rating"></div></div>
+            </header>
+            <article class="body">
+                <div class="reviewtitle">@review.Title</div>
+                <div class="content" style="">@Html.Raw(review.Text.Replace("\n", "<br/>"))  </div>
+            </article>
+        </div>
+    }
+
+
+
+</div>

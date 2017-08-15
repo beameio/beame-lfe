@@ -1,0 +1,83 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewBag.Title = "Manage Users Web Stores";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts
+{
+    <script>
+        
+        $(document).ready(function () {
+            $('#btn-submit-user-ws').unbind('click').bind('click', function () {
+                var id = $('#userId').val();
+
+                if (!hasValue(id)) {
+                    alert('Select user');
+                    return;
+                }
+
+                $('#ifrmWs').attr({'src': '@Url.Action("AdminUserWebStoreManage","WebStore",new{area="AuthorAdmin"})' + '/?userId=' + id});
+
+                $('#h-title').html($('#hidUserName').val() + ' Web Store Manage');
+                
+            });
+        });
+
+        function onUserSearch() {
+            return {
+                text: $("#users").val()
+            };
+        }
+        function onUserSelected(e) {
+            try {
+                var dataItem = this.dataItem(e.item.index());
+                $('#userId').val(dataItem.userId);
+                $('#hidUserName').val(dataItem.fullName);
+            } catch (ex) {
+                if (window.console) console.log(ex);
+            }
+        }
+        function onWsRequestBegin() {
+         
+            var id = $('#userId').val();
+          
+            if (!hasValue(id)) {
+                alert('Select user');
+                return false;
+            }
+         
+            return true;
+        }
+
+        function setTitle() {
+            $('#h-title').val( $('#hidUserName').val() + ' Web Store Manage');
+        }
+    </script> 
+}
+
+@Html.Hidden("hidUserName")
+<div>
+    <div class="inline">
+        @Html.Hidden("userId")
+        @(Html.Kendo().AutoComplete()
+                  .Name("users")
+                  .DataTextField("fullName")
+                  .Filter("contains")
+                  .MinLength(2)
+                  .HtmlAttributes(new { style = "width:250px" })
+                  .Events(e => e.Select("onUserSelected"))
+                  .DataSource(source => source.Read(read => read.Action("FindUsers", "WebStore", new { area = "PortalAdmin" }).Data("onUserSearch")).ServerFiltering(true))
+        )    
+    </div>
+    
+    
+    <div class="inline" style="margin-left: 20px;">
+        <input type="submit" id="btn-submit-user-ws" value="Get User Stores" class="k-button" />
+    </div>
+
+</div>
+
+<h3 id="h-title"></h3>
+
+<iframe id="ifrmWs" width="1260" height="1000" style="border:none;overflow-y: auto" ></iframe>

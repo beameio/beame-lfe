@@ -1,0 +1,26 @@
+﻿@using LFE.DataTokens
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditWebStorePageToken
+
+@{
+	
+	Layout = "~/Areas/AuthorAdmin/Views/Shared/_AdminWebStoreLayout.cshtml";
+}
+
+@section css
+{
+	<link href="@Url.Content( "~/Areas/AuthorAdmin/Content/styles/ws.css" )" rel="stylesheet" type="text/css"  />    
+}
+@section scripts
+{
+	<script>
+		$(document).ready(function () {
+			window.getNotifManagerInstance().subscribe(notifEvents.report.storesBound, setStoresTotal, null);
+		});
+
+		function setStoresTotal(total) {
+			$('#d-ws-total').html(total);
+		}
+	</script>
+}
+
+@Html.Partial("WebStore/_StoreContents", Model.store)

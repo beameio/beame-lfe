@@ -1,0 +1,93 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Models
+@{
+    
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+    var registrationSource = CommonEnums.eRegistrationSources.Unknown;
+
+    if (Request.QueryString["regSourceId"] != null)
+    {
+        registrationSource = Utils.ParseEnum<CommonEnums.eRegistrationSources>(Request.QueryString["regSourceId"]);
+    }
+
+    if (registrationSource == CommonEnums.eRegistrationSources.Unknown)
+    {
+        if (viewModel != null && viewModel.WebStore != null && !String.IsNullOrEmpty(viewModel.WebStore.WixInstanceID) && viewModel.WebStore.WixInstanceID != Guid.Empty.ToString())
+        {
+            registrationSource = CommonEnums.eRegistrationSources.WIX;
+        }    
+    }
+    
+    
+    var returnUrl = Request.Url != null ? Request.Url.PathAndQuery : "";
+    if (!String.IsNullOrEmpty(returnUrl))
+    {
+        returnUrl = HttpUtility.UrlDecode(returnUrl);
+    }
+    
+    var trackingId = viewModel != null ? (viewModel.WebStore == null ? viewModel.TrackingId : viewModel.WebStore.TrackingID) : string.Empty;
+
+}
+
+<script>
+ 
+    function onPriceClicked() {
+        window.getNotifManagerInstance().notify(notifEvents.object.openLogin, null);
+    }
+
+    $(document).ready(function () {
+        $('#a-login').unbind('click').click(openLoginWnd);
+        $('#a-register').unbind('click').click(openRegisterWnd);
+
+        window.getNotifManagerInstance().unsubscribe(notifEvents.object.openLogin, onOpenLoginWnd, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.object.openLogin, onOpenLoginWnd, null);
+
+        initLoginBehavior();
+    });
+
+    function onOpenLoginWnd() {
+        openLoginModalWnd({ mode: '@eLoginWindowMode.Login' });
+    }
+
+    function openLoginWnd(e) {
+        e.preventDefault();       
+        var params = { mode: '@eLoginWindowMode.Login' };
+        openLoginModalWnd(params);
+    }
+
+    function openRegisterWnd(e) {
+        e.preventDefault();
+        var params = { mode: '@eLoginWindowMode.Register' };
+        openLoginModalWnd(params);
+    }
+
+    function openLoginModalWnd(params) {
+        var url = '@(HttpUtility.UrlDecode(Url.Action("LoginWindow", "Account", new { area = "" })))';
+        var m = $('#modLogin');
+        params.returnUrl = '@(Html.Raw(returnUrl))';
+        params.trackingId = '@trackingId';
+        params.typeId = '@((byte)registrationSource)';
+        //console.log(url);
+        m.find('.modal-body').load(url, params, function () {
+            m.modal('show');
+        });
+    }
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="modLogin" tabindex="-1" role="dialog">
+    <div class="modal-dialog login-wnd-container">
+        <div class="modal-content">
+            <div class="modal-header login-head rel">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Login</h4>
+            </div>
+            <div class="modal-body no-pad">
+                <div class="inner">
+                    <div class="modal-body-wrapper"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

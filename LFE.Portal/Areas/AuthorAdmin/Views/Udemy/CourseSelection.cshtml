@@ -1,0 +1,114 @@
+﻿@model LFE.Portal.Areas.AuthorAdmin.Models.UdemyCoursesToken
+
+@{
+    ViewBag.Title = "Select Course";
+    Layout = "~/Areas/AuthorAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+    <link href="~/Areas/AuthorAdmin/Content/styles/udemy.css" rel="stylesheet" />
+}
+
+<div class="mc-header" style="margin-bottom: 30px;">
+    <h1>UDEMY IMPORT</h1>
+</div>
+
+@{
+    if (!Model.IsValid)
+    {
+        <div class="mc-errorBox">
+            <div class="header"><h2>Errors</h2></div>
+            <div class="content">
+                @Model.Message
+            </div>
+        </div>
+    }
+}
+
+<div class="mc-content">
+@{
+    if (Model == null)
+    {
+        <script>
+            window.location.href = '@Url.Action("Index", "Udemy", new {area = "AuthorAdmin"})';
+        </script>
+    }
+    else if (Model.Courses != null && Model.Courses.Any())
+    {
+        <h2>We found the following courses in your Udemy account. Select the courses you wish to import to LFE:</h2>
+
+        <div class="mc-inpBox">
+            
+                
+                
+                
+@{
+        using (Html.BeginForm("ImportCourses", "Udemy", new { area = "AuthorAdmin" }, FormMethod.Post, new { @id = "frm-udemy-import" }))
+        {
+            
+            var availableCourses = Model.Courses.Where(x => x.IsImported == false);
+            if (availableCourses.Any())
+            {
+                <h3>AVAILABLE UDEMY COURSES</h3>
+                foreach (var item in availableCourses)
+                {
+                    <div class="udemyItem" style="background-image: url(@item.ThumbUrl);">
+                        <input type="checkbox" name="@item.Id" id="cb_@item.Id" />
+                        <label for="cb_@item.Id">@item.Name (@item.LecturesNum lectures)</label>
+                    </div>
+                }
+            }
+
+            var importedCourses = Model.Courses.Where(x => x.IsImported == true);
+            if (importedCourses.Any())
+            {
+                <h3>IMPORTED UDEMY COURSES</h3>
+                foreach (var item in importedCourses)
+                {
+                    <div class="udemyItem" style="background-image: url(@item.ThumbUrl);">
+                        <input type="checkbox" disabled="disabled" name="@item.Id" id="cb_@item.Id" />
+                        <label for="cb_@item.Id">@item.Name (@item.LecturesNum lectures)</label>
+                    </div>
+                }
+            }
+            <input type="submit" value="Begin Import" />
+        }
+}
+                
+
+        </div>
+
+    }
+    else
+    {
+        <h2>No courses found</h2>
+    }
+}    
+
+</div>
+
+<script>
+$(function(e){
+    var ckBoxList = $('form[id=frm-udemy-import] input[type=checkbox]').filter(function(){ return !this.disabled; });
+    var btnSubmit = $('form[id=frm-udemy-import] input[type=submit]');
+    if (!ckBoxList || ckBoxList.length == 0){
+        btnSubmit.attr('disabled', 'disabled');
+        return;
+    }
+    function EnableSubmit() {
+        for (var i=0; i<ckBoxList.length; i++) 
+            if (ckBoxList[i].checked) { 
+                btnSubmit.removeAttr('disabled');
+                return;
+            }
+        btnSubmit.attr('disabled', 'disabled');
+    }
+    for (var i=0; i<ckBoxList.length; i++) {
+        $(ckBoxList[i]).change(function(){
+            EnableSubmit();
+        });
+    }
+    EnableSubmit();
+});
+</script>

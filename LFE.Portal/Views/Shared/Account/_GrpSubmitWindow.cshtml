@@ -1,0 +1,81 @@
+﻿@model LFE.DataTokens.GRPRequestToken
+<script>
+
+    $(document).ready(function(){
+        var form = $('#frmGRPRequest');
+        initUnobstructiveFormValidation(form);
+    });
+
+    function opepGrpSubmitWindow(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        if (!dataItem || !dataItem.OrderId) return;
+        $('#OrderLineId').val(dataItem.LineId);
+        $('#itemName').html(dataItem.ItemName);
+        $('#ReasonText').val('');
+        $("#cancelWin").data("kendoWindow").open();
+        showError(false);
+    }
+    function onSubmitSuccess(e) {
+        if (!e.success) {
+            showError(true, e.error);
+            return;
+        }
+        closeRefundWin();
+        $('#UserPurchaseReport').data('kendoGrid').dataSource.read();
+    }
+    function showError(doShow, text) {
+        if (doShow) {
+            $('#errMsg').show();
+            $('#errMsg').html(text);
+        }
+        else $('#errMsg').hide();
+    }
+    function onSubmitFailed(e) {
+    }
+    function closeRefundWin() {
+        $("#cancelWin").data("kendoWindow").close();
+    }
+</script>
+<style>
+.modal-cancelWin { max-width:770px; display:none; }
+.modal-cancelWin img { float:left;margin:0px 10px 0px 0px; }
+.modal-cancelWin h4 { font-size:1.3em; margin:0px 0px 10px 0px; }
+.modal-cancelWin textarea { width:750px;height:150px;margin:0px; }
+.modal-cancelWin #errMsg { color: #000000;background-color: #FFBBBB;padding: 10px;text-align: center; margin-bottom:10px; display:none; }
+.modal-cancelWin .buttons { position:relative;margin:10px 0px; }
+.modal-cancelWin .buttons > input { color:#FFFFFF;border:none; float:right; padding:10px 30px; background-color:#188842; margin-left:5px; }
+.modal-cancelWin .buttons > input[type=button]:last-of-type { background-color:#841B27; }
+</style>
+<div class="modal-cancelWin" id="cancelWin">
+    <div id="errMsg">this is error message</div>
+    <h4 id="itemName"></h4>
+    <img src="~/Areas/Widget/Content/assets/ico-grp.png" alt="" />
+    This course was purchased under the 30 Day Money Back Guarantee program. You will be refunded in full within 72 hours.<br /><br />
+    We made it our goal to ensure course quality and student satisfaction. Please take a moment to tell us why you are requesting this refund. We will forward this information to the course’s author so they can benefit from your valuable input:<br /><br />
+    @using (Ajax.BeginForm("ReguestRefundGRP", "Billing", new { area = "" }, new AjaxOptions { OnBegin = "window.showLoader();", OnComplete = "window.hideLoader();", OnFailure = "onSubmitFailed", OnSuccess = "onSubmitSuccess" }, new { id = "frmGRPRequest" }))
+    {
+        @Html.HiddenFor(m => m.OrderLineId)
+        @Html.TextAreaFor(m => m.ReasonText)
+        @Html.ValidationMessageFor(m => m.ReasonText, null, new { @class="" })
+        <div class="buttons">
+            <input type="submit" value="SEND" />
+            <input type="button" onclick="closeRefundWin();" value="CANCEL" />
+            <div style="clear:both;"></div>
+        </div>
+    }
+</div>
+<script>
+$(function(e){
+    var cancelWin = $('#cancelWin');
+    if (!cancelWin.data("kendoWindow")) {
+        cancelWin.kendoWindow({
+            title: "Request Refund",
+            modal: true,
+            actions: [ "Close" ]
+        });
+    }    
+    cancelWin.data("kendoWindow").center();
+});
+</script>
+
+

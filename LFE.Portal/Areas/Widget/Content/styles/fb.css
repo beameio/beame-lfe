@@ -1,0 +1,23 @@
+﻿body{ text-align: center;font-family: 'Open Sans',Arial;}
+.ifrm-settings {width:100%; background-color:white; border:none;overflow: hidden }
+.fb-box{ margin: 0 auto}
+.conn-btn-container{display: table;margin: 0;text-align: center;}
+.conn-btn-container > .conn-btn {width: 300px;height: 57px;display: table-cell;background-color: #5472d2;color: #ffffff !important;font-family: 'Open Sans',Arial;font-size: 18px;text-align: center;text-decoration: none;transition: all 0.5s ease 0s;vertical-align: middle;margin: 0 auto;}
+.fb-admin-container {padding: 10px;width: 770px}
+.fb-admin-container .box{width: 49%;display:inline-block;vertical-align: top}
+.fb-admin-container .box:first-child{border-right:#a4a4a4 solid 1px ;}
+.fb-admin-container .box  > .inner{text-align:center}
+.btn-fb-login{margin: 0  auto}
+
+.fb-admin-info { font-size: 16px;color: #000;margin: 4px 0 10px;text-align: left;line-height: 20px }
+.fb-admin-sub{font-size: 14px;color: #000;margin: 10px 0;text-align: left}
+.ul-login li.log-frm-inp-container{ display: inline-block;vertical-align: top}
+.ul-login li input{background-color:#ccd7ed;border:none;color:#64769a;height: 42px !important;width:170px;margin:0 0 4px;padding:8px 0 8px 8px;z-index: 100}/*1px solid #2574A9*/
+
+
+.validation-summary-errors{display: none}
+.field-validation-error{color: red;display: block;font-size: 11px;margin: 0 auto;padding-left: 6px;text-align: left;}
+.ul-login.simple-list .field-validation-error{position: absolute}
+.login-info-error{width: 360px;height: 30px;display: none;color: #fff;font-size: 12px;margin: 0 auto}
+.login-info-error > .inner{height: auto;width: 100%;background: red;}
+.login-info-error > .inner > .e-row{vertical-align: middle;padding-left: 15px;height: 30px;width: 100%;display: table-cell;}

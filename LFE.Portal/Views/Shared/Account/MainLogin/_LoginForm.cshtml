@@ -1,0 +1,16 @@
+﻿@model LFE.DataTokens.LoginDTO
+ @Html.AntiForgeryToken()          
+<fieldset id="fs-login">
+    <legend></legend>
+    <ul class="ul-login simple-list">
+        <li class="log-frm-inp-container">
+            @Html.TextBoxFor(model => model.Email, new { placeholder = "Email", title = "Email" })
+            @Html.ValidationMessageFor(m => m.Email)
+        </li>
+        <li class="log-frm-inp-container">
+            @Html.PasswordFor(model => model.Password, new { placeholder = "Password", title = "Password" })
+            @Html.ValidationMessageFor(m => m.Password)
+        </li>
+        <li id="lfe-login-info-panel" class="login-info-error"><div class="inner"><div class="e-row"></div></div></li>
+    </ul>
+</fieldset>     

@@ -1,0 +1,80 @@
+﻿@model LFE.DataTokens.WebStoreCategoryEditDTO
+
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmCategoryDetails';
+	
+	var deleteUrl = '@Url.Action("DeleteCategory","WebStore")';
+
+	$(document).ready(function () {
+
+		var id = Number('@Model.WebStoreCategoryId');
+		var name = Encoder.htmlDecode('@Model.CategoryName');	    
+
+		var token = {
+			kind: StoreFormKinds.category
+			,title: id < 0 ? 'Add new category' : 'Edit ' + name
+			,id: id
+			,form: EDIT_FORM_SELECTOR
+			,deleteUrl : deleteUrl + '/' + id
+		};
+		
+		window.getNotifManagerInstance().notify(notifEvents.webstore.formLoaded, token);
+		
+		var form = $(EDIT_FORM_SELECTOR);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onCategorySaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Category saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+
+		if (response.success) {
+			$(EDIT_FORM_SELECTOR).find('#WebStoreCategoryId').val(response.result.id);
+			response.result.deleteUrl = deleteUrl + '/' + response.result.id;
+			window.getNotifManagerInstance().notify(notifEvents.webstore.categorySaved, response.result);
+			//window.getNotifManagerInstance().notify(notifEvents.webstore.storeStateChanged, null);
+		}
+	}
+</script>
+
+
+@using (Ajax.BeginForm("SaveCategoryDetails", "WebStore", null, new AjaxOptions { OnBegin = "javaScript:showContainerLoader('#main', null)", OnSuccess = "onCategorySaved", LoadingElementId = "site-loader" }, new { @id = "frmCategoryDetails", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.WebStoreId)
+	@Html.HiddenFor(x=>x.WebStoreCategoryId)
+	@Html.HiddenFor(x=>x.OrderIndex)
+	<fieldset>
+		<legend></legend>
+		<ul class="ul-edit-form cn">
+			<li>
+				@Html.LabelFor(m=>m.CategoryName)
+				<div class="input-container">
+					@Html.TextBoxFor(m=>m.CategoryName,new{@class="txt-inp",@onchange="onTxtBoxChanged(this)",@size=50,@maxlength=50})
+					<span class="input-info">Maximum 50 symbols</span>
+				</div>
+				<div class="validator-container">
+					@Html.ValidationMessageFor(model => model.CategoryName,null,new{@class=String.IsNullOrEmpty(Model.CategoryName) ? "" :"pass"})
+				</div>
+			</li>
+			<li>
+				@Html.LabelFor(m=>m.Description)
+				<div class="input-container">
+					@Html.TextAreaFor(m=>m.Description,new{@class="txt-inp",@cols=20,@rows = 3})					
+				</div>
+				<div class="validator-container"></div>
+			</li>
+			<li>
+				<div class="input-container" style="width:35px;padding: 15px 0 0">
+					@Html.EditorFor(m=>m.IsPublic)
+				</div>
+				@Html.LabelFor(m=>m.IsPublic,new{@Style="width:auto"})
+			</li>
+		</ul>		
+	</fieldset>
+}

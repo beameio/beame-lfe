@@ -1,0 +1,54 @@
+﻿@using LFE.DataTokens
+@model CourseWizardDto
+
+<script>
+	$(document).ready(function () {
+
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.stepLoaded, rebindNavTree, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.stepLoaded, rebindNavTree, null);
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.wizard.rebindTree, rebindNavTree, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.wizard.rebindTree, rebindNavTree, null);
+	});
+	
+	function rebindNavTree() {
+		$('#ulNavTree').data("kendoListView").dataSource.read();
+	}
+
+	function onTreeDataRead() {
+		var last = getManagerStep(stepKinds.last), current = getManagerStep(stepKinds.current);
+		
+		if (!hasValue(last)) {
+			last = '@Model.LastCompletedStep';
+		}
+		if (!hasValue(current)) {
+			current = '@Model.CurrentWizardStep';
+		}
+		return {
+			 last: last
+			, current: current
+			, chaptersCnt: $(window.HID_CHAPTER_CNT_SELECTOR).val()
+		};
+	}
+</script>
+
+@(Html.Kendo().ListView<BreadcrumbStepDTO>()
+			.Name("ulNavTree")
+			.TagName("ul")
+			.HtmlAttributes(new{@class="ul-nav-tree"})
+			.ClientTemplateId("kendo-wizard-crumb-step")
+			.AutoBind(false)
+			.DataSource(ds => ds.Read( read => read.Action("LoadBreadcrumb", "Course").Data("onTreeDataRead")))
+			.Events(e=>e.DataBound("onBreadcrumbLoad"))
+)
+	
+<script type="text/x-kendo-template" id="kendo-wizard-crumb-step">
+		 <li data-role="go2" data-val="${Step}" class="${SpanCssClass}">
+			#if(data.Step<0){#
+				<span> ${StepTitle}</span>
+			#}
+			else{#
+				<a href='#=emptyHref#${Step}' >${StepTitle}</a>
+			#}#
+		</li>
+	</script>

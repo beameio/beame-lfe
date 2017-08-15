@@ -1,0 +1,65 @@
+﻿@using LFE.Core.Utils
+@model LFE.DataTokens.MonthlyStatementDTO
+      
+@{
+   
+    var currencySymbol = Model.Currency != null ? Model.Currency.Symbol : "$";
+}
+     
+<table>
+    <tr>
+        <td style="padding: 5px 0 10px">
+           <h1>@Model.Currency.CurrencyName Statement</h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 25px 0; border: 2px solid #ddd !important; font-size:15px; color: #000; text-align: left;line-height: 24px;">
+            <div style="display: inline-block; width: 370px;padding-left: 25px; border-right: 2px solid #f2f2f2;">
+                <div style="">Income from one-time sales</div>
+                <div style="">Income from monthly subscriptions	</div>
+                <div style="">Income from rental </div>
+
+                <div style="padding-top: 15px;">Affiliate Sales</div>
+
+                <div style="padding-top: 15px;">Money back guarantee released</div>
+                <div style="">Money back guarantee hold back</div>
+
+                <div style="padding-top: 10px">Total Sales</div>
+
+                <div style="padding-top: 30px;">PayPal fees</div>
+                <div style="">Affiliate Commission</div>
+                <div style="">Total Refunds</div>
+                <div style="">Total Refund Fees</div>
+
+                <div style="padding-top: 25px;">Total Balance</div>
+
+                <div style="padding-top: 30px;">@(Constants.APP_OFFICIAL_NAME) fees</div>
+
+                <div style="padding-top: 30px;font-weight: bold">Total for this statement:</div>
+            </div>
+            <div style="display: inline-block; width: 160px;text-align: center">
+                <div style="">@currencySymbol@Model.Stats.TotalOneTimeSales</div>
+                <div style="">@currencySymbol@Model.Stats.TotalSubscriptionPayments</div>
+                <div style="">@currencySymbol@Model.Stats.TotalRentalSales</div>
+
+                <div style="padding-top: 15px;">@currencySymbol@Model.Stats.AffiliateSales</div>
+
+                <div style="padding-top: 15px;">@currencySymbol@Model.Stats.RefundProgrammToRelease</div>
+                <div style="">-@currencySymbol@Model.Stats.RefundProgrammToHold</div>
+
+                <div style="padding-top: 10px;font-weight: bold;">@currencySymbol@(Model.Stats.TotalSales + Model.Stats.RefundProgrammToRelease - Model.Stats.RefundProgrammToHold)</div>
+
+                <div style="padding-top: 30px;">-@currencySymbol@Model.Stats.TotalPaypalFees</div>
+                <div style="">-@currencySymbol@Model.Stats.AffiliateFees</div>
+                <div style="">-@currencySymbol@Model.Stats.TotalRefunds</div>
+                <div style="">+@currencySymbol@Model.Stats.TotalRefundFees</div>
+
+                <div style="padding-top: 25px;font-weight: bold;">@currencySymbol@Model.Stats.Balance</div>
+
+                <div style="padding-top: 30px;">-@currencySymbol@Model.Stats.TotalLfeCommission</div>
+
+                <div style="padding-top: 30px;font-weight: bold">@currencySymbol@Model.Stats.TotalPayout</div>
+            </div>           
+        </td>
+    </tr>   
+</table>

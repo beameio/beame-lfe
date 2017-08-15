@@ -1,0 +1,43 @@
+﻿@using LFE.Portal.Areas.Widget.Models
+@model LFE.DataTokens.WidgetTrainingRegistrantDTO
+
+<div class="user-g2t-register-container">
+    <div class="head">
+        @Html.Partial("Training/_Header", new TrainingTimerToken
+            {
+                Start        = Model.EventDate
+                ,LoadTimer   = true
+                ,ContainerId = "g2t-user-form-timer"
+                ,Template    = "<span>{days} days,</span><span>{hours} hours,</span><span>{minutes} minutes </span><span>and {seconds} seconds</span>"
+            })
+    </div>
+
+    <div class="g2t-success-container">
+        <div class="head">
+            <h3 class="msg">Thank you for signing up</h3>
+        </div>
+        <div class="greeting-container">
+            <article>
+                @Html.Raw(Model.GreetingsMessage)
+            </article>
+        </div>
+        <div class="info">
+            Note: You must have Go-to-Training installed in order to participate in this session.
+            <a target="_blank" href="http://support.citrixonline.com/en_US/training/help_files/G2T060001?title=Test+Your+Connection+before+Your+Session">Click here</a> to do so before the session begins,
+             to ensure that you will not be delayed in joining live session.
+
+        </div>
+    </div>
+
+    <div class="g2t-foot">
+        <div class="float-left">
+            @Html.Partial("Training/_FooterLinks",new TrainingFooterLinksToken
+            {
+                Item          = Model.Item
+                ,AuthorEmail  = Model.AuthorEmail
+                ,State        = eUserG2TStates.ThankYou
+                ,RegistrantId = Model.RegistrantId
+            })
+        </div>
+    </div>
+</div>

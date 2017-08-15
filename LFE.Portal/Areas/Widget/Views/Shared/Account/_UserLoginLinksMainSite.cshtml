@@ -1,0 +1,41 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.Portal.Models.UserIndicatorViewModel
+
+
+
+@{
+    var isAdmin = this.IsCurrentUserAdmin();
+}
+
+
+
+
+@if (Model.IsLoggedIn)
+{
+    <div class="links">
+        @*@Html.Action("_UserCoursesCombo", "Home", new { area = "UserPortal" })
+        |*@
+        <span class="link">@Model.DisplayName</span>
+        
+        @*<div style="display: inline-block; padding: 0px 8px 0;">@Html.Action("_UserNotificationLink","User" , new{area="UserPortal"})</div>*@
+        | @Html.ActionLink("Account Settings", "UserSettings", "Account", new { area = "" }, new { target = "_blank", @class = "link" })
+        | @Html.ActionLink("Author Login", "Index", "Home", new { Area = "AuthorAdmin" }, new { target = "_blank", @class = "link" })
+        @{
+       if (isAdmin)
+       {
+            @Html.ActionLink("| Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { target = "_blank", @class = "link" })
+       }
+        }
+        | @Html.ActionLink("Log Off", "MainSiteLogOff", "Account", new{area=""}, new { @class = "link" })
+        
+        @* <a class="link" id="aLogOff">Log Out</a>            *@
+    </div>
+}
+else
+{
+    <div class="links">      
+        <a id="btnRegister" href="#" class="toolbar-arrow">Register</a> | 
+        <a id="btnLogin" href="#" class="toolbar-arrow">Login</a>
+    </div>
+}
+

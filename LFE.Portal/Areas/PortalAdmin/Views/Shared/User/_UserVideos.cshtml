@@ -1,0 +1,58 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int
+
+<script>
+    var gridId = 'UserVideos';
+    $(document).ready(function() {
+	 
+        window.getNotifManagerInstance().unsubscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+        window.getNotifManagerInstance().subscribe(notifEvents.video.searchVideos, filterVideosGrid, null);
+    });
+
+    function filterVideosGrid(filter) {
+
+        var filterExists = filter.filters.length > 0;
+
+        if (filterExists) {
+            checkFilter(filter, gridId, "kendoGrid");
+            filterReport(filter, gridId, "kendoGrid");
+        } else {
+            filterReport(null, gridId, "kendoGrid");
+        }
+    }
+
+    function rebindVideoGrid() {
+        $('#AuthorVideos').data("kendoGrid").dataSource.read();
+    }
+    function notify2Player(id, name) {
+        console.log(id);
+        var token = { id: id, name: name };
+        console.log(token);
+        window.getNotifManagerInstance().notify(notifEvents.video.openPlayer,token);
+    }
+</script>
+
+
+
+@(Html.Kendo().Grid <UserVideoDto>()
+		.Name("UserVideos")
+		.TableHtmlAttributes(new{@style="background-color: #fff !important;background-image: none !important;"})
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.title).Title("Title").ClientTemplate("<a href='javascript:notify2Player(\"#=bcid#\",\"#=Encoder.htmlEncode(title)#\")' style='margin:3px 0 0' class='list-cmd' >${title}</a>");
+            columns.Bound(p => p.bcid).Title("BcId");
+            columns.Bound(p => p.addon).Title("Date Added").Format("{0:d}").Width(120);
+			columns.Bound(p => p.uses).Title("Number of Uses");
+			columns.Bound(p => p.minutes).Title("Duration").Width(120);
+            columns.Bound(p => p.status).Title("Status").Width(100);		
+		})          
+		.Sortable()
+		.Pageable(pager => pager.Enabled(true).Refresh(true))
+		.Filterable(f=>f.Enabled(false))
+		.DataSource(dataSource => dataSource.Ajax()
+							.PageSize(10)    
+							.Model(model => model.Id(p => p.bcid))
+							.Read(read => read.Action("GetUserVideos", "User",new{area="PortalAdmin",id=Model}).Type(HttpVerbs.Get)).ServerOperation(false)
+							.Destroy(d=>d.Action("DestroyVideo","Author")))
+	)  

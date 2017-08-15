@@ -1,0 +1,33 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@model int
+
+<script>
+    var otherListSelector = '#d-other-list-container';
+    $(document).ready(function () {
+       // window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setLearnerListH, null);
+    });
+
+    function onLearnersBound(e) {
+        $.each(e.sender.wrapper.find('li'), function () {
+            var li = $(this);
+            li.unbind("click").bind('click', function () {
+                window.showLearner(parseInt(li.attr('data-val')));
+            });
+        });        
+    }
+</script>
+
+<h4>Who else is taking this course?</h4>
+
+<div id="d-other-list-container" class="" style="">    
+        @(Html.Kendo().ListView<LearnerListItemDTO>()
+            .Name("OtherLearnersList")
+            .Pageable(p=>p.Enabled(true).Numeric(true).PreviousNext(false))
+            .TagName("ul")  
+            .HtmlAttributes(new{@class="ul-ol-list"})  
+            .ClientTemplateId("kendo-ol-list-template")
+            .Events(e=>e.DataBound("onLearnersBound"))
+            .DataSource(ds => ds.Read( read => read.Action("GetOtherLearners", "Item",new{area="Widget",id=Model}).Type(HttpVerbs.Get)).PageSize(20).ServerOperation(false))
+        )
+</div>

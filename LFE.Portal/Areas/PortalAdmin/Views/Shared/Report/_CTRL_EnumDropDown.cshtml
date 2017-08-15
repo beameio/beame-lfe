@@ -1,0 +1,42 @@
+﻿@using LFE.Portal.Areas.PortalAdmin.Models
+@using Kendo.Mvc.UI
+@model CTRL_EnumDropDown
+@{
+    Model.SelectedCallback = string.IsNullOrEmpty(Model.SelectedCallback) ? "function(){}" : Model.SelectedCallback;
+    Model.SelectedItemCallback = string.IsNullOrEmpty(Model.SelectedItemCallback) ? "function(){}" : Model.SelectedItemCallback;
+}
+<script>
+(function(){
+    function dropDown() { return $('#@Model.ElementId').data("kendoDropDownList"); }
+    window['@Model.ElementId'] = {
+        onSelected: function(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var valueCallback = @Model.SelectedCallback;
+            valueCallback(dataItem.Value);
+            var itemCallback = @Model.SelectedItemCallback;
+            itemCallback(dataItem);
+        },
+        clear: function() {
+            dropDown().value(null);
+        },
+        value: function() {
+            return dropDown().dataItem();
+        },
+        dummy: function(value) {
+            alert('Model.callback not set! value: [' + value + ']');
+        }
+    }
+})();
+</script>
+
+<div style="display:inline-block;@Model.Style">
+@(Html.Kendo().DropDownList()
+            .Name(Model.ElementId)
+            .OptionLabel(Model.OptionLabel)
+            .DataTextField("Title")
+            .DataValueField("Value")
+            .BindTo(Model.NameValueList)
+            .HtmlAttributes(new { style = string.Format("width:{0}px;", Model.Width), @class = "combo-ps" })
+            .Events(e => e.Select(Model.ElementId + ".onSelected"))
+)
+</div>

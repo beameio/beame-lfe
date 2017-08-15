@@ -1,0 +1,28 @@
+﻿@using LFE.DataTokens
+@model StudentQuizDTO
+
+
+<div>
+    <h3 style="font-size: 24px; color: #333;margin: 0 0 15px 0">@Model.Student.FullName</h3>
+
+    <h4><a style="font-size: 18px; color: blue" href="mailto:@Model.Student.Email">@Model.Student.Email</a></h4>
+</div>
+
+<div>
+    @(Html.Kendo().Grid<StudentQuizAttemptDTO>()
+            .Name("attempts_rep_" + Model.StudentQuizId)
+            .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.UserScore).Title("Score").Width(80);
+                columns.Bound(p => p.IsSuccess).Title("Pass").Width(80).ClientTemplate("#= IsSuccess ? 'Yes' : 'No' #");
+                columns.Bound(p => p.StartOn).Title("Completion Date").Format("{0:d}").Width(80);
+
+            })
+            .Sortable(s => s.Enabled(false))
+            .Pageable(pager => pager.Enabled(false))
+            .Filterable(f => f.Enabled(false))
+            .ClientDetailTemplateId("template-student-attempt-answers")
+            .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.AttemptId)).Read(read => read.Action("GetStudentsQuizAttempts", "Quiz", new { id = Model.StudentQuizId }).Type(HttpVerbs.Get)))
+    )    
+</div>

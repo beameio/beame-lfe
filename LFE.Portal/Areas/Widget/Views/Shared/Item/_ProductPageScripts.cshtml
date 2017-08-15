@@ -1,0 +1,134 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Helpers
+@model LFE.DataTokens.ItemProductPageToken
+           
+
+
+@{
+    if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            ////_ItemPricesRow
+            //$(document).ready(function () {
+            //    $('.price-container.free-course').unbind('click').click(function () {
+            //        showLoader();
+            //        $('#frm-free-item').submit();
+            //    });
+            //});
+        </script>
+    }
+    else
+    {
+        <script>
+            //_ItemPricesRow            
+            //$(document).ready(function () {
+            //    $('.price-container.free-course').unbind('click').click(function () {
+            //        window.getNotifManagerInstance().notify(notifEvents.object.openLogin, null);
+            //    });
+            //});
+        </script>
+    }
+}
+
+<script>
+    //_ItemPricesRow
+    //$(document).ready(function () {
+    //    $('.price-container:not(.free-course)').unbind('click').click(notifyPriceSelection);    
+    //});
+
+
+    var trackingId = '@Model.TrackingID';
+
+    function bindItemVideosEvents() {
+
+        $('.ul-videos-tree > .li-video').click(function () {
+            var li = $(this);
+            var id = li.attr('data-id');
+
+            if (hasValue(id) && id > 0) {
+                var wrapper = li.parent().parent().parent().parent().siblings('.promo-video-container').find('.video-wrapper');
+                var playerId = wrapper.find('object').attr('id');
+                var container = li.parent().parent().parent().parent().parent().parent().parent();
+                setVideoPlayerContent(id, playerId, container);
+            }
+        });
+    }
+
+    //_ItemProductPagePrices
+    $(document).ready(function () {
+     //   window.getNotifManagerInstance().unsubscribe(notifEvents.item.priceSelected, window.onPriceClicked, null);
+     //   window.getNotifManagerInstance().subscribe(notifEvents.item.priceSelected, window.onPriceClicked, null);
+    });
+
+    //_ItemPriceBox
+    //$(document).ready(function () {
+    //    var id = $('.ul-rental-price').attr('id');
+    //    bindRentComboEvents(id);
+    //});
+
+    //_ItemProductPageTabsNav
+    $(document).ready(initTabEvents);
+
+
+    //_ChaptersTree
+    $(document).ready(bindItemVideosEvents);
+
+    function setVideoPlayerContent(video, playerId, container) {
+
+        if (container.hasClass('nano')) {
+            container.nanoScroller({ scroll: 'top' });
+        }
+        console.log(video); 
+        var player = window.brightcove.getExperience(playerId);
+        var videoPlayer = player.getModule(window.APIModules.VIDEO_PLAYER);
+        videoPlayer.loadVideo(video);
+    }
+
+</script>
+
+@{
+
+    if (Model.ItemType == BillingEnums.ePurchaseItemTypes.BUNDLE)
+    {
+        <script>
+            //_BundleCoursesList
+            function bindBundleCoursesEvents() {
+                var url = '@Url.ActionString("GetCourseContentsPartial", "Item", new RouteValueDictionary{ {"area","Widget"} })';
+                $('.bundle-course-list > li').unbind('click').bind('click', function () {
+                    var id = $(this).attr('data-val');
+                    var name = $(this).find('h4').html();
+                    var u = url + '?id=' + id + '&trackingId=' + '@Model.TrackingID';
+
+                    var m = $('#modCoursePreview');
+
+                    showLoader();
+
+                    m.find('.modal-body > .inner > .content > .modal-body-wrapper ').load(u, function () {
+                        hideLoader();
+                        m.find('.modal-title').html(name);
+                        m.modal('show');
+                    });
+
+                });
+            }
+
+            (function ($) {
+                bindBundleCoursesEvents();
+
+                $("#bundle-content").nanoScroller();
+
+                $("#modCoursePreview").on("shown.bs.modal", function () {
+                    bindItemVideosEvents();
+                    $("#bundle-content").nanoScroller({ iOSNativeScrolling: true });
+                    $("#bundle-content").nanoScroller({ scroll: 'top' });
+                });
+                $("#modCoursePreview").on("hidden.bs.modal", function () {
+                    var m = $('#modCoursePreview');
+                    m.find('.modal-body > .inner > .content > .modal-body-wrapper ').empty();
+                    // $("#bundle-content").nanoScroller({ scroll: 'top'});
+                    //$("#bundle-content > .pane > .slider").css({'top':'0px'});
+                });
+            })(jQuery);
+        </script>
+    }
+}

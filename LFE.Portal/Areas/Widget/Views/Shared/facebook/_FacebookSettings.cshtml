@@ -1,0 +1,178 @@
+﻿@model LFE.Portal.Areas.WixEndPoint.Models.SettingsViewToken
+
+
+@{
+
+    var shortStoreName = "";
+    if (!string.IsNullOrEmpty(Model.StoreName))
+    {
+        shortStoreName = Model.StoreName.Length > 32 ? Model.StoreName.Substring(0, 32) + "..." : Model.StoreName;
+    }
+    
+}
+
+
+    @*<link href="~/Areas/WixEndPoint/Scripts/wix/components/dropdown/dropdown.css" rel="stylesheet" />*@
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/bootstrap.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/common.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/WixEndPoint/Content/Styles/Wix/css/buttons.css" rel="stylesheet">
+    <link type="text/css" href="~/Areas/Widget/Content/Styles/facebooksettings.css" rel="stylesheet">
+    @*<link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/color-picker/css/color-picker.css" rel="stylesheet" />
+    <link type="text/css" href="~/Areas/WixEndPoint/Scripts/Wix/components/glued-position-min/glued.min.css" rel="stylesheet" />*@
+
+    
+
+    <div id="divContainer" class="box" >
+        <h3 id="mainTitle" >
+            <span style="text-decoration:underline" >Click Here</span> to create online courses and define your webstore settings
+            <img src="~/Areas/Widget/Content/images/facebook-Small-icon.png" style=" float:right; display:inline-block; margin-top:2px" />
+        </h3>
+
+        <div id="divContent" style="padding: 10px 0; display:none">
+            <!-- List 1: Controls -->
+            @if (Model.UserCoursesList == null || !Model.UserCoursesList.Any())
+            {
+                <div class="box">
+                    <h3 id="editCourses">Create/Edit Courses</h3>
+                    <div class="feature" id="divFeature1">
+                        <button class="submit btn" style="color: white; background-color: #DDDDDD; float:right; display:inline-block; margin-top:7px" id="btnRefresh">
+                            <img src="~/Areas/WixEndPoint/Content/images/refresh.png" style="height: 12px" alt="Refresh App" />
+                        </button>
+                        <ul class="simple-list">
+                            <li>
+                                <button class="submit btn connect create" id="btnCreateNewCourse">Create/Edit a course</button>
+                                <button class="submit btn help help2" id="btnHelp2">
+                                    <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" alt="help" />
+                                </button>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="box">
+                    <h3 id="editCourses">Create/Edit Courses</h3>
+                    <button class="submit btn help help1" id="btnHelp2">
+                        <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+                    </button>
+                    <div class="feature" id="divFeature2" >
+                        <button class="submit btn" style="color: white; background-color: #DDDDDD; float:right; display:inline-block; margin-top:7px" id="btnRefresh">
+                            <img src="~/Areas/WixEndPoint/Content/images/refresh.png" style="height: 12px" alt="Refresh App" />
+                        </button>
+                        <ul class=" simple-list">
+                            <li style="margin-left: 28px;">
+                                <button class="submit btn connect" style="width: 200px" id="btnCreateNewCourse">Create New course</button>                           
+                            
+                            </li>
+                            <li style="margin-left: 28px;">
+                                <div style="font-weight: bold">Or</div>
+                            </li>
+                            <li style="margin-left: 28px;">
+                                <div style="width: 430px">
+                                    <select class="btn" id="ddlCourses" style="width: 200px; display: inline-block; float: left; border: 1px solid #DDDDDD">
+                                        <option value="" selected disabled>Select Course</option>
+                                        @foreach (var course in Model.UserCoursesList)
+                                        {
+                                            <option value="@course.Uid">@course.Name</option>
+                                        }
+                                    </select>
+                                    <button class="submit btn connect" id="btnEditCourse" style="width: 200px; display: inline-block; margin-left:12px ;margin-top:-10px">Edit Course</button>
+
+                                </div>
+                            </li>
+
+
+                        </ul>
+                    
+                    </div>
+                </div>
+            }
+
+            <div class="box">
+                <h3 id="webstoreTitle">Webstore Management</h3>
+                <button class="submit btn help help1" id="btnHelp4">
+                    <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+                </button>
+                <div class="feature" id="divFeature3" style="display:none">
+                    <ul class="list topList">
+                        <li>
+                            <div class="store-name-form">
+                                <div class="title@(!string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange1">
+                                    <div class="text"><strong>Store Name</strong></div>
+                                    <input class="storeNameInput" type="text" id="txtStoreName" placeholder="Store Name" value="@(!string.IsNullOrEmpty(Model.StoreName) ? Model.StoreName : "")" />
+                                </div>
+                                <div class="apply@(!string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange2">
+                                    <button class="submit btn connect" style="color: white; float: left; width:150px" id="btnStoreName">Apply Changes</button>
+                                </div>
+
+                                <div class="name@(string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange3">
+                                    <div class="text"><span style="padding-right:30px">Store Name:</span><strong id="strStoreName">@shortStoreName</strong></div>
+                                </div>
+                                <div class="change@(string.IsNullOrEmpty(Model.StoreName) ? " hide" : "")" id="divStoreNameChange4">
+                                    <a id="aChangeName">Change Name</a>
+                                </div>
+                            </div>
+                      
+                        </li>
+
+                        <li class="noborder">
+                            <button class="submit btn default" style="width: 40%;" id="btnManageWebstore">Add/Remove Courses</button>
+                        </li>
+                        <li class="noborder">
+                            <button class="submit btn default" style="width:40%;" onclick="window.open('@Url.Action("Coupons", "Author", new { Area = "AuthorAdmin" })'); return false;">Generate Coupons</button>
+                        </li>
+                        <li class="noborder">
+                            <button class="submit btn default" style="width:40%;" onclick="window.open('@Url.Action("SalesReport", "Author", new { Area = "AuthorAdmin" })'); return false;">Sales Report</button>
+                        </li>
+                        <li class="noborder">
+                            <button class="submit btn default" style="width:40%;" id="btnDashboard" onclick="window.open('@Url.Action("Index", "Home", new { Area = "AuthorAdmin" })'); return false;">Full Dashboard</button>
+                        </li>
+                        <li class="noborder">
+
+                            <button class="submit btn default" style="width:40%;" onclick="window.open('@(Url.Action("Settings", "Author", new { area = "AuthorAdmin" }))#payout'); return false;">Payout Options</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="box">
+                <h3 id="settingTitle">Display Settings</h3>
+                <button class="submit btn help help2" id="btnHelp1">
+                    <img src="~/Areas/WixEndPoint/Content/images/help-popup-icon.png" style="height: 14px;" alt="help" />
+                </button>
+                <div class="feature" id="ulSetting" style="border-top: 0px; padding: 0 0;display:none">
+                    <ul class="list">
+                        <li class="listFirst">
+                            @*<span class="cell">Font Color</span>
+                            <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpFontColor"></a></span>*@
+
+                            <span class="cell">Background Color</span>
+                            <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpBackgroundColor"></a></span>
+
+                            @*<span class="cell">Tabs Font Color</span>
+                            <span class="picker"><a rel="popover" class="example-1-color-picker color-selector default" id="cpTabsFontColor"></a></span>*@
+
+                            <span class="checkbox" id="cbIsTransparent" style="display:none">
+                                <span class="check"></span>
+                                Transparent
+                            </span>
+
+                            @*<span class="checkbox cell" id="cbIsShowBorder">
+                                <span class="check"></span>
+                                Show Border
+                            </span>
+
+                            <span class="checkbox cell" id="cbIsShowTitleBar">
+                                <span class="check"></span>
+                                Show Title Bar
+                            </span>.help1*@
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    

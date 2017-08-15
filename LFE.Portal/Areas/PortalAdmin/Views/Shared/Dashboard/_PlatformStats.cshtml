@@ -1,0 +1,8 @@
+﻿@model List<LFE.DataTokens.PlatformStatsToken>
+           
+@{
+    foreach (var token in Model.OrderBy(x=>x.Index).ToArray())
+    {
+        @Html.Partial("Dashboard/_PlatformStatsRow",token)
+    }
+}

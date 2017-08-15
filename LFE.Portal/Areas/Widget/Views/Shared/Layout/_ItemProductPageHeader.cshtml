@@ -1,0 +1,26 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.ItemInfoToken
+
+<div class="row1">
+    <div class="row">
+        <div class="col col-xs-4"><h3>@Model.Author.FullName</h3></div>
+        <div class="col col-xs-8">
+            @{
+                if (Model.ItemType == BillingEnums.ePurchaseItemTypes.COURSE)
+                {
+                    <div class=" inline" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+                        <div id="item-rait" class="rateit" data-rateit-value="@Model.Rating" data-rateit-max="5" data-rateit-readonly="true"></div>
+                        <span style="visibility: hidden" itemprop="ratingValue">@Model.Rating</span>
+                    </div>
+                }
+            }            
+            <div class="inline nums rel">                
+                @Html.Partial("~/Areas/Widget/Views/Shared/Item/_ItemSubscribersLabel.cshtml", Model.NumOfSubscribers)
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row2">
+    <h2 class="ellipsis multiline" itemprop="name">@Model.ItemName</h2>
+</div>
+

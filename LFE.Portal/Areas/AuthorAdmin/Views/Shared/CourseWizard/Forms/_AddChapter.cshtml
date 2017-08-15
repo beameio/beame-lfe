@@ -1,0 +1,56 @@
+﻿@model LFE.DataTokens.WizardNewChapterDTO
+
+
+<script type="text/javascript">
+	var EDIT_FORM_SELECTOR = '#frmChapterDetails';
+	
+	$(document).ready(function () {
+
+		var form = $(EDIT_FORM_SELECTOR);
+
+		setFocusEvent($('#frmChapterDetails  #Name'));
+	    $('#frmChapterDetails  #Name').val(null);
+
+		initUnobstructiveFormValidation(form);
+
+		adjustValidatorsH();
+	});
+	
+	function onChapterSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Chapter saved successfully" : response.error;
+		
+		window.formUserNotifManager.show({ message: msg, kind: kind });
+		
+		if (response.success) {
+		    window.isFormInEditMode = false;
+
+		    window.getNotifManagerInstance().notify(notifEvents.chapter.chapterSaved, { Name: $('#frmChapterDetails  #Name').val(),ChapterId:response.result.id });
+
+			$('#frmChapterDetails  #Name').val(null);
+			
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);          
+		}
+	}
+</script>
+
+
+@using (Ajax.BeginForm("AddNewChapter", "Course", null, new AjaxOptions { OnSuccess = "onChapterSaved" }, new { @id = "frmChapterDetails", @style = "" }))
+{
+	@Html.HiddenFor(x=>x.CourseId)
+	@Html.HiddenFor(x=>x.ChapterId)
+	@Html.HiddenFor(x=>x.Uid)
+	@Html.HiddenFor(x=>x.OrderIndex)
+
+	<fieldset>
+		<legend></legend>
+		<div class="input-container inline">	        
+			@Html.TextBoxFor(m=>m.Name,new{@class="wiz-txt-inp",@size=50,@maxlength=50,@placeholder="Add New Chapter",@onkeydown="onTxtBoxInEdit(this)"})            
+			<span class="input-info">Maximum 50 symbols</span>                
+			@Html.ValidationMessageFor(model => model.Name,null,new{@style="",@class=""})
+		</div>
+		<div class="inline">
+            <input type="submit" class="btn-add-chapter" value="" />
+		</div>
+	</fieldset>
+}

@@ -1,0 +1,29 @@
+﻿
+@model LFE.DataTokens.CoursePurchaseDTO
+<div class="crs-header inline">
+    <div class="row-bottom">
+        <span class="author-name float-left">@Model.User.fullName</span>
+        <div class="rait float-right">
+            <div class="inline">
+                @if (@Model.Rating > 0)
+                {
+                    <div class="star_@Model.Rating left"></div> 
+                }
+                @if (@Model.NumSubscribers != null && @Model.NumSubscribers > 0)
+                {
+                    <div class="numSubscribers right">@Model.NumSubscribers Subscriber@(Model.NumSubscribers > 1 ? "s" : "")</div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row-top">
+        @Model.CourseName
+        @*<span class="crs-name float-left"></span>*@      
+        
+    </div>
+
+
+</div>
+

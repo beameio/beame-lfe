@@ -1,0 +1,204 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@model LFE.Portal.Areas.Widget.Models.FacebookLayoutToken
+           
+@section FbAppSettings
+{
+    <script>
+        var facebookAppId = '@Utils.GetKeyValue("Facebook:AppId")';       
+    </script>
+}
+
+@{
+    Layout = "../Shared/_FacebookFramesLayout.cshtml";
+
+    if (Model.Admin)
+    {
+        var settingsUrl = Url.Action("AppSettings", "Facebook", new { area = "Widget", trackingId = Model.TrackingId });
+
+      
+        <div class="fb-box" id="fb-settings-container">
+            <iframe id="frmSettings" class="ifrm-settings" src="about:blank"></iframe>
+        </div>
+
+        <script>
+            var settingsUrl = '@settingsUrl';
+            function reloadWidget(settingsUrl) {
+                if (settingsUrl != null) document.getElementById('frmSettings').src = settingsUrl;
+                document.getElementById('frmFbWidget').src = document.getElementById('frmFbWidget').src;
+            }
+
+            function setSettingsIframeH(h) {
+                $('#frmSettings').css({ 'min-height': h + 'px' });
+            }
+
+            var checkUserUrl = '@Url.Action("ValidateFbAdminUser", "Account", new {area = ""})';
+            window.fbAsyncInit = function () {
+                FB.Canvas.setAutoGrow();
+                FB.init({ appId: window.facebookAppId, status: 1, xfbml: 1 });
+                //console.log('call login status');
+                //validateAdminUser(731553587);
+                //return;
+                FB.getLoginStatus(function (response) {
+                    console.log('Login status response');
+                    console.log(response);
+                    if (response.status === 'connected') {
+                        var uid = response.authResponse.userID;
+                        validateAdminUser(uid);
+
+                    } else if (response.status === 'not_authorized') {                        
+                        console.log('Not authorized');
+                        loadAdminPanel();
+                    } else {
+                        console.log('Not logged in');
+                    }
+                });
+            }
+
+            function loadAdminPanel() {
+                $.ajax({
+                    url: checkUserUrl,
+                    cache: false,
+                    type: "Post",
+                    data: JSON.stringify(data),
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                        hideFormLoader();
+                        if (response.success) {
+                            var result = response.result;
+                            var url = '@Url.Action("LoadAdminPanel", "Facebook", new {area = "Widget"})' + '?state=1' // 1 = NotFoundNotAuthenticated
+                                + '&fbUserId='  
+                                + '&fbUserEmail=' 
+                                + '&trackingId=@Model.TrackingId'
+                                + '&providerUid=' ;
+                            //console.log(url);
+                            $('#frmSettings').attr({ src: url });
+                        } else {
+                            alert(response.error);
+                        }
+                    },
+                    error: function () {
+                        hideFormLoader();
+                    }
+                });
+            }
+
+            function validateAdminUser(uid) {
+                showFormLoader('#fb-settings-container');
+               
+                //console.log('call me');
+                FB.api('/me', function (meResponse) {
+                    console.log(meResponse);
+                    var data = {
+                        id: uid,
+                        email: meResponse.email
+                    };
+                    $.ajax({
+                        url: checkUserUrl,
+                        cache: false,
+                        type: "Post",
+                        data: JSON.stringify(data),
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            hideFormLoader();
+                            if (response.success) {
+                                var result = response.result;
+                                var url = '@Url.Action("LoadAdminPanel", "Facebook", new {area = "Widget"})' + '?state=' + result.state
+                                    + '&fbUserId=' + result.fbUserId
+                                    + '&fbUserEmail=' + result.fbUserEmail
+                                    + '&trackingId=@Model.TrackingId'
+                                    + '&providerUid=' + uid;
+                                //console.log(url);
+                                $('#frmSettings').attr({ src: url });
+                            } else {
+                                alert(response.error);
+                            }
+                        },
+                        error: function () {
+                            hideFormLoader();
+                        }
+                    });
+                });
+            }
+        </script>
+    }
+}
+
+
+
+
+<div class="rel fb-box" id="site-preview-container">
+    @{
+        
+        var widgetUrl = Url.Action("FacebookTab", "Facebook", new { area = "Widget", trackingId = Model.TrackingId, width = 810, height = 760, viewMode = "editor" , regSourceId = CommonEnums.eRegistrationSources.FB});
+        
+        //preview mode for admin
+        if (Model.Admin)
+        {
+            <div class="flip overlay">&nbsp;</div>
+        }
+    }
+
+    <iframe class="" id="frmFbWidget" style="width:100%;border:none;overflow: hidden;visibility: hidden" onload="adjustfbIframeH()" src="@widgetUrl"></iframe>
+</div>
+
+
+    @section JS{
+    
+        @{
+            if (!Model.Admin)
+            {
+           
+                <script>
+                    window.fbAsyncInit = function() {
+                        FB.Canvas.setAutoGrow();
+                    }
+                </script>
+            }
+        }
+
+        <script>
+            $(document).ready(function() {
+            });
+
+            function refreshApp() {
+                var widgetIframe = $('#frmFbWidget');
+                widgetIframe.attr("src", '@widgetUrl');
+                // setTimeout(adjustfbIframeH,1500);
+            }
+
+            function adjustfbIframeH() {
+                if (window.top == window.self) return;
+
+                var frmWidgetH = getIframeContentH('frmFbWidget');
+                var frmSettingsH = getIframeContentH('frmSettings');
+
+                if (frmWidgetH < 0 || frmSettingsH < 0) {
+                    $('#frmFbWidget').css({ 'height': 800, 'visibility': 'visible' });
+                    return;
+                }
+
+                var h = frmWidgetH + 50;
+                var h1 = frmSettingsH;
+                $('#frmFbWidget').css({ 'height': h, 'visibility': 'visible' });
+                $('#site-preview-container').height(h);
+
+                FB.Canvas.setSize({ height: (h + h1 + 100) });
+            }
+
+            function getIframeContentH(id) {
+                console.log('getIframeContentH :: id=' + id);
+                try {
+                    var frame = document.getElementById(id);
+
+                    return frame != null ? frame.contentWindow.document.body.offsetHeight : 0;
+                } catch (e) {
+                    console.log(e);
+                    return -1;
+                }
+            }
+
+        </script>    
+    } 

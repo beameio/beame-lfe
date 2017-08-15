@@ -1,0 +1,46 @@
+﻿@model LFE.DataTokens.WidgetTrainingUserRegisterDTO
+    
+<div class="head">
+    <h3 class="name">@Model.Title</h3>
+    <h4 class="start">
+        Live session will take place: @Model.Start.ToUniversalTime().ToString("r")
+    </h4>
+</div>
+<div class="places-left-container">
+    <div class="inner">
+        <span class="cnt">@Model.PlacesLeft</span>
+        <span class="info">places left</span>
+    </div>
+</div>
+<div class="user-notif-opt">
+    <label class="info">Get notification one hour before session begins:</label>
+    <div class="opt-form">
+        @using (Ajax.BeginForm("RegisterUser", "Training", new { area = "Widget", id = Model.TrainingId }, new AjaxOptions { HttpMethod = "Post", UpdateTargetId = "g2t-user-inner", OnSuccess = "onUserRegistered" }, new { @id = "frmG2tRegister", @style = "" }))
+        {
+            @Html.Partial("Training/_UserNotificationSettings",Model.NotificationSettings)
+        }
+        <script>
+                    //window.addEventListener("load", function () {
+                    //    window.getNotifManagerInstance().unsubscribe(notifEvents.training.actionButtonClicked, registerUser2LiveSession, null);
+                    //    window.getNotifManagerInstance().subscribe(notifEvents.training.actionButtonClicked, registerUser2LiveSession, null);
+                    //});
+
+                    setTimeout(function() {
+                        window.getNotifManagerInstance().unsubscribe(notifEvents.training.actionButtonClicked, registerUser2LiveSession, null);
+                        window.getNotifManagerInstance().subscribe(notifEvents.training.actionButtonClicked, registerUser2LiveSession, null);
+                    }, 2000);
+
+                    
+                    function onUserRegistered() {
+                        hideLoader();
+                        window.getNotifManagerInstance().notify(notifEvents.training.userRegistrationChanged, null);
+                    }
+
+
+                    function registerUser2LiveSession() {
+                        showLoader();
+                        $('#frmG2tRegister').submit();
+                    }
+        </script>
+    </div>
+</div>

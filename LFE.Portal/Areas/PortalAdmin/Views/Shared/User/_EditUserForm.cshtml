@@ -1,0 +1,125 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Extensions
+@using LFE.Core.Utils
+@model  LFE.DataTokens.UserEditDTO
+
+@{
+    var roles =this.GetCurrentUserId() == 422 ? (CommonEnums.UserRoles.Admin | CommonEnums.UserRoles.Author | CommonEnums.UserRoles.Learner | CommonEnums.UserRoles.Tester | CommonEnums.UserRoles.Affiliate | CommonEnums.UserRoles.StoreOwner | CommonEnums.UserRoles.System).ToTranslatedArray() :(CommonEnums.UserRoles.Admin | CommonEnums.UserRoles.Author | CommonEnums.UserRoles.Learner | CommonEnums.UserRoles.Tester | CommonEnums.UserRoles.Affiliate | CommonEnums.UserRoles.StoreOwner).ToTranslatedArray();
+
+    
+}
+
+<script type="text/javascript">
+	function filterRegions() {
+		return {
+			retailerId: $("#RetailerId").val()
+		};
+	}
+	
+	function filterStores() {
+		return {
+			regionId: $("#RegionId").val()
+		};
+	}
+
+   $(document).ready(function () {
+	   
+   });
+   
+   function onUserSaved(response) {
+	   if (response.success) {
+		   alert('user saved');
+
+	   } else {
+		   alert(response.error);
+	   }
+   }
+</script>
+@using (Ajax.BeginForm("SaveUser", "User", null, new AjaxOptions { OnSuccess = "onUserSaved" }, new { @id = "editUserForm", @style = "" }))
+{
+    <fieldset class="edit-form" style="padding: 0 0 0 15px">
+        <legend></legend>
+        <h3 class="">
+            @Html.Label("Edit " + Model.FullName)
+
+            <img src="@Model.PictureUrl" alt="" style="width: 25px;height: 25px; display: block;margin: 5px 0 0" />
+        </h3>
+        <label id="lbl-valid-message"></label>
+        @Html.HiddenFor(model => model.UserId)
+        @Html.HiddenFor(model => model.UserProfileId)
+        @Html.HiddenFor(model => model.Email)
+
+        <dl style="margin-right: 25px;width: 400px">
+            <dt>@Html.LabelFor(model => model.FullName) </dt>
+            <dd>@Model.FullName</dd>
+
+            <dt>@Html.LabelFor(model => model.Email) </dt>
+            <dd>@Model.Email</dd>
+
+            <dt>@Html.LabelFor(model => model.Status) </dt>
+            <dd>
+                @Html.EditorFor(e => e.Status)
+            </dd>
+
+        </dl>
+        
+        <dl style="width: 450px;">
+            @{
+                if (Model.UserProfileId < 0)
+                {
+                    <dt>@Html.LabelFor(model => model.OldPassword) </dt>
+                    <dd>
+                        @Html.EditorFor(m => m.OldPassword, new { @class = "txt-inp" })
+                        @Html.ValidationMessageFor(model => model.OldPassword)
+                    </dd>
+                }
+                else
+                {
+                    <dt>@Html.LabelFor(model => model.Password) </dt>
+                    <dd>
+                        @{
+                    if (!Model.IsSocialLogin)
+                    {
+                        @Html.EditorFor(m => m.Password, new { @class = "txt-inp" })
+                            @Html.ValidationMessageFor(model => model.Password)
+                    }
+                    else
+                    {
+                        <h3>User registered with @Model.ProviderName social login</h3>
+                    }
+                        }
+                    </dd>
+
+                    <dt>@Html.LabelFor(model => model.IsConfirmed) </dt>
+                    <dd>
+                        @Model.IsConfirmed
+                    </dd>
+                }
+            }
+            
+            @{
+                if (Model.UserProfileId >= 0)
+                {
+                    <dt class="inline" style="width:120px;font-size: 13px;color:#666">@Html.LabelFor(m => m.Roles)</dt>
+                    <dd class="inline" style="text-align: left">
+                        @(Html.Kendo().MultiSelectFor(model => model.Roles)
+                                            .DataTextField("Title")
+                                            .DataValueField("Name")
+                                            .Placeholder("-- select role --")
+                                            .BindTo(roles)
+                                            .Value(Model.Roles.Select(x => x.ToString()).ToList())
+                                            .HtmlAttributes(new { style = "height:auto !important;width:300px;" })
+                        )
+                    </dd>                    
+                }
+            }
+        </dl>        
+
+        <div style="height: 50px;">
+            <span style="float: right;margin:0 100px 0 0;display: block">
+                <input type="submit" class="k-button" value="Save" style="width: auto;padding: 7px 15px;display: block" />
+            </span>
+        </div>
+    </fieldset>
+}

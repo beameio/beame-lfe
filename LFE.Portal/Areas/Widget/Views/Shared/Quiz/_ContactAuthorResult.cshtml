@@ -1,0 +1,52 @@
+﻿@using LFE.DataTokens
+@using LFE.Portal.Areas.Widget.Models
+@model StudentQuizAttemptDTO
+
+@{
+    if (Model.IsValid)
+    {
+        <div class="quiz-head">
+            <div class="inner row">
+                <div class="float-left">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_AttemptsCounter.cshtml", new AttemptCounterToken { Attempts = Model.Quiz.Attempts, UserAttempts = Model.UserAttempts, IsCompleteForm = true })
+                </div>
+
+                <div class="float-right">
+                    @Html.Partial("~/Areas/Widget/Views/Shared/Quiz/_StaticTimer.cshtml", Model.Quiz.TimeLimit)
+                </div>
+            </div>
+        </div>
+        <div class="quiz-content-container post">
+            <div class="qz-contact-result">
+                <div class="c-title">
+                    <h4>Contact Author</h4>
+                </div>
+
+                <div class="">
+                    <div>
+                        <h5>
+                            <span class="ic"><i></i></span>
+                            <label>@(Model.RequestSendOn != null ? ((DateTime)Model.RequestSendOn).ToString("U") : "unknown")</label>
+                        </h5>
+
+                    </div>
+                    <p>
+                        Your message was successfully sent to @Model.Author.FullName .
+                        <br />
+                        An email notification will be sent to your email address as soon as @Model.Author.FullName responds.                        
+                    </p>
+                </div>
+            </div>
+
+
+
+            <div class="bottom-row">
+                <div class="inner row"></div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h2>@Model.Message</h2>
+    }
+}

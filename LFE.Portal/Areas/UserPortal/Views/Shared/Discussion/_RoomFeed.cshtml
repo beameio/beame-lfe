@@ -1,0 +1,6 @@
+﻿@model LFE.DataTokens.CourseDiscussionToken
+
+@Html.Action("MessageInputPartial","Discussion",new{roomId=Model.RoomId,courseId=Model.CourseId})
+
+@Html.Partial("Discussion/_RoomMessagesList",Model)
+

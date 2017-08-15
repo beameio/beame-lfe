@@ -1,0 +1,166 @@
+﻿@model LFE.DataTokens.LoginDTO
+
+
+@*@{
+    if (Model != null && string.IsNullOrEmpty(Model.Email) && Request.Cookies["lastEmail"] != null && !string.IsNullOrEmpty(Request.Cookies["lastEmail"].Value))
+    {
+        Model.Email = Request.Cookies["lastEmail"].Value;
+    }
+    ViewData["IsWidgetValue"] = "true";
+}*@
+<script type="text/javascript">
+    var loginSucceeded = '@(Model.IsLoggedIn)'.toLowerCase()=='true';
+    var socialLoginUrl = '@Url.Action("WidgetFbLogin", "Account", new { area = "Widget", trackingId = Model.TrackingID } )';
+    var newwindow, newdocument;
+
+    $(document).ready(function() {
+        $('#btnLogin').click(function()
+        {
+            ToggleLogin();
+        });
+        $('.close_login').click(function () {
+            ToggleLogin();
+        });  
+        $('.forgotPassword').click(function () {  
+            $("#loginAjaxWrapper").fadeOut();
+            $("#loginAjaxWrapper").hide();
+            $("#forgetPasswordWrapper").fadeIn();            
+        }); 
+        
+        FitLoginScreen();
+    });
+    
+    function ToggleLogin() {
+        var div = $('.dark');
+        $('.block-message').hide();
+        if ($('#registerWrapper').is(":hidden") && $('#loginWrapper').is(":visible"))
+        {
+            div.fadeOut();
+        }
+        else if (div.is(":hidden") && $('#loginWrapper').is(":hidden")) {
+            div.fadeIn();
+        }        
+         
+        if ($('#loginWrapper').is(":hidden") && ($('#registerWrapper').is(":visible"))) {
+            toggleButtonClass($('#btnRegister'));
+            $('#registerWrapper').slideToggle();
+        }
+
+        toggleButtonClass($('#btnLogin'));
+        $('#loginWrapper').slideToggle();
+    }
+
+    function toggleButtonClass(button) {
+        if (button.attr("class") == 'toolbar-arrow') {
+            button.attr("class", "toolbar-arrow-open");
+        }
+        else {
+            button.attr("class", "toolbar-arrow");
+        }
+    }
+
+    function loginCompleted() {    
+        if (loginSucceeded) { 
+            $('#submitLogin').hide();
+            $(".login-loader").show();
+            location.reload();             
+        } else {
+            $(".login-loader").hide();
+            $(".loginWrapper").show(); 
+            $("#submitLogin").show();      
+        }
+    }
+        
+    function PopSafariSessionWindow() {
+        @if(Request.Browser.Browser.ToLower().Trim() == "safari" )
+        {
+           <text>    
+            if (window.top != window.self) {
+                OpenForm('@(Request.Url.Scheme + "://" + Request.Url.Authority + Url.Action("SafariLoginSession", "Account", new { area = "Widget" }))');
+            }
+           </text>
+        }
+        
+    }
+
+    function OpenForm(url) {
+        //newwindow = window.open(url);
+        
+        newwindow = window.open(url,"","resizable=yes, top=0, left=0, width=50, height=50");
+        if (open == null || typeof (open) == 'undefined') {
+            alert("Please turn off your pop-up blocker in order to login.");
+        }
+        else {
+            newdocument = newwindow.document;
+
+            var i = 0;
+            var formLoaded = false;
+            while (formLoaded == false) {
+                if (newdocument == null || newdocument == undefined) {
+                    formLoaded = true;
+                }
+                else {
+                    formLoaded = IsFormLoaded(newdocument);
+                }
+                i++;
+                if (i > 20000)  // break out if hanging
+                {
+                    break;
+                }
+            }
+            if (formLoaded == true) {
+                //AutoFillForm(newdocument)
+            }
+        }
+    }
+
+    function IsFormLoaded(doc) {
+        try
+        {
+            if (doc.forms(0) == undefined) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        catch(err){
+            return true;
+        }
+    }
+    
+    //var isNewWindowClosed = false;
+      function loginBegin() {        
+          PopSafariSessionWindow();
+
+        $(".login-loader").show();
+        $('.loginError').hide();    
+        $('#submitLogin').hide();
+
+        return true;
+    }
+
+    function  FitLoginScreen(){
+        var width = $(window).width(); 
+        if(width <= 870){
+            $('#cssBlockWrapper').removeClass('block-wrapper').addClass('block-wrapper2');
+            $('#loginAjaxWrapper').css({margin: '10px'});
+            $('.sub_tool_bar').css({height: '300px'});
+          
+        }
+        else{
+            $('#cssBlockWrapper').removeClass('block-wrapper2').addClass('block-wrapper');
+            $('#loginAjaxWrapper').css({margin: '20px'});
+            $('.sub_tool_bar').css({height: '145px'});
+        }
+    }
+
+    $(window).resize(function(){       
+        FitLoginScreen();
+    })
+.resize();
+</script>
+
+@Html.Partial("~/Areas/Widget/Views/Shared/Account/_LoginForm.cshtml", Model)
+
+

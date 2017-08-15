@@ -1,0 +1,100 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.DataTokens
+@{
+	ViewBag.Title = "Courses Report";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+
+@section css{
+	<style>
+		.user-thumb{ width: 25px;height: 25px;}
+		.k-grid-Edit{text-align: left}
+		.old-login-row{background: #c0c0c0 !important}
+	</style>
+}
+
+<h2>Wix Stores Report</h2>
+
+<div style="margin: 10px 0">
+	<div class="inline">
+		@(Html.Kendo().AutoComplete()
+                      .Name("auUserName")
+                      .DataTextField("FullName")
+                      .Placeholder(" find by name")
+                      .Filter("contains")
+                      .MinLength(2)
+                      .Template("<img class=\"user-thumb inline\" src=\"${PictureUrl}\" alt=\"${FullName}\" />" +
+                                "<label class=\"inline\" style=\"margin:0 0 0 10px\">${FullName}</label>")
+                      .HtmlAttributes(new { style = "width:250px" })
+                      .Events(e => e.Select("onUserSelected").Change("onUserChanged"))
+                      .DataSource(source => source.Read(read => read.Action("FindUsers", "User").Data("onUserNameAu")).ServerFiltering(true))
+        )
+	</div>
+	
+	<script>
+        var gridId = '#WixStoresReport';
+        var hidUserId = '#SelectedUserId';
+        $(document).ready(function () {
+			$('#auUserName').val(null);
+			setFocusAuEvnt('auUserName');
+		    		
+		});
+        function onUserNameAu() {
+            return {
+                name: $("#auUserName").val()
+			    , email: null
+            };
+        }
+        function onUserChanged() {
+            try {
+                    var value = this.value();                
+                    if (!hasValue(value)) {
+                        $(hidUserId).val(null);
+                        $(gridId).data('kendoGrid').dataSource.read();
+                    }
+            } catch (ex) {
+                if (window.console) console.log(ex);
+            }
+        }
+        function onUserSelected(e) {
+            var dataItem = this.dataItem(e.item.index());
+            var id = dataItem.UserId;
+            $(hidUserId).val(id);
+		    $(gridId).data('kendoGrid').dataSource.read();
+		}
+		
+        function onRequestSend() {
+            
+		    return {
+		        id: $(hidUserId).val()
+		    };
+		}
+	</script>
+</div>
+
+<div>
+    @Html.Hidden("SelectedUserId",null)
+    @(Html.Kendo().Grid<WixStoreDTO>()
+          .Name("WixStoresReport")
+          .TableHtmlAttributes(new { @style = "background-color: #fff !important;background-image: none !important;" })
+          .Columns(columns =>
+          {
+              columns.Bound(p => p.Owner.FullName).Title("Owner").ClientTemplate("<span data-val='${Owner.UserId}' title='click to view user details' class='list-cmd usr-btn'>#=Owner.FullName#</a>");
+              columns.Bound(p => p.Owner.Email).Title("Email");
+              columns.Bound(p => p.AddOn).Title("Date Added").Format("{0:d}").Width(120);                            
+              columns.Bound(p => p.Name).Title("Store Name");
+              columns.Bound(p => p.TrackingID);
+              columns.Bound(p => p.WixInstanceID);
+              columns.Bound(m => m.WixSiteUrl).ClientTemplate(" # if (hasValue(WixSiteUrl)) { # <a href='#=WixSiteUrl#' title='view' target='_blank'>#=WixSiteUrl#</a> # } else{# <span>not exists</span> #}#").Title("Site Url");
+              columns.Bound(p => p.Status);
+          })
+          .Sortable()
+          .Pageable(pager => pager.Numeric(true).Refresh(true).PageSizes(true))
+          .Filterable(f => f.Enabled(true))
+            .Events(e => e.DataBound("boundGridUserDetails"))
+          .DataSource(dataSource => dataSource.Ajax()
+              .Model(model => model.Id(p => p.StoreId))
+                .Read(read => read.Action("GetWixStoresReport", "Report", new { area = "PortalAdmin" }).Data("onRequestSend").Type(HttpVerbs.Get)).PageSize(20).ServerOperation(true)
+          ))	
+</div>

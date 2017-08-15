@@ -1,0 +1,109 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Helpers
+
+@model LFE.Portal.Areas.AuthorAdmin.Models.EditWebStorePageToken
+
+<script type="text/javascript">
+		var STORE_TABS_SELECTOR = '#ul-store-tabs';
+		var HID_STORE_SELECTOR = '#CurrentStoreId';
+		
+
+		$(document).ready(function () {
+
+			
+			setTabsState('@Model.mode');
+
+			$(STORE_TABS_SELECTOR).find('a').unbind('click').bind('click', function () {
+				var ind = $(this).attr('data-index');
+				var id = $(HID_STORE_SELECTOR).val();
+
+				if (id < 0 && ind > 0) {
+					alert('Create store first');
+					setTimeout(function() {
+						window.location.hash = 'details';
+					}, 50);
+					
+					return;
+				}
+
+				var link = $(this);
+
+				$(STORE_TABS_SELECTOR).find('a').removeClass('active');
+
+				link.addClass('active');
+				link.parent().submit();
+				
+			});
+
+			var h = window.location.hash;
+
+			if (!hasValue(h)) {
+				h = '#details';
+			}
+
+			$(STORE_TABS_SELECTOR  + ' > li > form > a[href=' + h + ']').click();         
+			
+			//save on store created event
+			window.getNotifManagerInstance().unsubscribe(notifEvents.webstore.storeCreated, handleStoreSaveEvent, null);
+			window.getNotifManagerInstance().subscribe(notifEvents.webstore.storeCreated, handleStoreSaveEvent, null);			
+		});
+	
+	</script>
+
+<ul class="ul-crumb">
+	<li>
+		@{
+			if (Model.ownerUserId == null)
+			{
+				@Html.ActionLink("My stores","Report","WebStore")
+			}
+			else
+			{
+				@Html.ActionLink("User stores","AdminUserWebStoreManage","WebStore",new{userId=Model.ownerUserId},null)
+			}
+		}        
+	</li>
+	<li id="li-page-name">
+		@Model.title
+	</li>
+</ul>
+
+<div class="c-tabs upper-gray-box">
+	@Html.Hidden("CurrentStoreId",Model.store.id)
+	<ul id="ul-store-tabs">
+		<li>
+			@using (Ajax.BeginForm("StoreDetails", "WebStore", new { Model.store.id,Model.ownerUserId }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmDetails" }))
+			{
+                @Html.Hidden("Uid",Model.store.Uid)
+				<a href="#details" data-index="0">Store details</a>   
+			}
+		</li>
+		<li>
+			@using (Ajax.BeginForm("StoreContent", "WebStore", new { Model.store.id, Model.store.name }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmContent" }))
+			{
+				<a href="#content" data-index="1">Contents</a>
+			}
+		</li>
+		<li>
+			@using (Ajax.BeginForm("StoreEmbed", "WebStore", new { Model.store.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmEmbed" }))
+			{
+				<a href="#embed"  data-index="2">Embed code</a>
+			}
+		</li>
+		@{
+			if (Model.ownerUserId == null)
+			{
+				<li>
+					@using (Ajax.BeginForm("StoreSalesReports", "WebStore", new { Model.store.id }, new AjaxOptions { UpdateTargetId = "c-tabs-content", LoadingElementId = "site-loader" }, new { @id = "frmReports" }))
+					{
+							<a href="#report"  data-index="3">reports</a>
+					}            
+				</li>
+			}
+		}
+	</ul>
+</div>
+
+<div class="c-tabs-content" id="c-tabs-content" style="min-height: 340px">
+ 
+</div>

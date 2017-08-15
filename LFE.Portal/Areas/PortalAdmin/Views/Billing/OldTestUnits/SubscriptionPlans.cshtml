@@ -1,0 +1,55 @@
+﻿@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@{
+    ViewBag.Title = "Subscription plans manage";
+    Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+
+    var periodTypes = Utils.EnumWithDescToList<BillingEnums.eBillingPeriodType>();
+
+    periodTypes = periodTypes.Where(x => (int)x.Value > 0).ToList();
+}
+
+<h2>Subscription Plans</h2>
+
+<div style="">
+@(Html.Kendo().Grid<SubscriptionPlanDTO>()
+    .Name("grdSubscriptionPlans")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Code).Width(150);
+        columns.Bound(p => p.Name).Width(250);
+        columns.Bound(p => p.Price).Width(80);        
+        columns.ForeignKey(p => p.PeriodTypeId, periodTypes, "Value", "Title").Width(120);
+        columns.Bound(p => p.Description).Width(250);
+        columns.Bound(p => p.IsActive).Width(50);
+        columns.Command(command => command.Edit()).Width(100).Title(" ");
+        columns.Command(command => command.Destroy()).Width(100).Title(" ");
+    })
+    .Sortable()
+    .Filterable(f=>f.Enabled(false))
+    .ToolBar(toolbar => toolbar.Create().Text("add new plane"))
+    .Pageable(page =>
+                  {
+                      page.PreviousNext(true);
+                      page.Numeric(true);
+                      page.Refresh(true);
+                  })
+    .Editable(editable => editable.Mode(GridEditMode.InLine))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(15)
+        .Model(model =>
+        {
+            model.Id(p => p.PlanId);
+            model.Field(f => f.PlanId).DefaultValue(-1);
+            model.Field(f => f.IsActive).DefaultValue(true);
+        })
+        .Read(update => update.Action("GetSubscriptionPlans", "Billing").Type(HttpVerbs.Get))
+        .Create(create => create.Action("SavePlan", "Billing").Type(HttpVerbs.Post))
+        .Update(update => update.Action("SavePlan", "Billing").Type(HttpVerbs.Post))
+        .Destroy(destroy => destroy.Action("DeletePlan", "Billing").Type(HttpVerbs.Post))
+    )
+)
+</div>

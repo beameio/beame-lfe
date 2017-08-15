@@ -1,0 +1,136 @@
+﻿@using LFE.DataTokens
+@model CourseDiscussionToken
+
+<script>
+	var FLIP_CONTAINER_SELECTOR    = '#d-discussion-container';
+	var FLIP1_CONTAINER_SELECTOR   = '#d-feed-container';
+	var FLIP2_CONTAINER_SELECTOR   = '#d-tag-container';
+	var FEED_TREE_SELECTOR         = "#RoomMessages";	
+
+	var effect;
+	var reverse = false;
+	var flipSupported;
+
+	var roomFeedUrl = '@Url.Action("GetRoomFeedPartial","Discussion",new { id = Model.RoomId, courseId = Model.CourseId })';
+
+	$(document).ready(function () {
+
+		flipSupported = isFxSupported();
+
+		if (flipSupported) {
+			effect = kendo.fx(FLIP_CONTAINER_SELECTOR).flipHorizontal($(FLIP1_CONTAINER_SELECTOR), $(FLIP2_CONTAINER_SELECTOR)).duration(1000);
+		}
+		
+		window.getNotifManagerInstance().unsubscribe(notifEvents.disqus.messageClicked, getFeedView, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.disqus.messageClicked, getFeedView, null);
+		
+		window.getNotifManagerInstance().subscribe(notifEvents.window.windowResized, setDiscussH, null);
+
+		var h = $(window.CONTENT_CONTAINER_SELECTOR).height();
+		setDiscussH(h);
+	});
+	
+	function setDiscussH(h) {	    
+		if (h != null) {
+			$('#d-discussion-container').height(h - 40);
+			$('#d-feed-container').height(h - 40); //minus 40 tabs row
+			$('#d-tag-container').height(h - 40); //minus 40 tabs row
+		}
+		//setReportScroll("#d-ch-tree-container");
+	}
+
+	function getFeedView(data) {
+		var url = null;
+		var token = null;
+		switch (data.kind) {
+			case "Hashtag":
+				var t = $(window.FEED_TREE_SELECTOR + ' > li').find(".txt").find('.btn[data-kind=Hashtag][data-val=' + data.Id + ']');
+				if (t.length == 0) return;
+				var n = $(t[0]).text();
+                openFeedWnd(n);
+				return;
+			case "User":
+				url = '@Url.Action("_DiscussionUserProfile","User")';
+				token = {
+					id: data.Id
+					,pageSize : 3
+				};
+				break;
+		}
+
+		if (url == null) return;
+
+		ajaxAction(url, token, reverse ? refreshFeed : showFeedByParam, null);
+	}
+	
+	function openFeedWnd(tagName) {
+
+		var t = tagName.replace(new RegExp("#", 'g'), "");
+		var url = '@Url.Action("IFrameFeed","Discussion",new{area="UserPortal"})' + '?id=' + t;
+
+		var wnd = $("#wndFeed").data("kendoWindow");
+		$('#wndFeed').parent().find('.k-window-titlebar').addClass('l-header');
+		wnd.setOptions({
+			height: $('#main').height() - 150
+		});
+		wnd.refresh(url);
+		wnd.title(tagName + " Discussion Feed");
+		wnd.center();
+
+		wnd.open();
+	}
+</script>
+
+<div id="d-discussion-container">    
+	<div id="d-feed-container" class="flip" style="">
+	    @Html.Action("GetRoomFeedPartial","Discussion",new {id=Model.RoomId,courseId=Model.CourseId})
+	</div>
+	<div id="d-tag-container" class="flip" style="display: none;"></div>
+</div>
+
+
+
+<script type="text/x-kendo-template" id="msg-list-template">
+	<div class="parent-container">
+		<div class="inline img-container" >
+			<img alt="" src="${CreatorPhotoUrl}"/>
+		</div> 
+		<div class="inline row">   
+			<div class="auth">
+				<a href="@Url.Action("UserProfile","User",new { area="UserPortal"})/#= CreatorId #">
+					<span class="cr-name topic">${CreatorName}</span> 
+				</a>
+				<span class="replay" onclick='replayTo(${MessageId})'>Reply</span>
+				<span class="post-on">${PostedOn}</span>
+			</div>
+			<div class="txt">
+				#=Encoder.htmlDecode(HTMLMessage)#
+			</div>
+		</div>
+	</div>
+	<div class="replay-container"  id="replay-container-${MessageId}">
+		<ul class="ul-child-msg"  id="ul-replay-${MessageId}"></ul>
+		<div class="input-replay-container" style="display: none" id="input-replay-container-${MessageId}"></div>
+	</div>
+</script>
+
+<script type="text/x-kendo-template" id="replay-msg-list-template">    
+	<div class="replay-msg-box">
+		<div class="inline img-container" >
+			<img alt="" src="${CreatorPhotoUrl}"/>
+		</div> 
+		<div class="inline row">   
+			<div class="auth">
+				<a href="@Url.Action("UserProfile","User",new { area="UserPortal"})/#= CreatorId #">
+					<span class="cr-name">${CreatorName}</span>
+				</a>
+				<span class="post-on">${PostedOn}</span>
+			</div>
+			<div class="txt">
+					#=Encoder.htmlDecode(HTMLMessage)#
+			</div>
+		</div>
+	</div>
+</script>
+
+

@@ -1,0 +1,36 @@
+﻿@using LFE.Core.Enums
+@using LFE.Portal.Areas.PortalAdmin.Models
+@using LFE.Portal.Helpers
+
+@{
+	ViewBag.Title = "Events Log Chart by Role";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/kendo/@Url.ToKendoVersionUrl()/kendo.all.min.js"></script>
+<style>
+     .d-chart-row {
+        margin: 10px 0 0;
+    }
+
+    .config-section {
+        width: 170px;
+        margin: 50px 0 0;
+    }
+
+    .chart-wrapper {
+        width: calc(100% - 180px);
+    }
+
+    .configHead {
+        display: block;
+        font-size: 14px;
+        padding: 0 0 0 5px;
+    }
+    .chart-box{margin: 10px 0 15px;width: 100%}
+
+    .k-chart{width:1060px}
+</style>
+@Html.Partial("Report/_EventReportFilters", new EventFiltersToken { PeriodKind = ReportEnums.ePeriodSelectionKinds.last90,ShowOnlyPeriodCombo = true})
+
+
+@Html.Partial("Report/_EventsOwnerChart")

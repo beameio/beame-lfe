@@ -1,0 +1,50 @@
+﻿html{margin:0;padding: 0;width: 100%;height: 100%;background: #c7cbce}
+
+body{background-color:inherit;color:#333;font-family:Calibri;margin:0;padding: 0;height: 100%}
+#main{  clear: both;height: 100%;}
+.content-wrapper{margin:0 auto;max-width:1240px;height: 100%;text-align:center}
+
+header,footer,hgroup,nav,section{display:block}
+
+.float-left{float:left}
+.float-right{float:right}
+
+.clear-fix:after{content:".";clear:both;display:block;height:0;visibility:hidden}
+ul, ol { list-style: none; padding: 0; margin: 0; }
+
+.d-auth-form{height: 100%}
+/*register form*/
+#d-reg-form,.d-reg-store-form{ width: 380px;margin: 0 auto;}
+
+.reg-form{display: block;position: relative;text-align: left}
+.ul-reg{ font-size: 14px;}
+.ul-reg li label{ display: inline-block;vertical-align: top;font-weight: bold;width: 150px;margin: 7px 0 0;}
+.ul-reg li input{ display: inline-block;vertical-align: top}
+
+.btn-submit{background-image:url("../../Content/images/ico-save.png");background-position:0 2px;background-repeat:no-repeat;border:medium none;color:#333;cursor:pointer;font-size:16px;padding:0 0 0 20px;width:auto}
+.field-validation-error{ color: red;font-size: 11px;display: inline-block;vertical-align: top;margin: 15px 0 0 4px}
+
+/* forms */
+fieldset{border:none;margin:0;padding:0}
+
+fieldset legend{display:none}
+
+h2{ font-family: Arial;font-size: 15px;color:#000}
+
+label {display: block;}
+
+label.checkbox {display: inline;}
+
+input,textarea{border:1px solid #e2e2e2;background:#fff;color:#333;font-size:15px;margin:5px 0 6px 0;padding:5px;width:270px}
+
+textarea{font-family:inherit;width:500px}
+
+.btn-reg-form{color: #fff;font-size: 13px;background: #329900;font-family: Arial;width: 70px;margin: 0 0 0 5px;padding: 5px;position: absolute;bottom: 20px;right: 0;cursor: pointer}
+
+.forgotPassword {display:block; text-decoration: underline;font-size: 12px;color: #000;}
+
+.input-col-w{ width: 280px;}
+.inp-name-w{width: 127px}
+
+  
+

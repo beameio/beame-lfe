@@ -1,0 +1,55 @@
+﻿@using LFE.Core.Enums
+@model LFE.DataTokens.CourseDiscussionToken
+
+<ul class="ul-msg-list" id="RoomMessages"> 
+	@{
+		foreach (var msg in Model.Messages)
+		{
+			<li data-val="@msg.MessageId" data-addon="@msg.AddOn" class="li-topic">			        
+				<div class="parent-container">
+					<div class="inline img-container" >
+						<img alt="" src="@msg.CreatorPhotoUrl"/>
+					</div> 
+					<div class="inline row">   
+						<div class="auth">
+							<span class="cr-name topic btn" onclick="onMessageClickEvent(null,'@msg.CreatorId','@eFeedFilterKinds.User.ToString()')">@msg.CreatorName</span>     							
+							<span class="replay" onclick='replayTo(@msg.MessageId)'>Reply</span>
+							<span class="post-on">@msg.PostedOn</span>
+						</div>
+						<div class="txt">
+							@Html.Raw(msg.HTMLMessage)
+						</div>
+					</div>
+				</div>
+				<div class="replay-container" id="replay-container-@msg.MessageId">
+					<ul class="ul-child-msg" id="ul-replay-@msg.MessageId">
+						@{
+							foreach (var replay in msg.Replies)
+							{
+								<li data-val="@replay.MessageId">
+									<div class="replay-msg-box">
+										<div class="inline img-container" >
+											<img alt="" src="@replay.CreatorPhotoUrl"/>
+										</div> 
+										<div class="inline row">   
+											<div class="auth">
+												<span class="cr-name btn" onclick="onMessageClickEvent(null,'@replay.CreatorId','@eFeedFilterKinds.User.ToString()')">@replay.CreatorName</span> 
+												<span class="post-on">@replay.PostedOn</span>
+											</div>
+											<div class="txt">
+												@Html.Raw(replay.HTMLMessage)
+											</div>
+										</div>
+									</div>
+								</li>
+							}
+						}
+					</ul>
+					<div class="input-replay-container" style="display: none" id="input-replay-container-@msg.MessageId">
+					    @Html.Action("MessageInputPartial","Discussion",new{roomId=Model.RoomId,courseId=Model.CourseId,parentId=msg.MessageId})
+					</div>
+				</div>
+			</li>
+		}
+	}
+</ul>

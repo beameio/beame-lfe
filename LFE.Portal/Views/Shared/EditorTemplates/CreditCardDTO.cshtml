@@ -1,0 +1,64 @@
+﻿@using LFE.Portal.Helpers
+@model LFE.DataTokens.CreditCardDTO
+
+
+<div class="form-horizontal" role="form">      
+    <div class="form-group">
+        @Html.LabelFor(m => m.FirstName, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.FirstName)
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group" style="margin-bottom: 15px;">
+        @Html.LabelFor(m => m.LastName, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.LastName)
+            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+        
+    <div class="form-group">
+        @Html.LabelFor(m => m.Type, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.Type)
+            @Html.EditorFor(m => m.Type)
+        </div>
+    </div>
+        
+    <div class="form-group">
+        @Html.LabelFor(m => m.CardNumber, new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.CardNumber)
+            @Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.CVV2, new { @class = "control-label col col-xs-12 col-sm-4 cvv-label" })
+        <div class="inline col  col-xs-11 col-sm-7">
+            @Html.ValidationMessageFor(model => model.CVV2)
+            @Html.TextBoxFor(m => m.CVV2, new { @class = "form-control sc-input" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.Label("Valid Until", new { @class = "control-label col col-xs-12 col-sm-4" })        
+        <div class="inline col  col-xs-11 col-sm-7">
+            <span class="inline" style="margin: 0 2px 0 0">
+                @(Html.Kendo().DropDownListFor(m => m.ExpireMonth)
+                    .DataValueField("Value")
+                    .DataTextField("Text")
+                    .HtmlAttributes(new { @style = "", @class = "form-control form-drop small-combo" })
+                    .BindTo(this.Months_LOV())
+                )
+            </span>
+            <span class="inline">
+                @(Html.Kendo().DropDownListFor(m => m.ExpireYear)
+                    .DataValueField("Value")
+                    .DataTextField("Text")
+                    .HtmlAttributes(new { @style = "", @class = "form-control form-drop small-combo" })
+                    .BindTo(this.Years_LOV())
+                )
+            </span>
+        </div>
+    </div>
+</div>

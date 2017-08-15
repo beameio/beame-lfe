@@ -1,0 +1,26 @@
+﻿@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.Portal.Areas.PortalAdmin.Models
+
+@{
+	ViewBag.Title = "File Interface Logs";
+	Layout = "~/Areas/PortalAdmin/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	var dates = ( ReportEnums.ePeriodSelectionKinds.thisMonth | ReportEnums.ePeriodSelectionKinds.week
+					  | ReportEnums.ePeriodSelectionKinds.lastMonth | ReportEnums.ePeriodSelectionKinds.last90
+					  | ReportEnums.ePeriodSelectionKinds.last180 | ReportEnums.ePeriodSelectionKinds.all ).ToTranslatedArray();
+
+	ViewData["periodKinds"] = dates;
+
+	var statuses = Utils.EnumWithDescToList<ImportJobsEnums.eFileInterfaceStatus>();
+
+	ViewData["statusLOV"] = statuses;
+}
+
+<h2 class="page-title">File interface logs report</h2>
+
+@Html.Partial("Report/_ReportFilters",new ReportFilterViewToken{Action = "GetFileInterfaceUsersLOV"})
+
+@Html.Partial("Report/_FileInterfaceLogsGrid")

@@ -1,0 +1,36 @@
+﻿@{
+    Layout = "../Shared/_FacebookFramesLayout.cshtml";
+}
+
+    <div class="box" id="main-fb-sett-login-container">
+        <div class="feature" style="text-align:center">
+            In order to create a course or manage your webstore, you first have to connect LFE with facebook:
+            <div style="text-align:center; padding-top:10px">
+                <a id="facebookLogin">
+                    <img src="/Content/images/webstore/Connect-with-FB-btn.png" alt="Connect with Facebook" />
+                </a>
+            </div>
+            <div style="color:red" id="loginError"></div>
+        </div>
+
+    </div>
+
+@section JS
+{
+    <script>
+
+        var socialLoginUrl = '@Url.Action("WidgetFbLogin", "Account", new { area = "Widget" } )';
+
+        function PopSafariSessionWindow() {
+            @if(Request.Browser.Browser.ToLower().Trim() == "safari" )
+           {
+               <text>
+            if (window.top != window.self) {
+                OpenForm('@(Request.Url.Scheme + "://" + Request.Url.Authority + Url.Action("SafariLoginSession", "Account", new { area = "Widget" }))');
+            }
+            </text>
+           }
+        }
+    </script>
+
+}

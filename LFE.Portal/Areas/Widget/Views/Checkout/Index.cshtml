@@ -1,0 +1,132 @@
+﻿@using LFE.Core.Utils
+@using LFE.Portal.Areas.Widget.Models
+@using LFE.Portal.Helpers
+@model CheckoutBaseToken
+
+@Styles.Render("~/Content/kendo/" + Url.ToKendoVersionUrl() + "/css")
+@{
+    ViewBag.Title = "Purchase " + Model.ItemInfo.ItemName;
+    Layout = "~/Areas/Widget/Views/Shared/_WidgetBootstrapCheckoutLayout.cshtml";
+
+    var mode = Utils.ParseEnum<eScAuthenticationMode>(Request.QueryString["mode"] ?? "log");
+
+    string greetengs = null;
+
+    var user = this.CurrentUser();
+
+    if (user != null)
+    {
+        switch (mode)
+        {
+            case eScAuthenticationMode.soc:
+                greetengs = String.Format("Welcome, {0}", user.FirstName.CapitalizeWord());
+                break;
+            case eScAuthenticationMode.reg:
+                greetengs = String.Format("'Thank you, {0}. A sign-up confirmation was sent to this email account: {1}", user.FirstName.CapitalizeWord(),user.Email);
+                break; 
+            default:
+                greetengs = String.Format("Welcome back, {0}", user.FirstName.CapitalizeWord());
+                break;
+        }    
+    }
+}
+
+@section CSS
+{    
+    <link href="~/Areas/Widget/Content/styles/purchase.css" rel="stylesheet" />
+    <style>
+        .sc-main-area{padding-bottom: 0}
+        .grp-tooltip { text-align:left; background-color:#C6C6C6;width:490px;line-height:1.7em;padding:10px;color:#000000;border-radius:5px;border:solid 1px #AAAAAA; }
+    </style>
+}
+
+
+<div class="sc-main-area rel">
+    <div class="sc-head-info">
+        @greetengs
+@{
+    if (Model.PurchaseDataToken.PriceToken.IsItemUnderRGP)
+    {
+        <div class="icon-grp"></div>
+    }
+}
+    </div>
+
+    <div class="container sc-container rel" id="sc-container">
+        @Html.Partial("Checkout/_PurchaseForm", Model.PurchaseDataToken, new ViewDataDictionary { { "ref", Model.Refferal }, { "ItemPageUrl", (Model.ItemPageUrl ?? Model.Refferal) ?? "" } })
+    </div>
+    
+    <div class="rel" style="height: 60px;">
+        <div style="position: absolute;bottom: 0;right: 0;">
+            @{
+                if (!Model.PurchaseDataToken.IsPurchased)
+                {
+                    <a href="#" class="sc-form-btn sc-btn-green" id="sc-btn-buy" style="width: 175px">Complete Purchase</a>
+                }
+            }
+        </div>    
+    </div>
+</div>
+@section JS
+{
+
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/lfe/common/sc")
+
+    <script>
+        var showBuyButton = '@Model.PurchaseDataToken.IsPurchased.ToString().ToLower()' == 'false';
+        $(document).ready(function () {
+            
+            var msg = '@Model.Message';
+
+            if (hasValue(msg)) showMessage(msg, window.messageKind.error);
+
+            window.getNotifManagerInstance().unsubscribe(notifEvents.object.addressFormLoaded, onAddressLoaded, null);
+            window.getNotifManagerInstance().subscribe(notifEvents.object.addressFormLoaded, onAddressLoaded, null);
+
+            kendo.bind($("#sc-cart"), purchaseModel);
+
+            purchaseModel.init('@Model.PurchaseDataToken.PriceToken.Price', '@Model.PurchaseDataToken.PriceToken.PriceType', '@Model.PurchaseDataToken.BillingAddresses.Count');
+
+            bindSavedCCComboEvents();
+
+            //adjustScModalH();
+
+            loadDefaultContact();
+
+            setCcFormValidator();
+
+            if (showBuyButton) {
+                $('#sc-btn-buy').unbind('click').click(onSubmitClicked);
+            } 
+
+             $(".icon-grp").kendoTooltip({
+                        content: kendo.template($("#cc-grp-template").html()),
+                        position: "bottom"
+                    });
+
+        });
+        function onAddressLoaded() {
+
+            purchaseModel.setCCValidationStatus(false);
+            //use only once on load
+            window.getNotifManagerInstance().unsubscribe(notifEvents.object.addressFormLoaded, onAddressLoaded, null);
+        }
+
+    </script>
+
+}
+
+<script type="text/x-kendo-template" id="cc-error-template">
+    <div class="inner">
+        <div class="e-row common">There was an error in credit card details you provided. Please re-enter. <a href="#=emptyHref#">More</a></div>
+        <div class="e-row pp-error"><span>${paypal_error}</span></div>
+    </div>
+</script>
+<script type="text/x-kendo-template" id="cc-grp-template">
+    <div class="grp-tooltip">
+        This author is registered to the 30 Day Money Back Guarantee program.
+        <br />If for any reason you are not happy with the course you purchased you can request a full refund within 30 days.
+        <br />To request a refund you need to login to your LFE account, go to "Settings" and then "Purchases", where you will have a refund option next to the course you purchased.
+    </div>
+</script>

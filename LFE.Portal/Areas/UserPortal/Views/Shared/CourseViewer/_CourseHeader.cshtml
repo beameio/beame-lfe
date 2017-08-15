@@ -1,0 +1,73 @@
+﻿@using Kendo.Mvc.UI
+@model LFE.DataTokens.LearnerCourseViewerDTO
+
+ <div class="crs-thumb inline">
+		<img src="@Model.ThumbUrl" alt="@Model.CourseName" />
+</div>
+<div class="crs-header inline">
+	<div class="row-top">
+		<span class="crs-name float-left ellipsis" title="@(HttpUtility.HtmlDecode(Model.CourseName))">@Model.CourseName</span>
+			
+		<div id="social-bar" class="float-right">
+			<!-- AddThis Button BEGIN -->
+			<a class="" href="http://www.addthis.com/bookmark.php?v=300&amp;pubid=ra-4fd986434e10be80"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+			<script type="text/javascript">var addthis_config = { "data_track_addressbar": false };</script>
+			<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fd986434e10be80"></script>
+			<!-- AddThis Button END -->
+		</div>
+	</div>
+		
+	<div class="row-bottom">
+		<span class="author-name float-left">@Model.AuthorUserBaseDto.fullName</span>
+		<div class="rait float-right">
+			<span class="inline btn" id="btn-write-review" title="write course review">Review this course</span>
+			<div class="inline">
+				<div id="d-crs-rait" class="rateit" data-rateit-value="@Model.Rating" data-rateit-ispreset="true" data-rateit-readonly="true"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+		window.getNotifManagerInstance().unsubscribe(notifEvents.course.ratingUpdated, updateRating, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.course.ratingUpdated, updateRating, null);
+		$('#btn-write-review').unbind('click').bind('click', openReviewWnd);
+	});
+	
+	function updateRating(value) {
+		$('#d-crs-rait').rateit('value', value);
+	}
+
+	function openReviewWnd() {
+
+		var wnd = $("#wndReviewCourse").data("kendoWindow");
+		var url = '@Url.Action("GetCourseReviewPartial","Course",new{id=Model.CourseId})';			
+		$('#wndReviewCourse').parent().find('.k-window-titlebar').addClass('l-header');
+		wnd.refresh(url);
+		wnd.center();
+	    //pause player
+		window.getBcPlayerInstance().swithPlayerMode(playerActions.PAUSE);
+		wnd.open();
+	}
+	function closeReviewWnd() {
+	    $("#wndReviewCourse").data("kendoWindow").close();
+	    window.getBcPlayerInstance().swithPlayerMode(playerActions.PLAY);
+	}
+</script>
+
+@(Html.Kendo().Window()
+		.Name("wndReviewCourse")
+		.Title("Review this course")
+		.Draggable(false)
+		.HtmlAttributes(new{@style="padding:60px 25px 0;overflow:hidden"})
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Height(470)
+		.Width(575)
+		.Modal(true)  
+		.Animation(false)     
+		//.Events(e=>e.Close("onUploadWndClosed"))
+		.Content("loading review form .....")	  
+)

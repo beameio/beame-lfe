@@ -1,0 +1,91 @@
+﻿@using LFE.Core.Enums
+@using LFE.DataTokens
+@using LFE.Portal.Areas.AuthorAdmin.Models
+@model CoursePriceDTO
+
+<script type="text/javascript">
+	var formPriceUserNotifManager;
+
+	$(document).ready(function () {
+		
+		formPriceUserNotifManager = new UserNotificationManager('#cp-info', '.alert', false);
+
+		//setCover();
+		//window.getNotifManagerInstance().unsubscribe(notifEvents.course.priceLinesBound, setCover, null);
+		//window.getNotifManagerInstance().subscribe(notifEvents.course.priceLinesBound, setCover, null);
+
+		$('#btn-submit-cp').unbind('click').click(function (e) {
+			e.preventDefault();
+			$('#frmCoursePrice').submit();
+		});
+	});
+	
+	//function setCover() {
+	//	var c = $('#pl-container');
+	//	$('#d-free-cover').width(c.width() + 50).height(c.height()).css({ top: c.offset().top + 'px' });
+	//}
+
+	function onPriceSaving() {
+		var free = $('#frmCoursePrice #IsFree').is(":checked");
+
+		if (free && $('#CoursePrices > li').length > 0) {
+			if (!window.confirm('Price lines already defined for course and will be removed. Are You sure?')) return false;
+		}
+		return true;
+	}
+
+	function onPriceSaved(response) {
+		var kind = response.success ? NotificationKinds.Success : NotificationKinds.Error;
+		var msg = response.success ? "Course price saved successfully" : response.error;
+
+		if (response.success) {
+
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+			window.getNotifManagerInstance().notify(notifEvents.course.coursePriceMetaSaved, null);
+
+			//var free = $('#frmCoursePrice #IsFree').is(":checked");
+
+			//if (free && $('#CoursePrices > li').length > 0) {
+			//    $('#CoursePrices').data('kendoListView').dataSource.read();
+			//}
+		}
+		window.isFormInEditMode = false;
+		formPriceUserNotifManager.show({ message: msg, kind: kind });
+	}
+</script>
+
+<div id="d-item-price-container" >
+	
+	@using (Ajax.BeginForm("SaveAffiliateCommission", "Course", new { id = Model.CourseId }, new AjaxOptions { OnBegin = "javascript:return onPriceSaving()", OnSuccess = "onPriceSaved", LoadingElementId = "site-loader" }, new { @id = "frmCoursePrice", @class = "rel", @style = "width: 640px" }))
+	{
+		@Html.Partial("Pricing/_ManageAffiliateCommission",new ItemAffiliateCommissionDTO{ItemId = Model.CourseId,ItemType = BillingEnums.ePurchaseItemTypes.COURSE,AffiliateCommission = Model.AffiliateCommission})
+
+	    <a href="#" id="btn-submit-cp" style="right:2px;bottom: 20px;" class="action-button">Save</a>
+	}
+
+	@*<div style="display:@(Model.IsFree ? "block" :"none") " class="d-cover" id="d-free-cover"></div>*@
+	
+	@Html.Partial("Pricing/_ManageItemPrices",new PriceLinesManageToken
+	{
+		Item        = new BaseItemToken { ItemId = Model.CourseId,ItemType = BillingEnums.ePurchaseItemTypes.COURSE}
+		,Currency   = Model.Currency
+        ,IsFree     = Model.IsFree
+	})
+
+	  
+</div>
+	
+	<div id="cp-info" class="info-box" style="width: 960px; height: 40px; margin-left: 0;">
+		<p class="alert inline"></p>
+		@*<div class="inline btn-container">
+			<label class="price-info inline">Course can have a one-time or monthly subscription price, or both</label>
+			<a href="javaScript:submitForm('frmCoursePrice')" class="inline btn-submit">save changes</a>
+		</div>*@
+	</div>
+
+
+<script>
+	$(document).ready(function() {
+		window.getNotifManagerInstance().notify(notifEvents.course.pricelessFlagChanged, '@Model.IsFree.ToString().ToLower()'=='true');
+	});
+</script>

@@ -1,0 +1,510 @@
+﻿@using System.Linq
+@using Kendo.Mvc.UI
+@using LFE.Core.Enums
+@using LFE.Core.Utils
+@using LFE.DataTokens
+@model SaleSummaryReportDTO
+
+
+
+@{
+    if (Model.IsValid && String.IsNullOrEmpty(Model.Message) && Model.CurrencyRows.Any())
+    {
+
+        <script>
+            function onStatementSend(response) {
+                alert(response.success ? 'Mail sent' : response.error);
+            }
+        </script>
+        var payoutEnabled = false;
+
+        if (Model.PayoutExecution != null)
+        {
+            var payoutToken = Model.PayoutExecution;
+            var status = Utils.GetEnumDescription(payoutToken.Status);
+
+            var desc = string.Empty;
+
+            if (payoutToken.AddOn != null && payoutToken.ExecutedBy != null)
+            {
+                desc = " on " + payoutToken.AddOn + " by " + payoutToken.ExecutedBy.FullName;
+            }
+
+            
+            var today = DateTime.Now;
+
+            var firstCurrent = new DateTime(today.Year, today.Month, 1);
+            var firstReport = new DateTime(Model.Year, Model.Month, 1);
+
+            <h2 style="font-size: 24px;" class="inline">Payout status: @status @desc</h2>
+
+    
+            if (firstCurrent.Date > firstReport.Date)
+            {
+                if (firstCurrent.AddMonths(-1).Date == firstReport.Date)
+                {
+                    if (payoutToken.Status != BillingEnums.ePayoutStatuses.COMPLETED)
+                    {
+                        payoutEnabled = true;
+                    }
+                }
+                else
+                {
+
+                    if (payoutToken.Status != BillingEnums.ePayoutStatuses.COMPLETED && User.IsInRole(CommonEnums.UserRoles.System.ToString()))
+                    {
+                        payoutEnabled = true;
+                    }
+                }
+            }
+            payoutEnabled = true;
+            if (payoutEnabled)
+            {
+                <div style="height: 30px; padding-left: 50px;" class="inline">
+                    <span id="btn-submit-payout" class="btn-payout">Execute Payout</span>
+                </div>
+
+                <script>
+                    $(document).ready(function() {
+                        $('#btn-submit-payout').unbind('click').click(submitPayout);
+                    });
+                    function submitPayout() {
+                        if (!window.confirm('Are You sure?')) return;
+                        //swal({
+                        //        title: "Are you sure?",
+                        //        type: "warning",
+                        //        showCancelButton: true,
+                        //        confirmButtonColor: "#DD6B55",
+                        //        confirmButtonText: "Yes, pay it!",
+                        //        closeOnConfirm: false
+                        //    });
+                        var selectedUsers = [];
+                        for (var i = 0; i < gridsArray.length; i++) {
+                            var token = gridsArray[i];
+                            var users = getSelectedUserIds(token.id);
+
+                            for (var j = 0; j < users.length; j++) {
+                                selectedUsers.push({ userId: users[j], currId: token.currId });
+                            }
+                        }
+
+                        var data = {
+                            year :'@Model.Year', 
+                            month :'@Model.Month',
+                            include:selectedUsers
+                        };
+
+                        console.log(selectedUsers);
+
+                        window.showLoader();
+
+                        $('#btn-submit-payout').hide();
+                       
+                        ajaxAction('@Url.Action("ExecutePayout", "Payout", new { area = "PortalAdmin" })', data, onPayoutEnd, null);
+                    }
+
+                    function onPayoutEnd(response) {
+                        window.hideLoader();
+                        if (response.success) {
+                            var url = '@Url.Action("PayoutExecutionReport","Payout",new{area="PortalAdmin"})' + '/' + response.result;
+                            window.location.href = url;
+                        } else {
+                            swal({ title: "Error!", text: response.error, type: "error"});
+                            
+                        }
+
+                    }
+                </script>
+            }
+        }
+
+
+        <script>
+            var gridsArray = [];
+            //#region grid selection
+            function getSelectedUserIds(gridId) {
+
+                var selection = getSelected(gridId, 'selectedUids');
+
+                if (selection.length == 0) return [];
+
+                var grid = $("#"+gridId).data().kendoGrid;
+
+                // Map all selected rows to data items using jQuery.map and the dataItem method: http://docs.kendoui.com/api/web/grid#dataitem
+                var selectedUsers = $.map(selection, function (uid) {
+                    var user = grid.dataSource.getByUid(uid);
+                    return user.SellerId;
+                });
+
+                return selectedUsers;
+            }
+            function getUserId(gridId,uid) {
+                var ds = $("#" + gridId).data("kendoGrid").dataSource;
+                return ds.getByUid(uid).SellerId;
+            }
+            
+            function getFilteredData(gridId) {
+                var grid = $("#" + gridId).data().kendoGrid;
+
+                var dataSource = grid.dataSource;
+                var filters = dataSource.filter();
+                var allData = dataSource.data();
+                var query = new kendo.data.Query(allData);
+                var filteredData = query.filter(filters).data;
+
+                return filteredData;
+            }
+
+            function getUid(gridId,userId) {
+                var grid = $("#" + gridId).data().kendoGrid;
+
+                var dataSource = grid.dataSource;
+                var filters = [{ field: "SellerId", operator: "eq", value: userId }];
+                var allData = dataSource.data();
+                var query = new kendo.data.Query(allData);
+                var filteredData = query.filter(filters).data;
+
+                return filteredData.length == 1 ? filteredData[0].uid : null;
+            }
+
+           
+            function setSelectionState(gridId) {
+                var grid = $("#" + gridId).data().kendoGrid;
+
+                var selectedVals = getSelected(gridId,'selectedUids');                
+
+                for (var i = 0; i < grid.tbody.find('tr').length; i++) {
+                    var row = $(grid.tbody.find('tr')[i]);
+                    var uid = row.attr('data-uid');
+                    if ($.inArray(uid, selectedVals) >= 0) {
+                        row.find('input[type="checkbox"]').attr('checked', 'checked');
+                        // row.addClass('k-state-selected');
+                    } else {
+                        // row.removeClass('k-state-selected');                               
+                        row.find('input[type="checkbox"]').removeAttr('checked');
+                    }
+                }
+
+                if (selectedVals.length < getFilteredData(gridId).length) {
+                    grid.thead.find('#masterCheckBox').removeAttr('checked');
+                } else {
+                    grid.thead.find('#masterCheckBox').attr('checked', 'checked');
+                }            
+            }
+
+            function getSelected(gridId, attr) {
+                var selectedIds = $('#' + gridId).attr(attr);
+                if (selectedIds == undefined || selectedIds.length == 0) return [];
+
+                return selectedIds.split(',');
+            }
+
+            function restoreSelectionArray(gridId) {
+
+                var selectedUserIds = getSelected(gridId,'selectedUserIds');
+
+                if (selectedUserIds.length == 0) {
+                    $("#" + gridId).attr({ 'selectedUids': [] });
+                    return;
+                }
+                var uIds = [];
+                for (var i = 0; i < selectedUserIds.length; i++) {
+                    var prodId = selectedUserIds[i];
+                    var uid = getUid(gridId,prodId);
+                    if (uid != null) uIds.push(uid);
+                }
+
+                $('#' + gridId).attr('selectedUids', uIds);
+            }
+            function onCurrencyReportBound(e) {               
+
+                var grid = e.sender.element;
+
+                var gridId = $(grid).attr('id');
+
+                if (grid.attr('selectedUids') == undefined) grid.attr({ 'selectedUids': [] });
+                if (grid.attr('selectedUserIds') == undefined) grid.attr({ 'selectedUserIds': [] });
+
+                restoreSelectionArray(gridId);
+
+                setSelectionState(gridId);
+
+                checkAll(gridId, true);
+            }
+
+            function checkAll(gridId, allSelected) {
+                if (allSelected) {
+                    var all = [];
+                    var allUserIds = [];
+
+                    var filteredData = getFilteredData(gridId);
+
+                    for (var i = 0; i < filteredData.length; i++) {
+                        var uid = filteredData[i].uid;
+                        all.push(uid);
+                        allUserIds.push(getUserId(gridId, uid));
+                    }
+
+                    $('#' + gridId).attr('selectedUids', all);
+                    $('#' + gridId).attr('selectedUserIds', allUserIds);
+
+                } else {
+                    $('#' + gridId).attr('selectedUids', []);
+                    $('#' + gridId).attr('selectedUserIds', []);
+                }
+                setSelectionState(gridId);
+            }
+
+
+            function bindCheckBoxes(gridId) {
+                
+                $('#' + gridId).on('click', '#masterCheckBox', function () {
+                    var chk = $(this);                    
+                    checkAll(gridId, chk.is(':checked'));
+                });
+
+                $('#' + gridId).on('click', '.check_row', function () {
+                    var checked = $(this).is(':checked');
+                    var $row = $(this).closest('tr');
+
+
+                    var selectedVals = getSelected(gridId, 'selectedUids');
+                    var selectedUserIds = getSelected(gridId, 'selectedUserIds');
+
+                    var uid = $row.attr('data-uid');
+                    var userId = getUserId(gridId,uid);
+
+                    if (checked) {
+                        selectedVals.push(uid);
+                        selectedUserIds.push(userId);
+                    } else {
+                        var ind = $.inArray(uid, selectedVals);
+                        if (ind >= 0) {
+                            selectedVals.splice(ind, 1);
+                        }
+
+                        ind = $.inArray(userId, selectedUserIds);
+                        if (ind >= 0) {
+                            selectedUserIds.splice(ind, 1);
+                        }
+                    }
+
+                    $('#' + gridId).attr('selectedUids', selectedVals);
+                    $('#' + gridId).attr('selectedUserIds', selectedUserIds);
+
+                    setSelectionState(gridId);
+                });
+            }
+            //#endregion
+        </script>
+        
+        foreach (var currencySummary in Model.CurrencyRows.Where(x => x.Rows.Count > 0))
+        {
+            @Html.Partial("Payout/_MonthlyPayoutCurrencyGrid", currencySummary) 
+    
+            <script>
+                setTimeout(function () {
+                    var id = 'SummaryReportGrid_@currencySummary.Currency.CurrencyId';
+                    bindCheckBoxes(id);
+                    gridsArray.push({ id: id, currId: '@currencySummary.Currency.CurrencyId' });
+                }, 250);
+            </script>  
+        }
+        
+
+        <script id="template-payments-detail" type="text/kendo-tmpl">
+            @(Html.Kendo().TabStrip()
+                  .Name("tabStrip_#=uid#")
+                  .SelectedIndex(0)
+                  .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+                  .Items(items =>
+                    {
+                        items.Add().Text("Author Sales").Content(@<text>
+                                                                    @(Html.Kendo().Grid<PaymentViewDTO>()
+                                                                    .Name("payments_#=uid#")
+                                                                    .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                                                                    .Columns(columns =>
+                                                                    {
+                                                                        columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                                                                        columns.Bound(p => p.ItemName).Width(60).Title("Item");
+                                                                        columns.Bound(p => p.Buyer.FullName).Width(120).Title("Buyer");
+                                                                        columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                                                                        columns.Bound(p => p.TypeName).Width(60).Title("Type");
+                                                                        columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                        columns.Bound(p => p.Fee).Width(60).ClientTemplate("\\#=kendo.toString(Fee, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                        columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(60).ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                        columns.Bound(p => p.CompletedDate).Width(100).Format("{0:MM/dd/yy}").Title("Payment Date");
+                                                                        columns.Bound(p => p.Status);
+                                                                    })
+                                                                    .ClientDetailTemplateId("template-payment-refunds")
+                                                                    .Sortable(s => s.Enabled(true))
+                                                                    .Pageable(pager => pager.Refresh(true).Enabled(true).Numeric(true))
+                                                                    .Filterable(f => f.Enabled(false))
+                                                                    .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                                                                    .Aggregates(dag =>
+                                                                    {
+                                                                        dag.Add(d => d.Amount).Sum();
+                                                                        dag.Add(d => d.Fee).Sum();
+                                                                        dag.Add(d => d.TotalRefunded).Sum();
+                                                                    })
+                                                                    .Model(model => model.Id(p => p.PaymentId))
+                                                                    .Read(read => read.Action("GetSellerPayments", "Billing", new { sellerId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+                                                            </text>
+                          );
+                            items.Add().Text("Affiliate Sales").Content(@<text>
+                                                                            @(Html.Kendo().Grid<PaymentViewDTO>()
+                                                                                    .Name("aff_payments_#=uid#")
+                                                                                    .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                                                                                    .Columns(columns =>
+                                                                                    {
+                                                                                        columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                                                                                        columns.Bound(p => p.ItemName).Width(60).Title("Item");
+                                                                                        columns.Bound(p => p.Seller.FullName).Width(100).Title("Seller");
+                                                                                        columns.Bound(p => p.StoreOwner.FullName).Width(100).Title("Store Owner");
+                                                                                        columns.Bound(p => p.Buyer.FullName).Width(100).Title("Buyer");
+                                                                                        columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                                                                                        columns.Bound(p => p.TypeName).Width(60).Title("Type");
+                                                                                        columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.Fee).Width(60).ClientTemplate("\\#=kendo.toString(Fee, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.AffiliateCommission).Width(60).Title("Comm. %");
+                                                                                        columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(60).ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.CompletedDate).Width(100).Format("{0:MM/dd/yy}").Title("Payment Date");
+                                                                                    })
+                                                                                    .ClientDetailTemplateId("template-payment-refunds")
+                                                                                    .Sortable(s => s.Enabled(true))
+                                                                                    .Pageable(pager => pager.Refresh(true).Enabled(false))
+                                                                                    .Filterable(f => f.Enabled(false))
+                                                                                    .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                                                                                    .Aggregates(dag =>
+                                                                                    {
+                                                                                        dag.Add(d => d.Amount).Sum();
+                                                                                        dag.Add(d => d.Fee).Sum();
+                                                                                        dag.Add(d => d.TotalRefunded).Sum();
+                                                                                    })
+                                                                                    .Model(model => model.Id(p => p.PaymentId))
+                                                                                            .Read(read => read.Action("GetAffiliatePayments", "Billing", new { sellerId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+                                                                        </text>
+                                                                        );
+                            items.Add().Text("MBG to hold").Content(@<text>
+                                                                            @(Html.Kendo().Grid<PaymentViewDTO>()
+                                                                                    .Name("mbg_keep_payments_#=uid#")
+                                                                                    .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                                                                                    .Columns(columns =>
+                                                                                    {
+                                                                                        columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                                                                                        columns.Bound(p => p.ItemName).Width(60).Title("Item");
+                                                                                        columns.Bound(p => p.Seller.FullName).Width(100).Title("Seller");
+                                                                                        columns.Bound(p => p.StoreOwner.FullName).Width(100).Title("Store Owner");
+                                                                                        columns.Bound(p => p.Buyer.FullName).Width(100).Title("Buyer");
+                                                                                        columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                                                                                        columns.Bound(p => p.TypeName).Width(60).Title("Type");
+                                                                                        columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.Fee).Width(60).ClientTemplate("\\#=kendo.toString(Fee, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.AffiliateCommission).Width(60).Title("Comm. %");
+                                                                                        columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(60).ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.CompletedDate).Width(100).Format("{0:MM/dd/yy}").Title("Payment Date");
+                                                                                    })
+                                                                                    .ClientDetailTemplateId("template-payment-refunds")
+                                                                                    .Sortable(s => s.Enabled(true))
+                                                                                    .Pageable(pager => pager.Refresh(true).Enabled(false))
+                                                                                    .Filterable(f => f.Enabled(false))
+                                                                                    .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                                                                                    .Aggregates(dag =>
+                                                                                    {
+                                                                                        dag.Add(d => d.Amount).Sum();
+                                                                                        dag.Add(d => d.Fee).Sum();
+                                                                                        dag.Add(d => d.TotalRefunded).Sum();
+                                                                                    })
+                                                                                    .Model(model => model.Id(p => p.PaymentId))
+                                                                                        .Read(read => read.Action("GetRefundProgramPayments", "Billing", new { released = false, sellerId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+                                                                        </text>
+                                                                      );
+                            items.Add().Text("MBG released").Content(@<text>
+                                                                        @(Html.Kendo().Grid<PaymentViewDTO>()
+                                                                                    .Name("mbg_release_payments_#=uid#")
+                                                                                    .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                                                                                    .Columns(columns =>
+                                                                                    {
+                                                                                        columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                                                                                        columns.Bound(p => p.ItemName).Width(60).Title("Item");
+                                                                                        columns.Bound(p => p.Seller.FullName).Width(100).Title("Seller");
+                                                                                        columns.Bound(p => p.StoreOwner.FullName).Width(100).Title("Store Owner");
+                                                                                        columns.Bound(p => p.Buyer.FullName).Width(100).Title("Buyer");
+                                                                                        columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                                                                                        columns.Bound(p => p.TypeName).Width(60).Title("Type");
+                                                                                        columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.Fee).Width(60).ClientTemplate("\\#=kendo.toString(Fee, \"n2\")\\#\\#=Currency.Symbol\\#").ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.AffiliateCommission).Width(60).Title("Comm. %");
+                                                                                        columns.Bound(p => p.TotalRefunded).Title("Refunded").ClientTemplate("\\#=kendo.toString(TotalRefunded, \"n2\")\\#\\#=Currency.Symbol\\#").Width(60).ClientFooterTemplate("Total: \\#=kendo.toString(sum, 'n2')\\#");
+                                                                                        columns.Bound(p => p.CompletedDate).Width(100).Format("{0:MM/dd/yy}").Title("Payment Date");
+                                                                                    })
+                                                                                    .ClientDetailTemplateId("template-payment-refunds")
+                                                                                    .Sortable(s => s.Enabled(true))
+                                                                                    .Pageable(pager => pager.Refresh(true).Enabled(false))
+                                                                                    .Filterable(f => f.Enabled(false))
+                                                                                    .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                                                                                    .Aggregates(dag =>
+                                                                                    {
+                                                                                        dag.Add(d => d.Amount).Sum();
+                                                                                        dag.Add(d => d.Fee).Sum();
+                                                                                        dag.Add(d => d.TotalRefunded).Sum();
+                                                                                    })
+                                                                                    .Model(model => model.Id(p => p.PaymentId))
+                                                                                        .Read(read => read.Action("GetRefundProgramPayments", "Billing", new { released = true, sellerId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+                            </text>
+                                                                      );
+                            items.Add().Text("Refunds").Content(@<text>
+                                                                @(Html.Kendo().Grid<RefundDTO>()
+                                                                    .Name("refunds_#=uid#")
+                                                                    .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                                                                    .Columns(columns =>
+                                                                    {
+                                                                        columns.Bound(p => p.OrderNumber).Width(60).Title("Order N");
+                                                                        columns.Bound(p => p.ItemName).Width(60).Title("Item");
+                                                                        columns.Bound(p => p.Number).Width(60).Title("Pay. N");
+                                                                        columns.Bound(p => p.RefundTypeName).Width(60).Title("Type");
+                                                                        columns.Bound(p => p.RefundAmount).Width(80).ClientTemplate("\\#=kendo.toString(RefundAmount, \"n2\")\\#\\#=Currency.Symbol\\#");
+                                                                        columns.Bound(p => p.RefundDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+                                                                    })
+                                                                    .Sortable(s => s.Enabled(true))
+                                                                    .Pageable(pager => pager.Refresh(true).Enabled(false))
+                                                                    .Filterable(f => f.Enabled(false))
+                                                                    .DataSource(dataSource => dataSource.Ajax().ServerOperation(false)
+                                                                    .Aggregates(dag =>
+                                                                    {
+                                                                        dag.Add(d => d.Amount).Sum();
+                                                                        dag.Add(d => d.TotalRefunded).Sum();
+                                                                    })
+                                                                    .Model(model => model.Id(p => p.PaymentId))
+                                                                    .Read(read => read.Action("GetSellerRefunds", "Billing", new { sellerId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" }).Type(HttpVerbs.Get))).ToClientTemplate())
+                                                            </text>
+                        );
+                        items.Add().Text("Statement").LoadContentFrom("MonthlyStatementTab", "Billing", new { userId = "#=SellerId#", year = "#=Year#", month = "#=Month#", currencyId = "#=Currency.CurrencyId#" });
+                    }).ToClientTemplate())
+        </script>
+
+        <script id="template-payment-refunds" type="text/kendo-tmpl">
+            <label style="display:block;height24px;padding:5px 0 7px;font-size:18px">Payment Refund</label>
+            @(Html.Kendo().Grid<PaymentRefundDTO>()
+                  .Name("refund_#=PaymentId#")                   
+                  .TableHtmlAttributes(new { @style = "background-image: none !important;" })
+                  .Columns(columns =>
+                  {
+                      columns.Bound(p => p.Amount).Width(80).ClientTemplate("\\#=kendo.toString(Amount, \"n2\")\\#\\#=Currency.Symbol\\#");
+                      columns.Bound(p => p.TypeName).Width(60).Title("Type");
+                      columns.Bound(p => p.RefundDate).Width(80).Format("{0:MM/dd/yy}").Title("Scheduled");
+                  })
+                  .Sortable(s => s.Enabled(false))
+                  .Pageable(pager => pager.Enabled(false))
+                  .Filterable(f => f.Enabled(false))
+                  .DataSource(dataSource => dataSource.Ajax().Model(model => model.Id(p => p.RefundId)).Read(read => read.Action("GetPaymentRefunds", "Billing", new { PaymentId = "#=PaymentId#" }).Type(HttpVerbs.Get))).ToClientTemplate()
+                  )
+        
+        </script>
+
+    }
+    else
+    {
+        <h3>@Model.Message</h3>
+    }
+}

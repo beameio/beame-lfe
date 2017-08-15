@@ -1,0 +1,33 @@
+﻿@using LFE.Portal.Helpers
+
+
+@{
+    var isAdmin = false;
+    
+    var user = this.CurrentUser();
+
+    if (user != null)
+    {
+        isAdmin = this.IsCurrentUserAdmin();  
+    }
+    
+    var name = user!=null ? user.FullName :string.Empty;
+}
+
+@if (user!=null)
+{
+    <div style="margin-top:10px">
+     @name
+   | @Html.ActionLink("My Account", "UserSettings", "Account", new { area = "" }, new { style = "color:#555;text-decoration:underline" })
+   | @Html.ActionLink("Start to Teach", "Index", "Home", new { Area = "AuthorAdmin" }, new { style = "color:#555;text-decoration:underline" })
+   @{
+       if (isAdmin)
+       {
+           @Html.ActionLink("| Portal Admin", "Index", "Home", new { Area = "PortalAdmin" }, new { style = "color:#555;text-decoration:underline" });
+       }
+   }
+   | @Html.ActionLink("Log Out", "SignOff", "Account", new{area=""}, new { style = "color:#555;text-decoration:underline" })  
+    </div>
+}
+
+

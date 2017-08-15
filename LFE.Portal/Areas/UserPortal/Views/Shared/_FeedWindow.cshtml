@@ -1,0 +1,26 @@
+﻿@using Kendo.Mvc.UI
+@(Html.Kendo().Window()
+		.Name("wndFeed")		
+		.Draggable(false)
+		.HtmlAttributes(new{@style="overflow:hidden"})
+		.Actions(actions => actions.Close())
+		.Resizable(builder => builder.Enabled(false))
+		.Visible(false)
+		.Width(650)        
+		.Modal(true)
+		.Iframe(true)
+		.Animation(false)     
+		.Events(e=>e.Close("onWndClose"))
+		.Content("loading review form .....")	  
+)
+	  
+
+<div id="notif-container" style="display: none">
+	<div class="tri">&nbsp;</div>
+	@{
+		if (HttpContext.Current.User.Identity.IsAuthenticated)
+		{
+			@Html.Partial("_UserNotifications")        
+		}
+	}	
+</div>

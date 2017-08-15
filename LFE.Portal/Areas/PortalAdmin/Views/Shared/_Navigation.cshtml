@@ -1,0 +1,139 @@
+﻿@using LFE.Core.Extensions
+@using LFE.Portal.Helpers
+
+
+@{
+    var currentController = ViewContext.RouteData.GetRequiredString("controller");
+  
+    var report = currentController == "Report" ? "current" : "";
+
+    var billing = currentController == "Billing" ? "current" : "";
+
+    var settings = currentController == "Settings" ? "current" : "";
+    
+}
+
+
+<nav>
+    <ul>
+        <li>@Html.MenuLink("Dashboard", "Index", "Home", null, new {@class = "current", @title = "Dashboard"}, new {@title = "Dashboard"})</li>
+
+        @{
+            if (this.GetCurrentUserId() == 422)
+            {
+                <li>@Html.MenuLink("Actions", "SystemActions", "Home", null, new { @class = "current", @title = "Actions" }, new { @title = "Actions" })</li>
+            }
+        }
+
+        <li style="position:relative;" class="li-sub cb">
+            <span class="a @report">reports</span>
+            <div class="sub" style="width: 110px;">
+                <div class="inner">
+                    <div class="menu-name">reports</div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Event Logs", "EventLogsReport", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Old Dash", "Index", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Event Charts", "EventChartReport", "Report")
+                    </div>  
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Host Events", "HostEventsReport", "Report")
+                    </div>  
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Event Charts by Role", "EventOwnerChartReport", "Report")
+                    </div>                      
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Summary Report", "SummaryReport", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Hosts abandon", "HostAbandon", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Plugin Installations", "PluginInstallations", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Quiz", "QuizReport", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Stores", "StoresReport", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("System Logs", "SystemLogs", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Videos Report", "VideosReport", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("User Statistics", "StatisticsReport", "User")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("File Logs", "FileInterfaceLogs", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Email Logs", "EmailInterfaceLogs", "Report")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("FB Post Logs", "FbPostInterfaceLogs", "Report")
+                    </div>
+                </div>
+            </div>
+        </li>
+       
+        <li>@Html.MenuLink("Users", "Report", "User", null, new { @class = "current", @title = "Users" }, new { @title = "Users" })</li>
+        <li>@Html.MenuLink("Courses", "CourseReport", "Report", null, new { @class = "current", @title = "Course Report" }, new { @title = "Course Report" })</li>
+        <li>@Html.MenuLink("User WebStores", "Index", "WebStore", null, new { @class = "current", @title = "User WebStores" }, new { @title = "User WebStores" })</li>
+        
+        <li style="position:relative;" class="li-sub cb">
+            <span class="a @billing">Billing</span>
+            <div class="sub" style="width: 110px;">
+                <div class="inner">
+                    <div class="menu-name">billing</div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Sale Orders", "SaleOrdersReport", "Billing")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Monthly Payout", "PayoutMonthlyStatement", "Payout")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Payout Executions", "PayoutExecutionReport", "Payout")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Transaction report", "TransactionsReport", "Billing")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Completed Payments", "CompletedPayments", "Billing")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Scheduled Payments", "ScheduledSubscriptionPayments", "Billing")
+                    </div>
+                </div>
+            </div>
+        </li>
+
+        <li style="position:relative;" class="li-sub cb">
+            <span class="a @settings">Settings</span>
+            <div class="sub" style="width: 110px;">
+                <div class="inner">
+                    <div class="menu-name">settings</div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("LFE Catalog", "LfeStoreManage", "Settings")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Categories", "CategoryManage", "Settings")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Templates", "EmailTemplates", "Settings")
+                    </div>
+                    <div class="sub-menu-link">
+                        @Html.ActionLink("Wizard Steps", "WizardStepTooltips", "Settings")
+                    </div>
+                </div>
+            </div>
+        </li>
+
+        
+    </ul>   
+</nav>

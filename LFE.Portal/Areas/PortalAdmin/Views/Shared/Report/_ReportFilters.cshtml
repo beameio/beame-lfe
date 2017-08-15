@@ -1,0 +1,97 @@
+﻿@using System.Collections
+@using Kendo.Mvc.UI
+@using LFE.Portal.Areas.AuthorAdmin.Helpers
+
+@model LFE.Portal.Areas.PortalAdmin.Models.ReportFilterViewToken
+<script>
+	function onFilterSelected() {		
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+	}
+
+	function getLogsRepData() {
+		return {
+			periodSelectionKind: $('#periodSelectionKind').data("kendoDropDownList") != undefined ? $('#periodSelectionKind').data("kendoDropDownList").value() : '@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())'	
+			, userId: $('#ddlUserLOV').data("kendoComboBox") != undefined ? $('#ddlUserLOV').data("kendoComboBox").value() : null
+			, status: $('#ddlStatuses').data("kendoDropDownList") != undefined ? $('#ddlStatuses').data("kendoDropDownList").text() : null
+		};
+	}
+	function clearFilters() {
+		$('#periodSelectionKind').data("kendoDropDownList").value(null);
+		$('#ddlStatuses').data("kendoDropDownList").value(null);
+		$('#ddlUserLOV').data("kendoComboBox").value(null);
+		window.getNotifManagerInstance().notify(notifEvents.object.rebindReport, null);
+	}
+
+	function onReportBound(e) {
+	        window.boundGridUserDetails(e);
+			$(".col-tooltip").kendoTooltip({
+				position: "top",
+				content: kendo.template($("#tp-template").html()),
+				width: 250
+			}).data("kendoTooltip");
+	 }
+</script>
+<div id="rep-param-row" style="margin: 0 0 25px 0">
+	<div id="period-combo-container"  class="inline"  style="visibility: hidden;">
+		@(Html.Kendo().DropDownList()
+			  .Name("periodSelectionKind")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo((IEnumerable)ViewData["periodKinds"])
+			  .HtmlAttributes(new { @class = "combo-ps" })
+			  .Events(e=>e.Select("onFilterSelected"))
+			  )
+		<script>
+			$(document).ready(function () {
+				$('#periodSelectionKind').data("kendoDropDownList").value('@(((int)WebHelper.DEFAULT_PERIOD_SELECTION).ToString())');
+				setVisibility('#period-combo-container', true);		
+			});
+		</script>
+	</div>
+	
+	<div id="status-combo-container"  class="inline" style="visibility: hidden;">
+		@(Html.Kendo().DropDownList()
+			  .Name("ddlStatuses")
+			  .OptionLabel("..select status")
+			  .DataTextField("Title")
+			  .DataValueField("Value")
+			  .BindTo((IEnumerable) ViewData["statusLOV"] )
+			  .HtmlAttributes(new { @class = "combo-ps",@style="width:250px" })
+			  .Events(e=>e.Select("onFilterSelected")))
+		<script>
+			$(document).ready(function () {
+				$('#ddlStatuses').data("kendoDropDownList").value(null);
+				setVisibility('#status-combo-container', true);
+			});
+		</script>
+	</div>
+
+	<div id="user-combo-container"  class="inline"  style="">
+		@(Html.Kendo().ComboBox()
+			  .Name("ddlUserLOV")
+			  .DataValueField("id")
+			  .DataTextField("name")
+			  .Placeholder("select user")
+			  .HighlightFirst(true)
+			  .Filter(FilterType.Contains)
+			  .Suggest(true)
+			  .MinLength(2)              
+			  .Template("<img class=\"user-thumb inline\" src=\"${url}\" alt=\"${name}\" />" +
+						"<label class=\"inline\" style=\"margin:0 0 0 10px\">${name}</label>")
+			  .HtmlAttributes(new { @class = "combo-ps" })
+			  .DataSource(ds=>ds.Read(Model.Action,"Report"))
+			  .Events(e=>e.Select("onFilterSelected"))
+			 )
+		<script>
+			$(document).ready(function () {
+				$('#ddlUserLOV').data("kendoComboBox").value(null);
+			});
+		</script>		
+	</div>
+	
+	
+	   
+	<div class="inline">
+		<a href="#" onclick="clearFilters()" class="a-clear">clear filters</a>
+	</div>
+</div>

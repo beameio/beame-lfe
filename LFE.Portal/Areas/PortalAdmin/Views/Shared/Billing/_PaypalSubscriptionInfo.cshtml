@@ -1,0 +1,114 @@
+﻿@model LFE.DataTokens.PaypalRecurringProfileToken
+<style type="text/css">
+    .display-label { display: inline-block;width: 180px;}
+
+    .display-field { display: inline-block;vertical-align: top; }
+
+    .ul-view-form { text-align: left;padding: 20px}
+</style>
+           
+
+<fieldset>
+    <legend>Paypal Recurring Profile Details</legend>
+    
+    <ul class="ul-view-form">
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.ProfileID)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ProfileID)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.Description)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Description)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.SubscriberName)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.SubscriberName)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.Status)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Status)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.BillingStartDate)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.BillingStartDate)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.NextPaymentDate)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.NextPaymentDate)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.LastPaymentDate)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.LastPaymentDate)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.CompletedCycles)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.CompletedCycles)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.FailedPaymentCount)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.FailedPaymentCount)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.AmountPaid)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.AmountPaid)
+            </div>
+        </li>
+        <li>
+
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.BillingPeriod)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.BillingPeriod)
+            </div>
+        </li>
+        <li>
+            <div class="display-label">
+                @Html.DisplayNameFor(model => model.BillingFrequency)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.BillingFrequency)
+            </div>
+        </li>
+    </ul>
+   
+</fieldset>

@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/Shared/Common/_RedirectSSL.cshtml")
+    <title>@ViewBag.Title</title>
+    <!--[if ie]><meta http-equiv="X-UA-Compatible" content="IE=Edge"/><![endif]-->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    @Html.Partial("~/Views/Shared/Common/_ReferrerScripts.cshtml")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!--[if lt IE 9]>
+        <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <script src="@Url.Content("~/Scripts/plugins/jquery.placeholder.js")"></script>
+    <![endif]-->
+
+    @Styles.Render("~/bundles/styles/common")
+
+    @RenderSection("css", false)
+    @Html.Partial("~/Views/Shared/Common/_FacebookScript.cshtml")
+    @Scripts.Render("~/bundles/common/layout")
+</head>
+	<body>
+	            
+        @RenderSection("SiteHeader", false)
+
+        @RenderSection("SecondNav", false)
+
+	    <div class="container rel" id="main-container" style="margin-bottom: 30px;text-align: center;">
+			@RenderBody()
+		</div>
+	
+		<script>
+			var effect;
+			var reverse = false;
+			var flipSupported;
+
+			var initMode = 'Login';
+
+			var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+		</script>
+		
+		@RenderSection("scripts", false)
+        
+        @Html.Partial("~/Views/Shared/Common/_FooterScripts.cshtml")
+	    @Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+		@Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+	</body>
+</html>

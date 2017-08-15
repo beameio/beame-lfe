@@ -1,0 +1,167 @@
+﻿@using LFE.DataTokens
+@model WizardChapterManageDTO
+
+<script>
+	var CHAPTER_LIST_SELECTOR = '#CourseChapters';
+	var SAVE_CHAPTERS_ORDER_URL = '@Url.Action("SaveChapterOrder","Course")';
+	var animationSupported = isFxSupported();
+	var dataSource;
+	$(document).ready(function () {
+		window.isFormInEditMode = false;
+		//window.getNotifManagerInstance().unsubscribe(notifEvents.chapter.chapterSaved, rebindChapterList, null);
+		window.getNotifManagerInstance().subscribe(notifEvents.chapter.chapterSaved, rebindChapterList, null);
+		
+	});
+
+	function rebindChapterList(token) {
+		if (animationSupported) {
+			var template = kendo.template($("#kendo-ch-list-template").html());
+			var item = $('<li>').html(template(token)).addClass('new-item');
+			$('.reminders').append(item);
+			setTimeout(function() {
+				$(CHAPTER_LIST_SELECTOR).data("kendoListView").dataSource.read();
+			},200);
+		} else {
+			$(CHAPTER_LIST_SELECTOR).data("kendoListView").dataSource.read();
+		}
+		//
+		
+	}
+	
+	function onChapterEdit(e) {
+		var btn = e.item.find('.k-update-button');
+		btn.unbind('click').bind('click', function () {
+			$('#frmEditChapter').submit();
+		});
+	}
+
+
+	function onChapterRenamed(response) {
+		if(response.success)
+		{
+			$(CHAPTER_LIST_SELECTOR).data("kendoListView").dataSource.read();
+			window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+		} else {
+			alert(response.error);
+		}
+	}
+	
+	function onChapterListBound(e) {
+		
+		var cnt = e.sender.dataSource._data.length;
+
+		$(window.HID_CHAPTER_CNT_SELECTOR).val(cnt);
+
+		window.getNotifManagerInstance().notify(notifEvents.wizard.chaptersBound, cnt);
+	   
+		setListSortable(window.CHAPTER_LIST_SELECTOR, window.SAVE_CHAPTERS_ORDER_URL, onListReordered, 'data-val');
+
+	 
+		$.each(e.sender.wrapper.find('li'), function () {
+			var li = $(this);
+			var chapterId = li.attr('data-val');
+			li.find('.btn-edit').unbind('click').bind('click', function () {
+				redirect2ChapterEdit(chapterId);
+			});
+			li.find('.ch-name').unbind('click').bind('click', function () {
+				redirect2ChapterEdit(chapterId);
+			});			
+		});
+	}
+
+	function redirect2ChapterEdit(chapterId) {
+		if (!validateEditMode()) return;
+		window.editChapterContent(chapterId);
+		window.location.hash = '4';
+	}
+
+	function editChapterContent(id) {        
+		$(FORM_MANAGER_SELECTOR).find('#selectedChapterId').val(id);
+		updateManagerStep(wizardStepsEnum.ChapterContents, stepKinds.next);
+		changeStep();
+	}
+
+	function onChapterRemove(e) {
+		
+		if (!confirm('Are You sure?')) {
+			e.preventDefault();
+			return;
+		}
+		// return;
+		if (animationSupported) {
+			e.preventDefault();
+
+			$(e.item).addClass('removed-item')
+				.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
+					$(this).remove();
+				});
+
+			var data = { id: e.model.ChapterId };
+
+			$.ajax({
+				url: '@Url.Action("DeleteChapter","Course",new{area="AuthorAdmin"})',
+				cache: false,
+				type: "Post",
+				data: JSON.stringify(data),
+				datatype: "json",
+				contentType: "application/json; charset=utf-8"
+				, success: function (response) {
+					if (response.success) {
+						setTimeout(function () {
+							$(CHAPTER_LIST_SELECTOR).data("kendoListView").dataSource.read();
+						}, 500);
+						window.getNotifManagerInstance().notify(notifEvents.course.courseStateChanged, null);
+					} else {
+						alert(response.error);
+					}
+				}
+			});
+		}
+
+
+	}
+</script>
+
+<div class="d-insert-row" style="margin: 15px 0 0 0">
+	@Html.Partial("CourseWizard/Forms/_AddChapter",new WizardNewChapterDTO
+	{
+		CourseId    = Model.CourseEntity.id
+		,Uid        = Model.Uid
+		,OrderIndex = -1
+		,Name       = string.Empty
+	})
+</div>
+
+<div class="d-drag-row">
+	<span class="info">Drag to reorder</span>
+</div>
+
+<div class="d-chapter-list-container" style="" id="chapter-list-container">
+	
+	@(Html.Kendo().ListView<WizardChapterListEditDTO>()
+		  .Name("CourseChapters")
+		  .TagName("ul")  
+		  .HtmlAttributes(new{@class="ul-chapters-list reminders"})  
+		  .ClientTemplateId("kendo-ch-list-template") 
+		  .Pageable(p=>p.Enabled(true).Refresh(true))
+		  .Editable(e=>e.Enabled(true))
+		  .Events(e=>e.Remove("onChapterRemove").DataBound("onChapterListBound").Edit("onChapterEdit"))
+		  .DataSource(ds => ds.Read(r => r.Action("GetWizardCourseChaptersList", "Course",new{id=Model.Uid}).Type(HttpVerbs.Get)).PageSize(8)
+			 // .Update( u=> u.Action("RenameChapter","Course",new{area="AuthorAdmin"}).Type(HttpVerbs.Post))
+			  .Destroy( d=> d.Action("WizardDeleteChapter","Course",new{area="AuthorAdmin"}))
+			  .Model(model => model.Id("ChapterId"))
+		  ))	   
+</div>
+
+<script type="text/x-kendo-template" id="kendo-ch-list-template">
+	<li data-val="${ChapterId}">
+		<div class="float-left">
+		   <div class="img-move inline">&nbsp;</div>	<div class="ch-name inline">#:Name#</div>
+		</div>
+		<div class="float-right">
+			<a class="btn-action k-edit-button" href="\\#">Rename</a>
+			<a class="btn-action btn-edit" href="\\#">Edit</a>
+			<a class="btn-action k-delete-button" href="\\#">Delete</a>
+		</div>
+	</li>
+</script>

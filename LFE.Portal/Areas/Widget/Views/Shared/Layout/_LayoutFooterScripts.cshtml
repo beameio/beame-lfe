@@ -1,0 +1,59 @@
+﻿@{
+    var viewModel = (LFE.DataTokens.BaseModelViewToken)ViewBag.MainLayoutViewModel;
+}
+
+<script>
+        var effect;
+        var reverse = false;
+        var flipSupported;
+
+        var initMode = 'Login';
+
+        var DEFAULT_CONTAINER_SELECTOR = '#main-container';
+</script>
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@Scripts.Render("~/bundles/kendo/widget")
+
+@Scripts.Render("~/bundles/widget/common")
+
+@Scripts.Render("~/bundles/plugins")
+
+@RenderSection("JS", required: false)
+
+
+
+<script>
+
+        //_NavViewOptions
+        $(document).ready(function () {
+            $('.nav-inner-toggle').unbind('click').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).siblings($(this).attr('data-target')).toggle(300);
+            });
+        });
+</script>
+
+@Html.Partial("Layout/_LayoutWixScripts")
+
+@(User.Identity.IsAuthenticated ? Html.Partial("Layout/_LayoutCheckoutScripts") : Html.Partial("Layout/_LayoutLoginScripts"))
+
+<script>
+
+        $(document).ready(function () {
+            saveEventApi(USER_EVENTS.STORE_VIEW, '@(viewModel != null && viewModel.WebStore != null ? viewModel.WebStore.TrackingID : "")', null, null, null, null);
+        });
+</script>
+
+@*@Html.Action("_FeedWindow", "Home", new { area = "UserPortal" })*@
+
+@Html.Partial("~/Views/Shared/Common/_LoaderTemplate.cshtml")
+@Html.Partial("~/Views/Shared/Common/_NotificationManagerScript.cshtml")
+
+<script type="text/x-kendo-template" id="kendo-sort-template">
+    <li>
+        <a data-val="${field}" data-dir="${dir}" href="#=emptyHref#" title="Sort by ${name}">${name}</a>
+    </li>
+</script>
