@@ -15,6 +15,7 @@
 ## Third party 
 	1. Kendo Ui (https://www.telerik.com/kendo-ui)
 	2. HiQPdf (https://www.hiqpdf.com/)
+	3. JwPlayer (https://www.jwplayer.com/)
 
 
 ## Configurable files
